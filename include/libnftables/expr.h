@@ -1,0 +1,80 @@
+#ifndef _RULE_EXPR_H_
+#define _RULE_EXPR_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct nft_rule_expr;
+
+enum {
+	NFT_RULE_EXPR_ATTR_NAME = 0,
+	NFT_RULE_EXPR_ATTR_BASE,
+};
+
+struct nft_rule_expr *nft_rule_expr_alloc(const char *name);
+void nft_rule_expr_free(struct nft_rule_expr *expr);
+
+void nft_rule_expr_set(struct nft_rule_expr *expr, uint16_t type, const void *data, size_t data_len);
+void nft_rule_expr_set_u8(struct nft_rule_expr *expr, uint16_t type, uint8_t data);
+void nft_rule_expr_set_u32(struct nft_rule_expr *expr, uint16_t type, uint32_t data);
+void nft_rule_expr_set_u64(struct nft_rule_expr *expr, uint16_t type, uint64_t data);
+void nft_rule_expr_set_str(struct nft_rule_expr *expr, uint16_t type, char *str);
+
+const void *nft_rule_expr_get(struct nft_rule_expr *expr, uint16_t type, size_t *data_len);
+uint8_t nft_rule_expr_get_u8(struct nft_rule_expr *expr, uint16_t type);
+uint32_t nft_rule_expr_get_u32(struct nft_rule_expr *expr, uint16_t type);
+uint64_t nft_rule_expr_get_u64(struct nft_rule_expr *expr, uint16_t type);
+const char *nft_rule_expr_get_str(struct nft_rule_expr *expr, uint16_t type);
+
+struct list_head *nft_rule_expr_list_head(struct nft_rule_expr *expr);
+
+void nft_rule_expr_build_payload(struct nlmsghdr *nlh, struct nft_rule_expr *expr);
+
+enum {
+	NFT_EXPR_PAYLOAD_DREG	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_PAYLOAD_BASE,
+	NFT_EXPR_PAYLOAD_OFFSET,
+	NFT_EXPR_PAYLOAD_LEN,
+};
+
+enum {
+	NFT_EXPR_META_KEY	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_META_DREG,
+};
+
+enum {
+	NFT_EXPR_CMP_SREG	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_CMP_OP,
+	NFT_EXPR_CMP_DATA,
+};
+
+enum {
+	NFT_EXPR_IMM_DREG	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_IMM_DATA,
+	NFT_EXPR_IMM_VERDICT,
+	NFT_EXPR_IMM_CHAIN,
+};
+
+enum {
+	NFT_EXPR_CTR_PACKETS	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_CTR_BYTES,
+};
+
+enum {
+	NFT_EXPR_TG_NAME	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_TG_REV,
+	NFT_EXPR_TG_INFO,
+};
+
+enum {
+	NFT_EXPR_MT_NAME	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_MT_REV,
+	NFT_EXPR_MT_INFO,
+};
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif

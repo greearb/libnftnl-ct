@@ -1,0 +1,80 @@
+LIBNFTABLES_1.0 {
+global:
+  nft_table_alloc;
+  nft_table_free;
+  nft_table_attr_set;
+  nft_table_attr_get;
+  nft_table_snprintf;
+  nft_table_nlmsg_build_hdr;
+  nft_table_nlmsg_build_payload;
+  nft_table_nlmsg_parse;
+  nft_table_list_alloc;
+  nft_table_list_free;
+  nft_table_list_add;
+  nft_table_list_iter_create;
+  nft_table_list_iter_next;
+  nft_table_list_iter_destroy;
+
+  nft_chain_alloc;
+  nft_chain_free;
+  nft_chain_attr_set;
+  nft_chain_attr_set_u32;
+  nft_chain_attr_set_s32;
+  nft_chain_attr_set_u64;
+  nft_chain_attr_get;
+  nft_chain_attr_get_u32;
+  nft_chain_attr_get_s32;
+  nft_chain_attr_get_u64;
+  nft_chain_attr_get_str;
+  nft_chain_snprintf;
+  nft_chain_nlmsg_build_hdr;
+  nft_chain_nlmsg_build_payload;
+  nft_chain_nlmsg_parse;
+  nft_chain_list_alloc;
+  nft_chain_list_free;
+  nft_chain_list_add;
+  nft_chain_list_iter_create;
+  nft_chain_list_iter_next;
+  nft_chain_list_iter_destroy;
+
+  nft_rule_alloc;
+  nft_rule_free;
+  nft_rule_attr_set;
+  nft_rule_attr_set_u16;
+  nft_rule_attr_set_str;
+  nft_rule_attr_get;
+  nft_rule_attr_get_u16;
+  nft_rule_attr_get_str;
+  nft_rule_snprintf;
+  nft_rule_nlmsg_build_hdr;
+  nft_rule_nlmsg_build_payload;
+  nft_rule_nlmsg_parse;
+  nft_rule_add_expr;
+
+  nft_rule_expr_iter_create;
+  nft_rule_expr_iter_next;
+  nft_rule_expr_iter_destroy;
+
+  nft_rule_expr_alloc;
+  nft_rule_expr_set;
+  nft_rule_expr_set_u8;
+  nft_rule_expr_set_u32;
+  nft_rule_expr_set_u64;
+  nft_rule_expr_set_str;
+  nft_rule_expr_get;
+  nft_rule_expr_get_u8;
+  nft_rule_expr_get_u32;
+  nft_rule_expr_get_u64;
+  nft_rule_expr_get_str;
+  nft_rule_expr_free;
+
+  nft_rule_list_alloc;
+  nft_rule_list_free;
+  nft_rule_list_add;
+  nft_rule_list_iter_create;
+  nft_rule_list_iter_cur;
+  nft_rule_list_iter_next;
+  nft_rule_list_iter_destroy;
+
+local: *;
+};

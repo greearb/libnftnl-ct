@@ -1,0 +1,15 @@
+# libnftables pkg-config file
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libnftables
+Description: Netfilter nf_tables infrastructure library
+URL: http://netfilter.org/projects/libnftables/
+Version: @VERSION@
+Requires:
+Conflicts:
+Libs: -L${libdir} -lnftables
+Cflags: -I${includedir}
