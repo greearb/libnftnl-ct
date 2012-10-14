@@ -9,6 +9,7 @@ check_PROGRAMS = nft-table-add		\
 		 nft-rule-add		\
 		 nft-rule-del		\
 		 nft-rule-get		\
+		 nft-events		\
 		 nft-compat-get
 
 nft_table_add_SOURCES = nft-table-add.c
@@ -37,6 +38,9 @@ nft_rule_del_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
 
 nft_rule_get_SOURCES = nft-rule-get.c
 nft_rule_get_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+
+nft_events_SOURCES = nft-events.c
+nft_events_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
 
 nft_compat_get_SOURCES = nft-compat-get.c
 nft_compat_get_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
