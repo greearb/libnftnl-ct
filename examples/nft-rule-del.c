@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
 	/* If no handle is specified, delete all rules in the chain */
 	if (argc == 5)
-		nft_rule_attr_set_u16(r, NFT_RULE_ATTR_HANDLE, atoi(argv[4]));
+		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_HANDLE, atoi(argv[4]));
 
 	char tmp[1024];
 	nft_rule_snprintf(tmp, sizeof(tmp), r, 0, 0);

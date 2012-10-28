@@ -34,7 +34,7 @@ struct nft_rule {
 	char		*table;
 	char		*chain;
 	uint8_t		family;
-	uint16_t	handle;
+	uint64_t	handle;
 
 	struct list_head expr_list;
 };
@@ -80,7 +80,7 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, void *data)
 		r->chain = strdup(data);
 		break;
 	case NFT_RULE_ATTR_HANDLE:
-		r->handle = *((uint16_t *)data);
+		r->handle = *((uint64_t *)data);
 		break;
 	default:
 		return;
@@ -89,11 +89,11 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, void *data)
 }
 EXPORT_SYMBOL(nft_rule_attr_set);
 
-void nft_rule_attr_set_u16(struct nft_rule *r, uint16_t attr, uint16_t val)
+void nft_rule_attr_set_u64(struct nft_rule *r, uint16_t attr, uint64_t val)
 {
 	nft_rule_attr_set(r, attr, &val);
 }
-EXPORT_SYMBOL(nft_rule_attr_set_u16);
+EXPORT_SYMBOL(nft_rule_attr_set_u64);
 
 void nft_rule_attr_set_str(struct nft_rule *r, uint16_t attr, char *str)
 {
@@ -133,12 +133,12 @@ const char *nft_rule_attr_get_str(struct nft_rule *r, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_rule_attr_get_str);
 
-uint16_t nft_rule_attr_get_u16(struct nft_rule *r, uint16_t attr)
+uint64_t nft_rule_attr_get_u64(struct nft_rule *r, uint16_t attr)
 {
-	uint16_t val = *((uint32_t *)nft_rule_attr_get(r, attr));
+	uint64_t val = *((uint64_t *)nft_rule_attr_get(r, attr));
 	return val;
 }
-EXPORT_SYMBOL(nft_rule_attr_get_u16);
+EXPORT_SYMBOL(nft_rule_attr_get_u64);
 
 struct nlmsghdr *
 nft_rule_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
@@ -171,7 +171,7 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *r)
 	if (r->flags & (1 << NFT_RULE_ATTR_CHAIN))
 		mnl_attr_put_strz(nlh, NFTA_RULE_CHAIN, r->chain);
 	if (r->flags & (1 << NFT_RULE_ATTR_HANDLE))
-		mnl_attr_put_u16(nlh, NFTA_RULE_HANDLE, htons(r->handle));
+		mnl_attr_put_u64(nlh, NFTA_RULE_HANDLE, htobe64(r->handle));
 
 	nest = mnl_attr_nest_start(nlh, NFTA_RULE_EXPRESSIONS);
 	list_for_each_entry(expr, &r->expr_list, head) {
@@ -204,7 +204,7 @@ static int nft_rule_parse_attr_cb(const struct nlattr *attr, void *data)
 		}
 		break;
 	case NFTA_RULE_HANDLE:
-		if (mnl_attr_validate(attr, MNL_TYPE_U16) < 0) {
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
 		}
@@ -294,7 +294,7 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 		r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
 	}
 	if (tb[NFTA_RULE_HANDLE]) {
-		r->handle = ntohs(mnl_attr_get_u16(tb[NFTA_RULE_HANDLE]));
+		r->handle = be64toh(mnl_attr_get_u64(tb[NFTA_RULE_HANDLE]));
 		r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 	}
 	if (tb[NFTA_RULE_EXPRESSIONS])
@@ -313,8 +313,9 @@ int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
 	struct nft_rule_expr *expr;
 	int len = size, offset = 0;
 
-	ret = snprintf(buf, size, "family=%u table=%s chain=%s handle=%u ",
-			r->family, r->table, r->chain, r->handle);
+	ret = snprintf(buf, size, "family=%u table=%s chain=%s handle=%llu ",
+			r->family, r->table, r->chain,
+			(unsigned long long)r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(expr, &r->expr_list, head) {

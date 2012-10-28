@@ -21,12 +21,12 @@ enum {
 };
 
 void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, void *data);
-void nft_rule_attr_set_u16(struct nft_rule *r, uint16_t attr, uint16_t val);
+void nft_rule_attr_set_u64(struct nft_rule *r, uint16_t attr, uint64_t val);
 void nft_rule_attr_set_str(struct nft_rule *r, uint16_t attr, char *str);
 
 void *nft_rule_attr_get(struct nft_rule *r, uint16_t attr);
 const char *nft_rule_attr_get_str(struct nft_rule *r, uint16_t attr);
-uint16_t nft_rule_attr_get_u16(struct nft_rule *r, uint16_t attr);
+uint64_t nft_rule_attr_get_u64(struct nft_rule *r, uint16_t attr);
 
 void nft_rule_add_expr(struct nft_rule *r, struct nft_rule_expr *expr);
 

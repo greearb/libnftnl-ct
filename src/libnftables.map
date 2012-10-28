@@ -40,10 +40,10 @@ global:
   nft_rule_alloc;
   nft_rule_free;
   nft_rule_attr_set;
-  nft_rule_attr_set_u16;
+  nft_rule_attr_set_u64;
   nft_rule_attr_set_str;
   nft_rule_attr_get;
-  nft_rule_attr_get_u16;
+  nft_rule_attr_get_u64;
   nft_rule_attr_get_str;
   nft_rule_snprintf;
   nft_rule_nlmsg_build_hdr;
