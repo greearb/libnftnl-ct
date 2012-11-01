@@ -36,6 +36,7 @@ struct nft_chain {
 	uint64_t	packets;
 	uint64_t	bytes;
 	uint32_t	flags;
+	char            new_name[NFT_CHAIN_MAXNAMELEN];
 };
 
 struct nft_chain *nft_chain_alloc(void)
@@ -82,6 +83,9 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, void *data)
 		break;
 	case NFT_CHAIN_ATTR_PACKETS:
 		c->bytes = *((uint64_t *)data);
+		break;
+	case NFT_CHAIN_ATTR_NEW_NAME:
+		strncpy(c->new_name, data, NFT_CHAIN_MAXNAMELEN);
 		break;
 	default:
 		return;
@@ -155,6 +159,12 @@ void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
 	case NFT_CHAIN_ATTR_PACKETS:
 		if (c->flags & (1 << NFT_CHAIN_ATTR_PACKETS))
 			return &c->packets;
+		else
+			return NULL;
+		break;
+	case NFT_CHAIN_ATTR_NEW_NAME:
+		if (c->flags & (1 << NFT_CHAIN_ATTR_NEW_NAME))
+			return c->new_name;
 		else
 			return NULL;
 		break;
@@ -238,6 +248,8 @@ void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain 
 		mnl_attr_put_u64(nlh, NFTA_COUNTER_BYTES, be64toh(c->bytes));
 		mnl_attr_nest_end(nlh, nest);
 	}
+	if (c->flags & (1 << NFT_CHAIN_ATTR_NEW_NAME))
+		mnl_attr_put_strz(nlh, NFTA_CHAIN_NEW_NAME, c->new_name);
 }
 EXPORT_SYMBOL(nft_chain_nlmsg_build_payload);
 
@@ -252,6 +264,7 @@ static int nft_chain_parse_attr_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_CHAIN_NAME:
 	case NFTA_CHAIN_TABLE:
+	case NFTA_CHAIN_NEW_NAME:
 		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
@@ -386,6 +399,11 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 	}
 	if (tb[NFTA_CHAIN_COUNTERS])
 		ret = nft_chain_parse_counters(tb[NFTA_CHAIN_COUNTERS], c);
+	if (tb[NFTA_CHAIN_NEW_NAME]) {
+		strncpy(c->new_name, mnl_attr_get_str(tb[NFTA_CHAIN_NEW_NAME]),
+			NFT_CHAIN_MAXNAMELEN);
+		c->flags |= (1 << NFT_CHAIN_ATTR_NEW_NAME);
+	}
 
 	c->family = nfg->nfgen_family;
 

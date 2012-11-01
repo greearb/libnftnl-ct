@@ -22,6 +22,7 @@ enum {
 	NFT_CHAIN_ATTR_USE,
 	NFT_CHAIN_ATTR_BYTES,
 	NFT_CHAIN_ATTR_PACKETS	= 8,
+	NFT_CHAIN_ATTR_NEW_NAME,
 };
 
 void nft_chain_attr_set(struct nft_chain *t, uint16_t attr, void *data);
