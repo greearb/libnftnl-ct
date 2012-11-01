@@ -1,6 +1,8 @@
 #ifndef _LINUX_NF_TABLES_H
 #define _LINUX_NF_TABLES_H
 
+#define NFT_CHAIN_MAXNAMELEN 32
+
 enum nft_registers {
 	NFT_REG_VERDICT,
 	NFT_REG_1,

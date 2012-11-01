@@ -26,7 +26,7 @@
 struct nft_chain {
 	struct list_head head;
 
-	char		*name;
+	char		name[NFT_CHAIN_MAXNAMELEN];
 	char		*table;
 	uint8_t		family;
 	uint32_t	policy;
@@ -46,8 +46,6 @@ EXPORT_SYMBOL(nft_chain_alloc);
 
 void nft_chain_free(struct nft_chain *c)
 {
-	if (c->name != NULL)
-		free(c->name);
 	if (c->table != NULL)
 		free(c->table);
 
@@ -59,10 +57,7 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, void *data)
 {
 	switch(attr) {
 	case NFT_CHAIN_ATTR_NAME:
-		if (c->name)
-			free(c->name);
-
-		c->name = strdup(data);
+		strncpy(c->name, data, NFT_CHAIN_MAXNAMELEN);
 		break;
 	case NFT_CHAIN_ATTR_TABLE:
 		if (c->table)
@@ -371,7 +366,8 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 
 	mnl_attr_parse(nlh, sizeof(*nfg), nft_chain_parse_attr_cb, tb);
 	if (tb[NFTA_CHAIN_NAME]) {
-		c->name = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_NAME]));
+		strncpy(c->name, mnl_attr_get_str(tb[NFTA_CHAIN_NAME]),
+			NFT_CHAIN_MAXNAMELEN);
 		c->flags |= (1 << NFT_CHAIN_ATTR_NAME);
 	}
 	if (tb[NFTA_CHAIN_TABLE]) {
