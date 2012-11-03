@@ -27,6 +27,7 @@ struct nft_chain {
 	struct list_head head;
 
 	char		name[NFT_CHAIN_MAXNAMELEN];
+	char		*type;
 	char		*table;
 	uint8_t		family;
 	uint32_t	policy;
@@ -49,6 +50,8 @@ void nft_chain_free(struct nft_chain *c)
 {
 	if (c->table != NULL)
 		free(c->table);
+	if (c->type != NULL)
+		free(c->type);
 
 	free(c);
 }
@@ -86,6 +89,12 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, void *data)
 		break;
 	case NFT_CHAIN_ATTR_NEW_NAME:
 		strncpy(c->new_name, data, NFT_CHAIN_MAXNAMELEN);
+		break;
+	case NFT_CHAIN_ATTR_TYPE:
+		if (c->type)
+			free(c->type);
+
+		c->type = strdup(data);
 		break;
 	default:
 		return;
@@ -165,6 +174,12 @@ void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
 	case NFT_CHAIN_ATTR_NEW_NAME:
 		if (c->flags & (1 << NFT_CHAIN_ATTR_NEW_NAME))
 			return c->new_name;
+		else
+			return NULL;
+		break;
+	case NFT_CHAIN_ATTR_TYPE:
+		if (c->flags & (1 << NFT_CHAIN_ATTR_TYPE))
+			return c->type;
 		else
 			return NULL;
 		break;
@@ -250,6 +265,8 @@ void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain 
 	}
 	if (c->flags & (1 << NFT_CHAIN_ATTR_NEW_NAME))
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_NEW_NAME, c->new_name);
+	if (c->flags & (1 << NFT_CHAIN_ATTR_TYPE))
+		mnl_attr_put_strz(nlh, NFTA_CHAIN_TYPE, c->type);
 }
 EXPORT_SYMBOL(nft_chain_nlmsg_build_payload);
 
@@ -265,6 +282,7 @@ static int nft_chain_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_CHAIN_NAME:
 	case NFTA_CHAIN_TABLE:
 	case NFTA_CHAIN_NEW_NAME:
+	case NFTA_CHAIN_TYPE:
 		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
@@ -404,6 +422,10 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 			NFT_CHAIN_MAXNAMELEN);
 		c->flags |= (1 << NFT_CHAIN_ATTR_NEW_NAME);
 	}
+	if (tb[NFTA_CHAIN_TYPE]) {
+		c->type = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_TYPE]));
+		c->flags |= (1 << NFT_CHAIN_ATTR_TYPE);
+	}
 
 	c->family = nfg->nfgen_family;
 
@@ -414,10 +436,10 @@ EXPORT_SYMBOL(nft_chain_nlmsg_parse);
 int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
 		       uint32_t type, uint32_t flags)
 {
-	return snprintf(buf, size, "family=%u table=%s chain=%s "
+	return snprintf(buf, size, "family=%u table=%s chain=%s type=%s "
 				   "hook=%u prio=%d policy=%d use=%d "
 				   "packets=%lu bytes=%lu\n",
-			c->family, c->table, c->name, c->hooknum,
+			c->family, c->table, c->name, c->type, c->hooknum,
 			c->prio, c->policy, c->use, c->packets, c->bytes);
 }
 EXPORT_SYMBOL(nft_chain_snprintf);
