@@ -28,7 +28,7 @@ struct nft_table {
 
 	char		*name;
 	uint8_t		family;
-	uint32_t	flags;	/* FIXME missing */
+	uint32_t	flags;
 };
 
 struct nft_table *nft_table_alloc(void)
@@ -39,7 +39,7 @@ EXPORT_SYMBOL(nft_table_alloc);
 
 void nft_table_free(struct nft_table *t)
 {
-	if (t->name != NULL)
+	if (t->flags & (1 << NFT_TABLE_ATTR_NAME))
 		free(t->name);
 
 	free(t);
@@ -54,6 +54,7 @@ void nft_table_attr_set(struct nft_table *t, uint16_t attr, void *data)
 			free(t->name);
 
 		t->name = strdup(data);
+		t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 		break;
 	}
 }
@@ -61,11 +62,15 @@ EXPORT_SYMBOL(nft_table_attr_set);
 
 const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
 {
+	const void *ret = NULL;
+
 	switch(attr) {
 	case NFT_TABLE_ATTR_NAME:
-		return t->name;
+		if (t->flags & (1 << NFT_TABLE_ATTR_NAME))
+			ret = t->name;
+		break;
 	}
-	return NULL;
+	return ret;
 }
 EXPORT_SYMBOL(nft_table_attr_get);
 
@@ -92,7 +97,7 @@ EXPORT_SYMBOL(nft_table_nlmsg_build_hdr);
 
 void nft_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_table *t)
 {
-	if (t->name != NULL)
+	if (t->flags & (1 << NFT_TABLE_ATTR_NAME))
 		mnl_attr_put_strz(nlh, NFTA_TABLE_NAME, t->name);
 }
 EXPORT_SYMBOL(nft_table_nlmsg_build_payload);
@@ -120,8 +125,10 @@ int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t)
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
 
 	mnl_attr_parse(nlh, sizeof(*nfg), nft_table_parse_attr_cb, tb);
-	if (tb[NFTA_TABLE_NAME])
+	if (tb[NFTA_TABLE_NAME]) {
 		t->name = strdup(mnl_attr_get_str(tb[NFTA_TABLE_NAME]));
+		t->flags |= (1 << NFT_TABLE_ATTR_NAME);
+	}
 
 	t->family = nfg->nfgen_family;
 
