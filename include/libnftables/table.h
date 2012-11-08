@@ -15,6 +15,7 @@ void nft_table_free(struct nft_table *);
 enum {
 	NFT_TABLE_ATTR_NAME	= 0,
 	NFT_TABLE_ATTR_FAMILY,
+	NFT_TABLE_ATTR_FLAGS,
 };
 
 void nft_table_attr_set(struct nft_table *t, uint16_t attr, void *data);

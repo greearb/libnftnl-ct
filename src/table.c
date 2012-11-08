@@ -28,6 +28,7 @@ struct nft_table {
 
 	char		*name;
 	uint8_t		family;
+	uint32_t	table_flags;
 	uint32_t	flags;
 };
 
@@ -56,6 +57,10 @@ void nft_table_attr_set(struct nft_table *t, uint16_t attr, void *data)
 		t->name = strdup(data);
 		t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 		break;
+	case NFT_TABLE_ATTR_FLAGS:
+		t->table_flags = *((uint32_t *)data);
+		t->flags |= (1 << NFT_TABLE_ATTR_FLAGS);
+		break;
 	}
 }
 EXPORT_SYMBOL(nft_table_attr_set);
@@ -68,6 +73,10 @@ const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
 	case NFT_TABLE_ATTR_NAME:
 		if (t->flags & (1 << NFT_TABLE_ATTR_NAME))
 			ret = t->name;
+		break;
+	case NFT_TABLE_ATTR_FLAGS:
+		if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS))
+			ret = &t->table_flags;
 		break;
 	}
 	return ret;
@@ -99,6 +108,8 @@ void nft_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_table 
 {
 	if (t->flags & (1 << NFT_TABLE_ATTR_NAME))
 		mnl_attr_put_strz(nlh, NFTA_TABLE_NAME, t->name);
+	if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS))
+		mnl_attr_put_u32(nlh, NFTA_TABLE_FLAGS, htonl(t->table_flags));
 }
 EXPORT_SYMBOL(nft_table_nlmsg_build_payload);
 
@@ -110,9 +121,19 @@ static int nft_table_parse_attr_cb(const struct nlattr *attr, void *data)
 	if (mnl_attr_type_valid(attr, NFTA_TABLE_MAX) < 0)
 		return MNL_CB_OK;
 
-	if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
-		perror("mnl_attr_validate");
-		return MNL_CB_ERROR;
+	switch(type) {
+	case NFTA_TABLE_NAME:
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	case NFTA_TABLE_FLAGS:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
 	}
 
 	tb[type] = attr;
@@ -129,6 +150,10 @@ int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t)
 		t->name = strdup(mnl_attr_get_str(tb[NFTA_TABLE_NAME]));
 		t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 	}
+	if (tb[NFTA_TABLE_FLAGS]) {
+		t->table_flags = ntohl(mnl_attr_get_u32(tb[NFTA_TABLE_FLAGS]));
+		t->flags |= (1 << NFT_TABLE_ATTR_FLAGS);
+	}
 
 	t->family = nfg->nfgen_family;
 
@@ -139,7 +164,8 @@ EXPORT_SYMBOL(nft_table_nlmsg_parse);
 int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
 		       uint32_t type, uint32_t flags)
 {
-	return snprintf(buf, size, "table=%s family=%u\n", t->name, t->family);
+	return snprintf(buf, size, "table=%s family=%u flags=%x\n",
+			t->name, t->family, t->table_flags);
 }
 EXPORT_SYMBOL(nft_table_snprintf);
 
