@@ -4,6 +4,8 @@ global:
   nft_table_free;
   nft_table_attr_set;
   nft_table_attr_get;
+  nft_table_attr_set_u32;
+  nft_table_attr_get_u32;
   nft_table_snprintf;
   nft_table_nlmsg_build_hdr;
   nft_table_nlmsg_build_payload;

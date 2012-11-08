@@ -21,6 +21,9 @@ enum {
 void nft_table_attr_set(struct nft_table *t, uint16_t attr, void *data);
 const void *nft_table_attr_get(struct nft_table *t, uint16_t attr);
 
+void nft_table_attr_set_u32(struct nft_table *t, uint16_t attr, uint32_t data);
+uint32_t nft_table_attr_get_u32(struct nft_table *t, uint16_t attr);
+
 void nft_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_table *t);
 
 enum {

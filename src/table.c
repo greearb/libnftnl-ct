@@ -65,6 +65,12 @@ void nft_table_attr_set(struct nft_table *t, uint16_t attr, void *data)
 }
 EXPORT_SYMBOL(nft_table_attr_set);
 
+void nft_table_attr_set_u32(struct nft_table *t, uint16_t attr, uint32_t val)
+{
+	nft_table_attr_set(t, attr, &val);
+}
+EXPORT_SYMBOL(nft_table_attr_set_u32);
+
 const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
 {
 	const void *ret = NULL;
@@ -82,6 +88,13 @@ const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
 	return ret;
 }
 EXPORT_SYMBOL(nft_table_attr_get);
+
+uint32_t nft_table_attr_get_u32(struct nft_table *t, uint16_t attr)
+{
+	const void *ret = nft_table_attr_get(t, attr);
+	return ret == NULL ? 0 : *((uint32_t *)ret);
+}
+EXPORT_SYMBOL(nft_table_attr_get_u32);
 
 struct nlmsghdr *
 nft_table_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
