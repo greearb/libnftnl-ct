@@ -55,6 +55,15 @@ enum nft_hook_attributes {
 };
 #define NFTA_HOOK_MAX		(__NFTA_HOOK_MAX - 1)
 
+/**
+ * enum nft_table_flags - nf_tables table flags
+ *
+ * @NFT_TABLE_F_DORMANT: this table is not active
+ */
+enum nft_table_flags {
+	NFT_TABLE_F_DORMANT	= 0x1,
+};
+
 enum nft_table_attributes {
 	NFTA_TABLE_UNSPEC,
 	NFTA_TABLE_NAME,
