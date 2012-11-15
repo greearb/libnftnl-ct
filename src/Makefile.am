@@ -16,6 +16,7 @@ libnftables_la_SOURCES = table.c		\
 			 expr/immediate.c	\
 			 expr/match.c		\
 			 expr/meta.c		\
+			 expr/nat.c		\
 			 expr/payload.c		\
 			 expr/target.c		\
 			 libnftables.map	\
