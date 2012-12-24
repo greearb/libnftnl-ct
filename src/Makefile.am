@@ -7,6 +7,7 @@ libnftables_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libnftables.map \
 libnftables_la_SOURCES = table.c		\
 			 chain.c		\
 			 rule.c			\
+			 set.c			\
 			 expr.c			\
 			 expr_ops.c		\
 			 expr/bitwise.c		\

@@ -78,5 +78,27 @@ global:
   nft_rule_list_iter_next;
   nft_rule_list_iter_destroy;
 
+  nft_set_alloc;
+  nft_set_free;
+  nft_set_attr_set;
+  nft_set_attr_set_u32;
+  nft_set_attr_set_str;
+  nft_set_attr_get;
+  nft_set_attr_get_str;
+  nft_set_attr_get_u32;
+  nft_set_nlmsg_build_hdr;
+  nft_set_nlmsg_build_payload;
+  nft_set_nlmsg_parse;
+  nft_set_snprintf;
+
+  nft_set_list_alloc;
+  nft_set_list_free;
+  nft_set_list_add;
+
+  nft_set_list_iter_create;
+  nft_set_list_iter_cur;
+  nft_set_list_iter_next;
+  nft_set_list_iter_destroy;
+
 local: *;
 };

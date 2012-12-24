@@ -1,0 +1,373 @@
+/*
+ * (C) 2012 by Pablo Neira Ayuso <pablo@netfilter.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This code has been sponsored by Sophos Astaro <http://www.sophos.com>
+ */
+#include "internal.h"
+
+#include <time.h>
+#include <endian.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <netinet/in.h>
+
+#include <libmnl/libmnl.h>
+#include <linux/netfilter/nfnetlink.h>
+#include <linux/netfilter/nf_tables.h>
+
+#include <libnftables/set.h>
+
+#include "linux_list.h"
+#include "expr/data_reg.h"
+
+struct nft_set {
+	struct list_head	head;
+
+	uint32_t		flags;
+	char			*table;
+	char			*name;
+	uint32_t		key_type;
+	size_t			key_len;
+	union nft_data_reg	data;
+	uint32_t		attr_flags;
+};
+
+struct nft_set *nft_set_alloc(void)
+{
+	struct nft_set *s;
+
+	s = calloc(1, sizeof(struct nft_set));
+	if (s == NULL)
+		return NULL;
+
+	return s;
+}
+EXPORT_SYMBOL(nft_set_alloc);
+
+void nft_set_free(struct nft_set *s)
+{
+	if (s->table != NULL)
+		free(s->table);
+	if (s->name != NULL)
+		free(s->name);
+
+	free(s);
+}
+EXPORT_SYMBOL(nft_set_free);
+
+void nft_set_attr_set(struct nft_set *s, uint16_t attr, void *data)
+{
+	switch(attr) {
+	case NFT_SET_ATTR_TABLE:
+		if (s->table)
+			free(s->table);
+
+		s->table = strdup(data);
+		break;
+	case NFT_SET_ATTR_NAME:
+		if (s->name)
+			free(s->name);
+
+		s->name = strdup(data);
+		break;
+	case NFT_SET_ATTR_FLAGS:
+		s->flags = *((uint32_t *)data);
+		break;
+	case NFT_SET_ATTR_KEY_TYPE:
+		s->key_type = *((uint32_t *)data);
+		break;
+	case NFT_SET_ATTR_KEY_LEN:
+		s->key_len = *((uint32_t *)data);
+		break;
+	case NFT_SET_ATTR_VERDICT:
+		s->data.verdict = *((uint32_t *)data);
+		break;
+	case NFT_SET_ATTR_CHAIN:
+		if (s->data.chain)
+			free(s->data.chain);
+
+		s->data.chain = strdup(data);
+		break;
+	default:
+		return;
+	}
+	s->flags |= (1 << attr);
+}
+EXPORT_SYMBOL(nft_set_attr_set);
+
+void nft_set_attr_set_u32(struct nft_set *s, uint16_t attr, uint32_t val)
+{
+	nft_set_attr_set(s, attr, &val);
+}
+EXPORT_SYMBOL(nft_set_attr_set_u32);
+
+void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, char *str)
+{
+	nft_set_attr_set(s, attr, str);
+}
+EXPORT_SYMBOL(nft_set_attr_set_str);
+
+void *nft_set_attr_get(struct nft_set *s, uint16_t attr)
+{
+	switch(attr) {
+	case NFT_SET_ATTR_TABLE:
+		if (s->flags & (1 << NFT_SET_ATTR_TABLE))
+			return s->table;
+		break;
+	case NFT_SET_ATTR_NAME:
+		if (s->flags & (1 << NFT_SET_ATTR_NAME))
+			return s->name;
+		break;
+	case NFT_SET_ATTR_FLAGS:
+		if (s->flags & (1 << NFT_SET_ATTR_FLAGS))
+			return &s->key_type;
+		break;
+	case NFT_SET_ATTR_KEY_TYPE:
+		if (s->flags & (1 << NFT_SET_ATTR_KEY_TYPE))
+			return &s->key_type;
+		break;
+	case NFT_SET_ATTR_KEY_LEN:
+		if (s->flags & (1 << NFT_SET_ATTR_KEY_LEN))
+			return &s->key_len;
+		break;
+	case NFT_SET_ATTR_VERDICT:
+		if (s->flags & (1 << NFT_SET_ATTR_VERDICT))
+			return &s->data.verdict;
+		break;
+	case NFT_SET_ATTR_CHAIN:
+		if (s->flags & (1 << NFT_SET_ATTR_CHAIN))
+			return &s->data.chain;
+		break;
+	default:
+		break;
+	}
+	return NULL;
+}
+EXPORT_SYMBOL(nft_set_attr_get);
+
+const char *nft_set_attr_get_str(struct nft_set *s, uint16_t attr)
+{
+	return nft_set_attr_get(s, attr);
+}
+EXPORT_SYMBOL(nft_set_attr_get_str);
+
+uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr)
+{
+	uint32_t val = *((uint32_t *)nft_set_attr_get(s, attr));
+	return val;
+}
+EXPORT_SYMBOL(nft_set_attr_get_u32);
+
+struct nlmsghdr *
+nft_set_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
+			uint16_t type, uint32_t seq)
+{
+	struct nlmsghdr *nlh;
+	struct nfgenmsg *nfh;
+
+	nlh = mnl_nlmsg_put_header(buf);
+	nlh->nlmsg_type = (NFNL_SUBSYS_NFTABLES << 8) | cmd;
+	nlh->nlmsg_flags = NLM_F_REQUEST | type;
+	nlh->nlmsg_seq = seq;
+
+	nfh = mnl_nlmsg_put_extra_header(nlh, sizeof(struct nfgenmsg));
+	nfh->nfgen_family = family;
+	nfh->version = NFNETLINK_V0;
+	nfh->res_id = 0;
+
+	return nlh;
+}
+EXPORT_SYMBOL(nft_set_nlmsg_build_hdr);
+
+void nft_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s)
+{
+	if (s->flags & (1 << NFT_SET_ATTR_TABLE))
+		mnl_attr_put_strz(nlh, NFTA_SET_TABLE, s->table);
+	if (s->flags & (1 << NFT_SET_ATTR_NAME))
+		mnl_attr_put_strz(nlh, NFTA_SET_NAME, s->name);
+	if (s->flags & (1 << NFT_SET_ATTR_KEY_TYPE))
+		mnl_attr_put_u32(nlh, NFTA_SET_KEY_TYPE, htonl(s->key_type));
+	if (s->flags & (1 << NFT_SET_ATTR_KEY_LEN))
+		mnl_attr_put_u32(nlh, NFTA_SET_KEY_LEN, htonl(s->key_len));
+	if (s->flags & (1 << NFT_SET_ATTR_VERDICT)) {
+		struct nlattr *nest1, *nest2;
+
+		nest1 = mnl_attr_nest_start(nlh, NFTA_SET_DATA_TYPE);
+		nest2 = mnl_attr_nest_start(nlh, NFTA_DATA_VERDICT);
+		mnl_attr_put_u32(nlh, NFTA_VERDICT_CODE, htonl(s->data.verdict));
+		if (s->flags & (1 << NFT_SET_ATTR_CHAIN))
+			mnl_attr_put_strz(nlh, NFTA_VERDICT_CHAIN, s->data.chain);
+
+		mnl_attr_nest_end(nlh, nest1);
+		mnl_attr_nest_end(nlh, nest2);
+	}
+}
+EXPORT_SYMBOL(nft_set_nlmsg_build_payload);
+
+static int nft_set_parse_attr_cb(const struct nlattr *attr, void *data)
+{
+	const struct nlattr **tb = data;
+	int type = mnl_attr_get_type(attr);
+
+	if (mnl_attr_type_valid(attr, NFTA_SET_MAX) < 0)
+		return MNL_CB_OK;
+
+	switch(type) {
+	case NFTA_SET_TABLE:
+	case NFTA_SET_NAME:
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	case NFTA_SET_KEY_TYPE:
+	case NFTA_SET_KEY_LEN:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	case NFTA_SET_DATA_TYPE:
+		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	}
+
+	tb[type] = attr;
+	return MNL_CB_OK;
+}
+
+int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
+{
+	struct nlattr *tb[NFTA_SET_MAX+1] = {};
+	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
+	int ret = 0;
+
+	mnl_attr_parse(nlh, sizeof(*nfg), nft_set_parse_attr_cb, tb);
+	if (tb[NFTA_SET_TABLE]) {
+		s->table = strdup(mnl_attr_get_str(tb[NFTA_SET_TABLE]));
+		s->flags |= (1 << NFT_SET_ATTR_TABLE);
+	}
+	if (tb[NFTA_SET_NAME]) {
+		s->name = strdup(mnl_attr_get_str(tb[NFTA_SET_NAME]));
+		s->flags |= (1 << NFT_SET_ATTR_NAME);
+	}
+	if (tb[NFTA_SET_KEY_TYPE]) {
+		s->key_type = ntohl(mnl_attr_get_u32(tb[NFTA_SET_NAME]));
+		s->flags |= (1 << NFT_SET_ATTR_KEY_TYPE);
+	}
+	if (tb[NFTA_SET_KEY_LEN]) {
+		s->key_len = ntohl(mnl_attr_get_u32(tb[NFTA_SET_NAME]));
+		s->flags |= (1 << NFT_SET_ATTR_KEY_LEN);
+	}
+	/* XXX */
+
+	return ret;
+}
+EXPORT_SYMBOL(nft_set_nlmsg_parse);
+
+int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
+		     uint32_t type, uint32_t flags)
+{
+	int ret;
+	int len = size, offset = 0;
+
+	ret = snprintf(buf, size, "set=%s table=%s ",
+			s->table, s->name);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = snprintf(buf+offset-1, len, "\n");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return ret;
+}
+EXPORT_SYMBOL(nft_set_snprintf);
+
+struct nft_set_list {
+	struct list_head list;
+};
+
+struct nft_set_list *nft_set_list_alloc(void)
+{
+	struct nft_set_list *list;
+
+	list = calloc(1, sizeof(struct nft_set_list));
+	if (list == NULL)
+		return NULL;
+
+	INIT_LIST_HEAD(&list->list);
+
+	return list;
+}
+EXPORT_SYMBOL(nft_set_list_alloc);
+
+void nft_set_list_free(struct nft_set_list *list)
+{
+	struct nft_set *s, *tmp;
+
+	list_for_each_entry_safe(s, tmp, &list->list, head) {
+		list_del(&s->head);
+		nft_set_free(s);
+	}
+	free(list);
+}
+EXPORT_SYMBOL(nft_set_list_free);
+
+void nft_set_list_add(struct nft_set *s, struct nft_set_list *list)
+{
+	list_add_tail(&s->head, &list->list);
+}
+EXPORT_SYMBOL(nft_set_list_add);
+
+struct nft_set_list_iter {
+	struct nft_set_list	*list;
+	struct nft_set		*cur;
+};
+
+struct nft_set_list_iter *nft_set_list_iter_create(struct nft_set_list *l)
+{
+	struct nft_set_list_iter *iter;
+
+	iter = calloc(1, sizeof(struct nft_set_list_iter));
+	if (iter == NULL)
+		return NULL;
+
+	iter->list = l;
+	iter->cur = list_entry(l->list.next, struct nft_set, head);
+
+	return iter;
+}
+EXPORT_SYMBOL(nft_set_list_iter_create);
+
+struct nft_set *nft_set_list_iter_cur(struct nft_set_list_iter *iter)
+{
+	return iter->cur;
+}
+EXPORT_SYMBOL(nft_set_list_iter_cur);
+
+struct nft_set *nft_set_list_iter_next(struct nft_set_list_iter *iter)
+{
+	struct nft_set *s = iter->cur;
+
+	/* get next rule, if any */
+	iter->cur = list_entry(iter->cur->head.next, struct nft_set, head);
+	if (&iter->cur->head == iter->list->list.next)
+		return NULL;
+
+	return s;
+}
+EXPORT_SYMBOL(nft_set_list_iter_next);
+
+void nft_set_list_iter_destroy(struct nft_set_list_iter *iter)
+{
+	free(iter);
+}
+EXPORT_SYMBOL(nft_set_list_iter_destroy);
