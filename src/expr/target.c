@@ -19,6 +19,7 @@
 #include <libmnl/libmnl.h>
 
 #include <linux/netfilter/nf_tables.h>
+#include <linux/netfilter/nf_tables_compat.h>
 #include <linux/netfilter/x_tables.h>
 
 #include <libnftables/expr.h>
