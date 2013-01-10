@@ -104,6 +104,12 @@ EXPORT_SYMBOL(nft_rule_attr_set_str);
 void *nft_rule_attr_get(struct nft_rule *r, uint16_t attr)
 {
 	switch(attr) {
+	case NFT_RULE_ATTR_FAMILY:
+		if (r->flags & (1 << NFT_RULE_ATTR_FAMILY))
+			return &r->family;
+		else
+			return NULL;
+		break;
 	case NFT_RULE_ATTR_TABLE:
 		if (r->flags & (1 << NFT_RULE_ATTR_TABLE))
 			return r->table;
@@ -139,6 +145,13 @@ uint64_t nft_rule_attr_get_u64(struct nft_rule *r, uint16_t attr)
 	return val;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u64);
+
+uint8_t nft_rule_attr_get_u8(struct nft_rule *r, uint16_t attr)
+{
+	uint8_t val = *((uint8_t *)nft_rule_attr_get(r, attr));
+	return val;
+}
+EXPORT_SYMBOL(nft_rule_attr_get_u8);
 
 struct nlmsghdr *
 nft_rule_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
@@ -301,6 +314,7 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 		ret = nft_rule_parse_expr(tb[NFTA_RULE_EXPRESSIONS], r);
 
 	r->family = nfg->nfgen_family;
+	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
 
 	return ret;
 }

@@ -45,6 +45,7 @@ global:
   nft_rule_attr_set_u64;
   nft_rule_attr_set_str;
   nft_rule_attr_get;
+  nft_rule_attr_get_u8;
   nft_rule_attr_get_u64;
   nft_rule_attr_get_str;
   nft_rule_snprintf;
