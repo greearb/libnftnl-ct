@@ -125,7 +125,8 @@ nft_rule_expr_counter_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_counter_snprintf(char *buf, size_t len, struct nft_rule_expr *e)
+nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
+			       uint32_t flags, struct nft_rule_expr *e)
 {
 	struct nft_expr_counter *ctr = (struct nft_expr_counter *)e->data;
 

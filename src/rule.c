@@ -336,7 +336,7 @@ int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
 		ret = snprintf(buf+offset, len, "%s ", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = expr->ops->snprintf(buf+offset, len, expr);
+		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 	ret = snprintf(buf+offset-1, len, "\n");

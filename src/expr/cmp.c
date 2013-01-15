@@ -166,7 +166,8 @@ static char *expr_cmp_str[] = {
 };
 
 static int
-nft_rule_expr_cmp_snprintf(char *buf, size_t size, struct nft_rule_expr *e)
+nft_rule_expr_cmp_snprintf(char *buf, size_t size, uint32_t type,
+			   uint32_t flags, struct nft_rule_expr *e)
 {
 	struct nft_expr_cmp *cmp = (struct nft_expr_cmp *)e->data;
 	int len = size, offset = 0, ret, i;

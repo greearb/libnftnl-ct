@@ -201,7 +201,8 @@ nft_rule_expr_nat_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 }
 
 static int
-nft_rule_expr_nat_snprintf(char *buf, size_t size, struct nft_rule_expr *e)
+nft_rule_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
+			   uint32_t flags, struct nft_rule_expr *e)
 {
 	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
 	int len = size, offset = 0, ret = 0;
