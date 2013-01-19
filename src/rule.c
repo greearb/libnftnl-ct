@@ -34,6 +34,7 @@ struct nft_rule {
 	char		*table;
 	char		*chain;
 	uint8_t		family;
+	uint32_t	rule_flags;
 	uint64_t	handle;
 
 	struct list_head expr_list;
@@ -82,12 +83,21 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, void *data)
 	case NFT_RULE_ATTR_HANDLE:
 		r->handle = *((uint64_t *)data);
 		break;
+	case NFT_RULE_ATTR_FLAGS:
+		r->rule_flags = *((uint32_t *)data);
+		break;
 	default:
 		return;
 	}
 	r->flags |= (1 << attr);
 }
 EXPORT_SYMBOL(nft_rule_attr_set);
+
+void nft_rule_attr_set_u32(struct nft_rule *r, uint16_t attr, uint32_t val)
+{
+	nft_rule_attr_set(r, attr, &val);
+}
+EXPORT_SYMBOL(nft_rule_attr_set_u32);
 
 void nft_rule_attr_set_u64(struct nft_rule *r, uint16_t attr, uint64_t val)
 {
@@ -127,6 +137,12 @@ void *nft_rule_attr_get(struct nft_rule *r, uint16_t attr)
 		else
 			return NULL;
 		break;
+	case NFT_RULE_ATTR_FLAGS:
+		if (r->flags & (1 << NFT_RULE_ATTR_FLAGS))
+			return &r->rule_flags;
+		else
+			return NULL;
+		break;
 	default:
 		return NULL;
 	}
@@ -138,6 +154,13 @@ const char *nft_rule_attr_get_str(struct nft_rule *r, uint16_t attr)
 	return nft_rule_attr_get(r, attr);
 }
 EXPORT_SYMBOL(nft_rule_attr_get_str);
+
+uint32_t nft_rule_attr_get_u32(struct nft_rule *r, uint16_t attr)
+{
+	uint32_t val = *((uint32_t *)nft_rule_attr_get(r, attr));
+	return val;
+}
+EXPORT_SYMBOL(nft_rule_attr_get_u64);
 
 uint64_t nft_rule_attr_get_u64(struct nft_rule *r, uint16_t attr)
 {
@@ -185,6 +208,8 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *r)
 		mnl_attr_put_strz(nlh, NFTA_RULE_CHAIN, r->chain);
 	if (r->flags & (1 << NFT_RULE_ATTR_HANDLE))
 		mnl_attr_put_u64(nlh, NFTA_RULE_HANDLE, htobe64(r->handle));
+	if (r->flags & (1 << NFT_RULE_ATTR_FLAGS))
+		mnl_attr_put_u32(nlh, NFTA_RULE_FLAGS, htonl(r->rule_flags));
 
 	nest = mnl_attr_nest_start(nlh, NFTA_RULE_EXPRESSIONS);
 	list_for_each_entry(expr, &r->expr_list, head) {
@@ -218,6 +243,12 @@ static int nft_rule_parse_attr_cb(const struct nlattr *attr, void *data)
 		break;
 	case NFTA_RULE_HANDLE:
 		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	case NFTA_RULE_FLAGS:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
 		}
@@ -327,9 +358,10 @@ int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
 	struct nft_rule_expr *expr;
 	int len = size, offset = 0;
 
-	ret = snprintf(buf, size, "family=%u table=%s chain=%s handle=%llu ",
+	ret = snprintf(buf, size, "family=%u table=%s chain=%s handle=%llu "
+				  "flags=%x ",
 			r->family, r->table, r->chain,
-			(unsigned long long)r->handle);
+			(unsigned long long)r->handle, r->rule_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(expr, &r->expr_list, head) {
