@@ -54,6 +54,7 @@ struct nft_chain_list *nft_chain_list_alloc(void);
 void nft_chain_list_free(struct nft_chain_list *list);
 
 void nft_chain_list_add(struct nft_chain *r, struct nft_chain_list *list);
+void nft_chain_list_del(struct nft_chain *r);
 
 struct nft_chain_list_iter;
 

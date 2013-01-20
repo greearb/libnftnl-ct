@@ -35,6 +35,7 @@ global:
   nft_chain_list_alloc;
   nft_chain_list_free;
   nft_chain_list_add;
+  nft_chain_list_del;
   nft_chain_list_iter_create;
   nft_chain_list_iter_next;
   nft_chain_list_iter_destroy;

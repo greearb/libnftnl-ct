@@ -484,6 +484,12 @@ void nft_chain_list_add(struct nft_chain *r, struct nft_chain_list *list)
 }
 EXPORT_SYMBOL(nft_chain_list_add);
 
+void nft_chain_list_del(struct nft_chain *r)
+{
+	list_del(&r->head);
+}
+EXPORT_SYMBOL(nft_chain_list_del);
+
 struct nft_chain_list_iter {
 	struct nft_chain_list	*list;
 	struct nft_chain	*cur;
