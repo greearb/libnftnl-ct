@@ -85,7 +85,7 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, void *data)
 		c->bytes = *((uint64_t *)data);
 		break;
 	case NFT_CHAIN_ATTR_PACKETS:
-		c->bytes = *((uint64_t *)data);
+		c->packets = *((uint64_t *)data);
 		break;
 	case NFT_CHAIN_ATTR_HANDLE:
 		c->handle = *((uint64_t *)data);
