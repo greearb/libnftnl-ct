@@ -19,6 +19,8 @@ enum {
 	NFT_RULE_ATTR_CHAIN,
 	NFT_RULE_ATTR_HANDLE,
 	NFT_RULE_ATTR_FLAGS,
+	NFT_RULE_ATTR_COMPAT_PROTO,
+	NFT_RULE_ATTR_COMPAT_FLAGS,
 };
 
 void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, void *data);

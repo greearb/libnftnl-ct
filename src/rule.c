@@ -36,6 +36,10 @@ struct nft_rule {
 	uint8_t		family;
 	uint32_t	rule_flags;
 	uint64_t	handle;
+	struct {
+			uint32_t	flags;
+			uint32_t	proto;
+	} compat;
 
 	struct list_head expr_list;
 };
@@ -85,6 +89,12 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, void *data)
 		break;
 	case NFT_RULE_ATTR_FLAGS:
 		r->rule_flags = *((uint32_t *)data);
+		break;
+	case NFT_RULE_ATTR_COMPAT_PROTO:
+		r->compat.proto = *((uint32_t *)data);
+		break;
+	case NFT_RULE_ATTR_COMPAT_FLAGS:
+		r->compat.flags = *((uint32_t *)data);
 		break;
 	default:
 		return;
@@ -140,6 +150,18 @@ void *nft_rule_attr_get(struct nft_rule *r, uint16_t attr)
 	case NFT_RULE_ATTR_FLAGS:
 		if (r->flags & (1 << NFT_RULE_ATTR_FLAGS))
 			return &r->rule_flags;
+		else
+			return NULL;
+		break;
+	case NFT_RULE_ATTR_COMPAT_PROTO:
+		if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO))
+			return &r->compat.proto;
+		else
+			return NULL;
+		break;
+	case NFT_RULE_ATTR_COMPAT_FLAGS:
+		if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_FLAGS))
+			return &r->compat.flags;
 		else
 			return NULL;
 		break;
@@ -216,6 +238,17 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *r)
 		nft_rule_expr_build_payload(nlh, expr);
 	}
 	mnl_attr_nest_end(nlh, nest);
+
+	if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO) &&
+	    r->flags & (1 << NFT_RULE_ATTR_COMPAT_FLAGS)) {
+
+		nest = mnl_attr_nest_start(nlh, NFTA_RULE_COMPAT);
+		mnl_attr_put_u32(nlh, NFTA_RULE_COMPAT_PROTO,
+				 htonl(r->compat.proto));
+		mnl_attr_put_u32(nlh, NFTA_RULE_COMPAT_FLAGS,
+				 htonl(r->compat.flags));
+		mnl_attr_nest_end(nlh, nest);
+	}
 }
 EXPORT_SYMBOL(nft_rule_nlmsg_build_payload);
 
@@ -249,6 +282,12 @@ static int nft_rule_parse_attr_cb(const struct nlattr *attr, void *data)
 		break;
 	case NFTA_RULE_FLAGS:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	case NFTA_RULE_COMPAT:
+		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
 		}
@@ -322,6 +361,48 @@ static int nft_rule_parse_expr(struct nlattr *nest, struct nft_rule *r)
 	return 0;
 }
 
+static int nft_rule_parse_compat_cb(const struct nlattr *attr, void *data)
+{
+	const struct nlattr **tb = data;
+	int type = mnl_attr_get_type(attr);
+
+	if (mnl_attr_type_valid(attr, NFTA_RULE_COMPAT_MAX) < 0)
+		return MNL_CB_OK;
+
+	switch(type) {
+	case NFTA_RULE_COMPAT_PROTO:
+	case NFTA_RULE_COMPAT_FLAGS:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	}
+
+	tb[type] = attr;
+	return MNL_CB_OK;
+}
+
+static int nft_rule_parse_compat(struct nlattr *nest, struct nft_rule *r)
+{
+	struct nlattr *tb[NFTA_RULE_COMPAT_MAX+1] = {};
+
+	if (mnl_attr_parse_nested(nest, nft_rule_parse_compat_cb, tb) < 0)
+		return -1;
+
+	if (tb[NFTA_RULE_COMPAT_PROTO]) {
+		r->compat.proto =
+			ntohl(mnl_attr_get_u32(tb[NFTA_RULE_COMPAT_PROTO]));
+		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_PROTO);
+	}
+	if (tb[NFTA_RULE_COMPAT_FLAGS]) {
+		r->compat.flags =
+			ntohl(mnl_attr_get_u32(tb[NFTA_RULE_COMPAT_FLAGS]));
+		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_FLAGS);
+	}
+	return 0;
+}
+
 int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 {
 	struct nlattr *tb[NFTA_RULE_MAX+1] = {};
@@ -343,6 +424,8 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 	}
 	if (tb[NFTA_RULE_EXPRESSIONS])
 		ret = nft_rule_parse_expr(tb[NFTA_RULE_EXPRESSIONS], r);
+	if (tb[NFTA_RULE_COMPAT])
+		ret = nft_rule_parse_compat(tb[NFTA_RULE_COMPAT], r);
 
 	r->family = nfg->nfgen_family;
 	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
