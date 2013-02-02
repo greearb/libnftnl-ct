@@ -1,5 +1,5 @@
 /*
- * (C) 2012 by Pablo Neira Ayuso <pablo@netfilter.org>
+ * (C) 2012-2013 by Pablo Neira Ayuso <pablo@netfilter.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -29,13 +29,15 @@
 struct nft_set {
 	struct list_head	head;
 
-	uint32_t		flags;
+	uint32_t		set_flags;
 	char			*table;
 	char			*name;
 	uint32_t		key_type;
 	size_t			key_len;
-	union nft_data_reg	data;
-	uint32_t		attr_flags;
+	uint32_t		data_type;
+	size_t			data_len;
+
+	uint32_t		flags;
 };
 
 struct nft_set *nft_set_alloc(void)
@@ -77,22 +79,13 @@ void nft_set_attr_set(struct nft_set *s, uint16_t attr, void *data)
 		s->name = strdup(data);
 		break;
 	case NFT_SET_ATTR_FLAGS:
-		s->flags = *((uint32_t *)data);
+		s->set_flags = *((uint32_t *)data);
 		break;
 	case NFT_SET_ATTR_KEY_TYPE:
 		s->key_type = *((uint32_t *)data);
 		break;
 	case NFT_SET_ATTR_KEY_LEN:
 		s->key_len = *((uint32_t *)data);
-		break;
-	case NFT_SET_ATTR_VERDICT:
-		s->data.verdict = *((uint32_t *)data);
-		break;
-	case NFT_SET_ATTR_CHAIN:
-		if (s->data.chain)
-			free(s->data.chain);
-
-		s->data.chain = strdup(data);
 		break;
 	default:
 		return;
@@ -136,13 +129,13 @@ void *nft_set_attr_get(struct nft_set *s, uint16_t attr)
 		if (s->flags & (1 << NFT_SET_ATTR_KEY_LEN))
 			return &s->key_len;
 		break;
-	case NFT_SET_ATTR_VERDICT:
-		if (s->flags & (1 << NFT_SET_ATTR_VERDICT))
-			return &s->data.verdict;
+	case NFT_SET_ATTR_DATA_TYPE:
+		if (s->flags & (1 << NFT_SET_ATTR_DATA_TYPE))
+			return &s->data_type;
 		break;
-	case NFT_SET_ATTR_CHAIN:
-		if (s->flags & (1 << NFT_SET_ATTR_CHAIN))
-			return &s->data.chain;
+	case NFT_SET_ATTR_DATA_LEN:
+		if (s->flags & (1 << NFT_SET_ATTR_DATA_LEN))
+			return &s->data_len;
 		break;
 	default:
 		break;
@@ -191,22 +184,17 @@ void nft_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s)
 		mnl_attr_put_strz(nlh, NFTA_SET_TABLE, s->table);
 	if (s->flags & (1 << NFT_SET_ATTR_NAME))
 		mnl_attr_put_strz(nlh, NFTA_SET_NAME, s->name);
+	if (s->flags & (1 << NFT_SET_ATTR_FLAGS))
+		mnl_attr_put_u32(nlh, NFTA_SET_FLAGS, htonl(s->set_flags));
 	if (s->flags & (1 << NFT_SET_ATTR_KEY_TYPE))
 		mnl_attr_put_u32(nlh, NFTA_SET_KEY_TYPE, htonl(s->key_type));
 	if (s->flags & (1 << NFT_SET_ATTR_KEY_LEN))
 		mnl_attr_put_u32(nlh, NFTA_SET_KEY_LEN, htonl(s->key_len));
-	if (s->flags & (1 << NFT_SET_ATTR_VERDICT)) {
-		struct nlattr *nest1, *nest2;
-
-		nest1 = mnl_attr_nest_start(nlh, NFTA_SET_DATA_TYPE);
-		nest2 = mnl_attr_nest_start(nlh, NFTA_DATA_VERDICT);
-		mnl_attr_put_u32(nlh, NFTA_VERDICT_CODE, htonl(s->data.verdict));
-		if (s->flags & (1 << NFT_SET_ATTR_CHAIN))
-			mnl_attr_put_strz(nlh, NFTA_VERDICT_CHAIN, s->data.chain);
-
-		mnl_attr_nest_end(nlh, nest1);
-		mnl_attr_nest_end(nlh, nest2);
-	}
+	/* These are only used to map matching -> action (1:1) */
+	if (s->flags & (1 << NFT_SET_ATTR_DATA_TYPE))
+		mnl_attr_put_u32(nlh, NFTA_SET_DATA_TYPE, htonl(s->data_type));
+	if (s->flags & (1 << NFT_SET_ATTR_DATA_LEN))
+		mnl_attr_put_u32(nlh, NFTA_SET_DATA_LEN, htonl(s->data_len));
 }
 EXPORT_SYMBOL(nft_set_nlmsg_build_payload);
 
@@ -226,15 +214,12 @@ static int nft_set_parse_attr_cb(const struct nlattr *attr, void *data)
 			return MNL_CB_ERROR;
 		}
 		break;
+	case NFTA_SET_FLAGS:
 	case NFTA_SET_KEY_TYPE:
 	case NFTA_SET_KEY_LEN:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
-		break;
 	case NFTA_SET_DATA_TYPE:
-		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0) {
+	case NFTA_SET_DATA_LEN:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
 		}
@@ -260,15 +245,26 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 		s->name = strdup(mnl_attr_get_str(tb[NFTA_SET_NAME]));
 		s->flags |= (1 << NFT_SET_ATTR_NAME);
 	}
+	if (tb[NFTA_SET_FLAGS]) {
+		s->set_flags = ntohl(mnl_attr_get_u32(tb[NFTA_SET_FLAGS]));
+		s->flags |= (1 << NFT_SET_ATTR_FLAGS);
+	}
 	if (tb[NFTA_SET_KEY_TYPE]) {
-		s->key_type = ntohl(mnl_attr_get_u32(tb[NFTA_SET_NAME]));
+		s->key_type = ntohl(mnl_attr_get_u32(tb[NFTA_SET_KEY_TYPE]));
 		s->flags |= (1 << NFT_SET_ATTR_KEY_TYPE);
 	}
 	if (tb[NFTA_SET_KEY_LEN]) {
-		s->key_len = ntohl(mnl_attr_get_u32(tb[NFTA_SET_NAME]));
+		s->key_len = ntohl(mnl_attr_get_u32(tb[NFTA_SET_KEY_LEN]));
 		s->flags |= (1 << NFT_SET_ATTR_KEY_LEN);
 	}
-	/* XXX */
+	if (tb[NFTA_SET_DATA_TYPE]) {
+		s->data_type = ntohl(mnl_attr_get_u32(tb[NFTA_SET_DATA_TYPE]));
+		s->flags |= (1 << NFT_SET_ATTR_DATA_TYPE);
+	}
+	if (tb[NFTA_SET_DATA_LEN]) {
+		s->data_len = ntohl(mnl_attr_get_u32(tb[NFTA_SET_DATA_LEN]));
+		s->flags |= (1 << NFT_SET_ATTR_DATA_LEN);
+	}
 
 	return ret;
 }
@@ -280,8 +276,8 @@ int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 	int ret;
 	int len = size, offset = 0;
 
-	ret = snprintf(buf, size, "set=%s table=%s ",
-			s->table, s->name);
+	ret = snprintf(buf, size, "set=%s table=%s flags=%x ",
+			s->name, s->table, s->set_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset-1, len, "\n");
