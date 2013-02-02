@@ -26,20 +26,6 @@
 #include "linux_list.h"
 #include "expr/data_reg.h"
 
-struct nft_set {
-	struct list_head	head;
-
-	uint32_t		set_flags;
-	char			*table;
-	char			*name;
-	uint32_t		key_type;
-	size_t			key_len;
-	uint32_t		data_type;
-	size_t			data_len;
-
-	uint32_t		flags;
-};
-
 struct nft_set *nft_set_alloc(void)
 {
 	struct nft_set *s;
@@ -48,17 +34,24 @@ struct nft_set *nft_set_alloc(void)
 	if (s == NULL)
 		return NULL;
 
+	INIT_LIST_HEAD(&s->element_list);
 	return s;
 }
 EXPORT_SYMBOL(nft_set_alloc);
 
 void nft_set_free(struct nft_set *s)
 {
+	struct nft_set_elem *elem, *tmp;
+
 	if (s->table != NULL)
 		free(s->table);
 	if (s->name != NULL)
 		free(s->name);
 
+	list_for_each_entry_safe(elem, tmp, &s->element_list, head) {
+		list_del(&elem->head);
+		nft_set_elem_free(elem);
+	}
 	free(s);
 }
 EXPORT_SYMBOL(nft_set_free);
@@ -275,17 +268,29 @@ int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 {
 	int ret;
 	int len = size, offset = 0;
+	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, size, "set=%s table=%s flags=%x ",
+	ret = snprintf(buf, size, "set=%s table=%s flags=%x\n",
 			s->name, s->table, s->set_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset-1, len, "\n");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	list_for_each_entry(elem, &s->element_list, head) {
+		ret = snprintf(buf+offset, size, "\t");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	return ret;
+		ret = nft_set_elem_snprintf(buf+offset, size, elem, type, flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
 }
 EXPORT_SYMBOL(nft_set_snprintf);
+
+void nft_set_elem_add(struct nft_set *s, struct nft_set_elem *elem)
+{
+	list_add_tail(&elem->head, &s->element_list);
+}
+EXPORT_SYMBOL(nft_set_elem_add);
 
 struct nft_set_list {
 	struct list_head list;

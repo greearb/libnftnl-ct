@@ -22,6 +22,33 @@ struct nft_rule_expr {
 	uint8_t		data[];
 };
 
+struct nlattr;
+
+struct nft_set {
+	struct list_head	head;
+
+	uint32_t		set_flags;
+	char			*table;
+	char			*name;
+	uint32_t		key_type;
+	size_t			key_len;
+	uint32_t		data_type;
+	size_t			data_len;
+	struct list_head	element_list;
+
+	uint32_t		flags;
+};
+
+#include "expr/data_reg.h"
+
+struct nft_set_elem {
+	struct list_head head;
+	uint32_t	set_elem_flags;
+	union nft_data_reg key;
+	union nft_data_reg data;
+	uint32_t	flags;
+};
+
 #define SNPRINTF_BUFFER_SIZE(ret, size, len, offset)	\
 	size += ret;					\
 	if (ret > len)					\
