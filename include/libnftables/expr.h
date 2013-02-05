@@ -90,6 +90,12 @@ enum {
 	NFT_EXPR_NAT_REG_PROTO_MAX,
 };
 
+enum {
+	NFT_EXPR_LOOKUP_SREG	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_LOOKUP_DREG,
+	NFT_EXPR_LOOKUP_SET,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
