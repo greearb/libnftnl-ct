@@ -41,6 +41,7 @@ void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain 
 
 enum {
 	NFT_CHAIN_O_DEFAULT	= 0,
+	NFT_CHAIN_O_XML,
 };
 
 int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *t, uint32_t type, uint32_t flags);

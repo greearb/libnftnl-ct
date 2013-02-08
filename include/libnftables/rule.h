@@ -40,6 +40,7 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *t);
 
 enum {
 	NFT_RULE_O_DEFAULT	= 0,
+	NFT_RULE_O_XML,
 };
 
 int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *t, uint32_t type, uint32_t flags);

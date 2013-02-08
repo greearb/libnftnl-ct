@@ -174,11 +174,36 @@ int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t)
 }
 EXPORT_SYMBOL(nft_table_nlmsg_parse);
 
-int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
-		       uint32_t type, uint32_t flags)
+static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
+{
+	return snprintf(buf, size,
+			"<table name=\"%s\" >\n"
+				"\t<properties>\n"
+					"\t\t<family value=\"%u\" />\n"
+					"\t\t<flags value=\"%d\" table_flags=\"%d\" />\n"
+				"\t</properties>\n"
+			"</table>\n" ,
+			t->name, t->family, t->flags, t->table_flags);
+}
+
+static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)
 {
 	return snprintf(buf, size, "table=%s family=%u flags=%x\n",
 			t->name, t->family, t->table_flags);
+}
+
+int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
+		       uint32_t type, uint32_t flags)
+{
+	switch(type) {
+	case NFT_TABLE_O_XML:
+		return nft_table_snprintf_xml(buf, size, t);
+	case NFT_TABLE_O_DEFAULT:
+		return nft_table_snprintf_default(buf, size, t);
+	default:
+		break;
+	}
+	return -1;
 }
 EXPORT_SYMBOL(nft_table_snprintf);
 

@@ -18,6 +18,7 @@
 #include "internal.h"
 #include <libmnl/libmnl.h>
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_counter {
@@ -130,8 +131,17 @@ nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 {
 	struct nft_expr_counter *ctr = (struct nft_expr_counter *)e->data;
 
-	return snprintf(buf, len, "pkts=%lu bytes=%lu ",
-			ctr->pkts, ctr->bytes);
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return snprintf(buf, len, "\t\t<pkts>%lu</pkts> <bytes>%lu</bytes> ",
+				ctr->pkts, ctr->bytes);
+	case NFT_RULE_O_DEFAULT:
+		return snprintf(buf, len, "pkts=%lu bytes=%lu ",
+				ctr->pkts, ctr->bytes);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_counter = {

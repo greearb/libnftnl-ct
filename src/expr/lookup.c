@@ -17,6 +17,7 @@
 #include <arpa/inet.h>
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
+#include <libnftables/rule.h>
 #include <libnftables/expr.h>
 #include "data_reg.h"
 #include "expr_ops.h"
@@ -150,17 +151,46 @@ nft_rule_expr_lookup_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_lookup_snprintf_xml(char *buf, size_t size,
+				  struct nft_expr_lookup *l)
+{
+	int len = size, offset = 0, ret;
+
+	ret = snprintf(buf, len, "<set>%s</set><sreg>%u</sreg><dreg>%u</dreg>\n",
+			l->set_name, l->sreg, l->dreg);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int
+nft_rule_expr_lookup_snprintf_default(char *buf, size_t size,
+				      struct nft_expr_lookup *l)
+{
+	int len = size, offset = 0, ret;
+
+	ret = snprintf(buf, len, "set=%s sreg=%u dreg=%u\n",
+			l->set_name, l->sreg, l->dreg);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int
 nft_rule_expr_lookup_snprintf(char *buf, size_t size, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
 	struct nft_expr_lookup *lookup = (struct nft_expr_lookup *)e->data;
-	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "set=%s sreg=%u dreg=%u\n",
-			lookup->set_name, lookup->sreg, lookup->dreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return nft_rule_expr_lookup_snprintf_xml(buf, size, lookup);
+	case NFT_RULE_O_DEFAULT:
+		return nft_rule_expr_lookup_snprintf_default(buf, size, lookup);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_lookup = {

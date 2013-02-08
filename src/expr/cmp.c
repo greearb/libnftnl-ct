@@ -19,6 +19,7 @@
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 #include "expr_ops.h"
 #include "data_reg.h"
 
@@ -166,10 +167,29 @@ static char *expr_cmp_str[] = {
 };
 
 static int
-nft_rule_expr_cmp_snprintf(char *buf, size_t size, uint32_t type,
-			   uint32_t flags, struct nft_rule_expr *e)
+nft_rule_expr_cmp_snprintf_xml(char *buf, size_t size, struct nft_expr_cmp *cmp)
 {
-	struct nft_expr_cmp *cmp = (struct nft_expr_cmp *)e->data;
+	int len = size, offset = 0, ret, i;
+
+	ret = snprintf(buf, len, "\t\t<sreg>%u</sreg> <op>%s</op> <data>",
+			cmp->sreg, expr_cmp_str[cmp->op]);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	for (i=0; i<cmp->data.len/sizeof(uint32_t); i++) {
+		ret = snprintf(buf+offset, len, "%.8x ", cmp->data.val[i]);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, len, "</data> ");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int
+nft_rule_expr_cmp_snprintf_default(char *buf, size_t size,
+				   struct nft_expr_cmp *cmp)
+{
 	int len = size, offset = 0, ret, i;
 
 	ret = snprintf(buf, len, "sreg=%u op=%s data=",
@@ -181,6 +201,22 @@ nft_rule_expr_cmp_snprintf(char *buf, size_t size, uint32_t type,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 	return offset;
+}
+
+static int
+nft_rule_expr_cmp_snprintf(char *buf, size_t size, uint32_t type,
+			   uint32_t flags, struct nft_rule_expr *e)
+{
+	struct nft_expr_cmp *cmp = (struct nft_expr_cmp *)e->data;
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return nft_rule_expr_cmp_snprintf_xml(buf, size, cmp);
+	case NFT_RULE_O_DEFAULT:
+		return nft_rule_expr_cmp_snprintf_default(buf, size, cmp);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_cmp = {

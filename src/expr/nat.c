@@ -18,6 +18,7 @@
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_nat {
@@ -201,8 +202,49 @@ nft_rule_expr_nat_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 }
 
 static int
-nft_rule_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
-			   uint32_t flags, struct nft_rule_expr *e)
+nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
+				struct nft_rule_expr *e)
+{
+	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	int len = size, offset = 0, ret = 0;
+
+	switch (nat->type) {
+	case NFT_NAT_SNAT:
+		ret = snprintf(buf, len,
+			"\t\t<type>NFT_NAT_SNAT</type> ");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		break;
+	case NFT_NAT_DNAT:
+		ret = snprintf(buf, len,
+			"\t\t<type>NFT_NAT_DNAT</type> ");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		break;
+	}
+
+	ret = snprintf(buf, len, "<family>%s</family> ",
+		       nat->family == AF_INET ? "AF_INET" : "AF_INET6");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {
+		ret = snprintf(buf, len, "<sreg_addr_min_v4>%u</sreg_addr_min_v4>"
+				" <sreg_addr_max_v4>%u</sreg_addr_max_v4> ",
+			       nat->sreg_addr_min, nat->sreg_addr_max);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MIN)) {
+		ret = snprintf(buf, len, "<sreg_proto_min>%u</sreg_proto_min>"
+				" <sreg_proto_max>%u</sreg_proto_max> ",
+		       nat->sreg_proto_min, nat->sreg_proto_max);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+}
+
+static int
+nft_rule_expr_nat_snprintf_default(char *buf, size_t size,
+				   struct nft_rule_expr *e)
 {
 	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
 	int len = size, offset = 0, ret = 0;
@@ -210,12 +252,13 @@ nft_rule_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
 	switch (nat->type) {
 	case NFT_NAT_SNAT:
 		ret = snprintf(buf, len, "type=NFT_NAT_SNAT ");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	case NFT_NAT_DNAT:
 		ret = snprintf(buf, len, "type=NFT_NAT_DNAT ");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	}
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf, len, "family=%s ",
 		       nat->family == AF_INET ? "AF_INET" : "AF_INET6");
@@ -225,18 +268,32 @@ nft_rule_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
 		ret = snprintf(buf, len,
 			       "sreg_addr_min_v4=%u sreg_addr_max_v4=%u ",
 			       nat->sreg_addr_min, nat->sreg_addr_max);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MIN)) {
 		ret = snprintf(buf, len,
 			       "sreg_proto_min=%u sreg_proto_max=%u ",
 			       nat->sreg_proto_min, nat->sreg_proto_max);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
+}
+
+static int
+nft_rule_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
+			   uint32_t flags, struct nft_rule_expr *e)
+{
+	switch (type) {
+	case NFT_RULE_O_XML:
+		return nft_rule_expr_nat_snprintf_xml(buf, size, e);
+	case NFT_RULE_O_DEFAULT:
+		return nft_rule_expr_nat_snprintf_default(buf, size, e);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_nat = {

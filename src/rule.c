@@ -434,12 +434,42 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 }
 EXPORT_SYMBOL(nft_rule_nlmsg_parse);
 
-int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
-		       uint32_t type, uint32_t flags)
+static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
+				 uint32_t type, uint32_t flags)
 {
-	int ret;
+	int ret, len = size, offset = 0;
 	struct nft_rule_expr *expr;
-	int len = size, offset = 0;
+
+	ret = snprintf(buf, size,
+		"<rule family=\"%u\" table=\"%s\" "
+			"chain=\"%s\" handle=\"%llu\"> ",
+				r->family, r->table, r->chain,
+				(unsigned long long)r->handle);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	list_for_each_entry(expr, &r->expr_list, head) {
+		ret = snprintf(buf+offset, len,
+				"\n\t<expr type=\"%s\">\n", expr->ops->name);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		ret = snprintf(buf+offset, len, "\n\t</expr>");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	}
+	ret = snprintf(buf+offset-1, len, "\n</rule>\n ");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return ret;
+}
+
+static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r, 
+				     uint32_t type, uint32_t flags)
+{
+	struct nft_rule_expr *expr;
+	int ret, len = size, offset = 0;
 
 	ret = snprintf(buf, size, "family=%u table=%s chain=%s handle=%llu "
 				  "flags=%x ",
@@ -458,6 +488,20 @@ int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return ret;
+}
+
+int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
+		       uint32_t type, uint32_t flags)
+{
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return nft_rule_snprintf_xml(buf, size, r, type, flags);
+	case NFT_RULE_O_DEFAULT:
+		return nft_rule_snprintf_default(buf, size, r, type, flags);
+	default:
+		break;
+	}
+	return -1;
 }
 EXPORT_SYMBOL(nft_rule_snprintf);
 

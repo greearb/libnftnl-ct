@@ -18,6 +18,7 @@
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 #include "data_reg.h"
 #include "expr_ops.h"
 
@@ -195,10 +196,43 @@ nft_rule_expr_bitwise_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
-			       uint32_t flags, struct nft_rule_expr *e)
+nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
+				   struct nft_expr_bitwise *bitwise)
 {
-	struct nft_expr_bitwise *bitwise = (struct nft_expr_bitwise *)e->data;
+	int len = size, offset = 0, ret, i;
+
+	ret = snprintf(buf, len, "\t\t<sreg>%u</sreg> "
+					"<dreg>%u</dreg> ",
+			bitwise->sreg, bitwise->dreg);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = snprintf(buf+offset, len, "<mask>");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	for (i=0; i<bitwise->mask.len/sizeof(uint32_t); i++) {
+		ret = snprintf(buf+offset, len, "%.8x ",
+				bitwise->mask.val[i]);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, len, "</mask> <xor>");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	for (i=0; i<bitwise->xor.len/sizeof(uint32_t); i++) {
+		ret = snprintf(buf+offset, len, "%.8x ", bitwise->xor.val[i]);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, len, "</xor> ");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int
+nft_rule_expr_bitwise_snprintf_default(char *buf, size_t size,
+					struct nft_expr_bitwise *bitwise)
+{
 	int len = size, offset = 0, ret, i;
 
 	ret = snprintf(buf, len, "sreg=%u dreg=%u ",
@@ -222,6 +256,24 @@ nft_rule_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
 	}
 
 	return offset;
+}
+
+static int
+nft_rule_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
+			       uint32_t flags, struct nft_rule_expr *e)
+{
+	struct nft_expr_bitwise *bitwise = (struct nft_expr_bitwise *)e->data;
+
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return nft_rule_expr_bitwise_snprintf_xml(buf, size, bitwise);
+	case NFT_RULE_O_DEFAULT:
+		return nft_rule_expr_bitwise_snprintf_default(buf, size,
+							      bitwise);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_bitwise = {

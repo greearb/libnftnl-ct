@@ -18,6 +18,7 @@
 #include "internal.h"
 #include <libmnl/libmnl.h>
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_meta {
@@ -130,7 +131,18 @@ nft_rule_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 {
 	struct nft_expr_meta *meta = (struct nft_expr_meta *)e->data;
 
-	return snprintf(buf, len, "dreg=%u key=%u ", meta->dreg, meta->key);
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return snprintf(buf, len, "\t\t<dreg>%u</dreg>"
+					  " <key>%u</key> ",
+				meta->dreg, meta->key);
+	case NFT_RULE_O_DEFAULT:
+		return snprintf(buf, len, "dreg=%u key=%u ",
+				meta->dreg, meta->key);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_meta = {

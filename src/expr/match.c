@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <string.h>	/* for memcpy */
 #include <arpa/inet.h>
+#include <stdlib.h>	/* bin to hex*/
+#include <math.h>	/* bin to hex*/
 
 #include <libmnl/libmnl.h>
 
@@ -23,6 +25,7 @@
 #include <linux/netfilter/x_tables.h>
 
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 
 #include "expr_ops.h"
 
@@ -183,14 +186,47 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 	return 0;
 }
 
+static
+int nft_rule_exp_match_snprintf_xml(char *buf, size_t len,
+				struct nft_expr_match *mt)
+{
+	int ret, size=len;
+	int i;
+	int offset = 0;
+	uint8_t *data = (uint8_t *)mt->data;
+
+	ret = snprintf(buf, len, "\t\t<name>%s</name> <rev>%u</rev> <info>0x",
+				mt->name, mt->rev);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	for (i=0; i < mt->data_len; i++) {
+	        ret = snprintf(buf+offset, len, "%x", data[i] & 0xff);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, len, "</info>" );
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+
 static int
 nft_rule_expr_match_snprintf(char *buf, size_t len, uint32_t type,
 			     uint32_t flags, struct nft_rule_expr *e)
 {
 	struct nft_expr_match *match = (struct nft_expr_match *)e->data;
 
-	return snprintf(buf, len, "name=%s rev=%u ",
-			match->name, match->rev);
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return nft_rule_exp_match_snprintf_xml(buf, len, match);
+	case NFT_RULE_O_DEFAULT:
+		return snprintf(buf, len, "name=%s rev=%u ",
+				match->name, match->rev);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_match = {

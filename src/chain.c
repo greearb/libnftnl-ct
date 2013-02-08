@@ -437,14 +437,48 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 }
 EXPORT_SYMBOL(nft_chain_nlmsg_parse);
 
-int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
-		       uint32_t type, uint32_t flags)
+static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
+{
+	return snprintf(buf, size,
+		"<chain name=\"%s\" handle=\"%lu\""
+			" bytes=\"%lu\" packets=\"%lu\" >\n"
+			"\t<properties>\n"
+				"\t\t<flags value=\"%d\" />\n"
+				"\t\t<type value=\"%s\" />\n"
+				"\t\t<table value=\"%s\" />\n"
+				"\t\t<prio value=\"%d\" />\n"
+				"\t\t<use value=\"%d\" />\n"
+				"\t\t<hooknum value=\"%d\" />\n"
+				"\t\t<policy value=\"%d\" />\n"
+				"\t\t<family value=\"%d\" />\n"
+			"\t</properties>\n"
+		"</chain>\n",
+			c->name, c->handle, c->bytes, c->packets,
+			c->flags, c->type, c->table, c->prio,
+			c->use, c->hooknum, c->policy, c->family);
+}
+
+static int nft_chain_snprintf_default(char *buf, size_t size, struct nft_chain *c)
 {
 	return snprintf(buf, size, "family=%u table=%s chain=%s type=%s "
 				   "hook=%u prio=%d policy=%d use=%d "
 				   "packets=%lu bytes=%lu\n",
 			c->family, c->table, c->name, c->type, c->hooknum,
 			c->prio, c->policy, c->use, c->packets, c->bytes);
+}
+
+int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
+		       uint32_t type, uint32_t flags)
+{
+	switch(type) {
+	case NFT_CHAIN_O_XML:
+		return nft_chain_snprintf_xml(buf, size, c);
+	case NFT_CHAIN_O_DEFAULT:
+		return nft_chain_snprintf_default(buf, size, c);
+	default:
+		break;
+	}
+	return -1;
 }
 EXPORT_SYMBOL(nft_chain_snprintf);
 

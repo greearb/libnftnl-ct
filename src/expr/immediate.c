@@ -18,6 +18,7 @@
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 #include "expr_ops.h"
 #include "data_reg.h"
 
@@ -200,8 +201,18 @@ nft_rule_expr_immediate_snprintf(char *buf, size_t len, uint32_t type,
 {
 	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
 
-	return snprintf(buf, len, "dreg=%u data=%u ",
-			imm->dreg, imm->data.val[0]);
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return snprintf(buf, len, "\t\t<dreg>%u</dreg>"
+					  " <data>%u</data> ",
+				imm->dreg, imm->data.val[0]);
+	case NFT_RULE_O_DEFAULT:
+		return snprintf(buf, len, "dreg=%u data=%u ",
+				imm->dreg, imm->data.val[0]);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_immediate = {

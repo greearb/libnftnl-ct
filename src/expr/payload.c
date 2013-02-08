@@ -20,6 +20,7 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 
 #include "expr_ops.h"
 
@@ -169,9 +170,22 @@ nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 {
 	struct nft_expr_payload *payload = (struct nft_expr_payload *)e->data;
 
-	return snprintf(buf, len, "dreg=%u base=%u offset=%u len=%u ",
-			payload->dreg, payload->base,
-			payload->offset, payload->len);
+	switch(type) {
+	case NFT_RULE_O_XML:
+		return snprintf(buf, len, "\t\t<dreg>%u</dreg>"
+					  "<base>%u</base> <offset>%u</offset>"
+					  "<len>%u</len>",
+				payload->dreg, payload->base,
+					payload->offset, payload->len);
+
+	case NFT_RULE_O_DEFAULT:
+		return snprintf(buf, len, "dreg=%u base=%u offset=%u len=%u ",
+				payload->dreg, payload->base,
+				payload->offset, payload->len);
+	default:
+		break;
+	}
+	return -1;
 }
 
 struct expr_ops expr_ops_payload = {

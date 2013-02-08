@@ -28,6 +28,7 @@ void nft_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_table 
 
 enum {
 	NFT_TABLE_O_DEFAULT	= 0,
+	NFT_TABLE_O_XML,
 };
 
 int nft_table_snprintf(char *buf, size_t size, struct nft_table *t, uint32_t type, uint32_t flags);
