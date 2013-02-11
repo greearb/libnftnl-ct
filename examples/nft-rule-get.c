@@ -23,6 +23,7 @@ static int table_cb(const struct nlmsghdr *nlh, void *data)
 {
 	struct nft_rule *t;
 	char buf[4096];
+	uint32_t *type = data;
 
 	t = nft_rule_alloc();
 	if (t == NULL) {
@@ -35,7 +36,7 @@ static int table_cb(const struct nlmsghdr *nlh, void *data)
 		goto err_free;
 	}
 
-	nft_rule_snprintf(buf, sizeof(buf), t, NFT_RULE_O_DEFAULT, 0);
+	nft_rule_snprintf(buf, sizeof(buf), t, *type, 0);
 	printf("%s", buf);
 
 err_free:
@@ -49,9 +50,12 @@ int main(int argc, char *argv[])
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t portid, seq;
+	uint32_t portid, seq, type = NFT_RULE_O_DEFAULT;
 	struct nft_rule *t = NULL;
 	int ret;
+
+	if (argc == 2 && strcmp(argv[1], "xml") == 0 )
+		type = NFT_RULE_O_XML;
 
 	/* XXX requires table, chain and handle attributes for selective get */
 
@@ -84,7 +88,7 @@ int main(int argc, char *argv[])
 
 	ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
 	while (ret > 0) {
-		ret = mnl_cb_run(buf, ret, seq, portid, table_cb, NULL);
+		ret = mnl_cb_run(buf, ret, seq, portid, table_cb, &type);
 		if (ret <= 0)
 			break;
 		ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));

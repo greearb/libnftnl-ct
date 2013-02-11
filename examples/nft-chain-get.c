@@ -23,6 +23,7 @@ static int table_cb(const struct nlmsghdr *nlh, void *data)
 {
 	struct nft_chain *t;
 	char buf[4096];
+	uint32_t *type = data;
 
 	t = nft_chain_alloc();
 	if (t == NULL) {
@@ -35,7 +36,7 @@ static int table_cb(const struct nlmsghdr *nlh, void *data)
 		goto err_free;
 	}
 
-	nft_chain_snprintf(buf, sizeof(buf), t, NFT_CHAIN_O_DEFAULT, 0);
+	nft_chain_snprintf(buf, sizeof(buf), t, *type, 0);
 	printf("%s", buf);
 
 err_free:
@@ -49,16 +50,16 @@ int main(int argc, char *argv[])
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t portid, seq;
+	uint32_t portid, seq, type = NFT_CHAIN_O_DEFAULT;
 	struct nft_chain *t = NULL;
 	int ret;
 
 	seq = time(NULL);
 
-	if (argc == 1) {
+	if (argc >= 1 && argc <= 2) {
 		nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, AF_INET,
 						NLM_F_DUMP, seq);
-	} else if (argc == 4) {
+	} else if (argc >= 4 && argc <= 5) {
 		int family;
 
 		if (strcmp(argv[1], "ip") == 0)
@@ -84,10 +85,13 @@ int main(int argc, char *argv[])
 		nft_chain_nlmsg_build_payload(nlh, t);
 		nft_chain_free(t);
 	} else {
-		fprintf(stderr, "Usage: %s [<family> <table> <chain>]\n",
+		fprintf(stderr, "Usage: %s [<family> <table> <chain>] [xml]\n",
 			argv[0]);
 		exit(EXIT_FAILURE);
 	}
+
+	if (strcmp(argv[argc-1], "xml") == 0)
+		type = NFT_CHAIN_O_XML;
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
@@ -108,7 +112,7 @@ int main(int argc, char *argv[])
 
 	ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
 	while (ret > 0) {
-		ret = mnl_cb_run(buf, ret, seq, portid, table_cb, NULL);
+		ret = mnl_cb_run(buf, ret, seq, portid, table_cb, &type);
 		if (ret <= 0)
 			break;
 		ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));

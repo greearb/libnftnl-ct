@@ -23,6 +23,7 @@ static int table_cb(const struct nlmsghdr *nlh, void *data)
 {
 	struct nft_table *t;
 	char buf[4096];
+	uint32_t *type = data;
 
 	t = nft_table_alloc();
 	if (t == NULL) {
@@ -35,7 +36,7 @@ static int table_cb(const struct nlmsghdr *nlh, void *data)
 		goto err_free;
 	}
 
-	nft_table_snprintf(buf, sizeof(buf), t, NFT_TABLE_O_DEFAULT, 0);
+	nft_table_snprintf(buf, sizeof(buf), t, *type, 0);
 	printf("%s", buf);
 
 err_free:
@@ -52,6 +53,15 @@ int main(int argc, char *argv[])
 	uint32_t portid, seq;
 	struct nft_table *t = NULL;
 	int ret;
+	uint32_t type = NFT_TABLE_O_DEFAULT;
+
+	if (strcmp(argv[argc-1], "xml") == 0) {
+		type = NFT_TABLE_O_XML;
+		argv[argc-1] = NULL;
+		argc--;
+	} else if (strcmp(argv[argc - 1], "default") == 0) {
+		argc--;
+	}
 
 	if (argc == 2) {
 		t = nft_table_alloc();
@@ -92,7 +102,7 @@ int main(int argc, char *argv[])
 
 	ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
 	while (ret > 0) {
-		ret = mnl_cb_run(buf, ret, seq, portid, table_cb, NULL);
+		ret = mnl_cb_run(buf, ret, seq, portid, table_cb, &type);
 		if (ret <= 0)
 			break;
 		ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
