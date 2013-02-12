@@ -15,8 +15,6 @@
 #include <stdint.h>
 #include <string.h>	/* for memcpy */
 #include <arpa/inet.h>
-#include <stdlib.h>	/* bin to hex*/
-#include <math.h>	/* bin to hex*/
 
 #include <libmnl/libmnl.h>
 
