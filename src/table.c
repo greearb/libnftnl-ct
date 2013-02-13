@@ -179,8 +179,9 @@ static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 	return snprintf(buf, size,
 			"<table name=\"%s\" >\n"
 				"\t<properties>\n"
-					"\t\t<family value=\"%u\" />\n"
-					"\t\t<flags value=\"%d\" table_flags=\"%d\" />\n"
+					"\t\t<family>%u</family>\n"
+					"\t\t<flags>%d</flags>\n"
+					"\t\t<table_flags>%d</table_flags>\n"
 				"\t</properties>\n"
 			"</table>\n" ,
 			t->name, t->family, t->flags, t->table_flags);
