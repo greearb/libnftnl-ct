@@ -161,7 +161,8 @@ int main(int argc, char *argv[])
 
 	seq = time(NULL);
 	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, family,
-					NLM_F_APPEND|NLM_F_ACK, seq);
+					NLM_F_APPEND|NLM_F_ACK|NLM_F_CREATE,
+					seq);
 	nft_rule_nlmsg_build_payload(nlh, r);
 	nft_rule_free(r);
 
