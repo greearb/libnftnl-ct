@@ -96,6 +96,9 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, void *data)
 	case NFT_RULE_ATTR_COMPAT_FLAGS:
 		r->compat.flags = *((uint32_t *)data);
 		break;
+	case NFT_RULE_ATTR_FAMILY:
+		r->family = *((uint8_t *)data);
+		break;
 	default:
 		return;
 	}

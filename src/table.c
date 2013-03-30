@@ -61,6 +61,10 @@ void nft_table_attr_set(struct nft_table *t, uint16_t attr, void *data)
 		t->table_flags = *((uint32_t *)data);
 		t->flags |= (1 << NFT_TABLE_ATTR_FLAGS);
 		break;
+	case NFT_TABLE_ATTR_FAMILY:
+		t->family = *((uint8_t *)data);
+		t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
+		break;
 	}
 }
 EXPORT_SYMBOL(nft_table_attr_set);
@@ -83,6 +87,10 @@ const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
 	case NFT_TABLE_ATTR_FLAGS:
 		if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS))
 			ret = &t->table_flags;
+		break;
+	case NFT_TABLE_ATTR_FAMILY:
+		if (t->flags & (1 << NFT_TABLE_ATTR_FAMILY))
+			ret = &t->family;
 		break;
 	}
 	return ret;

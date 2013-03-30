@@ -90,6 +90,9 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, void *data)
 	case NFT_CHAIN_ATTR_HANDLE:
 		c->handle = *((uint64_t *)data);
 		break;
+	case NFT_CHAIN_ATTR_FAMILY:
+		c->family = *((uint8_t *)data);
+		break;
 	case NFT_CHAIN_ATTR_TYPE:
 		if (c->type)
 			free(c->type);
@@ -174,6 +177,12 @@ void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
 	case NFT_CHAIN_ATTR_HANDLE:
 		if (c->flags & (1 << NFT_CHAIN_ATTR_HANDLE))
 			return &c->handle;
+		else
+			return NULL;
+		break;
+	case NFT_CHAIN_ATTR_FAMILY:
+		if (c->flags & (1 << NFT_CHAIN_ATTR_FAMILY))
+			return &c->family;
 		else
 			return NULL;
 		break;
