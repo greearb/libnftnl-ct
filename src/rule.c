@@ -450,6 +450,13 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 				(unsigned long long)r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
+	ret = snprintf(buf+offset, len, "<rule_flags>%u</rule_flags>"
+					"<compat_flags>%u</compat_flags>"
+					"<compat_proto>%u</compat_proto>",
+					r->rule_flags,
+					r->compat.flags, r->compat.proto);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
 	list_for_each_entry(expr, &r->expr_list, head) {
 		ret = snprintf(buf+offset, len,
 				"\n\t<expr type=\"%s\">\n", expr->ops->name);
