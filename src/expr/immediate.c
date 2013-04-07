@@ -196,19 +196,77 @@ nft_rule_expr_immediate_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_immediate_snprintf_xml(char *buf, size_t len,
+				     struct nft_rule_expr *e, uint32_t flags)
+{
+	int size = len, offset = 0, ret;
+	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+
+	ret = snprintf(buf, len, "\t\t<dreg>%u</dreg>"
+				"\n\t\t<immediatedata>", imm->dreg);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+
+	if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {
+		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
+					    NFT_RULE_O_XML, flags, DATA_VALUE);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	} else if (e->flags & (1 << NFT_EXPR_IMM_VERDICT)) {
+		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
+					  NFT_RULE_O_XML, flags, DATA_VERDICT);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	} else if (e->flags & (1 << NFT_EXPR_IMM_CHAIN)) {
+		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
+					    NFT_RULE_O_XML, flags, DATA_CHAIN);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, len, "</immediatedata>");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int
+nft_rule_expr_immediate_snprintf_default(char *buf, size_t len,
+				struct nft_rule_expr *e, uint32_t flags)
+{
+	int size = len, offset = 0, ret;
+	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+
+	ret = snprintf(buf, len, "dreg=%u", imm->dreg);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {
+		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
+					NFT_RULE_O_DEFAULT, flags, DATA_VALUE);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	} else if (e->flags & (1 << NFT_EXPR_IMM_VERDICT)) {
+		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
+				NFT_RULE_O_DEFAULT, flags, DATA_VERDICT);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	} else if (e->flags & (1 << NFT_EXPR_IMM_CHAIN)) {
+		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
+					NFT_RULE_O_DEFAULT, flags, DATA_CHAIN);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+}
+
+static int
 nft_rule_expr_immediate_snprintf(char *buf, size_t len, uint32_t type,
 				 uint32_t flags, struct nft_rule_expr *e)
 {
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
-
 	switch(type) {
 	case NFT_RULE_O_XML:
-		return snprintf(buf, len, "\t\t<dreg>%u</dreg>"
-					  " <data>%u</data> ",
-				imm->dreg, imm->data.val[0]);
+		return nft_rule_expr_immediate_snprintf_xml(buf, len, e, flags);
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "dreg=%u data=%u ",
-				imm->dreg, imm->data.val[0]);
+		return nft_rule_expr_immediate_snprintf_default(buf, len, e, flags);
 	default:
 		break;
 	}

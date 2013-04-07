@@ -18,9 +18,104 @@
 #include <linux/netfilter.h>
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/expr.h>
+#include <libnftables/rule.h>
 #include "expr_ops.h"
 #include "data_reg.h"
 #include "internal.h"
+
+static int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
+					   union nft_data_reg *reg,
+					   uint32_t flags)
+{
+	int len = size, offset = 0, ret, i, j;
+	uint8_t *tmp;
+	int data_len = reg->len/sizeof(uint32_t);
+
+	ret = snprintf(buf, len, "<data_reg type=\"value\" >");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = snprintf(buf+offset, len, "<len>%d</len>", data_len);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	for (i=0; i<data_len; i++) {
+		ret = snprintf(buf+offset, len, "<data%d>0x", i);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		tmp = (uint8_t *)&reg->val[i];
+
+		for (j=0; j<sizeof(int); j++) {
+			ret = snprintf(buf+offset, len, "%.02x", tmp[j]);
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		}
+
+		ret = snprintf(buf+offset, len, "</data%d>", i);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, len, "</data_reg>");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int
+nft_data_reg_value_snprintf_default(char *buf, size_t size,
+				    union nft_data_reg *reg, uint32_t flags)
+{
+	int len = size, offset = 0, ret, i;
+
+	for (i=0; i<reg->len/sizeof(uint32_t); i++) {
+		ret = snprintf(buf+offset, len, "0x%.8x ", reg->val[i]);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+}
+
+int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
+			  uint32_t output_format, uint32_t flags, int reg_type)
+{
+	switch(reg_type) {
+	case DATA_VALUE:
+		switch(output_format) {
+		case NFT_RULE_O_XML:
+			return nft_data_reg_value_snprintf_xml(buf, size,
+							       reg, flags);
+		case NFT_RULE_O_DEFAULT:
+			return nft_data_reg_value_snprintf_default(buf, size,
+								   reg, flags);
+		default:
+			break;
+		}
+	case DATA_VERDICT:
+		switch(output_format) {
+		case NFT_RULE_O_XML:
+			return snprintf(buf, size,
+					"<data_reg type=\"verdict\" >"
+						"<verdict>%d</verdict>"
+					"</data_reg>", reg->verdict);
+		case NFT_RULE_O_DEFAULT:
+			return snprintf(buf, size, "verdict=%d", reg->verdict);
+		default:
+			break;
+		}
+	case DATA_CHAIN:
+		switch(output_format) {
+		case NFT_RULE_O_XML:
+			return snprintf(buf, size,
+					"<data_reg type=\"chain\" >"
+						"<chain>%s</chain>"
+					"</data_reg>", reg->chain);
+		case NFT_RULE_O_DEFAULT:
+			return snprintf(buf, size, "chain=%s", reg->chain);
+		default:
+			break;
+		}
+	default:
+		break;
+	}
+	return -1;
+}
 
 static int nft_data_parse_cb(const struct nlattr *attr, void *data)
 {

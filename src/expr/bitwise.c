@@ -199,29 +199,26 @@ static int
 nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
 				   struct nft_expr_bitwise *bitwise)
 {
-	int len = size, offset = 0, ret, i;
+	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "\t\t<sreg>%u</sreg> "
 					"<dreg>%u</dreg> ",
-			bitwise->sreg, bitwise->dreg);
+		       bitwise->sreg, bitwise->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "<mask>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	for (i=0; i<bitwise->mask.len/sizeof(uint32_t); i++) {
-		ret = snprintf(buf+offset, len, "%.8x ",
-				bitwise->mask.val[i]);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->mask,
+				    NFT_RULE_O_XML, 0, DATA_VALUE);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "</mask> <xor>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	for (i=0; i<bitwise->xor.len/sizeof(uint32_t); i++) {
-		ret = snprintf(buf+offset, len, "%.8x ", bitwise->xor.val[i]);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->xor,
+				    NFT_RULE_O_XML, 0, DATA_VALUE);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "</xor> ");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
@@ -231,29 +228,27 @@ nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
 
 static int
 nft_rule_expr_bitwise_snprintf_default(char *buf, size_t size,
-					struct nft_expr_bitwise *bitwise)
+				       struct nft_expr_bitwise *bitwise)
 {
-	int len = size, offset = 0, ret, i;
+	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "sreg=%u dreg=%u ",
-			bitwise->sreg, bitwise->dreg);
+		       bitwise->sreg, bitwise->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, " mask=");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	for (i=0; i<bitwise->mask.len/sizeof(uint32_t); i++) {
-		ret = snprintf(buf+offset, len, "%.8x ", bitwise->mask.val[i]);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->mask,
+				    NFT_RULE_O_DEFAULT, 0, DATA_VALUE);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, " xor=");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	for (i=0; i<bitwise->xor.len/sizeof(uint32_t); i++) {
-		ret = snprintf(buf+offset, len, "%.8x ", bitwise->xor.val[i]);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->xor,
+				    NFT_RULE_O_DEFAULT, 0, DATA_VALUE);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }
