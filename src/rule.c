@@ -185,7 +185,7 @@ uint32_t nft_rule_attr_get_u32(struct nft_rule *r, uint16_t attr)
 	uint32_t val = *((uint32_t *)nft_rule_attr_get(r, attr));
 	return val;
 }
-EXPORT_SYMBOL(nft_rule_attr_get_u64);
+EXPORT_SYMBOL(nft_rule_attr_get_u32);
 
 uint64_t nft_rule_attr_get_u64(struct nft_rule *r, uint16_t attr)
 {
