@@ -90,7 +90,7 @@ nft_rule_expr_set_u64(struct nft_rule_expr *expr, uint16_t type, uint64_t data)
 EXPORT_SYMBOL(nft_rule_expr_set_u64);
 
 void
-nft_rule_expr_set_str(struct nft_rule_expr *expr, uint16_t type, char *str)
+nft_rule_expr_set_str(struct nft_rule_expr *expr, uint16_t type, const char *str)
 {
 	nft_rule_expr_set(expr, type, str, strlen(str)+1);
 }

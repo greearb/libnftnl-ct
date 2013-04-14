@@ -23,10 +23,10 @@ enum {
 	NFT_RULE_ATTR_COMPAT_FLAGS,
 };
 
-void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, void *data);
+void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data);
 void nft_rule_attr_set_u32(struct nft_rule *r, uint16_t attr, uint32_t val);
 void nft_rule_attr_set_u64(struct nft_rule *r, uint16_t attr, uint64_t val);
-void nft_rule_attr_set_str(struct nft_rule *r, uint16_t attr, char *str);
+void nft_rule_attr_set_str(struct nft_rule *r, uint16_t attr, const char *str);
 
 void *nft_rule_attr_get(struct nft_rule *r, uint16_t attr);
 const char *nft_rule_attr_get_str(struct nft_rule *r, uint16_t attr);

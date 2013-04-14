@@ -56,7 +56,7 @@ void nft_set_free(struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_free);
 
-void nft_set_attr_set(struct nft_set *s, uint16_t attr, void *data)
+void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data)
 {
 	switch(attr) {
 	case NFT_SET_ATTR_TABLE:
@@ -93,7 +93,7 @@ void nft_set_attr_set_u32(struct nft_set *s, uint16_t attr, uint32_t val)
 }
 EXPORT_SYMBOL(nft_set_attr_set_u32);
 
-void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, char *str)
+void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, const char *str)
 {
 	nft_set_attr_set(s, attr, str);
 }

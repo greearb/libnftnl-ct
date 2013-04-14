@@ -16,9 +16,9 @@ struct nft_set;
 struct nft_set *nft_set_alloc(void);
 void nft_set_free(struct nft_set *s);
 
-void nft_set_attr_set(struct nft_set *s, uint16_t attr, void *data);
+void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data);
 void nft_set_attr_set_u32(struct nft_set *s, uint16_t attr, uint32_t val);
-void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, char *str);
+void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, const char *str);
 
 void *nft_set_attr_get(struct nft_set *s, uint16_t attr);
 const char *nft_set_attr_get_str(struct nft_set *s, uint16_t attr);
@@ -63,7 +63,7 @@ void nft_set_elem_add(struct nft_set *s, struct nft_set_elem *elem);
 
 void nft_set_elem_attr_set(struct nft_set_elem *s, uint16_t attr, const void *data, size_t data_len);
 void nft_set_elem_attr_set_u32(struct nft_set_elem *s, uint16_t attr, uint32_t val);
-void nft_set_elem_attr_set_str(struct nft_set_elem *s, uint16_t attr, char *str);
+void nft_set_elem_attr_set_str(struct nft_set_elem *s, uint16_t attr, const char *str);
 
 void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, size_t *data_len);
 const char *nft_set_elem_attr_get_str(struct nft_set_elem *s, uint16_t attr);

@@ -47,7 +47,7 @@ void nft_table_free(struct nft_table *t)
 }
 EXPORT_SYMBOL(nft_table_free);
 
-void nft_table_attr_set(struct nft_table *t, uint16_t attr, void *data)
+void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data)
 {
 	switch(attr) {
 	case NFT_TABLE_ATTR_NAME:
