@@ -211,17 +211,17 @@ nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 	switch (nat->type) {
 	case NFT_NAT_SNAT:
 		ret = snprintf(buf, len,
-			"\t\t<type>NFT_NAT_SNAT</type> ");
+			"<type>NFT_NAT_SNAT</type>");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	case NFT_NAT_DNAT:
 		ret = snprintf(buf, len,
-			"\t\t<type>NFT_NAT_DNAT</type> ");
+			"<type>NFT_NAT_DNAT</type>");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	}
 
-	ret = snprintf(buf, len, "<family>%s</family> ",
+	ret = snprintf(buf, len, "<family>%s</family>",
 		       nat->family == AF_INET ? "AF_INET" : "AF_INET6");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -234,7 +234,7 @@ nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MIN)) {
 		ret = snprintf(buf, len, "<sreg_proto_min>%u</sreg_proto_min>"
-				" <sreg_proto_max>%u</sreg_proto_max> ",
+				"<sreg_proto_max>%u</sreg_proto_max>",
 		       nat->sreg_proto_min, nat->sreg_proto_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}

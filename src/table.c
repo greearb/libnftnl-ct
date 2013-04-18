@@ -185,13 +185,13 @@ EXPORT_SYMBOL(nft_table_nlmsg_parse);
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
 	return snprintf(buf, size,
-			"<table name=\"%s\" >\n"
-				"\t<properties>\n"
-					"\t\t<family>%u</family>\n"
-					"\t\t<flags>%d</flags>\n"
-					"\t\t<table_flags>%d</table_flags>\n"
-				"\t</properties>\n"
-			"</table>\n" ,
+			"<table name=\"%s\">"
+				"<properties>"
+					"<family>%u</family>"
+					"<flags>%d</flags>"
+					"<table_flags>%d</table_flags>"
+				"</properties>"
+			"</table>" ,
 			t->name, t->family, t->flags, t->table_flags);
 }
 

@@ -172,8 +172,8 @@ nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_XML:
-		return snprintf(buf, len, "\t\t<dreg>%u</dreg>"
-					  "<base>%u</base> <offset>%u</offset>"
+		return snprintf(buf, len, "<dreg>%u</dreg>"
+					  "<base>%u</base><offset>%u</offset>"
 					  "<len>%u</len>",
 				payload->dreg, payload->base,
 					payload->offset, payload->len);

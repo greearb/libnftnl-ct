@@ -171,7 +171,7 @@ nft_rule_expr_cmp_snprintf_xml(char *buf, size_t size, struct nft_expr_cmp *cmp)
 {
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "\t\t<sreg>%u</sreg> <op>%s</op> <cmpdata>",
+	ret = snprintf(buf, len, "<sreg>%u</sreg><op>%s</op><cmpdata>",
 		       cmp->sreg, expr_cmp_str[cmp->op]);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -179,7 +179,7 @@ nft_rule_expr_cmp_snprintf_xml(char *buf, size_t size, struct nft_expr_cmp *cmp)
 				    NFT_RULE_O_XML, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "</cmpdata> ");
+	ret = snprintf(buf+offset, len, "</cmpdata>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;

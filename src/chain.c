@@ -450,18 +450,18 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 {
 	return snprintf(buf, size,
 		"<chain name=\"%s\" handle=\"%lu\""
-			" bytes=\"%lu\" packets=\"%lu\" >\n"
-			"\t<properties>\n"
-				"\t\t<flags>%d</flags>\n"
-				"\t\t<type>%s</type>\n"
-				"\t\t<table>%s</table>\n"
-				"\t\t<prio>%d</prio>\n"
-				"\t\t<use>%d</use>\n"
-				"\t\t<hooknum>%d</hooknum>\n"
-				"\t\t<policy>%d</policy>\n"
-				"\t\t<family>%d</family>\n"
-			"\t</properties>\n"
-		"</chain>\n",
+			" bytes=\"%lu\" packets=\"%lu\">"
+			"<properties>"
+				"<flags>%d</flags>"
+				"<type>%s</type>"
+				"<table>%s</table>"
+				"<prio>%d</prio>"
+				"<use>%d</use>"
+				"<hooknum>%d</hooknum>"
+				"<policy>%d</policy>"
+				"<family>%d</family>"
+			"</properties>"
+		"</chain>",
 			c->name, c->handle, c->bytes, c->packets,
 			c->flags, c->type, c->table, c->prio,
 			c->use, c->hooknum, c->policy, c->family);

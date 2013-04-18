@@ -459,17 +459,17 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 
 	list_for_each_entry(expr, &r->expr_list, head) {
 		ret = snprintf(buf+offset, len,
-				"\n\t<expr type=\"%s\">\n", expr->ops->name);
+				"<expr type=\"%s\">", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = snprintf(buf+offset, len, "\n\t</expr>");
+		ret = snprintf(buf+offset, len, "</expr>");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	}
-	ret = snprintf(buf+offset, len, "\n</rule>\n ");
+	ret = snprintf(buf+offset, len, "</rule>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return ret;

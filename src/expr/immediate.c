@@ -202,8 +202,8 @@ nft_rule_expr_immediate_snprintf_xml(char *buf, size_t len,
 	int size = len, offset = 0, ret;
 	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
 
-	ret = snprintf(buf, len, "\t\t<dreg>%u</dreg>"
-				"\n\t\t<immediatedata>", imm->dreg);
+	ret = snprintf(buf, len, "<dreg>%u</dreg>"
+				"<immediatedata>", imm->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 

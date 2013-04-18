@@ -156,7 +156,7 @@ nft_rule_expr_lookup_snprintf_xml(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "<set>%s</set><sreg>%u</sreg><dreg>%u</dreg>\n",
+	ret = snprintf(buf, len, "<set>%s</set><sreg>%u</sreg><dreg>%u</dreg>",
 			l->set_name, l->sreg, l->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
