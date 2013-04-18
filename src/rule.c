@@ -494,8 +494,6 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-	ret = snprintf(buf+offset-1, len, "\n");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return ret;
 }

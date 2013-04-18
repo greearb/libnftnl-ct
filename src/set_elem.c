@@ -347,8 +347,6 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 		ret = snprintf(buf+offset, len, "%.8x ", e->data.val[i]);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-	ret = snprintf(buf+offset, size, "\n");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }

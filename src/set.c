@@ -270,8 +270,15 @@ int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 	int len = size, offset = 0;
 	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, size, "set=%s table=%s flags=%x\n",
+	ret = snprintf(buf, size, "set=%s table=%s flags=%x",
 			s->name, s->table, s->set_flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	/* Empty set? Skip printinf of elements */
+	if (list_empty(&s->element_list))
+		return offset;
+
+	ret = snprintf(buf+offset, size, "\n");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(elem, &s->element_list, head) {

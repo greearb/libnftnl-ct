@@ -36,7 +36,7 @@ static int set_cb(const struct nlmsghdr *nlh, void *data)
 	}
 
 	nft_set_snprintf(buf, sizeof(buf), t, 0, 0);
-	printf("%s", buf);
+	printf("%s\n", buf);
 
 err_free:
 	nft_set_free(t);

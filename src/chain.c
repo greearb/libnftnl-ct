@@ -471,7 +471,7 @@ static int nft_chain_snprintf_default(char *buf, size_t size, struct nft_chain *
 {
 	return snprintf(buf, size, "family=%u table=%s chain=%s type=%s "
 				   "hook=%u prio=%d policy=%d use=%d "
-				   "packets=%lu bytes=%lu\n",
+				   "packets=%lu bytes=%lu",
 			c->family, c->table, c->name, c->type, c->hooknum,
 			c->prio, c->policy, c->use, c->packets, c->bytes);
 }

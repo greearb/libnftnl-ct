@@ -37,7 +37,7 @@ static int table_cb(const struct nlmsghdr *nlh, void *data)
 	}
 
 	nft_rule_snprintf(buf, sizeof(buf), t, *type, 0);
-	printf("%s", buf);
+	printf("%s\n", buf);
 
 err_free:
 	nft_rule_free(t);
