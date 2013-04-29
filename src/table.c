@@ -188,11 +188,10 @@ static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 			"<table name=\"%s\">"
 				"<properties>"
 					"<family>%u</family>"
-					"<flags>%d</flags>"
 					"<table_flags>%d</table_flags>"
 				"</properties>"
 			"</table>" ,
-			t->name, t->family, t->flags, t->table_flags);
+			t->name, t->family, t->table_flags);
 }
 
 static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)
