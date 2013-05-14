@@ -54,6 +54,8 @@ struct nft_rule_expr_iter *nft_rule_expr_iter_create(struct nft_rule *r);
 struct nft_rule_expr *nft_rule_expr_iter_next(struct nft_rule_expr_iter *iter);
 void nft_rule_expr_iter_destroy(struct nft_rule_expr_iter *iter);
 
+struct nft_rule_list;
+
 struct nft_rule_list *nft_rule_list_alloc(void);
 void nft_rule_list_free(struct nft_rule_list *list);
 void nft_rule_list_add(struct nft_rule *r, struct nft_rule_list *list);
