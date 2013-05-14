@@ -27,8 +27,6 @@ uint32_t nft_rule_expr_get_u32(struct nft_rule_expr *expr, uint16_t type);
 uint64_t nft_rule_expr_get_u64(struct nft_rule_expr *expr, uint16_t type);
 const char *nft_rule_expr_get_str(struct nft_rule_expr *expr, uint16_t type);
 
-struct list_head *nft_rule_expr_list_head(struct nft_rule_expr *expr);
-
 void nft_rule_expr_build_payload(struct nlmsghdr *nlh, struct nft_rule_expr *expr);
 
 enum {
