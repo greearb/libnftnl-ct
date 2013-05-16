@@ -26,10 +26,11 @@ enum {
 	NFT_CHAIN_ATTR_TYPE,
 };
 
-void nft_chain_attr_set(struct nft_chain *t, uint16_t attr, void *data);
+void nft_chain_attr_set(struct nft_chain *t, uint16_t attr, const void *data);
 void nft_chain_attr_set_u32(struct nft_chain *t, uint16_t attr, uint32_t data);
 void nft_chain_attr_set_s32(struct nft_chain *t, uint16_t attr, int32_t data);
 void nft_chain_attr_set_u64(struct nft_chain *t, uint16_t attr, uint64_t data);
+void nft_chain_attr_set_str(struct nft_chain *t, uint16_t attr, const char *str);
 
 void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr);
 const char *nft_chain_attr_get_str(struct nft_chain *c, uint16_t attr);

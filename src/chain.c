@@ -57,7 +57,7 @@ void nft_chain_free(struct nft_chain *c)
 }
 EXPORT_SYMBOL(nft_chain_free);
 
-void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, void *data)
+void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
 {
 	switch(attr) {
 	case NFT_CHAIN_ATTR_NAME:
@@ -123,6 +123,12 @@ void nft_chain_attr_set_u64(struct nft_chain *c, uint16_t attr, uint64_t data)
 	nft_chain_attr_set(c, attr, &data);
 }
 EXPORT_SYMBOL(nft_chain_attr_set_u64);
+
+void nft_chain_attr_set_str(struct nft_chain *c, uint16_t attr, const char *str)
+{
+	nft_chain_attr_set_str(c, attr, str);
+}
+EXPORT_SYMBOL(nft_chain_attr_set_str);
 
 void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
 {

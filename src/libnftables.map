@@ -25,6 +25,7 @@ global:
   nft_chain_attr_set_u32;
   nft_chain_attr_set_s32;
   nft_chain_attr_set_u64;
+  nft_chain_attr_set_str;
   nft_chain_attr_get;
   nft_chain_attr_get_u32;
   nft_chain_attr_get_s32;
