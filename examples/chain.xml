@@ -1,0 +1,11 @@
+<chain name="test" handle="0" bytes="59" packets="1" version="0">
+	<properties>
+		<type>filter</type>
+		<table>filter</table>
+		<prio>1</prio>
+		<use>0</use>
+		<hooknum>4</hooknum>
+		<policy>1</policy>
+		<family>10</family>
+	</properties>
+</chain>
