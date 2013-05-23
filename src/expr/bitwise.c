@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <string.h> /* for memcpy */
 #include <arpa/inet.h>
+#include <errno.h>
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/expr.h>
@@ -196,6 +197,115 @@ nft_rule_expr_bitwise_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_bitwise *bitwise = (struct nft_expr_bitwise *)e;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	mxml_node_t *save = NULL;
+	uint64_t tmp;
+	union nft_data_reg data_regtmp;
+	char *endptr = NULL;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("bitwise", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* get and set <sreg> */
+	node = mxmlFindElement(tree, tree, "sreg", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	bitwise->sreg = (uint32_t)tmp;
+	e->flags |= (1 << NFT_EXPR_BITWISE_SREG);
+
+	/* get and set <dreg> */
+	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL, MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	bitwise->dreg = (uint32_t)tmp;
+	e->flags |= (1 << NFT_EXPR_BITWISE_DREG);
+
+	/* Get and set <mask> */
+	node = mxmlFindElement(tree, tree, "mask", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* hack for mxmSaveAllocString to print just the current node */
+	save = node->next;
+	node->next = NULL;
+	if (nft_data_reg_xml_parse(&data_regtmp,
+			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	node->next = save;
+
+	memcpy(&bitwise->mask.val, data_regtmp.val, data_regtmp.len);
+	bitwise->mask.len = data_regtmp.len;
+	e->flags |= (1 << NFT_EXPR_BITWISE_MASK);
+
+	/* Get and set <xor> */
+	node = mxmlFindElement(tree, tree, "xor", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* hack for mxmSaveAllocString to print just the current node */
+	save = node->next;
+	node->next = NULL;
+	if (nft_data_reg_xml_parse(&data_regtmp,
+			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	memcpy(&bitwise->xor.val, data_regtmp.val, data_regtmp.len);
+	bitwise->xor.len = data_regtmp.len;
+	e->flags |= (1 << NFT_EXPR_BITWISE_XOR);
+
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
 				   struct nft_expr_bitwise *bitwise)
 {
@@ -280,4 +390,5 @@ struct expr_ops expr_ops_bitwise = {
 	.parse		= nft_rule_expr_bitwise_parse,
 	.build		= nft_rule_expr_bitwise_build,
 	.snprintf	= nft_rule_expr_bitwise_snprintf,
+	.xml_parse	= nft_rule_expr_bitwise_xml_parse,
 };

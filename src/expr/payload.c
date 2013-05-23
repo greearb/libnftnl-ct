@@ -13,8 +13,9 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <limits.h>
 #include <arpa/inet.h>
-
+#include <errno.h>
 #include <libmnl/libmnl.h>
 
 #include <linux/netfilter/nf_tables.h>
@@ -165,6 +166,91 @@ nft_rule_expr_payload_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_payload *payload = (struct nft_expr_payload *)e->data;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	uint64_t tmp;
+	char *endptr;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("payload", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and set <dreg>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		payload->dreg = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_PAYLOAD_DREG);
+	}
+
+	/* Get and set <base>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "base", NULL, NULL, MXML_DESCEND);
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		payload->base = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_PAYLOAD_BASE);
+	}
+
+	/* Get and set <offset>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "offset", NULL, NULL,
+			       MXML_DESCEND);
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		payload->offset = (unsigned int)tmp;
+		e->flags |= (1 << NFT_EXPR_PAYLOAD_OFFSET);
+	}
+
+	/* Get and set <len>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "len", NULL, NULL, MXML_DESCEND);
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		payload->len = (unsigned int)tmp;
+		e->flags |= (1 << NFT_EXPR_PAYLOAD_LEN);
+	}
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
@@ -197,4 +283,5 @@ struct expr_ops expr_ops_payload = {
 	.parse		= nft_rule_expr_payload_parse,
 	.build		= nft_rule_expr_payload_build,
 	.snprintf	= nft_rule_expr_payload_snprintf,
+	.xml_parse	= nft_rule_expr_payload_xml_parse,
 };

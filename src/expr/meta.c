@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <arpa/inet.h>
-
+#include <errno.h>
 #include <linux/netfilter/nf_tables.h>
 
 #include "internal.h"
@@ -125,6 +125,70 @@ nft_rule_expr_meta_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
+static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_meta *meta = (struct nft_expr_meta *)e->data;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	uint64_t tmp;
+	char *endptr;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("meta", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and set <dreg>. Is mandatory */
+	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	meta->dreg = (uint8_t)tmp;
+	e->flags |= (1 << NFT_EXPR_META_DREG);
+
+	/* Get and set <key>. Is mandatory */
+	node = mxmlFindElement(tree, tree, "key", NULL, NULL, MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	meta->key = (uint8_t)tmp;
+	e->flags |= (1 << NFT_EXPR_META_KEY);
+
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int
 nft_rule_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 			    uint32_t flags, struct nft_rule_expr *e)
@@ -154,4 +218,5 @@ struct expr_ops expr_ops_meta = {
 	.parse		= nft_rule_expr_meta_parse,
 	.build		= nft_rule_expr_meta_build,
 	.snprintf	= nft_rule_expr_meta_snprintf,
+	.xml_parse = nft_rule_expr_meta_xml_parse,
 };

@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <arpa/inet.h>
-
+#include <errno.h>
 #include "internal.h"
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
@@ -196,6 +196,105 @@ nft_rule_expr_immediate_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	mxml_node_t *save = NULL;
+	union nft_data_reg data_regtmp;
+	uint64_t tmp;
+	char *endptr;
+
+	/* load the tree */
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("immediate", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and set <dreg>. Is mandatory */
+	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	imm->dreg = (uint32_t)tmp;
+	e->flags |= (1 << NFT_EXPR_IMM_DREG);
+
+	/* Get and set <immdata>. Is mandatory */
+	node = mxmlFindElement(tree, tree, "immdata", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* hack for mxmSaveAllocString to print just the current node */
+	save = node->next;
+	node->next = NULL;
+
+	if (nft_data_reg_xml_parse(&data_regtmp,
+			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	node->next = save;
+
+	/* data_reg type switch */
+	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (mxmlElementGetAttr(node, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp(mxmlElementGetAttr(node, "type"), "value") == 0) {
+		memcpy(&imm->data.val, data_regtmp.val, data_regtmp.len);
+		imm->data.len = data_regtmp.len;
+		e->flags |= (1 << NFT_EXPR_IMM_DATA);
+	} else if (strcmp(mxmlElementGetAttr(node, "type"), "verdict") == 0) {
+		imm->data.verdict = data_regtmp.verdict;
+		e->flags |= (1 << NFT_EXPR_IMM_VERDICT);
+	} else if (strcmp(mxmlElementGetAttr(node, "type"), "chain") == 0) {
+		if (imm->data.chain)
+			free(imm->data.chain);
+
+		imm->data.chain = strdup(data_regtmp.chain);
+		e->flags |= (1 << NFT_EXPR_IMM_CHAIN);
+	}
+
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_immediate_snprintf_xml(char *buf, size_t len,
 				     struct nft_rule_expr *e, uint32_t flags)
 {
@@ -282,4 +381,5 @@ struct expr_ops expr_ops_immediate = {
 	.parse		= nft_rule_expr_immediate_parse,
 	.build		= nft_rule_expr_immediate_build,
 	.snprintf	= nft_rule_expr_immediate_snprintf,
+	.xml_parse	= nft_rule_expr_immediate_xml_parse,
 };

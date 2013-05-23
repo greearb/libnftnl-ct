@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <arpa/inet.h>
+#include <errno.h>
 
 #include <linux/netfilter/nf_tables.h>
 
@@ -126,6 +127,66 @@ nft_rule_expr_counter_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_counter *ctr = (struct nft_expr_counter *)e->data;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	char *endptr;
+	uint64_t tmp;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("counter", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* get and set <pkts>. Is not mandatory*/
+	node = mxmlFindElement(tree, tree, "pkts", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp == UINT64_MAX || tmp < 0 || *endptr ) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		ctr->pkts = (uint64_t)tmp;
+		e->flags |= (1 << NFT_EXPR_CTR_PACKETS);
+	}
+
+	/* get and set <bytes> */
+	node = mxmlFindElement(tree, tree, "bytes", NULL, NULL,
+			       MXML_DESCEND);
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp == UINT64_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		ctr->bytes = (uint64_t)tmp;
+		e->flags |= (1 << NFT_EXPR_CTR_BYTES);
+	}
+
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
@@ -153,4 +214,5 @@ struct expr_ops expr_ops_counter = {
 	.parse		= nft_rule_expr_counter_parse,
 	.build		= nft_rule_expr_counter_build,
 	.snprintf	= nft_rule_expr_counter_snprintf,
+	.xml_parse	= nft_rule_expr_counter_xml_parse,
 };

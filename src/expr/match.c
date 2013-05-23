@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include <string.h>	/* for memcpy */
 #include <arpa/inet.h>
-
+#include <errno.h>
 #include <libmnl/libmnl.h>
 
 #include <linux/netfilter/nf_tables.h>
@@ -184,6 +184,63 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 	return 0;
 }
 
+static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_match *mt = (struct nft_expr_match *)e->data;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	uint64_t tmp;
+	char *endptr;
+
+	/* load the tree */
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("match", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* get and set <name>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "name", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node != NULL) {
+		memcpy(mt->name, node->child->value.opaque,
+		       XT_EXTENSION_MAXNAMELEN);
+		mt->name[XT_EXTENSION_MAXNAMELEN-1] = '\0';
+		e->flags |= (1 << NFT_EXPR_MT_NAME);
+	}
+
+	/* get and set <rev>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "rev", NULL, NULL, MXML_DESCEND);
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		mt->rev = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_MT_REV);
+	}
+
+	/* mt->info is ignored until other solution is reached */
+
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int nft_rule_expr_match_snprintf_xml(char *buf, size_t len,
 					    struct nft_expr_match *mt)
 {
@@ -235,4 +292,5 @@ struct expr_ops expr_ops_match = {
 	.parse		= nft_rule_expr_match_parse,
 	.build		= nft_rule_expr_match_build,
 	.snprintf	= nft_rule_expr_match_snprintf,
+	.xml_parse = nft_rule_expr_match_xml_parse,
 };

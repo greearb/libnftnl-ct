@@ -12,7 +12,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <limits.h>
 #include <arpa/inet.h>
+#include <errno.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter.h>
@@ -23,10 +25,244 @@
 #include "data_reg.h"
 #include "internal.h"
 
-static int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
-					   union nft_data_reg *reg,
-					   uint32_t flags)
+#ifdef XML_PARSING
+static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg, char *xml)
 {
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	char *endptr;
+	long int tmp;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and validate <data_reg type="verdict" >*/
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp(mxmlElementGetAttr(tree, "type"), "verdict") != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and set <verdict> */
+	node = mxmlFindElement(tree, tree, "verdict", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	errno = 0;
+	tmp = strtoll(node->child->value.opaque, &endptr, 10);
+	if (tmp > INT_MAX || tmp < INT_MIN || errno != 0
+						|| strlen(endptr) > 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	reg->verdict = tmp;
+
+	mxmlDelete(tree);
+	return 0;
+	errno = EOPNOTSUPP;
+	return -1;
+}
+
+static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg, char *xml)
+{
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and validate <data_reg type="chain" >*/
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp(mxmlElementGetAttr(tree, "type"), "chain") != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and set <chain> */
+	node = mxmlFindElement(tree, tree, "chain", NULL, NULL, MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* no max len value to validate? */
+	if (strlen(node->child->value.opaque) < 1) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (reg->chain)
+		free(reg->chain);
+
+	reg->chain = strdup(node->child->value.opaque);
+
+	mxmlDelete(tree);
+	return 0;
+}
+
+static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
+{
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	int i, len;
+	int64_t tmp;
+	uint64_t utmp;
+	char *endptr;
+	char node_name[6];
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/*
+	* <data_reg type="value">
+	*    <len>4</len>
+	*    <data0>0xc09a002a</data0>
+	*    <data1>0x2700cac1</data1>
+	*    <data2>0x00000000</data2>
+	*    <data3>0x08000000</data3>
+	* </data_reg>
+	*/
+
+	/* Get and validate <data_reg type="value" ... >*/
+	if (mxmlElementGetAttr(node, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp(mxmlElementGetAttr(node, "type"), "value") != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get <len> */
+	node = mxmlFindElement(tree, tree, "len", NULL, NULL, MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	tmp = strtoll(node->child->value.opaque, &endptr, 10);
+	if (tmp > INT64_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	/* maybe also (len < 1 || len > 4) */
+	len = tmp;
+
+	/* Get and set <dataN> */
+	for (i = 0; i < len; i++) {
+		sprintf(node_name, "data%d", i);
+
+		node = mxmlFindElement(tree, tree, node_name, NULL,
+				       NULL, MXML_DESCEND);
+		if (node == NULL) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		utmp = strtoull(node->child->value.opaque, &endptr, 16);
+		if (utmp == UINT64_MAX || utmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+		reg->val[i] = tmp;
+	}
+
+	reg->len = sizeof(reg->val);
+
+	mxmlDelete(tree);
+	return 0;
+	errno = EOPNOTSUPP;
+	return -1;
+}
+#endif
+
+int nft_data_reg_xml_parse(union nft_data_reg *reg, char *xml)
+{
+#ifdef XML_PARSING
+	mxml_node_t *node = NULL;
+	mxml_node_t *tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+
+	if (tree == NULL)
+		return -1;
+
+	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get <data_reg type="xxx" ... >*/
+	if (mxmlElementGetAttr(node, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Select what type of parsing is needed */
+	if (strcmp(mxmlElementGetAttr(node, "type"), "value") == 0) {
+		mxmlDelete(tree);
+		return nft_data_reg_value_xml_parse(reg, xml);
+	} else if (strcmp(mxmlElementGetAttr(node, "type"), "verdict") == 0) {
+		mxmlDelete(tree);
+		return nft_data_reg_verdict_xml_parse(reg, xml);
+	} else if (strcmp(mxmlElementGetAttr(node, "type"), "chain") == 0) {
+		mxmlDelete(tree);
+		return nft_data_reg_chain_xml_parse(reg, xml);
+	}
+
+	mxmlDelete(tree);
+	return -1;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static
+int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
+				    union nft_data_reg *reg, uint32_t flags)
+{
+#ifdef XML_PARSING
 	int len = size, offset = 0, ret, i, j;
 	uint8_t *tmp;
 	int data_len = reg->len/sizeof(uint32_t);
@@ -56,6 +292,10 @@ static int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
 }
 
 static int
@@ -251,3 +491,4 @@ int nft_parse_data(union nft_data_reg *data, struct nlattr *attr, int *type)
 
 	return ret;
 }
+

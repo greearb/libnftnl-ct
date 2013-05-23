@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include <string.h>	/* for memcpy */
 #include <arpa/inet.h>
-
+#include <errno.h>
 #include <libmnl/libmnl.h>
 
 #include <linux/netfilter/nf_tables.h>
@@ -184,6 +184,66 @@ static int nft_rule_expr_target_parse(struct nft_rule_expr *e, struct nlattr *at
 	return 0;
 }
 
+static int
+nft_rule_expr_target_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_target *tg = (struct nft_expr_target *)e->data;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	uint64_t tmp;
+	char *endptr;
+
+	/* load the tree */
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("target", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and set <name>. Optional */
+	node = mxmlFindElement(tree, tree, "name", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node != NULL) {
+		memcpy(tg->name, node->child->value.opaque,
+					XT_EXTENSION_MAXNAMELEN);
+		tg->name[XT_EXTENSION_MAXNAMELEN-1] = '\0';
+		e->flags |= (1 << NFT_EXPR_TG_NAME);
+	}
+
+	/* Get and set <rev>. Optional */
+	node = mxmlFindElement(tree, tree, "rev", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		errno = 0;
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		tg->rev = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_TG_REV);
+	}
+
+	/* tg->info is ignored until other solution is reached */
+
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static
 int nft_rule_exp_target_snprintf_xml(char *buf, size_t len,
 				struct nft_expr_target *tg)
@@ -235,4 +295,5 @@ struct expr_ops expr_ops_target = {
 	.parse		= nft_rule_expr_target_parse,
 	.build		= nft_rule_expr_target_build,
 	.snprintf	= nft_rule_expr_target_snprintf,
+	.xml_parse	= nft_rule_expr_target_xml_parse,
 };

@@ -13,9 +13,11 @@
 #include <time.h>
 #include <endian.h>
 #include <stdint.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <errno.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -193,6 +195,97 @@ int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t)
 	return 0;
 }
 EXPORT_SYMBOL(nft_table_nlmsg_parse);
+
+static int nft_table_xml_parse(struct nft_table *t, char *xml)
+{
+#ifdef XML_PARSING
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	char *endptr = NULL;
+	uint64_t tmp;
+
+	/* NOTE: all XML nodes are mandatory */
+
+	/* Load the tree */
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	/* Get and set the name of the table */
+	if (mxmlElementGetAttr(tree, "name") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (t->name)
+		free(t->name);
+
+	t->name = strdup(mxmlElementGetAttr(tree, "name"));
+	t->flags |= (1 << NFT_TABLE_ATTR_NAME);
+
+	/* Ignore <properties> node */
+	node = mxmlFindElement(tree, tree, "properties", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+
+	/* Get the and set <family> node */
+	node = mxmlFindElement(tree, tree, "family", NULL, NULL, MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || *endptr || tmp < 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	t->family = (uint32_t)tmp;
+	t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
+
+	/* Get and set <table_flags> */
+	node = mxmlFindElement(tree, tree, "table_flags", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || *endptr || tmp < 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	t->table_flags = (uint32_t)tmp;
+	t->flags |= (1 << NFT_TABLE_ATTR_FLAGS);
+
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+int nft_table_parse(struct nft_table *t, enum nft_table_parse_type type,
+		    char *data)
+{
+	int ret;
+
+	switch (type) {
+	case NFT_TABLE_PARSE_XML:
+		ret = nft_table_xml_parse(t, data);
+		break;
+	default:
+		ret = -1;
+		errno = EOPNOTSUPP;
+		break;
+	}
+
+	return ret;
+}
+EXPORT_SYMBOL(nft_table_parse);
 
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {

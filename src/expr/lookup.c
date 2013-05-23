@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <string.h> /* for memcpy */
 #include <arpa/inet.h>
+#include <errno.h>
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/rule.h>
@@ -151,6 +152,82 @@ nft_rule_expr_lookup_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_lookup *lookup = (struct nft_expr_lookup *)e->data;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	uint64_t tmp;
+	char *endptr;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("lookup", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* get and set <set>. Is mandatory */
+	node = mxmlFindElement(tree, tree, "set", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	memcpy(lookup->set_name, node->child->value.opaque, IFNAMSIZ);
+	lookup->set_name[IFNAMSIZ-1] = '\0';
+	e->flags |= (1 << NFT_EXPR_LOOKUP_SET);
+
+	/* get and set <sreg>. Is mandatory */
+	node = mxmlFindElement(tree, tree, "sreg", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	errno = 0;
+
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	lookup->sreg = (uint32_t)tmp;
+	e->flags |= (1 << NFT_EXPR_LOOKUP_SREG);
+
+	/* get and set <dreg>. Isn't mandatory */
+	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
+			       MXML_DESCEND);
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		lookup->dreg = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_LOOKUP_DREG);
+	}
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_lookup_snprintf_xml(char *buf, size_t size,
 				  struct nft_expr_lookup *l)
 {
@@ -202,4 +279,5 @@ struct expr_ops expr_ops_lookup = {
 	.parse		= nft_rule_expr_lookup_parse,
 	.build		= nft_rule_expr_lookup_build,
 	.snprintf	= nft_rule_expr_lookup_snprintf,
+	.xml_parse	= nft_rule_expr_lookup_xml_parse,
 };

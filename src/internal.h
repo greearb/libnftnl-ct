@@ -13,6 +13,10 @@
 
 #include <stdint.h>
 
+#ifdef XML_PARSING
+#include <mxml.h>
+#endif
+
 struct expr_ops;
 
 struct nft_rule_expr {

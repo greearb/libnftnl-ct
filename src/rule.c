@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <errno.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -436,6 +437,189 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 	return ret;
 }
 EXPORT_SYMBOL(nft_rule_nlmsg_parse);
+
+static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
+{
+#ifdef XML_PARSING
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	mxml_node_t *save = NULL;
+	struct nft_rule_expr *e;
+	struct expr_ops *ops;
+	char *endptr = NULL;
+	uint64_t tmp;
+
+	/* Load the tree */
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	/* get and set <rule ... family=X ... > */
+	if (mxmlElementGetAttr(tree, "family") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	tmp = strtoull(mxmlElementGetAttr(tree, "family"), &endptr, 10);
+	if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	r->family = (uint8_t)tmp;
+	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
+
+	/* get and set <rule ... table=X ...> */
+	if (mxmlElementGetAttr(tree, "table") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (r->table)
+		free(r->table);
+
+	r->table = strdup(mxmlElementGetAttr(tree, "table"));
+
+	/* get and set <rule ... chain=X ...> */
+	if (mxmlElementGetAttr(tree, "chain") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (r->chain)
+		free(r->chain);
+
+	r->chain = strdup(mxmlElementGetAttr(tree, "chain"));
+	r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
+
+	/* get and set <rule ... handle=X ...> */
+	if (mxmlElementGetAttr(tree, "handle") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	tmp = strtoull(mxmlElementGetAttr(tree, "handle"), &endptr, 10);
+	if (tmp == UINT64_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	r->handle = (uint64_t)tmp;
+	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
+
+	/* get and set <rule_flags> */
+	node = mxmlFindElement(tree, tree, "rule_flags", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	r->rule_flags = (uint32_t)tmp;
+	r->flags |= (1 << NFT_RULE_ATTR_FLAGS);
+
+	/* get and set <compat_proto> */
+	node = mxmlFindElement(tree, tree, "compat_proto", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	r->compat.proto = (uint32_t)tmp;
+	r->flags |= (1 << NFT_RULE_ATTR_COMPAT_PROTO);
+
+	/* get and set <compat_flags> */
+	node = mxmlFindElement(tree, tree, "compat_flags", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	r->compat.flags = (uint32_t)tmp;
+	r->flags |= (1 << NFT_RULE_ATTR_COMPAT_FLAGS);
+
+	/* Iterating over <expr> */
+	for (node = mxmlFindElement(tree, tree, "expr", "type",
+				    NULL, MXML_DESCEND);
+		node != NULL;
+		node = mxmlFindElement(node, tree, "expr", "type",
+				       NULL, MXML_DESCEND)) {
+
+		if (mxmlElementGetAttr(node, "type") == NULL) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		ops = nft_expr_ops_lookup(mxmlElementGetAttr(node, "type"));
+		if (ops == NULL) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		e = nft_rule_expr_alloc(mxmlElementGetAttr(node, "type"));
+		if (e == NULL) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		/* This is a hack for mxml to print just the current node */
+		save = node->next;
+		node->next = NULL;
+
+		if (ops->xml_parse(e,
+				   mxmlSaveAllocString(node,
+						MXML_NO_CALLBACK)) != 0) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		nft_rule_add_expr(r, e);
+
+		node->next = save;
+		save = NULL;
+	}
+
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+int nft_rule_parse(struct nft_rule *r, enum nft_rule_parse_type type, char *data)
+{
+	int ret;
+
+	switch (type) {
+	case NFT_RULE_PARSE_XML:
+		ret = nft_rule_xml_parse(r, data);
+		break;
+	default:
+		ret = -1;
+		errno = EOPNOTSUPP;
+		break;
+	}
+
+	return ret;
+}
+EXPORT_SYMBOL(nft_rule_parse);
 
 static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 				 uint32_t type, uint32_t flags)

@@ -14,6 +14,10 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl Dependencies
 PKG_CHECK_MODULES([LIBMNL], [libmnl >= 1.0.0])
+AC_ARG_WITH([xml-parsing], AS_HELP_STRING([--with-xml-parsing], [XML parsing support]))
+AS_IF([test "x$with_xml_parsing" = "xyes"], [
+	PKG_CHECK_MODULES([LIBXML], [mxml >= 2.6])
+])
 
 AC_PROG_CC
 AM_PROG_CC_C_O
@@ -26,6 +30,9 @@ case "$host" in
 esac
 
 regular_CPPFLAGS="-D_FILE_OFFSET_BITS=64 -D_REENTRANT"
+AS_IF([test "x$with_xml_parsing" = "xyes"], [
+	regular_CPPFLAGS="$regular_CPPFLAGS -DXML_PARSING"
+])
 regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wshadow -Wstrict-prototypes \
 	-Wformat=2 -pipe"

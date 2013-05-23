@@ -14,6 +14,8 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <limits.h>
+#include <errno.h>
 #include <arpa/inet.h>
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
@@ -201,6 +203,130 @@ nft_rule_expr_nat_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 				 htonl(nat->sreg_proto_max));
 }
 
+
+static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
+{
+#ifdef XML_PARSING
+	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	mxml_node_t *tree = NULL;
+	mxml_node_t *node = NULL;
+	uint64_t tmp;
+	char *endptr;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL)
+		return -1;
+
+	if (mxmlElementGetAttr(tree, "type") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp("nat", mxmlElementGetAttr(tree, "type")) != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	/* Get and set <type>. Mandatory */
+	node = mxmlFindElement(tree, tree, "type", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp(node->child->value.opaque, "NFT_NAT_SNAT") == 0) {
+		nat->type = NFT_NAT_SNAT;
+	} else if (strcmp(node->child->value.opaque, "NFT_NAT_DNAT") == 0) {
+		nat->type = NFT_NAT_DNAT;
+	} else {
+		mxmlDelete(tree);
+		return -1;
+	}
+	e->flags |= (1 << NFT_EXPR_NAT_TYPE);
+
+	/* Get and set <family>. Mandatory */
+	node = mxmlFindElement(tree, tree, "family", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (strcmp(node->child->value.opaque, "AF_INET") == 0) {
+		nat->family = AF_INET;
+	} else if (strcmp(node->child->value.opaque, "AF_INET6") == 0) {
+		nat->family = AF_INET6;
+	} else {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	e->flags |= (1 << NFT_EXPR_NAT_FAMILY);
+
+	/* Get and set <sreg_addr_min_v4>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "sreg_addr_min_v4", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		nat->sreg_addr_min = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MIN);
+	}
+
+	/* Get and set <sreg_addr_max_v4>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "sreg_addr_max_v4", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		nat->sreg_addr_max = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MAX);
+	}
+
+	/* Get and set <sreg_proto_min>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "sreg_proto_min", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		nat->sreg_proto_min = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MIN);
+	}
+
+	/* Get and set <sreg_proto_max>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "sreg_proto_max", NULL, NULL,
+			       MXML_DESCEND);
+	if (node == NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		nat->sreg_proto_max = (uint32_t)tmp;
+		e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MAX);
+	}
+	mxmlDelete(tree);
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int
 nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 				struct nft_rule_expr *e)
@@ -305,4 +431,5 @@ struct expr_ops expr_ops_nat = {
 	.parse		= nft_rule_expr_nat_parse,
 	.build		= nft_rule_expr_nat_build,
 	.snprintf	= nft_rule_expr_nat_snprintf,
+	.xml_parse	= nft_rule_expr_nat_xml_parse,
 };
