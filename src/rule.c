@@ -503,7 +503,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 		return -1;
 	}
 
-	r->handle = (uint64_t)tmp;
+	r->handle = tmp;
 	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 
 	/* get and set <rule_flags> */

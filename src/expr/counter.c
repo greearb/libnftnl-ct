@@ -160,7 +160,7 @@ nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, char *xml)
 			return -1;
 		}
 
-		ctr->pkts = (uint64_t)tmp;
+		ctr->pkts = tmp;
 		e->flags |= (1 << NFT_EXPR_CTR_PACKETS);
 	}
 
@@ -174,7 +174,7 @@ nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, char *xml)
 			return -1;
 		}
 
-		ctr->bytes = (uint64_t)tmp;
+		ctr->bytes = tmp;
 		e->flags |= (1 << NFT_EXPR_CTR_BYTES);
 	}
 

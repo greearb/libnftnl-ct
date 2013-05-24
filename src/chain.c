@@ -490,7 +490,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		return -1;
 	}
 
-	c->handle = (uint64_t)utmp;
+	c->handle = utmp;
 	c->flags |= (1 << NFT_CHAIN_ATTR_HANDLE);
 
 	/* Get and set <chain bytes="x" ... >*/
@@ -503,7 +503,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		mxmlDelete(tree);
 		return -1;
 	}
-	c->bytes = (uint64_t)utmp;
+	c->bytes = utmp;
 	c->flags |= (1 << NFT_CHAIN_ATTR_BYTES);
 
 	/* Get and set <chain packets="x" ... > */
@@ -516,7 +516,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		mxmlDelete(tree);
 		return -1;
 	}
-	c->packets = (uint64_t)utmp;
+	c->packets = utmp;
 	c->flags |= (1 << NFT_CHAIN_ATTR_PACKETS);
 
 	/* Ignore <properties> node */
