@@ -479,6 +479,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 		free(r->table);
 
 	r->table = strdup(mxmlElementGetAttr(tree, "table"));
+	r->flags |= (1 << NFT_RULE_ATTR_TABLE);
 
 	/* get and set <rule ... chain=X ...> */
 	if (mxmlElementGetAttr(tree, "chain") == NULL) {
