@@ -262,7 +262,6 @@ static
 int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 				    union nft_data_reg *reg, uint32_t flags)
 {
-#ifdef XML_PARSING
 	int len = size, offset = 0, ret, i, j;
 	uint8_t *tmp;
 	int data_len = reg->len/sizeof(uint32_t);
@@ -292,10 +291,6 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
 }
 
 static int
