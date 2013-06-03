@@ -39,7 +39,7 @@ static int table_cb(const struct nlmsghdr *nlh, int type)
 	}
 
 	nft_table_snprintf(buf, sizeof(buf), t, NFT_TABLE_O_DEFAULT, 0);
-	printf("[%s]\t%s", type == NFT_MSG_NEWTABLE ? "NEW" : "DEL", buf);
+	printf("[%s]\t%s\n", type == NFT_MSG_NEWTABLE ? "NEW" : "DEL", buf);
 
 err_free:
 	nft_table_free(t);
@@ -64,7 +64,7 @@ static int rule_cb(const struct nlmsghdr *nlh, int type)
 	}
 
 	nft_rule_snprintf(buf, sizeof(buf), t, NFT_RULE_O_DEFAULT, 0);
-	printf("[%s]\t%s", type == NFT_MSG_NEWRULE ? "NEW" : "DEL", buf);
+	printf("[%s]\t%s\n", type == NFT_MSG_NEWRULE ? "NEW" : "DEL", buf);
 
 err_free:
 	nft_rule_free(t);
@@ -89,7 +89,7 @@ static int chain_cb(const struct nlmsghdr *nlh, int type)
 	}
 
 	nft_chain_snprintf(buf, sizeof(buf), t, NFT_CHAIN_O_DEFAULT, 0);
-	printf("[%s]\t%s", type == NFT_MSG_NEWCHAIN ? "NEW" : "DEL", buf);
+	printf("[%s]\t%s\n", type == NFT_MSG_NEWCHAIN ? "NEW" : "DEL", buf);
 
 err_free:
 	nft_chain_free(t);
