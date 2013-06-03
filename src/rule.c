@@ -657,7 +657,7 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 	ret = snprintf(buf+offset, len, "</rule>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	return ret;
+	return offset;
 }
 
 static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r, 
@@ -680,7 +680,7 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	return ret;
+	return offset;
 }
 
 int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
