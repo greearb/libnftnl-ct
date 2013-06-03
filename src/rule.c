@@ -14,6 +14,7 @@
 #include <endian.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <string.h>
 #include <netinet/in.h>
 #include <errno.h>
@@ -454,6 +455,17 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	if (tree == NULL)
 		return -1;
 
+	/* validate XML version <rule ... version=X ... > */
+	if (mxmlElementGetAttr(tree, "version") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	tmp = strtoll(mxmlElementGetAttr(tree, "version"), &endptr, 10);
+	if (tmp == LLONG_MAX || *endptr || tmp != NFT_RULE_XML_VERSION) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
 	/* get and set <rule ... family=X ... > */
 	if (mxmlElementGetAttr(tree, "family") == NULL) {
 		mxmlDelete(tree);
@@ -630,9 +642,10 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 
 	ret = snprintf(buf, size,
 		"<rule family=\"%u\" table=\"%s\" "
-			"chain=\"%s\" handle=\"%llu\"> ",
+			"chain=\"%s\" handle=\"%llu\" version=\"%d\"> ",
 				r->family, r->table, r->chain,
-				(unsigned long long)r->handle);
+				(unsigned long long)r->handle,
+				NFT_RULE_XML_VERSION);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "<rule_flags>%u</rule_flags>"

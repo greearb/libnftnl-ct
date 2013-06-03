@@ -203,6 +203,7 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	mxml_node_t *node = NULL;
 	char *endptr = NULL;
 	uint64_t tmp;
+	int64_t stmp;
 
 	/* NOTE: all XML nodes are mandatory */
 
@@ -210,6 +211,18 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
 		return -1;
+
+	/* Check the version of the XML */
+	if (mxmlElementGetAttr(tree, "version") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	stmp = strtoll(mxmlElementGetAttr(tree, "version"), &endptr, 10);
+	if (stmp == LLONG_MAX || *endptr || stmp != NFT_TABLE_XML_VERSION) {
+		mxmlDelete(tree);
+		return -1;
+	}
 
 	/* Get and set the name of the table */
 	if (mxmlElementGetAttr(tree, "name") == NULL) {
@@ -290,13 +303,14 @@ EXPORT_SYMBOL(nft_table_parse);
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
 	return snprintf(buf, size,
-			"<table name=\"%s\">"
+			"<table name=\"%s\" version=\"%d\">"
 				"<properties>"
 					"<family>%u</family>"
 					"<table_flags>%d</table_flags>"
 				"</properties>"
 			"</table>" ,
-			t->name, t->family, t->table_flags);
+			t->name, NFT_TABLE_XML_VERSION,
+			t->family, t->table_flags);
 }
 
 static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)

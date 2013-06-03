@@ -14,6 +14,7 @@
 #include <endian.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <string.h>
 #include <netinet/in.h>
 #include <errno.h>
@@ -469,6 +470,17 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	if (tree == NULL)
 		return -1;
 
+	/* Validate version */
+	if (mxmlElementGetAttr(tree, "version") == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+	tmp = strtoll(mxmlElementGetAttr(tree, "version"), &endptr, 10);
+	if (tmp == LLONG_MAX || *endptr || tmp != NFT_CHAIN_XML_VERSION) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
 	/* Get and set <chain name="xxx" ... >*/
 	if (mxmlElementGetAttr(tree, "name") == NULL) {
 		mxmlDelete(tree);
@@ -643,7 +655,7 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 {
 	return snprintf(buf, size,
 		"<chain name=\"%s\" handle=\"%lu\""
-			" bytes=\"%lu\" packets=\"%lu\">"
+			" bytes=\"%lu\" packets=\"%lu\" version=\"%d\">"
 			"<properties>"
 				"<type>%s</type>"
 				"<table>%s</table>"
@@ -655,8 +667,8 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 			"</properties>"
 		"</chain>",
 			c->name, c->handle, c->bytes, c->packets,
-			c->type, c->table, c->prio, c->use, c->hooknum,
-			c->policy, c->family);
+			NFT_CHAIN_XML_VERSION, c->type, c->table,
+			c->prio, c->use, c->hooknum, c->policy, c->family);
 }
 
 static int nft_chain_snprintf_default(char *buf, size_t size, struct nft_chain *c)
