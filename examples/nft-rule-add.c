@@ -151,8 +151,8 @@ int main(int argc, char *argv[])
 	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, argv[3]);
 
 	add_expr_match(r);
+	add_payload(r);
 	add_expr_target(r);
-//	add_payload(r);
 
 	char tmp[1024];
 	nft_rule_snprintf(tmp, sizeof(tmp), r, 0, 0);
