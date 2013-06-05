@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
 	nft_rule_snprintf(reprint, sizeof(reprint), r, NFT_RULE_O_XML, 0);
 	printf("Parsed:\n%s\n", reprint);
 
+	nft_rule_attr_unset(r, NFT_RULE_ATTR_HANDLE);
 	family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
 
 	seq = time(NULL);

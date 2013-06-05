@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
 	nft_chain_snprintf(reprint, sizeof(reprint), c, NFT_CHAIN_O_XML, 0);
 	printf("Parsed:\n%s\n", reprint);
 
+	nft_chain_attr_unset(c, NFT_CHAIN_ATTR_HANDLE);
 	family = (uint16_t)nft_chain_attr_get_u32(c, NFT_CHAIN_ATTR_FAMILY);
 
 	seq = time(NULL);
