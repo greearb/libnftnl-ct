@@ -21,7 +21,6 @@
 #include <libmnl/libmnl.h>
 #include <libnftables/rule.h>
 #include <libnftables/expr.h>
-#include <libnftables/payload.h>
 
 #include <linux/netfilter_ipv4/ipt_LOG.h>
 #include <linux/netfilter/xt_iprange.h>
