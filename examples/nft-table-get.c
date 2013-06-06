@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
 		type = NFT_TABLE_O_XML;
 		argv[argc-1] = NULL;
 		argc--;
+	}else if (strcmp(argv[argc-1], "json") == 0) {
+		type = NFT_TABLE_O_JSON;
+		argv[argc-1] = NULL;
+		argc--;
 	} else if (strcmp(argv[argc - 1], "default") == 0) {
 		argc--;
 	}
