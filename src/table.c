@@ -300,6 +300,22 @@ int nft_table_parse(struct nft_table *t, enum nft_table_parse_type type,
 }
 EXPORT_SYMBOL(nft_table_parse);
 
+static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
+{
+	return snprintf(buf, size,
+			"{\"table\" : {"
+			"\"name\" : \"%s\","
+			"\"version\" : %d,"
+			"\"properties\" : {"
+				"\"family\" : %u,"
+				"\"table_flags\" : %d"
+				"}"
+			"}"
+			"}" ,
+			t->name, NFT_TABLE_JSON_VERSION,
+			t->family, t->table_flags);
+}
+
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
 	return snprintf(buf, size,
@@ -325,6 +341,8 @@ int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
 	switch(type) {
 	case NFT_TABLE_O_XML:
 		return nft_table_snprintf_xml(buf, size, t);
+	case NFT_TABLE_O_JSON:
+		return nft_table_snprintf_json(buf, size, t);
 	case NFT_TABLE_O_DEFAULT:
 		return nft_table_snprintf_default(buf, size, t);
 	default:

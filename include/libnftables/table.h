@@ -31,6 +31,7 @@ void nft_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_table 
 enum {
 	NFT_TABLE_O_DEFAULT	= 0,
 	NFT_TABLE_O_XML,
+	NFT_TABLE_O_JSON,
 };
 
 enum nft_table_parse_type {
