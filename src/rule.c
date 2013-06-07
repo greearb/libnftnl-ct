@@ -71,6 +71,31 @@ void nft_rule_free(struct nft_rule *r)
 }
 EXPORT_SYMBOL(nft_rule_free);
 
+void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr)
+{
+	switch (attr) {
+	case NFT_RULE_ATTR_TABLE:
+		if (r->flags & (1 << NFT_RULE_ATTR_TABLE))
+			if (r->table) {
+				free(r->table);
+				r->table = NULL;
+			}
+		break;
+	case NFT_RULE_ATTR_CHAIN:
+		if (r->flags & (1 << NFT_RULE_ATTR_CHAIN))
+			if (r->chain) {
+				free(r->chain);
+				r->chain = NULL;
+			}
+		break;
+	default:
+		return;
+	}
+
+	r->flags &= ~(1 << attr);
+}
+EXPORT_SYMBOL(nft_rule_attr_unset);
+
 void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
 {
 	switch(attr) {

@@ -2,6 +2,7 @@ LIBNFTABLES_1.0 {
 global:
   nft_table_alloc;
   nft_table_free;
+  nft_table_attr_unset;
   nft_table_attr_set;
   nft_table_attr_get;
   nft_table_attr_set_u32;
@@ -22,6 +23,7 @@ global:
 
   nft_chain_alloc;
   nft_chain_free;
+  nft_chain_attr_unset;
   nft_chain_attr_set;
   nft_chain_attr_set_u32;
   nft_chain_attr_set_s32;
@@ -47,6 +49,7 @@ global:
 
   nft_rule_alloc;
   nft_rule_free;
+  nft_rule_attr_unset;
   nft_rule_attr_set;
   nft_rule_attr_set_u32;
   nft_rule_attr_set_u64;
@@ -91,6 +94,7 @@ global:
 
   nft_set_alloc;
   nft_set_free;
+  nft_set_attr_unset;
   nft_set_attr_set;
   nft_set_attr_set_u32;
   nft_set_attr_set_str;
@@ -114,6 +118,7 @@ global:
   nft_set_elem_alloc;
   nft_set_elem_free;
   nft_set_elem_add;
+  nft_set_elem_attr_unset;
   nft_set_elem_attr_set;
   nft_set_elem_attr_set_u32;
   nft_set_elem_attr_set_str;

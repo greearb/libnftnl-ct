@@ -49,9 +49,27 @@ void nft_table_free(struct nft_table *t)
 }
 EXPORT_SYMBOL(nft_table_free);
 
+void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
+{
+	switch (attr) {
+	case NFT_TABLE_ATTR_NAME:
+		if (t->flags & (1 << NFT_TABLE_ATTR_NAME)) {
+			if (t->name) {
+				free(t->name);
+				t->name = NULL;
+			}
+		}
+		break;
+	default:
+		return;
+	}
+	t->flags &= ~(1 << attr);
+}
+EXPORT_SYMBOL(nft_table_attr_unset);
+
 void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data)
 {
-	switch(attr) {
+	switch (attr) {
 	case NFT_TABLE_ATTR_NAME:
 		if (t->name)
 			free(t->name);

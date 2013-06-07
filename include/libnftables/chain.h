@@ -26,6 +26,7 @@ enum {
 	NFT_CHAIN_ATTR_TYPE,
 };
 
+void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr);
 void nft_chain_attr_set(struct nft_chain *t, uint16_t attr, const void *data);
 void nft_chain_attr_set_u32(struct nft_chain *t, uint16_t attr, uint32_t data);
 void nft_chain_attr_set_s32(struct nft_chain *t, uint16_t attr, int32_t data);

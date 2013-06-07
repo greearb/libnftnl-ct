@@ -56,6 +56,31 @@ void nft_set_free(struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_free);
 
+void nft_set_attr_unset(struct nft_set *s, uint16_t attr)
+{
+	switch (attr) {
+	case NFT_SET_ATTR_TABLE:
+		if (s->flags & (1 << NFT_SET_ATTR_TABLE))
+			if (s->table) {
+				free(s->table);
+				s->table = NULL;
+			}
+		break;
+	case NFT_SET_ATTR_NAME:
+		if (s->flags & (1 << NFT_SET_ATTR_NAME))
+			if (s->name) {
+				free(s->name);
+				s->name = NULL;
+			}
+		break;
+	default:
+		return;
+	}
+
+	s->flags &= ~(1 << attr);
+}
+EXPORT_SYMBOL(nft_set_attr_unset);
+
 void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data)
 {
 	switch(attr) {
