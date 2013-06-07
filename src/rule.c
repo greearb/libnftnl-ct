@@ -88,6 +88,12 @@ void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr)
 				r->chain = NULL;
 			}
 		break;
+	case NFT_RULE_ATTR_HANDLE:
+	case NFT_RULE_ATTR_FLAGS:
+	case NFT_RULE_ATTR_COMPAT_PROTO:
+	case NFT_RULE_ATTR_COMPAT_FLAGS:
+	case NFT_RULE_ATTR_FAMILY:
+		break;
 	default:
 		return;
 	}

@@ -79,6 +79,15 @@ void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr)
 				c->type = NULL;
 			}
 		break;
+	case NFT_CHAIN_ATTR_NAME:
+	case NFT_CHAIN_ATTR_HOOKNUM:
+	case NFT_CHAIN_ATTR_PRIO:
+	case NFT_CHAIN_ATTR_POLICY:
+	case NFT_CHAIN_ATTR_BYTES:
+	case NFT_CHAIN_ATTR_PACKETS:
+	case NFT_CHAIN_ATTR_HANDLE:
+	case NFT_CHAIN_ATTR_FAMILY:
+		break;
 	default:
 		return;
 	}

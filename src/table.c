@@ -60,6 +60,9 @@ void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
 			}
 		}
 		break;
+	case NFT_TABLE_ATTR_FLAGS:
+	case NFT_TABLE_ATTR_FAMILY:
+		break;
 	default:
 		return;
 	}

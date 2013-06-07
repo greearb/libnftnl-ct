@@ -73,6 +73,10 @@ void nft_set_attr_unset(struct nft_set *s, uint16_t attr)
 				s->name = NULL;
 			}
 		break;
+	case NFT_SET_ATTR_FLAGS:
+	case NFT_SET_ATTR_KEY_TYPE:
+	case NFT_SET_ATTR_KEY_LEN:
+		break;
 	default:
 		return;
 	}

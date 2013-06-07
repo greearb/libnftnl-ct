@@ -55,6 +55,10 @@ void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr)
 			}
 		}
 		break;
+	case NFT_SET_ELEM_ATTR_FLAGS:
+	case NFT_SET_ELEM_ATTR_KEY:	/* NFTA_SET_ELEM_KEY */
+	case NFT_SET_ELEM_ATTR_VERDICT:	/* NFTA_SET_ELEM_DATA */
+		break;
 	default:
 		return;
 	}
