@@ -90,8 +90,11 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (strcmp(argv[argc-1], "xml") == 0)
+	if (strcmp(argv[argc-1], "xml") == 0){
 		type = NFT_CHAIN_O_XML;
+	}else if (strcmp(argv[argc-1], "json") == 0){
+		type = NFT_CHAIN_O_JSON;
+	}
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
