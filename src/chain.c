@@ -688,6 +688,31 @@ int nft_chain_parse(struct nft_chain *c, enum nft_chain_parse_type type,
 }
 EXPORT_SYMBOL(nft_chain_parse);
 
+static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
+{
+	return snprintf(buf, size,
+		"{ \"chain\": {"
+			"\"name\": \"%s\","
+			"\"handle\": %lu,"
+			"\"bytes\": %lu,"
+			"\"packets\": %lu,"
+			"\"version\": %d,"
+			"\"properties\": {"
+				"\"type\" : \"%s\","
+				"\"table\" : \"%s\","
+				"\"prio\" : %d,"
+				"\"use\" : %d,"
+				"\"hooknum\" : %d,"
+				"\"policy\" : %d,"
+				"\"family\" : %d"
+			"}"
+		"}"
+		"}",
+			c->name, c->handle, c->bytes, c->packets,
+			NFT_CHAIN_JSON_VERSION, c->type, c->table,
+			c->prio, c->use, c->hooknum, c->policy, c->family);
+}
+
 static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 {
 	return snprintf(buf, size,
@@ -721,6 +746,8 @@ int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
 		       uint32_t type, uint32_t flags)
 {
 	switch(type) {
+	case NFT_CHAIN_O_JSON:
+		return nft_chain_snprintf_json(buf, size, c);
 	case NFT_CHAIN_O_XML:
 		return nft_chain_snprintf_xml(buf, size, c);
 	case NFT_CHAIN_O_DEFAULT:

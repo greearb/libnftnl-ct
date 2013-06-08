@@ -44,6 +44,7 @@ void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain 
 enum {
 	NFT_CHAIN_O_DEFAULT	= 0,
 	NFT_CHAIN_O_XML,
+	NFT_CHAIN_O_JSON,
 };
 
 enum nft_chain_parse_type {

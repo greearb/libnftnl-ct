@@ -21,6 +21,7 @@
 #define NFT_CHAIN_XML_VERSION 0
 #define NFT_RULE_XML_VERSION 0
 #define NFT_TABLE_JSON_VERSION 0
+#define NFT_CHAIN_JSON_VERSION 0
 
 struct expr_ops;
 
