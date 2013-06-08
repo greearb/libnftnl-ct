@@ -58,6 +58,7 @@ void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr)
 	case NFT_SET_ELEM_ATTR_FLAGS:
 	case NFT_SET_ELEM_ATTR_KEY:	/* NFTA_SET_ELEM_KEY */
 	case NFT_SET_ELEM_ATTR_VERDICT:	/* NFTA_SET_ELEM_DATA */
+	case NFT_SET_ELEM_ATTR_DATA:	/* NFTA_SET_ELEM_DATA */
 		break;
 	default:
 		return;
@@ -86,6 +87,10 @@ void nft_set_elem_attr_set(struct nft_set_elem *s, uint16_t attr,
 			free(s->data.chain);
 
 		s->data.chain = strdup(data);
+		break;
+	case NFT_SET_ELEM_ATTR_DATA:	/* NFTA_SET_ELEM_DATA */
+		memcpy(s->data.val, data, data_len);
+		s->data.len = data_len;
 		break;
 	default:
 		return;
@@ -120,6 +125,12 @@ void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, size_t *data_
 	case NFT_SET_ELEM_ATTR_CHAIN:	/* NFTA_SET_ELEM_DATA */
 		if (s->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN))
 			return &s->data.chain;
+		break;
+	case NFT_SET_ELEM_ATTR_DATA:	/* NFTA_SET_ELEM_DATA */
+		if (s->flags & (1 << NFT_SET_ELEM_ATTR_DATA)) {
+			*data_len = s->data.len;
+			return &s->data.val;
+		}
 		break;
 	default:
 		break;
@@ -188,6 +199,13 @@ void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 
 		mnl_attr_nest_end(nlh, nest1);
 		mnl_attr_nest_end(nlh, nest2);
+	}
+	if (e->flags & (1 << NFT_SET_ELEM_ATTR_DATA)) {
+		struct nlattr *nest1;
+
+		nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_DATA);
+		mnl_attr_put(nlh, NFTA_DATA_VALUE, e->data.len, e->data.val);
+		mnl_attr_nest_end(nlh, nest1);
 	}
 }
 
@@ -270,6 +288,9 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 			break;
 		case DATA_CHAIN:
 			s->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
+			break;
+		case DATA_VALUE:
+			s->flags |= (1 << NFT_SET_ELEM_ATTR_DATA);
 			break;
 		}
         }
