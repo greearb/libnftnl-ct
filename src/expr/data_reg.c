@@ -76,8 +76,6 @@ static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg, char *xml)
 
 	mxmlDelete(tree);
 	return 0;
-	errno = EOPNOTSUPP;
-	return -1;
 }
 
 static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg, char *xml)
