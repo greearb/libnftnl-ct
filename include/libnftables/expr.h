@@ -94,6 +94,13 @@ enum {
 	NFT_EXPR_LOOKUP_SET,
 };
 
+enum {
+	NFT_EXPR_LOG_PREFIX	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_LOG_GROUP,
+	NFT_EXPR_LOG_SNAPLEN,
+	NFT_EXPR_LOG_QTHRESHOLD,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
