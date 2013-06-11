@@ -101,6 +101,13 @@ enum {
 	NFT_EXPR_LOG_QTHRESHOLD,
 };
 
+enum {
+	NFT_EXPR_EXTHDR_DREG	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_EXTHDR_TYPE,
+	NFT_EXPR_EXTHDR_OFFSET,
+	NFT_EXPR_EXTHDR_LEN,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
