@@ -108,6 +108,12 @@ enum {
 	NFT_EXPR_EXTHDR_LEN,
 };
 
+enum {
+	NFT_EXPR_CT_DREG	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_CT_KEY,
+	NFT_EXPR_CT_DIR,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

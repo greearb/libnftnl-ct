@@ -5,6 +5,7 @@
 extern struct expr_ops expr_ops_bitwise;
 extern struct expr_ops expr_ops_cmp;
 extern struct expr_ops expr_ops_counter;
+extern struct expr_ops expr_ops_ct;
 extern struct expr_ops expr_ops_exthdr;
 extern struct expr_ops expr_ops_immediate;
 extern struct expr_ops expr_ops_log;
@@ -19,6 +20,7 @@ struct expr_ops *expr_ops[] = {
 	&expr_ops_bitwise,
 	&expr_ops_cmp,
 	&expr_ops_counter,
+	&expr_ops_ct,
 	&expr_ops_exthdr,
 	&expr_ops_immediate,
 	&expr_ops_match,

@@ -14,6 +14,7 @@ libnftables_la_SOURCES = table.c		\
 			 expr/bitwise.c		\
 			 expr/cmp.c		\
 			 expr/counter.c		\
+			 expr/ct.c		\
 			 expr/data_reg.c	\
 			 expr/exthdr.c		\
 			 expr/log.c		\
