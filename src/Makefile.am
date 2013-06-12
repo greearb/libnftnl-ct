@@ -12,6 +12,7 @@ libnftables_la_SOURCES = table.c		\
 			 expr.c			\
 			 expr_ops.c		\
 			 expr/bitwise.c		\
+			 expr/byteorder.c	\
 			 expr/cmp.c		\
 			 expr/counter.c		\
 			 expr/ct.c		\

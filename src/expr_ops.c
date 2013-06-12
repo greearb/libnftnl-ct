@@ -3,6 +3,7 @@
 #include "expr_ops.h"
 
 extern struct expr_ops expr_ops_bitwise;
+extern struct expr_ops expr_ops_byteorder;
 extern struct expr_ops expr_ops_cmp;
 extern struct expr_ops expr_ops_counter;
 extern struct expr_ops expr_ops_ct;
@@ -18,6 +19,7 @@ extern struct expr_ops expr_ops_target;
 
 struct expr_ops *expr_ops[] = {
 	&expr_ops_bitwise,
+	&expr_ops_byteorder,
 	&expr_ops_cmp,
 	&expr_ops_counter,
 	&expr_ops_ct,
