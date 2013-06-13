@@ -18,6 +18,7 @@ libnftables_la_SOURCES = table.c		\
 			 expr/ct.c		\
 			 expr/data_reg.c	\
 			 expr/exthdr.c		\
+			 expr/limit.c		\
 			 expr/log.c		\
 			 expr/lookup.c		\
 			 expr/immediate.c	\

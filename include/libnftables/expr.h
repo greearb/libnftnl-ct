@@ -122,6 +122,11 @@ enum {
 	NFT_EXPR_BYTEORDER_SIZE,
 };
 
+enum {
+	NFT_EXPR_LIMIT_RATE	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_LIMIT_DEPTH,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

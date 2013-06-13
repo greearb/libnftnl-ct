@@ -9,6 +9,7 @@ extern struct expr_ops expr_ops_counter;
 extern struct expr_ops expr_ops_ct;
 extern struct expr_ops expr_ops_exthdr;
 extern struct expr_ops expr_ops_immediate;
+extern struct expr_ops expr_ops_limit;
 extern struct expr_ops expr_ops_log;
 extern struct expr_ops expr_ops_lookup;
 extern struct expr_ops expr_ops_match;
@@ -30,6 +31,7 @@ struct expr_ops *expr_ops[] = {
 	&expr_ops_nat,
 	&expr_ops_payload,
 	&expr_ops_target,
+	&expr_ops_limit,
 	&expr_ops_log,
 	&expr_ops_lookup,
 	NULL,
