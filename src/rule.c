@@ -742,6 +742,22 @@ int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
 }
 EXPORT_SYMBOL(nft_rule_snprintf);
 
+int nft_rule_expr_foreach(struct nft_rule *r,
+                          int (*cb)(struct nft_rule_expr *e, void *data),
+                          void *data)
+{
+       struct nft_rule_expr *cur, *tmp;
+       int ret;
+
+       list_for_each_entry_safe(cur, tmp, &r->expr_list, head) {
+               ret = cb(cur, data);
+               if (ret < 0)
+                       return ret;
+       }
+       return 0;
+}
+EXPORT_SYMBOL(nft_rule_expr_foreach);
+
 struct nft_rule_expr_iter {
 	struct nft_rule		*r;
 	struct nft_rule_expr	*cur;
@@ -816,6 +832,22 @@ void nft_rule_list_add(struct nft_rule *r, struct nft_rule_list *list)
 	list_add_tail(&r->head, &list->list);
 }
 EXPORT_SYMBOL(nft_rule_list_add);
+
+int nft_rule_list_foreach(struct nft_rule_list *rule_list,
+			  int (*cb)(struct nft_rule *r, void *data),
+			  void *data)
+{
+	struct nft_rule *cur, *tmp;
+	int ret;
+
+	list_for_each_entry_safe(cur, tmp, &rule_list->list, head) {
+		ret = cb(cur, data);
+		if (ret < 0)
+			return ret;
+	}
+	return 0;
+}
+EXPORT_SYMBOL(nft_rule_list_foreach);
 
 struct nft_rule_list_iter {
 	struct nft_rule_list	*list;

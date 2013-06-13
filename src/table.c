@@ -409,6 +409,22 @@ void nft_table_list_add(struct nft_table *r, struct nft_table_list *list)
 }
 EXPORT_SYMBOL(nft_table_list_add);
 
+int nft_table_list_foreach(struct nft_table_list *table_list,
+			   int (*cb)(struct nft_table *t, void *data),
+			   void *data)
+{
+	struct nft_table *cur, *tmp;
+	int ret;
+
+	list_for_each_entry_safe(cur, tmp, &table_list->list, head) {
+		ret = cb(cur, data);
+		if (ret < 0)
+			return ret;
+	}
+	return 0;
+}
+EXPORT_SYMBOL(nft_table_list_foreach);
+
 struct nft_table_list_iter {
 	struct nft_table_list	*list;
 	struct nft_table	*cur;

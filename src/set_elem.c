@@ -396,6 +396,22 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 }
 EXPORT_SYMBOL(nft_set_elem_snprintf);
 
+int nft_set_elem_foreach(struct nft_set *s,
+			 int (*cb)(struct nft_set_elem *e, void *data),
+			 void *data)
+{
+	struct nft_set_elem *elem;
+	int ret;
+
+	list_for_each_entry(elem, &s->element_list, head) {
+		ret = cb(elem, data);
+		if (ret < 0)
+			return ret;
+	}
+	return 0;
+}
+EXPORT_SYMBOL(nft_set_elem_foreach);
+
 struct nft_set_elems_iter {
 	struct list_head		*list;
 	struct nft_set_elem		*cur;

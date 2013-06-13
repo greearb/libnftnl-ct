@@ -56,6 +56,10 @@ int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *t, uint32_t type,
 struct nlmsghdr *nft_rule_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);
 int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *t);
 
+int nft_rule_expr_foreach(struct nft_rule *r,
+			  int (*cb)(struct nft_rule_expr *e, void *data),
+			  void *data);
+
 struct nft_rule_expr_iter;
 
 struct nft_rule_expr_iter *nft_rule_expr_iter_create(struct nft_rule *r);
@@ -67,6 +71,7 @@ struct nft_rule_list;
 struct nft_rule_list *nft_rule_list_alloc(void);
 void nft_rule_list_free(struct nft_rule_list *list);
 void nft_rule_list_add(struct nft_rule *r, struct nft_rule_list *list);
+int nft_rule_list_foreach(struct nft_rule_list *rule_list, int (*cb)(struct nft_rule *t, void *data), void *data);
 
 struct nft_rule_list_iter;
 

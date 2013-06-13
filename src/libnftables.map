@@ -16,6 +16,7 @@ global:
   nft_table_nlmsg_parse;
   nft_table_list_alloc;
   nft_table_list_free;
+  nft_table_list_foreach;
   nft_table_list_add;
   nft_table_list_iter_create;
   nft_table_list_iter_next;
@@ -43,6 +44,7 @@ global:
   nft_chain_list_free;
   nft_chain_list_add;
   nft_chain_list_del;
+  nft_chain_list_foreach;
   nft_chain_list_iter_create;
   nft_chain_list_iter_next;
   nft_chain_list_iter_destroy;
@@ -66,6 +68,7 @@ global:
   nft_rule_nlmsg_parse;
   nft_rule_add_expr;
 
+  nft_rule_expr_foreach;
   nft_rule_expr_iter_create;
   nft_rule_expr_iter_next;
   nft_rule_expr_iter_destroy;
@@ -87,6 +90,7 @@ global:
   nft_rule_list_alloc;
   nft_rule_list_free;
   nft_rule_list_add;
+  nft_rule_list_foreach;
   nft_rule_list_iter_create;
   nft_rule_list_iter_cur;
   nft_rule_list_iter_next;
@@ -109,6 +113,7 @@ global:
   nft_set_list_alloc;
   nft_set_list_free;
   nft_set_list_add;
+  nft_set_list_foreach;
 
   nft_set_list_iter_create;
   nft_set_list_iter_cur;
@@ -118,6 +123,7 @@ global:
   nft_set_elem_alloc;
   nft_set_elem_free;
   nft_set_elem_add;
+  nft_set_elem_foreach;
   nft_set_elem_attr_unset;
   nft_set_elem_attr_set;
   nft_set_elem_attr_set_u32;
@@ -132,6 +138,8 @@ global:
 
   nft_set_elems_nlmsg_build_payload;
   nft_set_elems_nlmsg_parse;
+
+  nft_set_elems_foreach;
 
   nft_set_elems_iter_create;
   nft_set_elems_iter_cur;

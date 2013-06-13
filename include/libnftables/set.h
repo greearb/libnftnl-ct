@@ -37,6 +37,7 @@ struct nft_set_list;
 struct nft_set_list *nft_set_list_alloc(void);
 void nft_set_list_free(struct nft_set_list *list);
 void nft_set_list_add(struct nft_set *s, struct nft_set_list *list);
+int nft_set_list_foreach(struct nft_set_list *set_list, int (*cb)(struct nft_set *t, void *data), void *data);
 
 struct nft_set_list_iter;
 struct nft_set_list_iter *nft_set_list_iter_create(struct nft_set_list *l);
@@ -79,6 +80,8 @@ void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set_elem 
 int nft_set_elem_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set_elem *s);
 
 int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *s, uint32_t type, uint32_t flags);
+
+int nft_set_elem_foreach(struct nft_set *s, int (*cb)(struct nft_set_elem *e, void *data), void *data);
 
 struct nft_set_elems_iter;
 struct nft_set_elems_iter *nft_set_elems_iter_create(struct nft_set *s);

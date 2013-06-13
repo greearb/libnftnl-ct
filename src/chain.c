@@ -801,6 +801,22 @@ void nft_chain_list_del(struct nft_chain *r)
 }
 EXPORT_SYMBOL(nft_chain_list_del);
 
+int nft_chain_list_foreach(struct nft_chain_list *chain_list,
+			   int (*cb)(struct nft_chain *r, void *data),
+			   void *data)
+{
+	struct nft_chain *cur, *tmp;
+	int ret;
+
+	list_for_each_entry_safe(cur, tmp, &chain_list->list, head) {
+		ret = cb(cur, data);
+		if (ret < 0)
+			return ret;
+	}
+	return 0;
+}
+EXPORT_SYMBOL(nft_chain_list_foreach);
+
 struct nft_chain_list_iter {
 	struct nft_chain_list	*list;
 	struct nft_chain	*cur;
