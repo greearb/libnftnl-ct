@@ -12,6 +12,7 @@ enum {
 	NFT_SET_ATTR_KEY_LEN,
 	NFT_SET_ATTR_DATA_TYPE,
 	NFT_SET_ATTR_DATA_LEN,
+	NFT_SET_ATTR_FAMILY,
 };
 
 struct nft_set;

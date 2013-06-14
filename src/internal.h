@@ -37,6 +37,7 @@ struct nlattr;
 struct nft_set {
 	struct list_head	head;
 
+	uint32_t		family;
 	uint32_t		set_flags;
 	char			*table;
 	char			*name;
