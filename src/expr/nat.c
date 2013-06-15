@@ -348,19 +348,21 @@ nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 		break;
 	}
 
-	ret = snprintf(buf, len, "<family>%s</family>",
+	ret = snprintf(buf+offset, len, "<family>%s</family>",
 		       nat->family == AF_INET ? "AF_INET" : "AF_INET6");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {
-		ret = snprintf(buf, len, "<sreg_addr_min_v4>%u</sreg_addr_min_v4>"
-				" <sreg_addr_max_v4>%u</sreg_addr_max_v4> ",
+		ret = snprintf(buf+offset, len,
+				"<sreg_addr_min_v4>%u</sreg_addr_min_v4>"
+				"<sreg_addr_max_v4>%u</sreg_addr_max_v4>",
 			       nat->sreg_addr_min, nat->sreg_addr_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MIN)) {
-		ret = snprintf(buf, len, "<sreg_proto_min>%u</sreg_proto_min>"
+		ret = snprintf(buf+offset, len,
+				"<sreg_proto_min>%u</sreg_proto_min>"
 				"<sreg_proto_max>%u</sreg_proto_max>",
 		       nat->sreg_proto_min, nat->sreg_proto_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
