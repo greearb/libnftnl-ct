@@ -201,7 +201,7 @@ static int
 nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, char *xml)
 {
 #ifdef XML_PARSING
-	struct nft_expr_bitwise *bitwise = (struct nft_expr_bitwise *)e;
+	struct nft_expr_bitwise *bitwise = (struct nft_expr_bitwise *)e->data;
 	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	mxml_node_t *save = NULL;
