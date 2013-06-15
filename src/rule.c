@@ -679,7 +679,7 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 
 	ret = snprintf(buf, size,
 		"<rule family=\"%u\" table=\"%s\" "
-			"chain=\"%s\" handle=\"%llu\" version=\"%d\"> ",
+			"chain=\"%s\" handle=\"%llu\" version=\"%d\">",
 				r->family, r->table, r->chain,
 				(unsigned long long)r->handle,
 				NFT_RULE_XML_VERSION);
