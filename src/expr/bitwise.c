@@ -62,7 +62,8 @@ nft_rule_expr_bitwise_set(struct nft_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nft_rule_expr_bitwise_get(struct nft_rule_expr *e, uint16_t type, size_t *data_len)
+nft_rule_expr_bitwise_get(const struct nft_rule_expr *e, uint16_t type,
+			  size_t *data_len)
 {
 	struct nft_expr_bitwise *bitwise = (struct nft_expr_bitwise *)e->data;
 

@@ -62,7 +62,7 @@ nft_rule_expr_target_set(struct nft_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nft_rule_expr_target_get(struct nft_rule_expr *e, uint16_t type,
+nft_rule_expr_target_get(const struct nft_rule_expr *e, uint16_t type,
 			 size_t *data_len)
 {
 	struct nft_expr_target *tg = (struct nft_expr_target *)e->data;

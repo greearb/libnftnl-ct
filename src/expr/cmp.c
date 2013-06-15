@@ -54,7 +54,8 @@ nft_rule_expr_cmp_set(struct nft_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nft_rule_expr_cmp_get(struct nft_rule_expr *e, uint16_t type, size_t *data_len)
+nft_rule_expr_cmp_get(const struct nft_rule_expr *e, uint16_t type,
+		      size_t *data_len)
 {
 	struct nft_expr_cmp *cmp = (struct nft_expr_cmp *)e->data;
 

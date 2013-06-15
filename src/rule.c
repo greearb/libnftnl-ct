@@ -163,7 +163,7 @@ void nft_rule_attr_set_str(struct nft_rule *r, uint16_t attr, const char *str)
 }
 EXPORT_SYMBOL(nft_rule_attr_set_str);
 
-void *nft_rule_attr_get(struct nft_rule *r, uint16_t attr)
+const void *nft_rule_attr_get(const struct nft_rule *r, uint16_t attr)
 {
 	switch(attr) {
 	case NFT_RULE_ATTR_FAMILY:
@@ -213,27 +213,27 @@ void *nft_rule_attr_get(struct nft_rule *r, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_rule_attr_get);
 
-const char *nft_rule_attr_get_str(struct nft_rule *r, uint16_t attr)
+const char *nft_rule_attr_get_str(const struct nft_rule *r, uint16_t attr)
 {
 	return nft_rule_attr_get(r, attr);
 }
 EXPORT_SYMBOL(nft_rule_attr_get_str);
 
-uint32_t nft_rule_attr_get_u32(struct nft_rule *r, uint16_t attr)
+uint32_t nft_rule_attr_get_u32(const struct nft_rule *r, uint16_t attr)
 {
 	uint32_t val = *((uint32_t *)nft_rule_attr_get(r, attr));
 	return val;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u32);
 
-uint64_t nft_rule_attr_get_u64(struct nft_rule *r, uint16_t attr)
+uint64_t nft_rule_attr_get_u64(const struct nft_rule *r, uint16_t attr)
 {
 	uint64_t val = *((uint64_t *)nft_rule_attr_get(r, attr));
 	return val;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u64);
 
-uint8_t nft_rule_attr_get_u8(struct nft_rule *r, uint16_t attr)
+uint8_t nft_rule_attr_get_u8(const struct nft_rule *r, uint16_t attr)
 {
 	uint8_t val = *((uint8_t *)nft_rule_attr_get(r, attr));
 	return val;

@@ -57,7 +57,8 @@ nft_rule_expr_lookup_set(struct nft_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nft_rule_expr_lookup_get(struct nft_rule_expr *e, uint16_t type, size_t *data_len)
+nft_rule_expr_lookup_get(const struct nft_rule_expr *e, uint16_t type,
+			 size_t *data_len)
 {
 	struct nft_expr_lookup *lookup = (struct nft_expr_lookup *)e->data;
 

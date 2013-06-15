@@ -31,11 +31,11 @@ void nft_rule_attr_set_u32(struct nft_rule *r, uint16_t attr, uint32_t val);
 void nft_rule_attr_set_u64(struct nft_rule *r, uint16_t attr, uint64_t val);
 void nft_rule_attr_set_str(struct nft_rule *r, uint16_t attr, const char *str);
 
-void *nft_rule_attr_get(struct nft_rule *r, uint16_t attr);
-const char *nft_rule_attr_get_str(struct nft_rule *r, uint16_t attr);
-uint8_t nft_rule_attr_get_u8(struct nft_rule *r, uint16_t attr);
-uint32_t nft_rule_attr_get_u32(struct nft_rule *r, uint16_t attr);
-uint64_t nft_rule_attr_get_u64(struct nft_rule *r, uint16_t attr);
+const void *nft_rule_attr_get(const struct nft_rule *r, uint16_t attr);
+const char *nft_rule_attr_get_str(const struct nft_rule *r, uint16_t attr);
+uint8_t nft_rule_attr_get_u8(const struct nft_rule *r, uint16_t attr);
+uint32_t nft_rule_attr_get_u32(const struct nft_rule *r, uint16_t attr);
+uint64_t nft_rule_attr_get_u64(const struct nft_rule *r, uint16_t attr);
 
 void nft_rule_add_expr(struct nft_rule *r, struct nft_rule_expr *expr);
 
