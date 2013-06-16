@@ -1,6 +1,8 @@
 #ifndef _RULE_EXPR_H_
 #define _RULE_EXPR_H_
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
