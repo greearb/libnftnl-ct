@@ -15,6 +15,7 @@ enum {
 struct nft_rule_expr *nft_rule_expr_alloc(const char *name);
 void nft_rule_expr_free(struct nft_rule_expr *expr);
 
+bool nft_rule_expr_is_set(const struct nft_rule_expr *expr, uint16_t type);
 void nft_rule_expr_set(struct nft_rule_expr *expr, uint16_t type, const void *data, size_t data_len);
 void nft_rule_expr_set_u8(struct nft_rule_expr *expr, uint16_t type, uint8_t data);
 void nft_rule_expr_set_u32(struct nft_rule_expr *expr, uint16_t type, uint32_t data);

@@ -53,6 +53,12 @@ void nft_rule_expr_free(struct nft_rule_expr *expr)
 }
 EXPORT_SYMBOL(nft_rule_expr_free);
 
+bool nft_rule_expr_is_set(const struct nft_rule_expr *expr, uint16_t type)
+{
+	return expr->flags & (1 << type);
+}
+EXPORT_SYMBOL(nft_rule_expr_is_set);
+
 void
 nft_rule_expr_set(struct nft_rule_expr *expr, uint16_t type,
 		  const void *data, size_t data_len)

@@ -44,6 +44,12 @@ void nft_set_elem_free(struct nft_set_elem *s)
 }
 EXPORT_SYMBOL(nft_set_elem_free);
 
+bool nft_set_elem_attr_is_set(struct nft_set_elem *s, uint16_t attr)
+{
+	return s->flags & (1 << attr);
+}
+EXPORT_SYMBOL(nft_set_elem_attr_is_set);
+
 void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr)
 {
 	switch (attr) {

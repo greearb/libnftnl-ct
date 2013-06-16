@@ -49,6 +49,12 @@ void nft_table_free(struct nft_table *t)
 }
 EXPORT_SYMBOL(nft_table_free);
 
+bool nft_table_attr_is_set(struct nft_table *t, uint16_t attr)
+{
+	return t->flags & (1 << attr);
+}
+EXPORT_SYMBOL(nft_table_attr_is_set);
+
 void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
 {
 	switch (attr) {

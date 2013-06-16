@@ -71,6 +71,12 @@ void nft_rule_free(struct nft_rule *r)
 }
 EXPORT_SYMBOL(nft_rule_free);
 
+bool nft_rule_attr_is_set(struct nft_rule *r, uint16_t attr)
+{
+	return r->flags & (1 << attr);
+}
+EXPORT_SYMBOL(nft_rule_attr_is_set);
+
 void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr)
 {
 	switch (attr) {

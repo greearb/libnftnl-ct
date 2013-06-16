@@ -2,6 +2,7 @@
 #define _RULE_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,6 +25,7 @@ enum {
 };
 
 void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr);
+bool nft_rule_attr_is_set(struct nft_rule *r, uint16_t attr);
 void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data);
 void nft_rule_attr_set_u32(struct nft_rule *r, uint16_t attr, uint32_t val);
 void nft_rule_attr_set_u64(struct nft_rule *r, uint16_t attr, uint64_t val);
