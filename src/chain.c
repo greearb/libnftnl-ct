@@ -492,6 +492,7 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 	}
 
 	c->family = nfg->nfgen_family;
+	c->flags |= (1 << NFT_CHAIN_ATTR_FAMILY);
 
 	return ret;
 }

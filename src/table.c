@@ -218,6 +218,7 @@ int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t)
 	}
 
 	t->family = nfg->nfgen_family;
+	t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
 
 	return 0;
 }

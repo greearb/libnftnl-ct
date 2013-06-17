@@ -169,6 +169,10 @@ void *nft_set_attr_get(struct nft_set *s, uint16_t attr)
 		if (s->flags & (1 << NFT_SET_ATTR_DATA_LEN))
 			return &s->data_len;
 		break;
+	case NFT_SET_ATTR_FAMILY:
+		if (s->flags & (1 << NFT_SET_ATTR_FAMILY))
+			return &s->family;
+		break;
 	default:
 		break;
 	}
@@ -297,6 +301,8 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 		s->data_len = ntohl(mnl_attr_get_u32(tb[NFTA_SET_DATA_LEN]));
 		s->flags |= (1 << NFT_SET_ATTR_DATA_LEN);
 	}
+	s->family = nfg->nfgen_family;
+	s->flags |= (1 << NFT_SET_ATTR_FAMILY);
 
 	return ret;
 }
