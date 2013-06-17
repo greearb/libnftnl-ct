@@ -268,7 +268,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 	/* Get and set <sreg_addr_min_v4>. Not mandatory */
 	node = mxmlFindElement(tree, tree, "sreg_addr_min_v4", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
+	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
 		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
 			mxmlDelete(tree);
@@ -282,7 +282,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 	/* Get and set <sreg_addr_max_v4>. Not mandatory */
 	node = mxmlFindElement(tree, tree, "sreg_addr_max_v4", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
+	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
 		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
 			mxmlDelete(tree);
@@ -296,7 +296,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 	/* Get and set <sreg_proto_min>. Not mandatory */
 	node = mxmlFindElement(tree, tree, "sreg_proto_min", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
+	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
 		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
 			mxmlDelete(tree);
@@ -310,7 +310,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 	/* Get and set <sreg_proto_max>. Not mandatory */
 	node = mxmlFindElement(tree, tree, "sreg_proto_max", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
+	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
 		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
 			mxmlDelete(tree);
