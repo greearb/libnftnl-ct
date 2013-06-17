@@ -280,7 +280,7 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 	if (tb[NFTA_SET_ELEM_FLAGS]) {
 		e->set_elem_flags =
 			ntohl(mnl_attr_get_u32(tb[NFTA_SET_ELEM_FLAGS]));
-		e->flags |= (1 << NFT_SET_ELEM_ATTR_KEY);
+		e->flags |= (1 << NFT_SET_ELEM_ATTR_FLAGS);
 	}
         if (tb[NFTA_SET_ELEM_KEY]) {
 		ret = nft_parse_data(&e->key, tb[NFTA_SET_ELEM_KEY], &type);
