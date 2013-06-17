@@ -151,7 +151,7 @@ void *nft_set_attr_get(struct nft_set *s, uint16_t attr)
 		break;
 	case NFT_SET_ATTR_FLAGS:
 		if (s->flags & (1 << NFT_SET_ATTR_FLAGS))
-			return &s->key_type;
+			return &s->set_flags;
 		break;
 	case NFT_SET_ATTR_KEY_TYPE:
 		if (s->flags & (1 << NFT_SET_ATTR_KEY_TYPE))
