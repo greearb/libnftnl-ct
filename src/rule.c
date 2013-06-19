@@ -697,7 +697,7 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 				"<expr type=\"%s\">", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
+		ret = nft_rule_expr_snprintf(buf+offset, size, expr, type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = snprintf(buf+offset, len, "</expr>");
@@ -726,7 +726,7 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 		ret = snprintf(buf+offset, len, "%s ", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
+		ret = nft_rule_expr_snprintf(buf+offset, size, expr, type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 

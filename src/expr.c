@@ -193,3 +193,16 @@ nft_rule_expr_build_payload(struct nlmsghdr *nlh, struct nft_rule_expr *expr)
 	mnl_attr_nest_end(nlh, nest1);
 }
 EXPORT_SYMBOL(nft_rule_expr_build_payload);
+
+int nft_rule_expr_snprintf(char *buf, size_t size, struct nft_rule_expr *expr,
+			   uint32_t type, uint32_t flags)
+{
+	int ret;
+	unsigned int offset = 0, len = size;
+
+	ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+EXPORT_SYMBOL(nft_rule_expr_snprintf);
