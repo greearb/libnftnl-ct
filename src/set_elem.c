@@ -130,7 +130,7 @@ void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, size_t *data_
 		break;
 	case NFT_SET_ELEM_ATTR_CHAIN:	/* NFTA_SET_ELEM_DATA */
 		if (s->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN))
-			return &s->data.chain;
+			return s->data.chain;
 		break;
 	case NFT_SET_ELEM_ATTR_DATA:	/* NFTA_SET_ELEM_DATA */
 		if (s->flags & (1 << NFT_SET_ELEM_ATTR_DATA)) {
