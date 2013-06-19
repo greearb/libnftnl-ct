@@ -42,9 +42,9 @@ struct nft_set {
 	char			*table;
 	char			*name;
 	uint32_t		key_type;
-	size_t			key_len;
+	uint32_t		key_len;
 	uint32_t		data_type;
-	size_t			data_len;
+	uint32_t		data_len;
 	struct list_head	element_list;
 
 	uint32_t		flags;

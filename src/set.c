@@ -82,6 +82,8 @@ void nft_set_attr_unset(struct nft_set *s, uint16_t attr)
 	case NFT_SET_ATTR_FLAGS:
 	case NFT_SET_ATTR_KEY_TYPE:
 	case NFT_SET_ATTR_KEY_LEN:
+	case NFT_SET_ATTR_DATA_TYPE:
+	case NFT_SET_ATTR_DATA_LEN:
 	case NFT_SET_ATTR_FAMILY:
 		break;
 	default:
@@ -115,6 +117,12 @@ void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data)
 		break;
 	case NFT_SET_ATTR_KEY_LEN:
 		s->key_len = *((uint32_t *)data);
+		break;
+	case NFT_SET_ATTR_DATA_TYPE:
+		s->data_type = *((uint32_t *)data);
+		break;
+	case NFT_SET_ATTR_DATA_LEN:
+		s->data_len = *((uint32_t *)data);
 		break;
 	case NFT_SET_ATTR_FAMILY:
 		s->family = *((uint32_t *)data);
