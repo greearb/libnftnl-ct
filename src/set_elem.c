@@ -290,13 +290,14 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 		ret = nft_parse_data(&e->data, tb[NFTA_SET_ELEM_DATA], &type);
 		switch(type) {
 		case DATA_VERDICT:
-			s->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
 			break;
 		case DATA_CHAIN:
-			s->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT) |
+				    (1 << NFT_SET_ELEM_ATTR_CHAIN);
 			break;
 		case DATA_VALUE:
-			s->flags |= (1 << NFT_SET_ELEM_ATTR_DATA);
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_DATA);
 			break;
 		}
         }
