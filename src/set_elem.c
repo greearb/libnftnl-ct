@@ -111,6 +111,12 @@ void nft_set_elem_attr_set_u32(struct nft_set_elem *s, uint16_t attr, uint32_t v
 }
 EXPORT_SYMBOL(nft_set_elem_attr_set_u32);
 
+void nft_set_elem_attr_set_str(struct nft_set_elem *s, uint16_t attr, const char *str)
+{
+	nft_set_elem_attr_set(s, attr, str, strlen(str));
+}
+EXPORT_SYMBOL(nft_set_elem_attr_set_str);
+
 void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, size_t *data_len)
 {
 	switch(attr) {
