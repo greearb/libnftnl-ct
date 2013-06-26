@@ -212,13 +212,19 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, char *xml)
 	/* Get and set <base>. Not mandatory */
 	node = mxmlFindElement(tree, tree, "base", NULL, NULL, MXML_DESCEND);
 	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+
+		if (strcmp(node->child->value.opaque, "link") == 0) {
+			payload->base = NFT_PAYLOAD_LL_HEADER;
+		} else if (strcmp(node->child->value.opaque, "network") == 0) {
+			payload->base = NFT_PAYLOAD_NETWORK_HEADER;
+		} else if (strcmp(node->child->value.opaque,
+				  "transport") == 0) {
+			payload->base = NFT_PAYLOAD_TRANSPORT_HEADER;
+		} else {
 			mxmlDelete(tree);
 			return -1;
 		}
 
-		payload->base = (uint32_t)tmp;
 		e->flags |= (1 << NFT_EXPR_PAYLOAD_BASE);
 	}
 
@@ -257,6 +263,41 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, char *xml)
 }
 
 static int
+nft_rule_expr_payload_snprintf_xml(char *buf, size_t len, uint32_t flags,
+				   struct nft_expr_payload *p)
+{
+	int size = len, offset = 0, ret;
+
+	ret = snprintf(buf, len, "<dreg>%u</dreg><offset>%u</offset>"
+		       "<len>%u</len>", p->dreg, p->offset, p->len);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	/* A default option is not provided.
+	 * The <base> node will be missing; Is not mandatory.
+	 */
+
+	switch (p->base) {
+	case NFT_PAYLOAD_LL_HEADER:
+		ret = snprintf(buf+offset, len, "<base>link</base>");
+		break;
+	case NFT_PAYLOAD_NETWORK_HEADER:
+		ret = snprintf(buf+offset, len, "<base>network</base>");
+		break;
+	case NFT_PAYLOAD_TRANSPORT_HEADER:
+		ret = snprintf(buf+offset, len, "<base>transport</base>");
+		break;
+	default:
+		ret = snprintf(buf+offset, len, "<base>unknown</base>");
+		break;
+	}
+
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+
+static int
 nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
@@ -264,12 +305,8 @@ nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_XML:
-		return snprintf(buf, len, "<dreg>%u</dreg>"
-					  "<base>%u</base><offset>%u</offset>"
-					  "<len>%u</len>",
-				payload->dreg, payload->base,
-					payload->offset, payload->len);
-
+		return nft_rule_expr_payload_snprintf_xml(buf, len, flags,
+							  payload);
 	case NFT_RULE_O_DEFAULT:
 		return snprintf(buf, len, "dreg=%u base=%u offset=%u len=%u ",
 				payload->dreg, payload->base,

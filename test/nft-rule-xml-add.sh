@@ -53,7 +53,7 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
   </expr>
   <expr type=\"payload\">
     <dreg>1</dreg>
-    <base>1</base>
+    <base>transport</base>
     <offset>12</offset>
     <len>4</len>
   </expr>
@@ -69,7 +69,7 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
   </expr>
   <expr type=\"payload\">
     <dreg>1</dreg>
-    <base>1</base>
+    <base>link</base>
     <offset>16</offset>
     <len>4</len>
   </expr>
@@ -85,7 +85,7 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
   </expr>
   <expr type=\"payload\">
     <dreg>1</dreg>
-    <base>1</base>
+    <base>network</base>
     <offset>9</offset>
     <len>1</len>
   </expr>
