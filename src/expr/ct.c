@@ -177,6 +177,9 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, char *xml)
 	if (tmp > UINT8_MAX || tmp < 0 || *endptr)
 		goto err;
 
+	if (tmp > NFT_REG_MAX)
+		goto err;
+
 	ct->dreg = tmp;
 	e->flags |= (1 << NFT_EXPR_CT_DREG);
 

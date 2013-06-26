@@ -225,6 +225,9 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, char *xml)
 	if (tmp > UINT32_MAX || tmp < 0 || *endptr)
 		goto err;
 
+	if (tmp > NFT_REG_MAX)
+		goto err;
+
 	byteorder->sreg = tmp;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_SREG);
 
@@ -234,6 +237,9 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, char *xml)
 
 	tmp = strtoull(node->child->value.opaque, &endptr, 10);
 	if (tmp > UINT32_MAX || tmp < 0 || *endptr)
+		goto err;
+
+	if (tmp > NFT_REG_MAX)
 		goto err;
 
 	byteorder->dreg = tmp;

@@ -163,6 +163,11 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, char *xml)
 		return -1;
 	}
 
+	if (tmp > NFT_REG_MAX) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
 	meta->dreg = (uint8_t)tmp;
 	e->flags |= (1 << NFT_EXPR_META_DREG);
 

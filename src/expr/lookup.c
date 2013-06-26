@@ -204,6 +204,11 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, char *xml)
 		return -1;
 	}
 
+	if (tmp > NFT_REG_MAX) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
 	lookup->sreg = (uint32_t)tmp;
 	e->flags |= (1 << NFT_EXPR_LOOKUP_SREG);
 
@@ -213,6 +218,11 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, char *xml)
 	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
 		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		if (tmp > NFT_REG_MAX) {
 			mxmlDelete(tree);
 			return -1;
 		}

@@ -205,6 +205,11 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, char *xml)
 			return -1;
 		}
 
+		if (tmp > NFT_REG_MAX) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
 		exthdr->dreg = tmp;
 		e->flags |= (1 << NFT_EXPR_EXTHDR_DREG);
 	}
