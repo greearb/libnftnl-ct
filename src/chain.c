@@ -661,13 +661,16 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		mxmlDelete(tree);
 		return -1;
 	}
-	utmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (utmp > UINT32_MAX || utmp < 0 || *endptr) {
+
+	if (strcmp(node->child->value.opaque, "accept") == 0) {
+		c->policy = NF_ACCEPT;
+	} else if (strcmp(node->child->value.opaque, "drop") == 0) {
+		c->policy = NF_DROP;
+	} else {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	c->policy = (uint32_t)utmp;
 	c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);
 
 	/* Get and set <family> */
@@ -741,23 +744,39 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 
 static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 {
-	return snprintf(buf, size,
-		"<chain name=\"%s\" handle=\"%lu\""
-			" bytes=\"%lu\" packets=\"%lu\" version=\"%d\">"
-			"<properties>"
+	int ret, len = size, offset = 0;
+
+	ret = snprintf(buf, size,
+		       "<chain name=\"%s\" handle=\"%lu\""
+		       " bytes=\"%lu\" packets=\"%lu\" version=\"%d\">"
+		       "<properties>"
 				"<type>%s</type>"
 				"<table>%s</table>"
 				"<prio>%d</prio>"
 				"<use>%d</use>"
-				"<hooknum>%s</hooknum>"
-				"<policy>%d</policy>"
-				"<family>%s</family>"
-			"</properties>"
-		"</chain>",
-			c->name, c->handle, c->bytes, c->packets,
-			NFT_CHAIN_XML_VERSION, c->type, c->table,
-			c->prio, c->use, hooknum2str_array[c->hooknum],
-			c->policy, nft_family2str(c->family));
+				"<hooknum>%s</hooknum>",
+		       c->name, c->handle, c->bytes, c->packets,
+		       NFT_CHAIN_XML_VERSION, c->type, c->table,
+		       c->prio, c->use, hooknum2str_array[c->hooknum]);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	/* The parsing will fail both if there are something different
+	 * than {accept|drop} or if the <policy> node is missing.
+	 */
+	if (c->policy == NF_ACCEPT) {
+		ret = snprintf(buf+offset, size, "<policy>accept</policy>");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	} else if (c->policy == NF_DROP) {
+		ret = snprintf(buf+offset, size, "<policy>drop</policy>");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, size, "<family>%s</family>"
+		       "</properties></chain>",
+		       nft_family2str(c->family));
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
 }
 
 static int nft_chain_snprintf_default(char *buf, size_t size,
