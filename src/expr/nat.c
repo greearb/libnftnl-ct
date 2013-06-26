@@ -385,18 +385,18 @@ nft_rule_expr_nat_snprintf_default(char *buf, size_t size,
 		break;
 	}
 
-	ret = snprintf(buf, len, "family=%s ", nft_family2str(nat->family));
+	ret = snprintf(buf+offset, len, "family=%s ", nft_family2str(nat->family));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {
-		ret = snprintf(buf, len,
+		ret = snprintf(buf+offset, len,
 			       "sreg_addr_min_v4=%u sreg_addr_max_v4=%u ",
 			       nat->sreg_addr_min, nat->sreg_addr_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MIN)) {
-		ret = snprintf(buf, len,
+		ret = snprintf(buf+offset, len,
 			       "sreg_proto_min=%u sreg_proto_max=%u ",
 			       nat->sreg_proto_min, nat->sreg_proto_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
