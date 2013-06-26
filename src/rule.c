@@ -572,37 +572,33 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	r->rule_flags = (uint32_t)tmp;
 	r->flags |= (1 << NFT_RULE_ATTR_FLAGS);
 
-	/* get and set <compat_proto> */
+	/* <compat_proto> is optional */
 	node = mxmlFindElement(tree, tree, "compat_proto", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-		mxmlDelete(tree);
-		return -1;
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
+
+		r->compat.proto = tmp;
+		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_PROTO);
 	}
 
-	r->compat.proto = (uint32_t)tmp;
-	r->flags |= (1 << NFT_RULE_ATTR_COMPAT_PROTO);
-
-	/* get and set <compat_flags> */
+	/* <compat_flags> is optional */
 	node = mxmlFindElement(tree, tree, "compat_flags", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (node != NULL) {
+		tmp = strtoull(node->child->value.opaque, &endptr, 10);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+			mxmlDelete(tree);
+			return -1;
+		}
 
-	r->compat.flags = (uint32_t)tmp;
-	r->flags |= (1 << NFT_RULE_ATTR_COMPAT_FLAGS);
+		r->compat.flags = tmp;
+		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_FLAGS);
+	}
 
 	/* Iterating over <expr> */
 	for (node = mxmlFindElement(tree, tree, "expr", "type",
@@ -685,12 +681,17 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 				NFT_RULE_XML_VERSION);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "<rule_flags>%u</rule_flags>"
-					"<compat_flags>%u</compat_flags>"
-					"<compat_proto>%u</compat_proto>",
-					r->rule_flags,
-					r->compat.flags, r->compat.proto);
+	ret = snprintf(buf+offset, len, "<rule_flags>%u</rule_flags>",
+		       r->rule_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (r->compat.flags != 0 || r->compat.proto != 0) {
+		ret = snprintf(buf+offset, len,
+			       "<compat_flags>%u</compat_flags>"
+			       "<compat_proto>%u</compat_proto>",
+			       r->compat.flags, r->compat.proto);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	list_for_each_entry(expr, &r->expr_list, head) {
 		ret = snprintf(buf+offset, len,
