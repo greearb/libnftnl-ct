@@ -101,9 +101,6 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
   </expr>
   <expr type=\"match\">
     <name>state</name>
-    <rev>0</rev>
-    <info>
-    </info>
   </expr>
   <expr type=\"counter\">
     <pkts>123123</pkts>
@@ -111,9 +108,6 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
   </expr>
   <expr type=\"target\">
     <name>LOG</name>
-    <rev>0</rev>
-    <info>
-    </info>
   </expr>
 </rule>"
 

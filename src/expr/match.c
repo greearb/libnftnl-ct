@@ -190,8 +190,6 @@ static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, char *xml)
 	struct nft_expr_match *mt = (struct nft_expr_match *)e->data;
 	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
-	uint64_t tmp;
-	char *endptr;
 
 	/* load the tree */
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
@@ -218,19 +216,6 @@ static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, char *xml)
 		e->flags |= (1 << NFT_EXPR_MT_NAME);
 	}
 
-	/* get and set <rev>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "rev", NULL, NULL, MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
-		mt->rev = (uint32_t)tmp;
-		e->flags |= (1 << NFT_EXPR_MT_REV);
-	}
-
 	/* mt->info is ignored until other solution is reached */
 
 	mxmlDelete(tree);
@@ -247,8 +232,7 @@ static int nft_rule_expr_match_snprintf_xml(char *buf, size_t len,
 	int ret, size=len;
 	int offset = 0;
 
-	ret = snprintf(buf, len, "<name>%s</name><rev>%u</rev>",
-				mt->name, mt->rev);
+	ret = snprintf(buf, len, "<name>%s</name>", mt->name);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
