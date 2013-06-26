@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <linux/netfilter/nf_tables.h>
@@ -20,6 +21,10 @@
 #include <libnftables/expr.h>
 #include <libnftables/rule.h>
 #include "expr_ops.h"
+
+#ifndef NFT_META_MAX
+#define NFT_META_MAX (NFT_META_SECMARK + 1)
+#endif
 
 struct nft_expr_meta {
 	uint8_t			key;	/* enum nft_meta_keys */
@@ -126,6 +131,44 @@ nft_rule_expr_meta_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
+const char *meta_key2str_array[NFT_META_MAX] = {
+	[NFT_META_LEN]		= "len",
+	[NFT_META_PROTOCOL]	= "protocol",
+	[NFT_META_PRIORITY]	= "priority",
+	[NFT_META_MARK]		= "mark",
+	[NFT_META_IIF]		= "iif",
+	[NFT_META_OIF]		= "oif",
+	[NFT_META_IIFNAME]	= "iifname",
+	[NFT_META_OIFNAME]	= "oifname",
+	[NFT_META_IIFTYPE]	= "iiftype",
+	[NFT_META_OIFTYPE]	= "oiftype",
+	[NFT_META_SKUID]	= "skuid",
+	[NFT_META_SKGID]	= "skgid",
+	[NFT_META_NFTRACE]	= "nftrace",
+	[NFT_META_RTCLASSID]	= "rtclassid",
+	[NFT_META_SECMARK]	= "secmark",
+};
+
+static const char *meta_key2str(uint8_t key)
+{
+	if (key < NFT_META_MAX)
+		return meta_key2str_array[key];
+
+	return "unknown";
+}
+
+static inline int str2meta_key(const char *str)
+{
+	int i;
+
+	for (i = 0; i < NFT_META_MAX; i++) {
+		if (strcmp(str, meta_key2str_array[i]) == 0)
+			return i;
+	}
+
+	return -1;
+}
+
 static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, char *xml)
 {
 #ifdef XML_PARSING
@@ -134,6 +177,7 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, char *xml)
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
+	int key;
 
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
@@ -178,13 +222,13 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, char *xml)
 		return -1;
 	}
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
+	key = str2meta_key(node->child->value.opaque);
+	if (key < 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	meta->key = (uint8_t)tmp;
+	meta->key = key;
 	e->flags |= (1 << NFT_EXPR_META_KEY);
 
 	mxmlDelete(tree);
@@ -204,8 +248,8 @@ nft_rule_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 	switch(type) {
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
-					  "<key>%u</key>",
-				meta->dreg, meta->key);
+					  "<key>%s</key>",
+				meta->dreg, meta_key2str(meta->key));
 	case NFT_RULE_O_DEFAULT:
 		return snprintf(buf, len, "dreg=%u key=%u ",
 				meta->dreg, meta->key);

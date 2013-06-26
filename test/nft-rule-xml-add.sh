@@ -39,7 +39,7 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
   <compat_proto>0</compat_proto>
   <expr type=\"meta\">
     <dreg>1</dreg>
-    <key>4</key>
+    <key>iif</key>
   </expr>
   <expr type=\"cmp\">
     <sreg>1</sreg>
