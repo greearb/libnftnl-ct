@@ -195,64 +195,79 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, char *xml)
 		return -1;
 	}
 
-	/* Get and set <dreg>. Not mandatory */
+	/* All nodes are mandatory */
+
+	/* Get and set <dreg> */
 	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
 			       MXML_DESCEND_FIRST);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
-		if (tmp > NFT_REG_MAX) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
-		exthdr->dreg = tmp;
-		e->flags |= (1 << NFT_EXPR_EXTHDR_DREG);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
 	}
 
-	/* Get and set <type>. Not mandatory */
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	if (tmp > NFT_REG_MAX) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	exthdr->dreg = tmp;
+	e->flags |= (1 << NFT_EXPR_EXTHDR_DREG);
+
+	/* Get and set <type> */
 	node = mxmlFindElement(tree, tree, "type", NULL, NULL, MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
-		exthdr->type = tmp;
-		e->flags |= (1 << NFT_EXPR_EXTHDR_TYPE);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
 	}
 
-	/* Get and set <offset>. Not mandatory */
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	exthdr->type = tmp;
+	e->flags |= (1 << NFT_EXPR_EXTHDR_TYPE);
+
+	/* Get and set <offset> */
 	node = mxmlFindElement(tree, tree, "offset", NULL, NULL,
 			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
-		exthdr->offset = tmp;
-		e->flags |= (1 << NFT_EXPR_EXTHDR_OFFSET);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
 	}
 
-	/* Get and set <len>. Not mandatory */
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	exthdr->offset = tmp;
+	e->flags |= (1 << NFT_EXPR_EXTHDR_OFFSET);
+
+	/* Get and set <len> */
 	node = mxmlFindElement(tree, tree, "len", NULL, NULL, MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
-		exthdr->len = tmp;
-		e->flags |= (1 << NFT_EXPR_EXTHDR_LEN);
+	if (node == NULL) {
+		mxmlDelete(tree);
+		return -1;
 	}
+
+	tmp = strtoull(node->child->value.opaque, &endptr, 10);
+	if (tmp > UINT_MAX || tmp < 0 || *endptr) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	exthdr->len = tmp;
+	e->flags |= (1 << NFT_EXPR_EXTHDR_LEN);
+
 	mxmlDelete(tree);
 	return 0;
 #else
