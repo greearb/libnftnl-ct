@@ -264,8 +264,8 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 	nat->family = family;
 	e->flags |= (1 << NFT_EXPR_NAT_FAMILY);
 
-	/* Get and set <sreg_addr_min_v4>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "sreg_addr_min_v4", NULL, NULL,
+	/* Get and set <sreg_addr_min>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "sreg_addr_min", NULL, NULL,
 			       MXML_DESCEND);
 	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
@@ -278,8 +278,8 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 		e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MIN);
 	}
 
-	/* Get and set <sreg_addr_max_v4>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "sreg_addr_max_v4", NULL, NULL,
+	/* Get and set <sreg_addr_max>. Not mandatory */
+	node = mxmlFindElement(tree, tree, "sreg_addr_max", NULL, NULL,
 			       MXML_DESCEND);
 	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
@@ -350,8 +350,8 @@ nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {
 		ret = snprintf(buf+offset, len,
-				"<sreg_addr_min_v4>%u</sreg_addr_min_v4>"
-				"<sreg_addr_max_v4>%u</sreg_addr_max_v4>",
+				"<sreg_addr_min>%u</sreg_addr_min>"
+				"<sreg_addr_max>%u</sreg_addr_max>",
 			       nat->sreg_addr_min, nat->sreg_addr_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
