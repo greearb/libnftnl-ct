@@ -298,6 +298,14 @@ nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, char *xml)
 	bitwise->xor.len = data_regtmp.len;
 	e->flags |= (1 << NFT_EXPR_BITWISE_XOR);
 
+	/* Additional validation: mask and xor must use the same number of
+	 * data registers.
+	 */
+	if (bitwise->mask.len != bitwise->xor.len) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
 	mxmlDelete(tree);
 	return 0;
 #else
