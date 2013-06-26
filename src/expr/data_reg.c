@@ -15,6 +15,7 @@
 #include <limits.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <netinet/in.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter.h>
@@ -205,7 +206,6 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 		reg->val[i] = utmp;
 	}
 
-
 	mxmlDelete(tree);
 	return 0;
 }
@@ -258,6 +258,7 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 				    union nft_data_reg *reg, uint32_t flags)
 {
 	int len = size, offset = 0, ret, i, j;
+	uint32_t be;
 	uint8_t *tmp;
 	int data_len = reg->len/sizeof(uint32_t);
 
@@ -271,9 +272,10 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 		ret = snprintf(buf+offset, len, "<data%d>0x", i);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		tmp = (uint8_t *)&reg->val[i];
+		be = htonl(reg->val[i]);
+		tmp = (uint8_t *)&be;
 
-		for (j=0; j<sizeof(int); j++) {
+		for (j = 0; j < sizeof(uint32_t); j++) {
 			ret = snprintf(buf+offset, len, "%.02x", tmp[j]);
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
