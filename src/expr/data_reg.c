@@ -132,7 +132,7 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 {
 	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
-	int i, len;
+	int i;
 	int64_t tmp;
 	uint64_t utmp;
 	char *endptr;
@@ -152,7 +152,7 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 
 	/*
 	* <data_reg type="value">
-	*    <len>4</len>
+	*    <len>16</len>
 	*    <data0>0xc09a002a</data0>
 	*    <data1>0x2700cac1</data1>
 	*    <data2>0x00000000</data2>
@@ -183,11 +183,11 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 		mxmlDelete(tree);
 		return -1;
 	}
-	/* maybe also (len < 1 || len > 4) */
-	len = tmp;
+
+	reg->len = tmp;
 
 	/* Get and set <dataN> */
-	for (i = 0; i < len; i++) {
+	for (i = 0; i < reg->len/sizeof(uint32_t); i++) {
 		sprintf(node_name, "data%d", i);
 
 		node = mxmlFindElement(tree, tree, node_name, NULL,
@@ -205,7 +205,6 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 		reg->val[i] = utmp;
 	}
 
-	reg->len = sizeof(reg->val);
 
 	mxmlDelete(tree);
 	return 0;
@@ -265,7 +264,7 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 	ret = snprintf(buf, len, "<data_reg type=\"value\">");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "<len>%d</len>", data_len);
+	ret = snprintf(buf+offset, len, "<len>%zd</len>", reg->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	for (i=0; i<data_len; i++) {

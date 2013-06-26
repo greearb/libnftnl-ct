@@ -46,7 +46,7 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
     <op>eq</op>
     <cmpdata>
       <data_reg type=\"value\">
-        <len>1</len>
+        <len>4</len>
         <data0>0x04000000</data0>
       </data_reg>
     </cmpdata>
@@ -62,7 +62,7 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
     <op>eq</op>
     <cmpdata>
       <data_reg type=\"value\">
-        <len>1</len>
+        <len>4</len>
         <data0>0x96d60496</data0>
       </data_reg>
     </cmpdata>
@@ -78,7 +78,7 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
     <op>eq</op>
     <cmpdata>
       <data_reg type=\"value\">
-        <len>1</len>
+        <len>4</len>
         <data0>0x96d60329</data0>
       </data_reg>
     </cmpdata>
@@ -94,7 +94,7 @@ XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version
     <op>eq</op>
     <cmpdata>
       <data_reg type=\"value\">
-        <len>1</len>
+        <len>4</len>
         <data0>0x06000000</data0>
       </data_reg>
     </cmpdata>
