@@ -12,6 +12,7 @@
 #include "internal.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include <limits.h>
 #include <arpa/inet.h>
@@ -24,6 +25,10 @@
 #include <libnftables/rule.h>
 
 #include "expr_ops.h"
+
+#ifndef IPPROTO_MH
+#define IPPROTO_MH 135
+#endif
 
 struct nft_expr_exthdr {
 	enum nft_registers	dreg;
@@ -171,6 +176,41 @@ nft_rule_expr_exthdr_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
+static const char *exthdr_type2str(uint32_t type)
+{
+	switch (type) {
+	case IPPROTO_HOPOPTS:
+		return "hopopts";
+	case IPPROTO_ROUTING:
+		return "routing";
+	case IPPROTO_FRAGMENT:
+		return "fragment";
+	case IPPROTO_DSTOPTS:
+		return "dstopts";
+	case IPPROTO_MH:
+		return "mh";
+	default:
+		return "unknown";
+	}
+}
+
+static inline int str2exthdr_type(char *str)
+{
+	if (strcmp(str, "hopopts") == 0)
+		return IPPROTO_HOPOPTS;
+	else if (strcmp(str, "routing") == 0)
+		return IPPROTO_ROUTING;
+	else if (strcmp(str, "fragment") == 0)
+		return IPPROTO_FRAGMENT;
+	else if (strcmp(str, "dstopts") == 0)
+		return IPPROTO_DSTOPTS;
+	else if (strcmp(str, "mh") == 0)
+		return IPPROTO_MH;
+
+	return -1;
+}
+
+
 static int
 nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, char *xml)
 {
@@ -180,6 +220,7 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, char *xml)
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
+	int type;
 
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
@@ -226,13 +267,13 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, char *xml)
 		return -1;
 	}
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
+	type = str2exthdr_type(node->child->value.opaque);
+	if (type < 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	exthdr->type = tmp;
+	exthdr->type = type;
 	e->flags |= (1 << NFT_EXPR_EXTHDR_TYPE);
 
 	/* Get and set <offset> */
@@ -285,9 +326,10 @@ nft_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 	switch(type) {
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
-					  "<type>%u</type><offset>%u</offset>"
+					  "<type>%s</type><offset>%u</offset>"
 					  "<len>%u</len>",
-					exthdr->dreg, exthdr->type,
+					exthdr->dreg,
+					exthdr_type2str(exthdr->type),
 					exthdr->offset, exthdr->len);
 
 	case NFT_RULE_O_DEFAULT:
