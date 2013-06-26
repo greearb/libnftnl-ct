@@ -260,8 +260,9 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, char *xml)
 	exthdr->dreg = tmp;
 	e->flags |= (1 << NFT_EXPR_EXTHDR_DREG);
 
-	/* Get and set <type> */
-	node = mxmlFindElement(tree, tree, "type", NULL, NULL, MXML_DESCEND);
+	/* Get and set <exthdr_type> */
+	node = mxmlFindElement(tree, tree, "exthdr_type", NULL, NULL,
+			       MXML_DESCEND);
 	if (node == NULL) {
 		mxmlDelete(tree);
 		return -1;
@@ -326,7 +327,8 @@ nft_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 	switch(type) {
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
-					  "<type>%s</type><offset>%u</offset>"
+					  "<exthdr_type>%s</exthdr_type>"
+					  "<offset>%u</offset>"
 					  "<len>%u</len>",
 					exthdr->dreg,
 					exthdr_type2str(exthdr->type),
