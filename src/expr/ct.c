@@ -27,6 +27,9 @@ struct nft_expr_ct {
 	uint8_t			dir;
 };
 
+#define IP_CT_DIR_ORIGINAL	0
+#define IP_CT_DIR_REPLY		1
+
 static int
 nft_rule_expr_ct_set(struct nft_rule_expr *e, uint16_t type,
 		       const void *data, size_t data_len)
@@ -200,6 +203,9 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, char *xml)
 
 	tmp = strtoull(node->child->value.opaque, &endptr, 10);
 	if (tmp > UINT8_MAX || tmp < 0 || *endptr)
+		goto err;
+
+	if (tmp != IP_CT_DIR_ORIGINAL && tmp != IP_CT_DIR_REPLY)
 		goto err;
 
 	ct->dir = tmp;
