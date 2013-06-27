@@ -515,6 +515,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	char *endptr = NULL;
 	uint64_t utmp;
 	int64_t tmp;
+	int family;
 
 	/* NOTE: all XML nodes are mandatory */
 
@@ -675,13 +676,14 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		mxmlDelete(tree);
 		return -1;
 	}
-	utmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (utmp > UINT8_MAX || utmp < 0 || *endptr) {
+
+	family = nft_str2family(node->child->value.opaque);
+	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	c->family = (uint32_t)utmp;
+	c->family = family;
 	c->flags |= (1 << NFT_CHAIN_ATTR_FAMILY);
 
 	mxmlDelete(tree);
@@ -727,14 +729,14 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 				"\"use\" : %d,"
 				"\"hooknum\" : \"%s\","
 				"\"policy\" : %d,"
-				"\"family\" : %d"
+				"\"family\" : \"%s\""
 			"}"
 		"}"
 		"}",
 			c->name, c->handle, c->bytes, c->packets,
 			NFT_CHAIN_JSON_VERSION, c->type, c->table,
 			c->prio, c->use, hooknum2str_array[c->hooknum],
-			c->policy, c->family);
+			c->policy, nft_family2str(c->family));
 }
 
 static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
@@ -749,22 +751,24 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 				"<use>%d</use>"
 				"<hooknum>%s</hooknum>"
 				"<policy>%d</policy>"
-				"<family>%d</family>"
+				"<family>%s</family>"
 			"</properties>"
 		"</chain>",
 			c->name, c->handle, c->bytes, c->packets,
 			NFT_CHAIN_XML_VERSION, c->type, c->table,
 			c->prio, c->use, hooknum2str_array[c->hooknum],
-			c->policy, c->family);
+			c->policy, nft_family2str(c->family));
 }
 
-static int nft_chain_snprintf_default(char *buf, size_t size, struct nft_chain *c)
+static int nft_chain_snprintf_default(char *buf, size_t size,
+				      struct nft_chain *c)
 {
-	return snprintf(buf, size, "family=%u table=%s chain=%s type=%s "
+	return snprintf(buf, size, "family=%s table=%s chain=%s type=%s "
 				   "hook=%u prio=%d policy=%d use=%d "
 				   "packets=%lu bytes=%lu",
-			c->family, c->table, c->name, c->type, c->hooknum,
-			c->prio, c->policy, c->use, c->packets, c->bytes);
+			nft_family2str(c->family), c->table, c->name, c->type,
+			c->hooknum, c->prio, c->policy, c->use, c->packets,
+			c->bytes);
 }
 
 int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,

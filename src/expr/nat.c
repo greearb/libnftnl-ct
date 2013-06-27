@@ -213,6 +213,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
+	int family;
 
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
@@ -254,15 +255,13 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 		return -1;
 	}
 
-	if (strcmp(node->child->value.opaque, "AF_INET") == 0) {
-		nat->family = AF_INET;
-	} else if (strcmp(node->child->value.opaque, "AF_INET6") == 0) {
-		nat->family = AF_INET6;
-	} else {
+	family = nft_str2family(node->child->value.opaque);
+	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
+	nat->family = family;
 	e->flags |= (1 << NFT_EXPR_NAT_FAMILY);
 
 	/* Get and set <sreg_addr_min_v4>. Not mandatory */
@@ -349,7 +348,7 @@ nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 	}
 
 	ret = snprintf(buf+offset, len, "<family>%s</family>",
-		       nat->family == AF_INET ? "AF_INET" : "AF_INET6");
+		       nft_family2str(nat->family));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {
@@ -389,8 +388,7 @@ nft_rule_expr_nat_snprintf_default(char *buf, size_t size,
 		break;
 	}
 
-	ret = snprintf(buf, len, "family=%s ",
-		       nat->family == AF_INET ? "AF_INET" : "AF_INET6");
+	ret = snprintf(buf, len, "family=%s ", nft_family2str(nat->family));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {

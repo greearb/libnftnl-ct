@@ -42,7 +42,7 @@ XML="<chain name=\"test1\" handle=\"100\" bytes=\"123\" packets=\"321\" version=
                 <use>0</use>
                 <hooknum>NF_INET_LOCAL_IN</hooknum>
                 <policy>1</policy>
-                <family>2</family>
+                <family>ip</family>
         </properties>
 </chain>"
 
@@ -63,7 +63,7 @@ XML="<chain name=\"test2\" handle=\"101\" bytes=\"59\" packets=\"1\" version=\"0
 		<use>0</use>
 		<hooknum>NF_INET_POST_ROUTING</hooknum>
 		<policy>1</policy>
-		<family>10</family>
+		<family>ip6</family>
 	</properties>
 </chain>"
 
@@ -85,7 +85,7 @@ XML="<chain name=\"test3\" handle=\"102\" bytes=\"51231239\" packets=\"112312312
 		<use>0</use>
 		<hooknum>NF_INET_FORWARD</hooknum>
 		<policy>1</policy>
-		<family>2</family>
+		<family>ip</family>
 	</properties>
 </chain>"
 

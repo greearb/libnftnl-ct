@@ -40,7 +40,7 @@ fi
 # This is valid
 XML="<table name=\"filter_test\" version=\"0\">
 	<properties>
-		<family>2</family>
+		<family>ip</family>
 		<table_flags>0</table_flags>
 	</properties>
 </table>"
@@ -57,7 +57,7 @@ fi
 # This is valid
 XML="<table name=\"filter6_test\" version=\"0\">
 	<properties>
-		<family>10</family>
+		<family>ip6</family>
 		<table_flags>0</table_flags>
 	</properties>
 </table>"

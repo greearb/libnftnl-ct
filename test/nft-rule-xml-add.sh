@@ -33,9 +33,8 @@ fi
 
 [ ! -x "$NFT" ] && echo "W: nftables main binary not found but continuing anyway $NFT"
 
-XML="<rule family=\"2\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version=\"0\">
+XML="<rule family=\"ip\" table=\"filter\" chain=\"INPUT\" handle=\"100\" version=\"0\">
   <rule_flags>0</rule_flags>
-  <flags>127</flags>
   <compat_flags>0</compat_flags>
   <compat_proto>0</compat_proto>
   <expr type=\"meta\">

@@ -486,6 +486,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	struct expr_ops *ops;
 	char *endptr = NULL;
 	uint64_t tmp;
+	int family;
 
 	/* Load the tree */
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
@@ -509,13 +510,13 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 		return -1;
 	}
 
-	tmp = strtoull(mxmlElementGetAttr(tree, "family"), &endptr, 10);
-	if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
+	family = nft_str2family(mxmlElementGetAttr(tree, "family"));
+	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	r->family = (uint8_t)tmp;
+	r->family = family;
 	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
 
 	/* get and set <rule ... table=X ...> */
@@ -674,9 +675,9 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 	struct nft_rule_expr *expr;
 
 	ret = snprintf(buf, size,
-		"<rule family=\"%u\" table=\"%s\" "
+		"<rule family=\"%s\" table=\"%s\" "
 			"chain=\"%s\" handle=\"%llu\" version=\"%d\">",
-				r->family, r->table, r->chain,
+				nft_family2str(r->family), r->table, r->chain,
 				(unsigned long long)r->handle,
 				NFT_RULE_XML_VERSION);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
@@ -717,9 +718,9 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 	struct nft_rule_expr *expr;
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, size, "family=%u table=%s chain=%s handle=%llu "
+	ret = snprintf(buf, size, "family=%s table=%s chain=%s handle=%llu "
 				  "flags=%x ",
-			r->family, r->table, r->chain,
+			nft_family2str(r->family), r->table, r->chain,
 			(unsigned long long)r->handle, r->rule_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 

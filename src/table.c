@@ -232,6 +232,7 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	char *endptr = NULL;
 	uint64_t tmp;
 	int64_t stmp;
+	int family;
 
 	/* NOTE: all XML nodes are mandatory */
 
@@ -275,13 +276,13 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 		return -1;
 	}
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || *endptr || tmp < 0) {
+	family = nft_str2family(node->child->value.opaque);
+	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	t->family = (uint32_t)tmp;
+	t->family = family;
 	t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
 
 	/* Get and set <table_flags> */
@@ -335,32 +336,31 @@ static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 			"\"name\" : \"%s\","
 			"\"version\" : %d,"
 			"\"properties\" : {"
-				"\"family\" : %u,"
+				"\"family\" : \"%s\","
 				"\"table_flags\" : %d"
 				"}"
 			"}"
 			"}" ,
 			t->name, NFT_TABLE_JSON_VERSION,
-			t->family, t->table_flags);
+			nft_family2str(t->family), t->table_flags);
 }
 
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
-	return snprintf(buf, size,
-			"<table name=\"%s\" version=\"%d\">"
+	return snprintf(buf, size, "<table name=\"%s\" version=\"%d\">"
 				"<properties>"
-					"<family>%u</family>"
+					"<family>%s</family>"
 					"<table_flags>%d</table_flags>"
 				"</properties>"
-			"</table>" ,
-			t->name, NFT_TABLE_XML_VERSION,
-			t->family, t->table_flags);
+				"</table>",
+		       t->name, NFT_TABLE_XML_VERSION,
+		       nft_family2str(t->family), t->table_flags);
 }
 
 static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)
 {
-	return snprintf(buf, size, "table=%s family=%u flags=%x",
-			t->name, t->family, t->table_flags);
+	return snprintf(buf, size, "table=%s family=%s flags=%x",
+			t->name, nft_family2str(t->family), t->table_flags);
 }
 
 int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,

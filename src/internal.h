@@ -23,6 +23,9 @@
 #define NFT_TABLE_JSON_VERSION 0
 #define NFT_CHAIN_JSON_VERSION 0
 
+const char *nft_family2str(uint32_t family);
+int nft_str2family(const char *family);
+
 struct expr_ops;
 
 struct nft_rule_expr {
