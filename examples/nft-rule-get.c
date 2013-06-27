@@ -54,8 +54,11 @@ int main(int argc, char *argv[])
 	struct nft_rule *t = NULL;
 	int ret;
 
-	if (argc == 2 && strcmp(argv[1], "xml") == 0 )
+	if (argc == 2 && strcmp(argv[1], "xml") == 0 ){
 		type = NFT_RULE_O_XML;
+	}else if (argc == 2 && strcmp(argv[1], "json") == 0 ){
+		type = NFT_RULE_O_JSON;
+	}
 
 	/* XXX requires table, chain and handle attributes for selective get */
 
