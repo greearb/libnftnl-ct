@@ -1,7 +1,5 @@
 <rule family="ip" table="test" chain="test" handle="1000" version="0">
-  <rule_flags>123</rule_flags>
-  <compat_flags>123</compat_flags>
-  <compat_proto>123</compat_proto>
+  <rule_flags>0</rule_flags>
   <expr type="byteorder">
 	<sreg>3</sreg>
 	<dreg>4</dreg>

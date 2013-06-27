@@ -1,7 +1,5 @@
 <rule family="ip" table="filter" chain="INPUT" handle="100" version="0">
   <rule_flags>0</rule_flags>
-  <compat_flags>0</compat_flags>
-  <compat_proto>0</compat_proto>
   <expr type="ct">
     <dreg>4</dreg>
     <dir>1</dir>
