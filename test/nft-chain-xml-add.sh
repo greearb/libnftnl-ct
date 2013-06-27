@@ -40,7 +40,7 @@ XML="<chain name=\"test1\" handle=\"100\" bytes=\"123\" packets=\"321\" version=
                 <table>filter</table>
                 <prio>0</prio>
                 <use>0</use>
-                <hooknum>2</hooknum>
+                <hooknum>NF_INET_LOCAL_IN</hooknum>
                 <policy>1</policy>
                 <family>2</family>
         </properties>
@@ -61,7 +61,7 @@ XML="<chain name=\"test2\" handle=\"101\" bytes=\"59\" packets=\"1\" version=\"0
 		<table>filter</table>
 		<prio>1</prio>
 		<use>0</use>
-		<hooknum>4</hooknum>
+		<hooknum>NF_INET_POST_ROUTING</hooknum>
 		<policy>1</policy>
 		<family>10</family>
 	</properties>
@@ -83,7 +83,7 @@ XML="<chain name=\"test3\" handle=\"102\" bytes=\"51231239\" packets=\"112312312
 		<table>filter</table>
 		<prio>0</prio>
 		<use>0</use>
-		<hooknum>4</hooknum>
+		<hooknum>NF_INET_FORWARD</hooknum>
 		<policy>1</policy>
 		<family>2</family>
 	</properties>

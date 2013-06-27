@@ -22,6 +22,7 @@
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nf_tables.h>
+#include <linux/netfilter.h>
 
 #include <libnftables/chain.h>
 
@@ -40,6 +41,14 @@ struct nft_chain {
 	uint64_t	bytes;
 	uint64_t	handle;
 	uint32_t	flags;
+};
+
+static const char *hooknum2str_array[NF_INET_NUMHOOKS] = {
+	[NF_INET_PRE_ROUTING]	= "NF_INET_PRE_ROUTING",
+	[NF_INET_LOCAL_IN]	= "NF_INET_LOCAL_IN",
+	[NF_INET_FORWARD]	= "NF_INET_FORWARD",
+	[NF_INET_LOCAL_OUT]	= "NF_INET_LOCAL_OUT",
+	[NF_INET_POST_ROUTING]	= "NF_INET_POST_ROUTING",
 };
 
 struct nft_chain *nft_chain_alloc(void)
@@ -629,14 +638,21 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		mxmlDelete(tree);
 		return -1;
 	}
-	utmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (utmp > UINT32_MAX || utmp < 0 || *endptr) {
+
+	/* iterate the list of hooks until a match is found */
+	for (utmp = 0; utmp < NF_INET_NUMHOOKS; utmp++) {
+		if (strcmp(node->child->value.opaque, hooknum2str_array[utmp]) == 0) {
+			c->hooknum = utmp;
+			c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
+			break;
+		}
+	}
+
+	/* if no hook was found, error */
+	if (!(c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM))) {
 		mxmlDelete(tree);
 		return -1;
 	}
-
-	memcpy(&c->hooknum, &utmp, sizeof(c->hooknum));
-	c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
 
 	/* Get and set <policy> */
 	node = mxmlFindElement(tree, tree, "policy", NULL, NULL, MXML_DESCEND);
@@ -709,7 +725,7 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 				"\"table\" : \"%s\","
 				"\"prio\" : %d,"
 				"\"use\" : %d,"
-				"\"hooknum\" : %d,"
+				"\"hooknum\" : \"%s\","
 				"\"policy\" : %d,"
 				"\"family\" : %d"
 			"}"
@@ -717,7 +733,8 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 		"}",
 			c->name, c->handle, c->bytes, c->packets,
 			NFT_CHAIN_JSON_VERSION, c->type, c->table,
-			c->prio, c->use, c->hooknum, c->policy, c->family);
+			c->prio, c->use, hooknum2str_array[c->hooknum],
+			c->policy, c->family);
 }
 
 static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
@@ -730,14 +747,15 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 				"<table>%s</table>"
 				"<prio>%d</prio>"
 				"<use>%d</use>"
-				"<hooknum>%d</hooknum>"
+				"<hooknum>%s</hooknum>"
 				"<policy>%d</policy>"
 				"<family>%d</family>"
 			"</properties>"
 		"</chain>",
 			c->name, c->handle, c->bytes, c->packets,
 			NFT_CHAIN_XML_VERSION, c->type, c->table,
-			c->prio, c->use, c->hooknum, c->policy, c->family);
+			c->prio, c->use, hooknum2str_array[c->hooknum],
+			c->policy, c->family);
 }
 
 static int nft_chain_snprintf_default(char *buf, size_t size, struct nft_chain *c)
