@@ -99,10 +99,10 @@ int main(int argc, char *argv[])
 		if (strcmp(&dent->d_name[len-4], ".xml") == 0) {
 			printf("parsing %s: ", path);
 			if (test_xml(path) < 0)
-				printf("\033[31mFAILED\033[37m (%s)\n",
+				printf("\033[31mFAILED\e[0m (%s)\n",
 					strerror(errno));
 			else
-				printf("\033[32mOK\033[37m \n");
+				printf("\033[32mOK\e[0m\n");
 		}
 	}
 
