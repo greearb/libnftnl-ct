@@ -328,6 +328,44 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 }
 
 static int
+nft_rule_expr_nat_snprintf_json(char *buf, size_t size,
+				struct nft_rule_expr *e)
+{
+	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	int len = size, offset = 0, ret = 0;
+
+	if (nat->type == NFT_NAT_SNAT)
+		ret = snprintf(buf, len, "\"nat_type\" : \"snat\", ");
+	else if (nat->type == NFT_NAT_DNAT)
+		ret = snprintf(buf, len, "\nat_type\" : \"dnat\", ");
+
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = snprintf(buf+offset, len, "\"family\" : \"%s\", ",
+		       nft_family2str(nat->family));
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {
+		ret = snprintf(buf+offset, len,
+				"\"sreg_addr_min\" : %u, "
+				"\"sreg_addr_max\" : %u, ",
+			       nat->sreg_addr_min, nat->sreg_addr_max);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MIN)) {
+		ret = snprintf(buf+offset, len,
+				"\"sreg_proto_min\" : %u, "
+				"\"sreg_proto_max\" : %u",
+		       nat->sreg_proto_min, nat->sreg_proto_max);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+}
+
+
+static int
 nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 				struct nft_rule_expr *e)
 {
@@ -410,10 +448,12 @@ nft_rule_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
 			   uint32_t flags, struct nft_rule_expr *e)
 {
 	switch (type) {
-	case NFT_RULE_O_XML:
-		return nft_rule_expr_nat_snprintf_xml(buf, size, e);
 	case NFT_RULE_O_DEFAULT:
 		return nft_rule_expr_nat_snprintf_default(buf, size, e);
+	case NFT_RULE_O_XML:
+		return nft_rule_expr_nat_snprintf_xml(buf, size, e);
+	case NFT_RULE_O_JSON:
+		return nft_rule_expr_nat_snprintf_json(buf, size, e);
 	default:
 		break;
 	}

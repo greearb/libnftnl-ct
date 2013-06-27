@@ -239,6 +239,20 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, char *xml)
 }
 
 static int
+nft_rule_expr_lookup_snprintf_json(char *buf, size_t size,
+				  struct nft_expr_lookup *l)
+{
+	int len = size, offset = 0, ret;
+
+	ret = snprintf(buf, len, "\"set\" : \"%s\", \"sreg\" : %u, \"dreg\" : %u",
+			l->set_name, l->sreg, l->dreg);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+
+static int
 nft_rule_expr_lookup_snprintf_xml(char *buf, size_t size,
 				  struct nft_expr_lookup *l)
 {
@@ -271,10 +285,12 @@ nft_rule_expr_lookup_snprintf(char *buf, size_t size, uint32_t type,
 	struct nft_expr_lookup *lookup = (struct nft_expr_lookup *)e->data;
 
 	switch(type) {
-	case NFT_RULE_O_XML:
-		return nft_rule_expr_lookup_snprintf_xml(buf, size, lookup);
 	case NFT_RULE_O_DEFAULT:
 		return nft_rule_expr_lookup_snprintf_default(buf, size, lookup);
+	case NFT_RULE_O_XML:
+		return nft_rule_expr_lookup_snprintf_xml(buf, size, lookup);
+	case NFT_RULE_O_JSON:
+		return nft_rule_expr_lookup_snprintf_json(buf, size, lookup);
 	default:
 		break;
 	}

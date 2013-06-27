@@ -253,6 +253,44 @@ int nft_data_reg_xml_parse(union nft_data_reg *reg, char *xml)
 #endif
 }
 
+static int
+nft_data_reg_value_snprintf_json(char *buf, size_t size,
+					   union nft_data_reg *reg,
+					   uint32_t flags)
+{
+	int len = size, offset = 0, ret, i, j;
+	uint32_t utemp;
+	uint8_t *tmp;
+	int data_len = reg->len/sizeof(uint32_t);
+
+	ret = snprintf(buf, len, "\"data_reg\": { \"type\" : \"value\", ");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = snprintf(buf+offset, len, "\"len\" : %zd, ", reg->len);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	for (i = 0; i<data_len; i++) {
+		ret = snprintf(buf+offset, len, "\"data%d\" : \"0x", i);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		utemp = htonl(reg->val[i]);
+		tmp = (uint8_t *)&utemp;
+
+		for (j = 0; j<sizeof(uint32_t); j++) {
+			ret = snprintf(buf+offset, len, "%.02x", tmp[j]);
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		}
+
+		ret = snprintf(buf+offset, len, "\"");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, len, "}");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
 static
 int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 				    union nft_data_reg *reg, uint32_t flags)
@@ -310,36 +348,49 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 	switch(reg_type) {
 	case DATA_VALUE:
 		switch(output_format) {
-		case NFT_RULE_O_XML:
-			return nft_data_reg_value_snprintf_xml(buf, size,
-							       reg, flags);
 		case NFT_RULE_O_DEFAULT:
 			return nft_data_reg_value_snprintf_default(buf, size,
 								   reg, flags);
+		case NFT_RULE_O_XML:
+			return nft_data_reg_value_snprintf_xml(buf, size,
+							       reg, flags);
+		case NFT_RULE_O_JSON:
+			return nft_data_reg_value_snprintf_json(buf, size,
+							       reg, flags);
 		default:
 			break;
 		}
 	case DATA_VERDICT:
 		switch(output_format) {
+		case NFT_RULE_O_DEFAULT:
+			return snprintf(buf, size, "verdict=%d", reg->verdict);
 		case NFT_RULE_O_XML:
 			return snprintf(buf, size,
 					"<data_reg type=\"verdict\">"
 						"<verdict>%d</verdict>"
 					"</data_reg>", reg->verdict);
-		case NFT_RULE_O_DEFAULT:
-			return snprintf(buf, size, "verdict=%d", reg->verdict);
+		case NFT_RULE_O_JSON:
+			return snprintf(buf, size,
+					"\"data_reg\": { \"type\" : \"verdict\", "
+						"\"verdict\" : %d"
+					"}", reg->verdict);
 		default:
 			break;
 		}
 	case DATA_CHAIN:
 		switch(output_format) {
+		case NFT_RULE_O_DEFAULT:
+			return snprintf(buf, size, "chain=%s", reg->chain);
 		case NFT_RULE_O_XML:
 			return snprintf(buf, size,
 					"<data_reg type=\"chain\">"
 						"<chain>%s</chain>"
 					"</data_reg>", reg->chain);
-		case NFT_RULE_O_DEFAULT:
-			return snprintf(buf, size, "chain=%s", reg->chain);
+		case NFT_RULE_O_JSON:
+			return snprintf(buf, size,
+					"\"data_reg\": { \"type\" : \"chain\", "
+						"\"chain\" : %d"
+					"}", reg->verdict);
 		default:
 			break;
 		}

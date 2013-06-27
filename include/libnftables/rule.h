@@ -44,6 +44,7 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *t);
 enum {
 	NFT_RULE_O_DEFAULT	= 0,
 	NFT_RULE_O_XML,
+	NFT_RULE_O_JSON,
 };
 
 enum nft_rule_parse_type {

@@ -298,6 +298,25 @@ err:
 }
 
 static int
+nft_rule_expr_byteorder_snprintf_json(char *buf, size_t size,
+				       struct nft_expr_byteorder *byteorder)
+{
+	int len = size, offset = 0, ret;
+
+	ret = snprintf(buf, len, "\"sreg\" : %u, "
+				 "\"dreg\" : %u, "
+				 "\"op\" : \"%s\", "
+				 "\"len\" : %u, "
+				 "\"size\" : %u",
+		       byteorder->sreg, byteorder->dreg,
+		       expr_byteorder_str[byteorder->op],
+		       byteorder->len, byteorder->size);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int
 nft_rule_expr_byteorder_snprintf_xml(char *buf, size_t size,
 				   struct nft_expr_byteorder *byteorder)
 {
@@ -343,6 +362,9 @@ nft_rule_expr_byteorder_snprintf(char *buf, size_t size, uint32_t type,
 								byteorder);
 	case NFT_RULE_O_XML:
 		return nft_rule_expr_byteorder_snprintf_xml(buf, size,
+							    byteorder);
+	case NFT_RULE_O_JSON:
+		return nft_rule_expr_byteorder_snprintf_json(buf, size,
 							    byteorder);
 	default:
 		break;

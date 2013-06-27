@@ -279,6 +279,11 @@ nft_rule_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
 					  "<key>%s</key>"
 					  "<dir>%u</dir>",
 				ct->dreg, ctkey2str(ct->key), ct->dir);
+	case NFT_RULE_O_JSON:
+		return snprintf(buf, len, "\"dreg\" : %u, "
+					  "\"key\" : \"%s\", "
+					  "\"dir\" : %u",
+				ct->dreg, ctkey2str(ct->key), ct->dir);
 	default:
 		break;
 	}

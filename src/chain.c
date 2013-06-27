@@ -794,12 +794,12 @@ int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
 		       uint32_t type, uint32_t flags)
 {
 	switch(type) {
-	case NFT_CHAIN_O_JSON:
-		return nft_chain_snprintf_json(buf, size, c);
-	case NFT_CHAIN_O_XML:
-		return nft_chain_snprintf_xml(buf, size, c);
 	case NFT_CHAIN_O_DEFAULT:
 		return nft_chain_snprintf_default(buf, size, c);
+	case NFT_CHAIN_O_XML:
+		return nft_chain_snprintf_xml(buf, size, c);
+	case NFT_CHAIN_O_JSON:
+		return nft_chain_snprintf_json(buf, size, c);
 	default:
 		break;
 	}

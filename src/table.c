@@ -367,12 +367,12 @@ int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
 		       uint32_t type, uint32_t flags)
 {
 	switch(type) {
+	case NFT_TABLE_O_DEFAULT:
+		return nft_table_snprintf_default(buf, size, t);
 	case NFT_TABLE_O_XML:
 		return nft_table_snprintf_xml(buf, size, t);
 	case NFT_TABLE_O_JSON:
 		return nft_table_snprintf_json(buf, size, t);
-	case NFT_TABLE_O_DEFAULT:
-		return nft_table_snprintf_default(buf, size, t);
 	default:
 		break;
 	}

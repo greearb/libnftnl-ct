@@ -246,13 +246,17 @@ nft_rule_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_meta *meta = (struct nft_expr_meta *)e->data;
 
 	switch(type) {
+	case NFT_RULE_O_DEFAULT:
+		return snprintf(buf, len, "dreg=%u key=%u ",
+				meta->dreg, meta->key);
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
 					  "<key>%s</key>",
 				meta->dreg, meta_key2str(meta->key));
-	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "dreg=%u key=%u ",
-				meta->dreg, meta->key);
+	case NFT_RULE_O_JSON:
+		return snprintf(buf, len, "\"dreg\" : %u, "
+					  "\"key\" : %s",
+				meta->dreg, meta_key2str(meta->key));
 	default:
 		break;
 	}
