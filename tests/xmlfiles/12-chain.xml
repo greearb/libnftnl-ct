@@ -1,0 +1,11 @@
+<chain name="foo" handle="100" bytes="59264154979" packets="2548796325" version="0">
+	<properties>
+		<type>nat</type>
+		<table>nat</table>
+		<prio>0</prio>
+		<use>1</use>
+		<hooknum>NF_INET_POST_ROUTING</hooknum>
+		<policy>accept</policy>
+		<family>ip</family>
+	</properties>
+</chain>

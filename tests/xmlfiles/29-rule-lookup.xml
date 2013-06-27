@@ -1,0 +1,8 @@
+<rule family="ip" table="filter" chain="INPUT" handle="100" version="0">
+  <rule_flags>0</rule_flags>
+  <expr type="lookup">
+    <sreg>2</sreg>
+    <dreg>1</dreg>
+    <set>set_name_test</set>
+  </expr>
+</rule>

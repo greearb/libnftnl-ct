@@ -1,0 +1,12 @@
+<rule family="ip" table="test" chain="test" handle="1000" version="0">
+  <rule_flags>123</rule_flags>
+  <compat_flags>123</compat_flags>
+  <compat_proto>123</compat_proto>
+  <expr type="byteorder">
+	<sreg>3</sreg>
+	<dreg>4</dreg>
+	<op>hton</op>
+	<len>4</len>
+	<size>4</size>
+  </expr>
+</rule>

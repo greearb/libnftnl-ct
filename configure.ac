@@ -38,5 +38,5 @@ regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
 	-Wformat=2 -pipe"
 AC_SUBST([regular_CPPFLAGS])
 AC_SUBST([regular_CFLAGS])
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile include/libnftables/Makefile include/linux/Makefile include/linux/netfilter/Makefile examples/Makefile libnftables.pc doxygen.cfg])
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile include/libnftables/Makefile include/linux/Makefile include/linux/netfilter/Makefile examples/Makefile tests/Makefile libnftables.pc doxygen.cfg])
 AC_OUTPUT
