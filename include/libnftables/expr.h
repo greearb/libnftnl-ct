@@ -1,6 +1,7 @@
 #ifndef _RULE_EXPR_H_
 #define _RULE_EXPR_H_
 
+#include <stdint.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
