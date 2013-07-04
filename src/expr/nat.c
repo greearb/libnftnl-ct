@@ -205,44 +205,26 @@ nft_rule_expr_nat_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 }
 
 
-static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
+static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
-	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
 	int family;
 
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(tree, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (strcmp("nat", mxmlElementGetAttr(tree, "type")) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
 	/* Get and set <nat_type>. Mandatory */
 	node = mxmlFindElement(tree, tree, "nat_type", NULL, NULL,
 			       MXML_DESCEND_FIRST);
-	if (node == NULL) {
-		mxmlDelete(tree);
+	if (node == NULL)
 		return -1;
-	}
 
 	if (strcmp(node->child->value.opaque, "snat") == 0) {
 		nat->type = NFT_NAT_SNAT;
 	} else if (strcmp(node->child->value.opaque, "dnat") == 0) {
 		nat->type = NFT_NAT_DNAT;
 	} else {
-		mxmlDelete(tree);
 		return -1;
 	}
 	e->flags |= (1 << NFT_EXPR_NAT_TYPE);
@@ -250,16 +232,12 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 	/* Get and set <family>. Mandatory */
 	node = mxmlFindElement(tree, tree, "family", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
+	if (node == NULL)
 		return -1;
-	}
 
 	family = nft_str2family(node->child->value.opaque);
-	if (family < 0) {
-		mxmlDelete(tree);
+	if (family < 0)
 		return -1;
-	}
 
 	nat->family = family;
 	e->flags |= (1 << NFT_EXPR_NAT_FAMILY);
@@ -269,10 +247,8 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 			       MXML_DESCEND);
 	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
 			return -1;
-		}
 
 		nat->sreg_addr_min = (uint32_t)tmp;
 		e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MIN);
@@ -283,10 +259,8 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 			       MXML_DESCEND);
 	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
 			return -1;
-		}
 
 		nat->sreg_addr_max = (uint32_t)tmp;
 		e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MAX);
@@ -297,10 +271,8 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 			       MXML_DESCEND);
 	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
 			return -1;
-		}
 
 		nat->sreg_proto_min = (uint32_t)tmp;
 		e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MIN);
@@ -311,15 +283,12 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, char *xml)
 			       MXML_DESCEND);
 	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
+		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
 			return -1;
-		}
 
 		nat->sreg_proto_max = (uint32_t)tmp;
 		e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MAX);
 	}
-	mxmlDelete(tree);
 	return 0;
 #else
 	errno = EOPNOTSUPP;

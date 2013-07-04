@@ -10,6 +10,7 @@ libnftables_la_SOURCES = utils.c		\
 			 rule.c			\
 			 set.c			\
 			 set_elem.c		\
+			 mxml.c			\
 			 expr.c			\
 			 expr_ops.c		\
 			 expr/bitwise.c		\

@@ -185,27 +185,11 @@ static int nft_rule_expr_target_parse(struct nft_rule_expr *e, struct nlattr *at
 }
 
 static int
-nft_rule_expr_target_xml_parse(struct nft_rule_expr *e, char *xml)
+nft_rule_expr_target_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_target *tg = (struct nft_expr_target *)e->data;
-	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
-
-	/* load the tree */
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(tree, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (strcmp("target", mxmlElementGetAttr(tree, "type")) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
 
 	/* Get and set <name>. Optional */
 	node = mxmlFindElement(tree, tree, "name", NULL, NULL,
@@ -219,7 +203,6 @@ nft_rule_expr_target_xml_parse(struct nft_rule_expr *e, char *xml)
 
 	/* tg->info is ignored until other solution is reached */
 
-	mxmlDelete(tree);
 	return 0;
 #else
 	errno = EOPNOTSUPP;

@@ -126,24 +126,13 @@ nft_rule_expr_limit_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, char *xml)
+static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_limit *limit = (struct nft_expr_limit *)e->data;
-	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
-
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(tree, "type") == NULL)
-		goto err;
-
-	if (strcmp("limit", mxmlElementGetAttr(tree, "type")) != 0)
-		goto err;
 
 	node = mxmlFindElement(tree, tree, "rate", NULL, NULL,
 			       MXML_DESCEND_FIRST);
@@ -169,11 +158,9 @@ static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, char *xml)
 	limit->depth = tmp;
 	e->flags |= (1 << NFT_EXPR_LIMIT_DEPTH);
 
-	mxmlDelete(tree);
 	return 0;
 err:
 	errno = EINVAL;
-	mxmlDelete(tree);
 	return -1;
 #else
 	errno = EOPNOTSUPP;

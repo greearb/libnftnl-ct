@@ -202,24 +202,13 @@ static char *expr_byteorder_str[] = {
 };
 
 static int
-nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, char *xml)
+nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_byteorder *byteorder = (struct nft_expr_byteorder *)e;
-	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr = NULL;
-
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(tree, "type") == NULL)
-		goto err;
-
-	if (strcmp("byteorder", mxmlElementGetAttr(tree, "type")) != 0)
-		goto err;
 
 	node = mxmlFindElement(tree, tree, "sreg", NULL, NULL,
 			       MXML_DESCEND_FIRST);
@@ -285,10 +274,8 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, char *xml)
 	byteorder->size = tmp;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_SIZE);
 
-	mxmlDelete(tree);
 	return 0;
 err:
-	mxmlDelete(tree);
 	errno = EINVAL;
 	return -1;
 #else

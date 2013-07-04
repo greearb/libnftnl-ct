@@ -196,50 +196,28 @@ nft_rule_expr_immediate_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, char *xml)
+nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
-	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	mxml_node_t *save = NULL;
 	union nft_data_reg data_regtmp;
 	uint64_t tmp;
 	char *endptr;
 
-	/* load the tree */
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(tree, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (strcmp("immediate", mxmlElementGetAttr(tree, "type")) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
 	/* Get and set <dreg>. Is mandatory */
 	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
 			       MXML_DESCEND_FIRST);
-	if (node == NULL) {
-		mxmlDelete(tree);
+	if (node == NULL)
 		return -1;
-	}
 
 	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
-		mxmlDelete(tree);
+	if (tmp > UINT32_MAX || tmp < 0 || *endptr)
 		return -1;
-	}
 
-	if (tmp > NFT_REG_MAX) {
-		mxmlDelete(tree);
+	if (tmp > NFT_REG_MAX)
 		return -1;
-	}
 
 	imm->dreg = (uint32_t)tmp;
 	e->flags |= (1 << NFT_EXPR_IMM_DREG);
@@ -247,34 +225,26 @@ nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, char *xml)
 	/* Get and set <immdata>. Is mandatory */
 	node = mxmlFindElement(tree, tree, "immdata", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
+	if (node == NULL)
 		return -1;
-	}
 
 	/* hack for mxmSaveAllocString to print just the current node */
 	save = node->next;
 	node->next = NULL;
 
 	if (nft_data_reg_xml_parse(&data_regtmp,
-			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0) {
-		mxmlDelete(tree);
+			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0)
 		return -1;
-	}
 	node->next = save;
 
 	/* data_reg type switch */
 	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
 			       MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
+	if (node == NULL)
 		return -1;
-	}
 
-	if (mxmlElementGetAttr(node, "type") == NULL) {
-		mxmlDelete(tree);
+	if (mxmlElementGetAttr(node, "type") == NULL)
 		return -1;
-	}
 
 	if (strcmp(mxmlElementGetAttr(node, "type"), "value") == 0) {
 		memcpy(&imm->data.val, data_regtmp.val, data_regtmp.len);
@@ -291,7 +261,6 @@ nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, char *xml)
 		e->flags |= (1 << NFT_EXPR_IMM_CHAIN);
 	}
 
-	mxmlDelete(tree);
 	return 0;
 #else
 	errno = EOPNOTSUPP;

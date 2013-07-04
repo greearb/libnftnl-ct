@@ -1,6 +1,7 @@
 #ifndef _EXPR_OPS_H_
 #define _EXPR_OPS_H_
 
+#include "internal.h"
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -17,7 +18,7 @@ struct expr_ops {
 	int 	(*parse)(struct nft_rule_expr *e, struct nlattr *attr);
 	void	(*build)(struct nlmsghdr *nlh, struct nft_rule_expr *e);
 	int	(*snprintf)(char *buf, size_t len, uint32_t type, uint32_t flags, struct nft_rule_expr *e);
-	int	(*xml_parse)(struct nft_rule_expr *e, char *xml);
+	int	(*xml_parse)(struct nft_rule_expr *e, mxml_node_t *tree);
 };
 
 struct expr_ops *nft_expr_ops_lookup(const char *name);

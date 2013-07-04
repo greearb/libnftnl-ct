@@ -483,7 +483,6 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	mxml_node_t *node = NULL;
 	mxml_node_t *save = NULL;
 	struct nft_rule_expr *e;
-	struct expr_ops *ops;
 	char *endptr = NULL;
 	uint64_t tmp;
 	int family;
@@ -608,30 +607,12 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 		node = mxmlFindElement(node, tree, "expr", "type",
 				       NULL, MXML_DESCEND)) {
 
-		if (mxmlElementGetAttr(node, "type") == NULL) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
-		ops = nft_expr_ops_lookup(mxmlElementGetAttr(node, "type"));
-		if (ops == NULL) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
-		e = nft_rule_expr_alloc(mxmlElementGetAttr(node, "type"));
-		if (e == NULL) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
 		/* This is a hack for mxml to print just the current node */
 		save = node->next;
 		node->next = NULL;
 
-		if (ops->xml_parse(e,
-				   mxmlSaveAllocString(node,
-						MXML_NO_CALLBACK)) != 0) {
+		e = nft_mxml_expr_parse(node);
+		if (e == NULL) {
 			mxmlDelete(tree);
 			return -1;
 		}

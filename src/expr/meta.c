@@ -169,69 +169,43 @@ static inline int str2meta_key(const char *str)
 	return -1;
 }
 
-static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, char *xml)
+static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_meta *meta = (struct nft_expr_meta *)e->data;
-	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
 	int key;
 
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(tree, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (strcmp("meta", mxmlElementGetAttr(tree, "type")) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
 	/* Get and set <dreg>. Is mandatory */
 	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
 			       MXML_DESCEND_FIRST);
-	if (node == NULL) {
-		mxmlDelete(tree);
+	if (node == NULL)
 		return -1;
-	}
 
 	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
-		mxmlDelete(tree);
+	if (tmp > UINT8_MAX || tmp < 0 || *endptr)
 		return -1;
-	}
 
-	if (tmp > NFT_REG_MAX) {
-		mxmlDelete(tree);
+	if (tmp > NFT_REG_MAX)
 		return -1;
-	}
 
 	meta->dreg = (uint8_t)tmp;
 	e->flags |= (1 << NFT_EXPR_META_DREG);
 
 	/* Get and set <key>. Is mandatory */
 	node = mxmlFindElement(tree, tree, "key", NULL, NULL, MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
+	if (node == NULL)
 		return -1;
-	}
 
 	key = str2meta_key(node->child->value.opaque);
-	if (key < 0) {
-		mxmlDelete(tree);
+	if (key < 0)
 		return -1;
-	}
 
 	meta->key = key;
 	e->flags |= (1 << NFT_EXPR_META_KEY);
 
-	mxmlDelete(tree);
 	return 0;
 #else
 	errno = EOPNOTSUPP;

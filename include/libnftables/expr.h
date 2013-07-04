@@ -31,6 +31,8 @@ uint32_t nft_rule_expr_get_u32(const struct nft_rule_expr *expr, uint16_t type);
 uint64_t nft_rule_expr_get_u64(const struct nft_rule_expr *expr, uint16_t type);
 const char *nft_rule_expr_get_str(const struct nft_rule_expr *expr, uint16_t type);
 
+struct nlmsghdr;
+
 void nft_rule_expr_build_payload(struct nlmsghdr *nlh, struct nft_rule_expr *expr);
 
 int nft_rule_expr_snprintf(char *buf, size_t buflen, struct nft_rule_expr *expr, uint32_t type, uint32_t flags);

@@ -168,45 +168,26 @@ static char *expr_cmp_str[] = {
 	[NFT_CMP_GTE]	= "gte",
 };
 
-static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, char *xml)
+static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_cmp *cmp = (struct nft_expr_cmp *)e->data;
-	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	mxml_node_t *save = NULL;
 	union nft_data_reg data_regtmp;
 	uint64_t tmp;
 	char *endptr;
 
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(tree, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (strcmp("cmp", mxmlElementGetAttr(tree, "type")) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
 	/* Get and set <sreg>. Is not mandatory */
 	node = mxmlFindElement(tree, tree, "sreg", NULL, NULL,
 			       MXML_DESCEND_FIRST);
 	if (node != NULL) {
 		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT8_MAX || tmp < 0 || *endptr) {
-			mxmlDelete(tree);
+		if (tmp > UINT8_MAX || tmp < 0 || *endptr)
 			return -1;
-		}
 
-		if (tmp > NFT_REG_MAX) {
-			mxmlDelete(tree);
+		if (tmp > NFT_REG_MAX)
 			return -1;
-		}
 
 		cmp->sreg = (uint8_t)tmp;
 		e->flags |= (1 << NFT_EXPR_CMP_SREG);
@@ -229,7 +210,6 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, char *xml)
 			cmp->op = NFT_CMP_GTE;
 		} else {
 			/* If <op> is present, a valid value is mandatory */
-			mxmlDelete(tree);
 			return -1;
 		}
 		e->flags |= (1 << NFT_EXPR_CMP_OP);
@@ -245,7 +225,6 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, char *xml)
 
 		if (nft_data_reg_xml_parse(&data_regtmp,
 			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0) {
-			mxmlDelete(tree);
 			return -1;
 		}
 
@@ -256,7 +235,6 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, char *xml)
 		e->flags |= (1 << NFT_EXPR_CMP_DATA);
 	}
 
-	mxmlDelete(tree);
 	return 0;
 #else
 	errno = EOPNOTSUPP;

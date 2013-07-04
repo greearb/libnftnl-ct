@@ -170,24 +170,13 @@ nft_rule_expr_log_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, char *xml)
+static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_log *log = (struct nft_expr_log *)e->data;
-	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
-
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(tree, "type") == NULL)
-		goto err;
-
-	if (strcmp("log", mxmlElementGetAttr(tree, "type")) != 0)
-		goto err;
 
 	node = mxmlFindElement(tree, tree, "prefix", NULL, NULL,
 			       MXML_DESCEND_FIRST);
@@ -232,11 +221,9 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, char *xml)
 	log->qthreshold = tmp;
 	e->flags |= (1 << NFT_EXPR_LOG_QTHRESHOLD);
 
-	mxmlDelete(tree);
 	return 0;
 err:
 	errno = EINVAL;
-	mxmlDelete(tree);
 	return -1;
 #else
 	errno = EOPNOTSUPP;
