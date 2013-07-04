@@ -46,7 +46,7 @@ nft_rule_expr_ct_set(struct nft_rule_expr *e, uint16_t type,
 		ct->key = *((uint32_t *)data);
 		break;
 	case NFT_EXPR_CT_DIR:
-		ct->dreg = *((uint8_t *)data);
+		ct->dir = *((uint8_t *)data);
 		break;
 	case NFT_EXPR_CT_DREG:
 		ct->dreg = *((uint32_t *)data);
