@@ -9,6 +9,10 @@ struct nlattr;
 struct nlmsghdr;
 struct nft_rule_expr;
 
+#ifndef XML_PARSING
+#define mxml_node_t void
+#endif
+
 struct expr_ops {
 	char	*name;
 	size_t	alloc_len;

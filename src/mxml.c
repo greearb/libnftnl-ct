@@ -16,6 +16,7 @@
 #include <libnftables/rule.h>
 #include <libnftables/expr.h>
 
+#ifdef XML_PARSING
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node)
 {
 	mxml_node_t *tree;
@@ -75,3 +76,4 @@ int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags)
 err:
 	return -1;
 }
+#endif
