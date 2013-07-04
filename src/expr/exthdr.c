@@ -219,24 +219,14 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
+	int32_t reg;
 	int type;
 
-	/* All nodes are mandatory */
-
-	/* Get and set <dreg> */
-	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL)
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
+	if (reg < 0)
 		return -1;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-		return -1;
-
-	if (tmp > NFT_REG_MAX)
-		return -1;
-
-	exthdr->dreg = tmp;
+	exthdr->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_EXTHDR_DREG);
 
 	/* Get and set <exthdr_type> */

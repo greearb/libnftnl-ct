@@ -198,22 +198,15 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	struct nft_expr_ct *ct = (struct nft_expr_ct *)e->data;
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
+	int32_t reg;
 	char *endptr;
 	int key;
 
-	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL)
-		goto err;
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
+	if (reg < 0)
+		return -1;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT8_MAX || tmp < 0 || *endptr)
-		goto err;
-
-	if (tmp > NFT_REG_MAX)
-		goto err;
-
-	ct->dreg = tmp;
+	ct->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_CT_DREG);
 
 	node = mxmlFindElement(tree, tree, "key", NULL, NULL, MXML_DESCEND);

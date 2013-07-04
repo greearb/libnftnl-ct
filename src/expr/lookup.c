@@ -158,8 +158,7 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 #ifdef XML_PARSING
 	struct nft_expr_lookup *lookup = (struct nft_expr_lookup *)e->data;
 	mxml_node_t *node = NULL;
-	uint64_t tmp;
-	char *endptr;
+	int32_t reg;
 
 	/* get and set <set>. Is mandatory */
 	node = mxmlFindElement(tree, tree, "set", NULL, NULL,
@@ -171,38 +170,20 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	lookup->set_name[IFNAMSIZ-1] = '\0';
 	e->flags |= (1 << NFT_EXPR_LOOKUP_SET);
 
-	/* get and set <sreg>. Is mandatory */
-	node = mxmlFindElement(tree, tree, "sreg", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
+	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND);
+	if (reg < 0)
 		return -1;
 
-	errno = 0;
-
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-		return -1;
-
-	if (tmp > NFT_REG_MAX)
-		return -1;
-
-	lookup->sreg = (uint32_t)tmp;
+	lookup->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_LOOKUP_SREG);
 
-	/* get and set <dreg>. Isn't mandatory */
-	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-			return -1;
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND);
+	if (reg < 0)
+		return -1;
 
-		if (tmp > NFT_REG_MAX)
-			return -1;
+	lookup->dreg = reg;
+	e->flags |= (1 << NFT_EXPR_LOOKUP_DREG);
 
-		lookup->dreg = (uint32_t)tmp;
-		e->flags |= (1 << NFT_EXPR_LOOKUP_DREG);
-	}
 	return 0;
 #else
 	errno = EOPNOTSUPP;

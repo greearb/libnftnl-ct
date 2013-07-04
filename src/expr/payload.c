@@ -203,22 +203,15 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	struct nft_expr_payload *payload = (struct nft_expr_payload *)e->data;
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
+	int32_t reg;
 	char *endptr;
 
-	/* Get and set <dreg>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "dreg", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-			return -1;
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
+	if (reg < 0)
+		return -1;
 
-		if (tmp > NFT_REG_MAX)
-			return -1;
-
-		payload->dreg = (uint32_t)tmp;
-		e->flags |= (1 << NFT_EXPR_PAYLOAD_DREG);
-	}
+	payload->dreg = reg;
+	e->flags |= (1 << NFT_EXPR_PAYLOAD_DREG);
 
 	/* Get and set <base>. Not mandatory */
 	node = mxmlFindElement(tree, tree, "base", NULL, NULL, MXML_DESCEND);

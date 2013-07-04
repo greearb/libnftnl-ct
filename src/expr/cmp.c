@@ -175,23 +175,14 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	mxml_node_t *node = NULL;
 	mxml_node_t *save = NULL;
 	union nft_data_reg data_regtmp;
-	uint64_t tmp;
-	char *endptr;
+	int32_t reg;
 
-	/* Get and set <sreg>. Is not mandatory */
-	node = mxmlFindElement(tree, tree, "sreg", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT8_MAX || tmp < 0 || *endptr)
-			return -1;
+	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
+	if (reg < 0)
+		return -1;
 
-		if (tmp > NFT_REG_MAX)
-			return -1;
-
-		cmp->sreg = (uint8_t)tmp;
-		e->flags |= (1 << NFT_EXPR_CMP_SREG);
-	}
+	cmp->sreg = reg;
+	e->flags |= (1 << NFT_EXPR_CMP_SREG);
 
 	/* Get and set <op>. Is not mandatory*/
 	node = mxmlFindElement(tree, tree, "op", NULL, NULL, MXML_DESCEND);

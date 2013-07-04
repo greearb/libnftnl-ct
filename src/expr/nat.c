@@ -209,9 +209,8 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 {
 #ifdef XML_PARSING
 	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
-	mxml_node_t *node = NULL;
-	uint64_t tmp;
-	char *endptr;
+	mxml_node_t *node;
+	int32_t reg;
 	int family;
 
 	/* Get and set <nat_type>. Mandatory */
@@ -242,53 +241,34 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	nat->family = family;
 	e->flags |= (1 << NFT_EXPR_NAT_FAMILY);
 
-	/* Get and set <sreg_addr_min>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "sreg_addr_min", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-			return -1;
+	reg = nft_mxml_reg_parse(tree, "sreg_addr_min", MXML_DESCEND);
+	if (reg < 0)
+		return -1;
 
-		nat->sreg_addr_min = (uint32_t)tmp;
-		e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MIN);
-	}
+	nat->sreg_addr_min = reg;
+	e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MIN);
 
-	/* Get and set <sreg_addr_max>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "sreg_addr_max", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-			return -1;
+	reg = nft_mxml_reg_parse(tree, "sreg_addr_max", MXML_DESCEND);
+	if (reg < 0)
+		return -1;
 
-		nat->sreg_addr_max = (uint32_t)tmp;
-		e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MAX);
-	}
+	nat->sreg_addr_max = reg;
+	e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MAX);
 
-	/* Get and set <sreg_proto_min>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "sreg_proto_min", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-			return -1;
+	reg = nft_mxml_reg_parse(tree, "sreg_proto_min", MXML_DESCEND);
+	if (reg < 0)
+		return -1;
 
-		nat->sreg_proto_min = (uint32_t)tmp;
-		e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MIN);
-	}
+	nat->sreg_proto_min = reg;
+	e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MIN);
 
-	/* Get and set <sreg_proto_max>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "sreg_proto_max", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-			return -1;
+	reg = nft_mxml_reg_parse(tree, "sreg_proto_max", MXML_DESCEND);
+	if (reg < 0)
+		return -1;
 
-		nat->sreg_proto_max = (uint32_t)tmp;
-		e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MAX);
-	}
+	nat->sreg_proto_max = reg;
+	e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MAX);
+
 	return 0;
 #else
 	errno = EOPNOTSUPP;

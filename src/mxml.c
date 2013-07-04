@@ -53,3 +53,25 @@ err:
 	errno = EINVAL;
 	return NULL;
 }
+
+int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags)
+{
+	mxml_node_t *node;
+	char *endptr;
+	uint64_t val;
+
+	node = mxmlFindElement(tree, tree, reg_name, NULL, NULL, flags);
+	if (node == NULL) {
+		errno = EINVAL;
+		goto err;
+	}
+
+	val = strtoull(node->child->value.opaque, &endptr, 10);
+	if (val > NFT_REG_MAX || val < 0 || *endptr) {
+		errno = ERANGE;
+		goto err;
+	}
+	return val;
+err:
+	return -1;
+}
