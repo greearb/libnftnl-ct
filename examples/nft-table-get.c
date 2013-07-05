@@ -50,10 +50,27 @@ int main(int argc, char *argv[])
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t portid, seq;
+	uint32_t portid, seq, family;
 	struct nft_table *t = NULL;
 	int ret;
 	uint32_t type = NFT_TABLE_O_DEFAULT;
+
+	if (argc < 2 || argc > 4) {
+		fprintf(stderr, "%s <family> [<table>] [<default|xml|json>]\n",
+			argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	if (strcmp(argv[1], "ip") == 0)
+		family = AF_INET;
+	else if (strcmp(argv[1], "ip6") == 0)
+		family = AF_INET6;
+	else if (strcmp(argv[1], "bridge") == 0)
+		family = AF_BRIDGE;
+	else {
+		fprintf(stderr, "Unknown family: ip, ip6, bridge\n");
+		exit(EXIT_FAILURE);
+	}
 
 	if (strcmp(argv[argc-1], "xml") == 0) {
 		type = NFT_TABLE_O_XML;
@@ -67,7 +84,7 @@ int main(int argc, char *argv[])
 		argc--;
 	}
 
-	if (argc == 2) {
+	if (argc == 3) {
 		t = nft_table_alloc();
 		if (t == NULL) {
 			perror("OOM");
@@ -77,12 +94,12 @@ int main(int argc, char *argv[])
 
 	seq = time(NULL);
 	if (t == NULL) {
-		nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, AF_INET,
+		nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
 						NLM_F_DUMP, seq);
 	} else {
-		nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, AF_INET,
+		nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
 						NLM_F_ACK, seq);
-		nft_table_attr_set(t, NFT_TABLE_ATTR_NAME, argv[1]);
+		nft_table_attr_set(t, NFT_TABLE_ATTR_NAME, argv[2]);
 		nft_table_nlmsg_build_payload(nlh, t);
 		nft_table_free(t);
 	}
