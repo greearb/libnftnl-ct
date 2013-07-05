@@ -211,8 +211,8 @@ nft_rule_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "dreg=%u key=%u ",
-				meta->dreg, meta->key);
+		return snprintf(buf, len, "load %s => reg %u ",
+				meta_key2str(meta->key), meta->dreg);
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
 					  "<key>%s</key>",

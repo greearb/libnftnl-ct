@@ -242,7 +242,7 @@ nft_rule_expr_match_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "name=%s rev=%u ",
+		return snprintf(buf, len, "name %s rev %u ",
 				match->name, match->rev);
 	case NFT_RULE_O_XML:
 		return nft_rule_expr_match_snprintf_xml(buf, len, match);

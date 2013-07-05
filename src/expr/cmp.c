@@ -277,8 +277,8 @@ nft_rule_expr_cmp_snprintf_default(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "sreg=%u op=%s data=",
-		       cmp->sreg, expr_cmp_str[cmp->op]);
+	ret = snprintf(buf, len, "%s reg %u ",
+		       expr_cmp_str[cmp->op], cmp->sreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &cmp->data,

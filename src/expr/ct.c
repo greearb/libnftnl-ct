@@ -252,8 +252,8 @@ nft_rule_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "dreg=%u key=%s dir=%u ",
-				ct->dreg, ctkey2str(ct->key), ct->dir);
+		return snprintf(buf, len, "load %s => reg %u dir %u ",
+				ctkey2str(ct->key), ct->dreg, ct->dir);
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
 					  "<key>%s</key>"

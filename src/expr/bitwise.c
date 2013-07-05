@@ -337,18 +337,15 @@ nft_rule_expr_bitwise_snprintf_default(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "sreg=%u dreg=%u ",
-		       bitwise->sreg, bitwise->dreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	ret = snprintf(buf+offset, len, " mask=");
+	ret = snprintf(buf, len, "reg %u = (reg=%u & ",
+		       bitwise->dreg, bitwise->sreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->mask,
 				    NFT_RULE_O_DEFAULT, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, " xor=");
+	ret = snprintf(buf+offset, len, ") ^ ");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->xor,

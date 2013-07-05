@@ -18,6 +18,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -721,9 +722,9 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 	return snprintf(buf, size,
 		"{ \"chain\": {"
 			"\"name\": \"%s\","
-			"\"handle\": %lu,"
-			"\"bytes\": %lu,"
-			"\"packets\": %lu,"
+			"\"handle\": %"PRIu64","
+			"\"bytes\": %"PRIu64","
+			"\"packets\": %"PRIu64","
 			"\"version\": %d,"
 			"\"properties\": {"
 				"\"type\" : \"%s\","
@@ -747,8 +748,8 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 	int ret, len = size, offset = 0;
 
 	ret = snprintf(buf, size,
-		       "<chain name=\"%s\" handle=\"%lu\""
-		       " bytes=\"%lu\" packets=\"%lu\" version=\"%d\">"
+		       "<chain name=\"%s\" handle=\"%"PRIu64"\""
+		       " bytes=\"%"PRIu64"\" packets=\"%"PRIu64"\" version=\"%d\">"
 		       "<properties>"
 				"<type>%s</type>"
 				"<table>%s</table>"
@@ -779,15 +780,39 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 	return offset;
 }
 
+static const char *policy2str(int policy)
+{
+	switch (policy) {
+	case NF_ACCEPT:
+		return "accept";
+	case NF_DROP:
+		return "drop";
+	default:
+		break;
+	}
+	return "unknown";
+}
+
 static int nft_chain_snprintf_default(char *buf, size_t size,
 				      struct nft_chain *c)
 {
-	return snprintf(buf, size, "family=%s table=%s chain=%s type=%s "
-				   "hook=%u prio=%d policy=%d use=%d "
-				   "packets=%lu bytes=%lu",
-			nft_family2str(c->family), c->table, c->name, c->type,
-			c->hooknum, c->prio, c->policy, c->use, c->packets,
-			c->bytes);
+	int ret, len = size, offset = 0;
+
+	ret = snprintf(buf, size, "%s %s %s",
+			nft_family2str(c->family), c->table, c->name);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
+		ret = snprintf(buf+offset, size,
+			       " type %s hook %s prio %d policy %s use %d "
+			       "packets %"PRIu64" bytes %"PRIu64"",
+			       c->type, hooknum2str_array[c->hooknum], c->prio,
+			       policy2str(c->policy), c->use,
+			       c->packets, c->bytes);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
 }
 
 int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,

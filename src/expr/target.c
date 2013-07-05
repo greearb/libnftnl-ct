@@ -244,7 +244,7 @@ nft_rule_expr_target_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "name=%s rev=%u ",
+		return snprintf(buf, len, "name %s rev %u ",
 				target->name, target->rev);
 	case NFT_RULE_O_XML:
 		return nft_rule_exp_target_snprintf_xml(buf, len, target);

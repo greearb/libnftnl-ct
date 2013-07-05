@@ -18,6 +18,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -745,17 +746,19 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 	struct nft_rule_expr *expr;
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, size, "family=%s table=%s chain=%s handle=%llu "
-				  "flags=%x ",
+	ret = snprintf(buf, size, "%s %s %s %"PRIu64"\n",
 			nft_family2str(r->family), r->table, r->chain,
-			(unsigned long long)r->handle, r->rule_flags);
+			r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(expr, &r->expr_list, head) {
-		ret = snprintf(buf+offset, len, "%s ", expr->ops->name);
+		ret = snprintf(buf+offset, len, "  [ %s ", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = nft_rule_expr_snprintf(buf+offset, size, expr, type, flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		ret = snprintf(buf+offset, len, "]\n");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 

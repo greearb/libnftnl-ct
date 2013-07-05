@@ -359,7 +359,7 @@ static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 
 static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)
 {
-	return snprintf(buf, size, "table=%s family=%s flags=%x",
+	return snprintf(buf, size, "table %s %s flags %x",
 			t->name, nft_family2str(t->family), t->table_flags);
 }
 

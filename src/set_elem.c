@@ -389,7 +389,7 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 {
 	int ret, len = size, offset = 0, i;
 
-	ret = snprintf(buf, size, "flags=%u key=", e->set_elem_flags);
+	ret = snprintf(buf, size, "element ");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	for (i=0; i<e->key.len/sizeof(uint32_t); i++) {
@@ -397,13 +397,16 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, size, "data=");
+	ret = snprintf(buf+offset, size, " : ");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	for (i=0; i<e->data.len/sizeof(uint32_t); i++) {
 		ret = snprintf(buf+offset, len, "%.8x ", e->data.val[i]);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
+
+	ret = snprintf(buf+offset, len, "%u [end]", e->set_elem_flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }

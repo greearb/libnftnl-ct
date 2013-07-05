@@ -239,8 +239,8 @@ nft_rule_expr_log_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "prefix=%s group=%u "
-					  "snaplen=%u qthreshold=%u ",
+		return snprintf(buf, len, "prefix '%s' group %u "
+					  "snaplen %u qthreshold %u ",
 				log->prefix, log->group,
 				log->snaplen, log->qthreshold);
 	case NFT_RULE_O_XML:

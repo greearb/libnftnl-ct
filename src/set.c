@@ -323,7 +323,7 @@ int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 	int len = size, offset = 0;
 	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, size, "set=%s table=%s flags=%x",
+	ret = snprintf(buf, size, "%s %s %x",
 			s->name, s->table, s->set_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 

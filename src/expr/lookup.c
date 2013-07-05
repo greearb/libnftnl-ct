@@ -224,8 +224,8 @@ nft_rule_expr_lookup_snprintf_default(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "set=%s sreg=%u dreg=%u",
-			l->set_name, l->sreg, l->dreg);
+	ret = snprintf(buf, len, "reg %u set %s dreg %u ",
+			l->sreg, l->set_name, l->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;

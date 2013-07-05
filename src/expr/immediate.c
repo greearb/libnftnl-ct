@@ -333,7 +333,7 @@ nft_rule_expr_immediate_snprintf_default(char *buf, size_t len,
 	int size = len, offset = 0, ret;
 	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
 
-	ret = snprintf(buf, len, "dreg=%u ", imm->dreg);
+	ret = snprintf(buf, len, "reg %u ", imm->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {

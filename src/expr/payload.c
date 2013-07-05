@@ -303,9 +303,8 @@ nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "dreg=%u base=%u offset=%u len=%u ",
-				payload->dreg, payload->base,
-				payload->offset, payload->len);
+		return snprintf(buf, len, "load %ub @ network header + %u => reg %u ",
+				payload->dreg, payload->offset, payload->len);
 	case NFT_RULE_O_XML:
 		return nft_rule_expr_payload_snprintf_xml(buf, len, flags,
 							  payload);

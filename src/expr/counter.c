@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include <linux/netfilter/nf_tables.h>
 
@@ -175,13 +176,13 @@ nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "pkts=%lu bytes=%lu ",
+		return snprintf(buf, len, "pkts %"PRIu64" bytes %"PRIu64" ",
 				ctr->pkts, ctr->bytes);
 	case NFT_RULE_O_XML:
-		return snprintf(buf, len, "<pkts>%lu</pkts><bytes>%lu</bytes>",
+		return snprintf(buf, len, "<pkts>%"PRIu64"</pkts><bytes>%"PRIu64"</bytes>",
 				ctr->pkts, ctr->bytes);
 	case NFT_RULE_O_JSON:
-		return snprintf(buf, len, "\"pkts\" : %lu, \"bytes\" : %lu",
+		return snprintf(buf, len, "\"pkts\" : %"PRIu64", \"bytes\" : %"PRIu64"",
 				ctr->pkts, ctr->bytes);
 	default:
 		break;

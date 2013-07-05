@@ -363,28 +363,28 @@ nft_rule_expr_nat_snprintf_default(char *buf, size_t size,
 
 	switch (nat->type) {
 	case NFT_NAT_SNAT:
-		ret = snprintf(buf, len, "type=NFT_NAT_SNAT ");
+		ret = snprintf(buf, len, "snat ");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	case NFT_NAT_DNAT:
-		ret = snprintf(buf, len, "type=NFT_NAT_DNAT ");
+		ret = snprintf(buf, len, "dnat ");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	}
 
-	ret = snprintf(buf+offset, len, "family=%s ", nft_family2str(nat->family));
+	ret = snprintf(buf+offset, len, "%s ", nft_family2str(nat->family));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {
 		ret = snprintf(buf+offset, len,
-			       "sreg_addr_min_v4=%u sreg_addr_max_v4=%u ",
+			       "addr_min reg %u addr_max reg %u ",
 			       nat->sreg_addr_min, nat->sreg_addr_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MIN)) {
 		ret = snprintf(buf+offset, len,
-			       "sreg_proto_min=%u sreg_proto_max=%u ",
+			       "proto_min reg %u proto_max reg %u ",
 			       nat->sreg_proto_min, nat->sreg_proto_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}

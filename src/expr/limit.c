@@ -176,7 +176,7 @@ nft_rule_expr_limit_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "rate=%"PRIu64" depth=%"PRIu64" ",
+		return snprintf(buf, len, "rate %"PRIu64" depth %"PRIu64" ",
 				limit->rate, limit->depth);
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<rate>%"PRIu64"</rate>"

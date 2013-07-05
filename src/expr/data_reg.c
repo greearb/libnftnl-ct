@@ -363,7 +363,7 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 	case DATA_VERDICT:
 		switch(output_format) {
 		case NFT_RULE_O_DEFAULT:
-			return snprintf(buf, size, "verdict=%d", reg->verdict);
+			return snprintf(buf, size, "%d ", reg->verdict);
 		case NFT_RULE_O_XML:
 			return snprintf(buf, size,
 					"<data_reg type=\"verdict\">"
@@ -380,7 +380,7 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 	case DATA_CHAIN:
 		switch(output_format) {
 		case NFT_RULE_O_DEFAULT:
-			return snprintf(buf, size, "chain=%s", reg->chain);
+			return snprintf(buf, size, "%s ", reg->chain);
 		case NFT_RULE_O_XML:
 			return snprintf(buf, size,
 					"<data_reg type=\"chain\">"

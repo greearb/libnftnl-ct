@@ -315,10 +315,9 @@ nft_rule_expr_byteorder_snprintf_default(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "sreg=%u dreg=%u op=%s len=%u size=%u ",
-		       byteorder->sreg, byteorder->dreg,
-		       expr_byteorder_str[byteorder->op],
-		       byteorder->len, byteorder->size);
+	ret = snprintf(buf, len, "reg %u = %s(reg %u, %u, %u) ",
+		       byteorder->dreg, expr_byteorder_str[byteorder->op],
+		       byteorder->sreg, byteorder->size, byteorder->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
