@@ -62,6 +62,11 @@ enum {
 	NFT_SET_ELEM_ATTR_DATA,
 };
 
+enum {
+	NFT_SET_O_DEFAULT	= 0,
+	NFT_SET_O_JSON,
+};
+
 struct nft_set_elem;
 
 struct nft_set_elem *nft_set_elem_alloc(void);

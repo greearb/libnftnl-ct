@@ -316,8 +316,46 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_nlmsg_parse);
 
-int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
-		     uint32_t type, uint32_t flags)
+static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
+			   uint32_t type, uint32_t flags)
+{
+	int ret;
+	int len = size, offset = 0;
+	struct nft_set_elem *elem;
+
+	ret = snprintf(buf, size, "{ \"set\" : { \"name\" : \"%s\", \"table\" : \"%s\", \"flags\" : %u",
+			s->name, s->table, s->set_flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	/* Empty set? Skip printinf of elements */
+	if (list_empty(&s->element_list)){
+		ret = snprintf(buf+offset, size, "}}");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		return offset;
+	}
+
+	ret = snprintf(buf+offset, size, ", \"set_elem\" : [");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	list_for_each_entry(elem, &s->element_list, head) {
+		ret = snprintf(buf+offset, size, "{");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		ret = nft_set_elem_snprintf(buf+offset, size, elem, type, flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		ret = snprintf(buf+offset, size, "}, ");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset-2, size, "]}}");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int nft_set_snprintf_default(char *buf, size_t size, struct nft_set *s,
+			      uint32_t type, uint32_t flags)
 {
 	int ret;
 	int len = size, offset = 0;
@@ -343,6 +381,20 @@ int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 	}
 
 	return offset;
+}
+
+int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
+		      uint32_t type, uint32_t flags)
+{
+	switch(type) {
+	case NFT_SET_O_DEFAULT:
+		return nft_set_snprintf_default(buf, size, s, type, flags);
+	case NFT_SET_O_JSON:
+		return nft_set_snprintf_json(buf, size, s, type, flags);
+	default:
+		break;
+	}
+	return -1;
 }
 EXPORT_SYMBOL(nft_set_snprintf);
 

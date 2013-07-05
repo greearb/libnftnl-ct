@@ -23,6 +23,7 @@ static int set_cb(const struct nlmsghdr *nlh, void *data)
 {
 	struct nft_set *t;
 	char buf[4096];
+	uint32_t *type = data;
 
 	t = nft_set_alloc();
 	if (t == NULL) {
@@ -35,7 +36,7 @@ static int set_cb(const struct nlmsghdr *nlh, void *data)
 		goto err_free;
 	}
 
-	nft_set_snprintf(buf, sizeof(buf), t, 0, 0);
+	nft_set_snprintf(buf, sizeof(buf), t, *type, 0);
 	printf("%s\n", buf);
 
 err_free:
@@ -50,11 +51,12 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, family;
+	uint32_t type = NFT_SET_O_DEFAULT;
 	struct nft_set *t = NULL;
 	int ret;
 
-	if (argc != 4) {
-		fprintf(stderr, "%s <family> <table> <set>\n", argv[0]);
+	if (argc < 4 || argc > 5) {
+		fprintf(stderr, "%s <family> <table> <set> [default|json]\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 	t = nft_set_alloc();
@@ -67,12 +69,15 @@ int main(int argc, char *argv[])
 		family = AF_INET;
 	else if (strcmp(argv[1], "ip6") == 0)
 		family = AF_INET6;
-	else if (strcmp(argv[2], "bridge") == 0)
+	else if (strcmp(argv[1], "bridge") == 0)
 		family = AF_BRIDGE;
 	else {
 		fprintf(stderr, "Unknown family: ip, ip6, bridge\n");
 		exit(EXIT_FAILURE);
 	}
+
+	if (argc == 5 && strcmp(argv[4], "json") == 0 )
+		type = NFT_SET_O_JSON;
 
 	nlh = nft_set_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
 					NLM_F_DUMP|NLM_F_ACK, seq);
@@ -100,7 +105,7 @@ int main(int argc, char *argv[])
 
 	ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
 	while (ret > 0) {
-		ret = mnl_cb_run(buf, ret, seq, portid, set_cb, NULL);
+		ret = mnl_cb_run(buf, ret, seq, portid, set_cb, &type);
 		if (ret <= 0)
 			break;
 		ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));

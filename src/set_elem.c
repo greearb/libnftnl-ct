@@ -384,8 +384,41 @@ int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_elems_nlmsg_parse);
 
-int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
-			  uint32_t type, uint32_t flags)
+static int nft_set_elem_snprintf_json(char *buf, size_t size, struct nft_set_elem *e)
+{
+	int ret, len = size, offset = 0, i, numregs;
+
+	ret = snprintf(buf, size, "\"flags\" : %u", e->set_elem_flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	numregs = div_round_up(e->key.len, sizeof(uint32_t));
+	if (numregs != 0) {
+		ret = snprintf(buf+offset, len, ", \"key\" : \"0x");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		for (i = 0; i < numregs; i++) {
+			ret = snprintf(buf+offset, len, "%.8x", e->key.val[i]);
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		}
+		ret = snprintf(buf+offset, len, "\"");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	numregs = div_round_up(e->data.len, sizeof(uint32_t));
+	if (numregs != 0) {
+		ret = snprintf(buf+offset, size, " ,\"data\" : \"0x");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		for (i = 0; i < numregs; i++) {
+			ret = snprintf(buf+offset, len, "%.8x", e->data.val[i]);
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		}
+		ret = snprintf(buf+offset, len, "\"");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+}
+
+static int nft_set_elem_snprintf_default(char *buf, size_t size, struct nft_set_elem *e)
 {
 	int ret, len = size, offset = 0, i;
 
@@ -409,6 +442,20 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
+}
+
+int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
+			   uint32_t type, uint32_t flags)
+{
+	switch(type) {
+	case NFT_SET_O_DEFAULT:
+		return nft_set_elem_snprintf_default(buf, size, e);
+	case NFT_SET_O_JSON:
+		return nft_set_elem_snprintf_json(buf, size, e);
+	default:
+		break;
+	}
+	return -1;
 }
 EXPORT_SYMBOL(nft_set_elem_snprintf);
 
