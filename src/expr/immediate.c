@@ -200,9 +200,7 @@ nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
-	mxml_node_t *node = NULL;
-	mxml_node_t *save = NULL;
-	union nft_data_reg data_regtmp;
+	int datareg_type;
 	int32_t reg;
 
 	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
@@ -212,43 +210,22 @@ nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	imm->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_IMM_DREG);
 
-	/* Get and set <immdata>. Is mandatory */
-	node = mxmlFindElement(tree, tree, "immdata", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
+	datareg_type = nft_mxml_data_reg_parse(tree, "immdata", &imm->data);
+	if (datareg_type < 0)
 		return -1;
 
-	/* hack for mxmSaveAllocString to print just the current node */
-	save = node->next;
-	node->next = NULL;
-
-	if (nft_data_reg_xml_parse(&data_regtmp,
-			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0)
-		return -1;
-	node->next = save;
-
-	/* data_reg type switch */
-	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
-		return -1;
-
-	if (mxmlElementGetAttr(node, "type") == NULL)
-		return -1;
-
-	if (strcmp(mxmlElementGetAttr(node, "type"), "value") == 0) {
-		memcpy(&imm->data.val, data_regtmp.val, data_regtmp.len);
-		imm->data.len = data_regtmp.len;
+	switch (datareg_type) {
+	case DATA_VALUE:
 		e->flags |= (1 << NFT_EXPR_IMM_DATA);
-	} else if (strcmp(mxmlElementGetAttr(node, "type"), "verdict") == 0) {
-		imm->data.verdict = data_regtmp.verdict;
+		break;
+	case DATA_VERDICT:
 		e->flags |= (1 << NFT_EXPR_IMM_VERDICT);
-	} else if (strcmp(mxmlElementGetAttr(node, "type"), "chain") == 0) {
-		if (imm->data.chain)
-			free(imm->data.chain);
-
-		imm->data.chain = strdup(data_regtmp.chain);
+		break;
+	case DATA_CHAIN:
 		e->flags |= (1 << NFT_EXPR_IMM_CHAIN);
+		break;
+	default:
+		return -1;
 	}
 
 	return 0;

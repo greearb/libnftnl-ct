@@ -202,10 +202,7 @@ nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_bitwise *bitwise = (struct nft_expr_bitwise *)e->data;
-	mxml_node_t *node = NULL;
-	mxml_node_t *save = NULL;
 	int32_t reg;
-	union nft_data_reg data_regtmp;
 
 	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
 	if (reg < 0)
@@ -221,39 +218,15 @@ nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	bitwise->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_BITWISE_DREG);
 
-	/* Get and set <mask> */
-	node = mxmlFindElement(tree, tree, "mask", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
+	if (nft_mxml_data_reg_parse(tree, "mask",
+				    &bitwise->mask) != DATA_VALUE)
 		return -1;
 
-	/* hack for mxmSaveAllocString to print just the current node */
-	save = node->next;
-	node->next = NULL;
-	if (nft_data_reg_xml_parse(&data_regtmp,
-			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0)
-		return -1;
-	node->next = save;
-
-	memcpy(&bitwise->mask.val, data_regtmp.val, data_regtmp.len);
-	bitwise->mask.len = data_regtmp.len;
 	e->flags |= (1 << NFT_EXPR_BITWISE_MASK);
 
-	/* Get and set <xor> */
-	node = mxmlFindElement(tree, tree, "xor", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
+	if (nft_mxml_data_reg_parse(tree, "xor", &bitwise->xor) != DATA_VALUE)
 		return -1;
 
-	/* hack for mxmSaveAllocString to print just the current node */
-	save = node->next;
-	node->next = NULL;
-	if (nft_data_reg_xml_parse(&data_regtmp,
-			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0)
-		return -1;
-
-	memcpy(&bitwise->xor.val, data_regtmp.val, data_regtmp.len);
-	bitwise->xor.len = data_regtmp.len;
 	e->flags |= (1 << NFT_EXPR_BITWISE_XOR);
 
 	/* Additional validation: mask and xor must use the same number of

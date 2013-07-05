@@ -17,6 +17,8 @@
 #include <mxml.h>
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node);
 int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags);
+union nft_data_reg;
+int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name, union nft_data_reg *data_reg);
 #endif
 
 #define NFT_TABLE_XML_VERSION 0

@@ -173,8 +173,6 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 #ifdef XML_PARSING
 	struct nft_expr_cmp *cmp = (struct nft_expr_cmp *)e->data;
 	mxml_node_t *node = NULL;
-	mxml_node_t *save = NULL;
-	union nft_data_reg data_regtmp;
 	int32_t reg;
 
 	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
@@ -207,22 +205,12 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	}
 
 	/* Get and set <cmpdata>. Is not mandatory */
-	node = mxmlFindElement(tree, tree, "cmpdata", NULL, NULL,
-			       MXML_DESCEND);
+	node = mxmlFindElement(tree, tree, "cmpdata", NULL, NULL, MXML_DESCEND);
 	if (node != NULL) {
-		/* hack for mxmSaveAllocString to print just the current node */
-		save = node->next;
-		node->next = NULL;
-
-		if (nft_data_reg_xml_parse(&data_regtmp,
-			mxmlSaveAllocString(node, MXML_NO_CALLBACK)) < 0) {
+		if (nft_mxml_data_reg_parse(tree, "cmpdata",
+					    &cmp->data) != DATA_VALUE) {
 			return -1;
 		}
-
-		node->next = save;
-
-		memcpy(&cmp->data.val, data_regtmp.val, data_regtmp.len);
-		cmp->data.len = data_regtmp.len;
 		e->flags |= (1 << NFT_EXPR_CMP_DATA);
 	}
 
