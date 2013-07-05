@@ -73,4 +73,6 @@ struct nft_set_elem {
 	offset += ret;					\
 	len -= ret;
 
+#define div_round_up(n, d)	(((n) + (d) - 1) / (d))
+
 #endif

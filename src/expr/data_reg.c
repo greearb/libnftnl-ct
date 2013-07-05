@@ -188,7 +188,7 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 	reg->len = tmp;
 
 	/* Get and set <dataN> */
-	for (i = 0; i < reg->len/sizeof(uint32_t); i++) {
+	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
 		sprintf(node_name, "data%d", i);
 
 		node = mxmlFindElement(tree, tree, node_name, NULL,
@@ -261,7 +261,6 @@ nft_data_reg_value_snprintf_json(char *buf, size_t size,
 	int len = size, offset = 0, ret, i, j;
 	uint32_t utemp;
 	uint8_t *tmp;
-	int data_len = reg->len/sizeof(uint32_t);
 
 	ret = snprintf(buf, len, "\"data_reg\": { \"type\" : \"value\", ");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
@@ -269,7 +268,7 @@ nft_data_reg_value_snprintf_json(char *buf, size_t size,
 	ret = snprintf(buf+offset, len, "\"len\" : %zd, ", reg->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	for (i = 0; i<data_len; i++) {
+	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
 		ret = snprintf(buf+offset, len, "\"data%d\" : \"0x", i);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -298,7 +297,6 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 	int len = size, offset = 0, ret, i, j;
 	uint32_t be;
 	uint8_t *tmp;
-	int data_len = reg->len/sizeof(uint32_t);
 
 	ret = snprintf(buf, len, "<data_reg type=\"value\">");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
@@ -306,7 +304,7 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 	ret = snprintf(buf+offset, len, "<len>%zd</len>", reg->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	for (i=0; i<data_len; i++) {
+	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
 		ret = snprintf(buf+offset, len, "<data%d>0x", i);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -334,7 +332,7 @@ nft_data_reg_value_snprintf_default(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret, i;
 
-	for (i=0; i<reg->len/sizeof(uint32_t); i++) {
+	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
 		ret = snprintf(buf+offset, len, "0x%.8x ", reg->val[i]);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
