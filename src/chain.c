@@ -69,7 +69,7 @@ void nft_chain_free(struct nft_chain *c)
 }
 EXPORT_SYMBOL(nft_chain_free);
 
-bool nft_chain_attr_is_set(struct nft_chain *c, uint16_t attr)
+bool nft_chain_attr_is_set(const struct nft_chain *c, uint16_t attr)
 {
 	return c->flags & (1 << attr);
 }

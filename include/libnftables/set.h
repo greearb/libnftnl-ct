@@ -20,7 +20,7 @@ struct nft_set;
 struct nft_set *nft_set_alloc(void);
 void nft_set_free(struct nft_set *s);
 
-bool nft_set_attr_is_set(struct nft_set *s, uint16_t attr);
+bool nft_set_attr_is_set(const struct nft_set *s, uint16_t attr);
 void nft_set_attr_unset(struct nft_set *s, uint16_t attr);
 void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data);
 void nft_set_attr_set_u32(struct nft_set *s, uint16_t attr, uint32_t val);
@@ -86,7 +86,7 @@ void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, size_t *data_
 const char *nft_set_elem_attr_get_str(struct nft_set_elem *s, uint16_t attr);
 uint32_t nft_set_elem_attr_get_u32(struct nft_set_elem *s, uint16_t attr);
 
-bool nft_set_elem_attr_is_set(struct nft_set_elem *s, uint16_t attr);
+bool nft_set_elem_attr_is_set(const struct nft_set_elem *s, uint16_t attr);
 
 struct nlmsghdr *nft_set_elem_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);
 void nft_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s);

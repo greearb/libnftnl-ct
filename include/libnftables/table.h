@@ -19,7 +19,7 @@ enum {
 	NFT_TABLE_ATTR_FLAGS,
 };
 
-bool nft_table_attr_is_set(struct nft_table *t, uint16_t attr);
+bool nft_table_attr_is_set(const struct nft_table *t, uint16_t attr);
 void nft_table_attr_unset(struct nft_table *t, uint16_t attr);
 void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data);
 const void *nft_table_attr_get(struct nft_table *t, uint16_t attr);

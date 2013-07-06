@@ -56,7 +56,7 @@ void nft_set_free(struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_free);
 
-bool nft_set_attr_is_set(struct nft_set *s, uint16_t attr)
+bool nft_set_attr_is_set(const struct nft_set *s, uint16_t attr)
 {
 	return s->flags & (1 << attr);
 }
