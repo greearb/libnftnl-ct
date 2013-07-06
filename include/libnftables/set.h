@@ -64,6 +64,7 @@ enum {
 
 enum {
 	NFT_SET_O_DEFAULT	= 0,
+	NFT_SET_O_XML,
 	NFT_SET_O_JSON,
 };
 

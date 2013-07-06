@@ -24,6 +24,7 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name, union nft_
 #define NFT_TABLE_XML_VERSION 0
 #define NFT_CHAIN_XML_VERSION 0
 #define NFT_RULE_XML_VERSION 0
+#define NFT_SET_XML_VERSION 0
 #define NFT_TABLE_JSON_VERSION 0
 #define NFT_CHAIN_JSON_VERSION 0
 #define NFT_RULE_JSON_VERSION 0
