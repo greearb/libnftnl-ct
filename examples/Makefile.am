@@ -10,6 +10,7 @@ check_PROGRAMS = nft-table-add		\
 		 nft-chain-del		\
 		 nft-chain-get		\
 		 nft-rule-add		\
+		 nft-rule-insert	\
 		 nft-rule-xml-add	\
 		 nft-rule-del		\
 		 nft-rule-get		\
@@ -51,6 +52,9 @@ nft_chain_get_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
 
 nft_rule_add_SOURCES = nft-rule-add.c
 nft_rule_add_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+
+nft_rule_insert_SOURCES = nft-rule-insert.c
+nft_rule_insert_LDADD = ../src/libnftables.la ${LIBMNL_LIBS} ${LIBXML_LIBS}
 
 nft_rule_xml_add_SOURCES = nft-rule-xml-add.c
 nft_rule_xml_add_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
