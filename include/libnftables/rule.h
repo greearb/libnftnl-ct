@@ -22,6 +22,7 @@ enum {
 	NFT_RULE_ATTR_FLAGS,
 	NFT_RULE_ATTR_COMPAT_PROTO,
 	NFT_RULE_ATTR_COMPAT_FLAGS,
+	NFT_RULE_ATTR_POSITION,
 };
 
 void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr);

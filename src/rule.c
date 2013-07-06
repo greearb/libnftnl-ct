@@ -39,6 +39,7 @@ struct nft_rule {
 	uint8_t		family;
 	uint32_t	rule_flags;
 	uint64_t	handle;
+	uint64_t	position;
 	struct {
 			uint32_t	flags;
 			uint32_t	proto;
@@ -99,6 +100,7 @@ void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr)
 	case NFT_RULE_ATTR_FLAGS:
 	case NFT_RULE_ATTR_COMPAT_PROTO:
 	case NFT_RULE_ATTR_COMPAT_FLAGS:
+	case NFT_RULE_ATTR_POSITION:
 	case NFT_RULE_ATTR_FAMILY:
 		break;
 	default:
@@ -138,6 +140,9 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
 		break;
 	case NFT_RULE_ATTR_FAMILY:
 		r->family = *((uint8_t *)data);
+		break;
+	case NFT_RULE_ATTR_POSITION:
+		r->position = *((uint64_t *)data);
 		break;
 	default:
 		return;
@@ -184,6 +189,8 @@ const void *nft_rule_attr_get(const struct nft_rule *r, uint16_t attr)
 		return &r->compat.proto;
 	case NFT_RULE_ATTR_COMPAT_FLAGS:
 		return &r->compat.flags;
+	case NFT_RULE_ATTR_POSITION:
+		return &r->position;
 	}
 	return NULL;
 }
@@ -248,6 +255,8 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *r)
 		mnl_attr_put_strz(nlh, NFTA_RULE_CHAIN, r->chain);
 	if (r->flags & (1 << NFT_RULE_ATTR_HANDLE))
 		mnl_attr_put_u64(nlh, NFTA_RULE_HANDLE, htobe64(r->handle));
+	if (r->flags & (1 << NFT_RULE_ATTR_POSITION))
+		mnl_attr_put_u64(nlh, NFTA_RULE_POSITION, htobe64(r->position));
 	if (r->flags & (1 << NFT_RULE_ATTR_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_RULE_FLAGS, htonl(r->rule_flags));
 
@@ -306,6 +315,12 @@ static int nft_rule_parse_attr_cb(const struct nlattr *attr, void *data)
 		break;
 	case NFTA_RULE_COMPAT:
 		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	case NFTA_RULE_POSITION:
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
 		}
@@ -444,6 +459,10 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 		ret = nft_rule_parse_expr(tb[NFTA_RULE_EXPRESSIONS], r);
 	if (tb[NFTA_RULE_COMPAT])
 		ret = nft_rule_parse_compat(tb[NFTA_RULE_COMPAT], r);
+	if (tb[NFTA_RULE_POSITION]) {
+		r->position = be64toh(mnl_attr_get_u64(tb[NFTA_RULE_POSITION]));
+		r->flags |= (1 << NFT_RULE_ATTR_POSITION);
+	}
 
 	r->family = nfg->nfgen_family;
 	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
