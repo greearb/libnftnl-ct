@@ -3,6 +3,7 @@
   <expr type="bitwise">
     <sreg>2</sreg>
     <dreg>2</dreg>
+    <len>16</len>
     <mask>
       <data_reg type="value">
         <len>16</len>

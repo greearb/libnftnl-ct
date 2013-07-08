@@ -280,8 +280,9 @@ nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
 	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "<sreg>%u</sreg>"
-				"<dreg>%u</dreg>",
-		       bitwise->sreg, bitwise->dreg);
+				 "<dreg>%u</dreg>"
+				 "<len>%u</len>",
+		       bitwise->sreg, bitwise->dreg, bitwise->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "<mask>");
