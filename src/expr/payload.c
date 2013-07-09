@@ -294,6 +294,19 @@ nft_rule_expr_payload_snprintf_xml(char *buf, size_t len, uint32_t flags,
 	return offset;
 }
 
+static char *base2str_array[NFT_PAYLOAD_TRANSPORT_HEADER+1] = {
+	[NFT_PAYLOAD_LL_HEADER]		= "link",
+	[NFT_PAYLOAD_NETWORK_HEADER] 	= "network",
+	[NFT_PAYLOAD_TRANSPORT_HEADER]	= "transport",
+};
+
+static const char *base2str(enum nft_payload_bases base)
+{
+	if (base > NFT_PAYLOAD_TRANSPORT_HEADER)
+		return "unknown";
+
+	return base2str_array[base];
+}
 
 static int
 nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
@@ -303,8 +316,9 @@ nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "load %ub @ network header + %u => reg %u ",
-				payload->dreg, payload->offset, payload->len);
+		return snprintf(buf, len, "load %ub @ %s header + %u => reg %u ",
+				payload->dreg, base2str(payload->base),
+				payload->offset, payload->len);
 	case NFT_RULE_O_XML:
 		return nft_rule_expr_payload_snprintf_xml(buf, len, flags,
 							  payload);
