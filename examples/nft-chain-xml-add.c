@@ -1,10 +1,13 @@
 /*
- * 2013 by Arturo Borrero Gonzalez <arturo.borrero.glez@gmail.com>
+ * (C) 2013 by Pablo Neira Ayuso <pablo@netfilter.org>
+ * (C) 2013 by Arturo Borrero Gonzalez <arturo.borrero.glez@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
+ *
+ * This code has been sponsored by Sophos Astaro <http://www.sophos.com>
  */
 
 #include <stdlib.h>
@@ -30,8 +33,7 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq;
 	struct nft_chain *c = NULL;
-	int ret;
-	int fd;
+	int ret, fd;
 	uint16_t family;
 	char xml[4096];
 	char reprint[4096];
@@ -70,11 +72,11 @@ int main(int argc, char *argv[])
 	printf("Parsed:\n%s\n", reprint);
 
 	nft_chain_attr_unset(c, NFT_CHAIN_ATTR_HANDLE);
-	family = (uint16_t)nft_chain_attr_get_u32(c, NFT_CHAIN_ATTR_FAMILY);
+	family = nft_chain_attr_get_u32(c, NFT_CHAIN_ATTR_FAMILY);
 
 	seq = time(NULL);
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, family,
-					NLM_F_ACK, seq);
+					NLM_F_CREATE|NLM_F_ACK, seq);
 	nft_chain_nlmsg_build_payload(nlh, c);
 
 	nft_chain_free(c);

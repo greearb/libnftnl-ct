@@ -1,10 +1,13 @@
 /*
- * 2013 by Arturo Borrero Gonzalez <arturo.borrero.glez@gmail.com>
+ * (C) 2013 by Pablo Neira Ayuso <pablo@netfilter.org>
+ * (C) 2013 by Arturo Borrero Gonzalez <arturo.borrero.glez@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
+ *
+ * This code has been sponsored by Sophos Astaro <http://www.sophos.com>
  */
 
 #include <stdlib.h>
@@ -52,6 +55,7 @@ int main(int argc, char *argv[])
 		close(fd);
 		exit(EXIT_FAILURE);
 	}
+	close(fd);
 
 	r = nft_rule_alloc();
 	if (r == NULL) {
@@ -72,7 +76,8 @@ int main(int argc, char *argv[])
 
 	seq = time(NULL);
 	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, family,
-					NLM_F_APPEND|NLM_F_ACK, seq);
+				       NLM_F_CREATE|NLM_F_APPEND|NLM_F_ACK,
+				       seq);
 	nft_rule_nlmsg_build_payload(nlh, r);
 	nft_rule_free(r);
 
