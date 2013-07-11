@@ -867,6 +867,12 @@ void nft_rule_list_free(struct nft_rule_list *list)
 }
 EXPORT_SYMBOL(nft_rule_list_free);
 
+int nft_rule_list_is_empty(struct nft_rule_list *list)
+{
+	return list_empty(&list->list);
+}
+EXPORT_SYMBOL(nft_rule_list_is_empty);
+
 void nft_rule_list_add(struct nft_rule *r, struct nft_rule_list *list)
 {
 	list_add_tail(&r->head, &list->list);

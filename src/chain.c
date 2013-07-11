@@ -862,6 +862,12 @@ void nft_chain_list_free(struct nft_chain_list *list)
 }
 EXPORT_SYMBOL(nft_chain_list_free);
 
+int nft_chain_list_is_empty(struct nft_chain_list *list)
+{
+	return list_empty(&list->list);
+}
+EXPORT_SYMBOL(nft_chain_list_is_empty);
+
 void nft_chain_list_add(struct nft_chain *r, struct nft_chain_list *list)
 {
 	list_add_tail(&r->head, &list->list);

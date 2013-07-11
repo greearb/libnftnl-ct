@@ -473,6 +473,12 @@ void nft_set_list_free(struct nft_set_list *list)
 }
 EXPORT_SYMBOL(nft_set_list_free);
 
+int nft_set_list_is_empty(struct nft_set_list *list)
+{
+	return list_empty(&list->list);
+}
+EXPORT_SYMBOL(nft_set_list_is_empty);
+
 void nft_set_list_add(struct nft_set *s, struct nft_set_list *list)
 {
 	list_add_tail(&s->head, &list->list);
