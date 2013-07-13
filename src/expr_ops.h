@@ -14,6 +14,8 @@ struct nft_rule_expr;
 #endif
 
 struct expr_ops {
+	struct list_head head;
+
 	char	*name;
 	size_t	alloc_len;
 	int	max_attr;
@@ -25,6 +27,7 @@ struct expr_ops {
 	int	(*xml_parse)(struct nft_rule_expr *e, mxml_node_t *tree);
 };
 
+void nft_expr_ops_register(struct expr_ops *ops);
 struct expr_ops *nft_expr_ops_lookup(const char *name);
 
 #endif

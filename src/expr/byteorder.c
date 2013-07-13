@@ -356,3 +356,8 @@ struct expr_ops expr_ops_byteorder = {
 	.snprintf	= nft_rule_expr_byteorder_snprintf,
 	.xml_parse	= nft_rule_expr_byteorder_xml_parse,
 };
+
+static void __init expr_byteorder_init(void)
+{
+	nft_expr_ops_register(&expr_ops_byteorder);
+}

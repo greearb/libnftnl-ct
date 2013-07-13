@@ -360,3 +360,8 @@ struct expr_ops expr_ops_bitwise = {
 	.snprintf	= nft_rule_expr_bitwise_snprintf,
 	.xml_parse	= nft_rule_expr_bitwise_xml_parse,
 };
+
+static void __init expr_bitwise(void)
+{
+	nft_expr_ops_register(&expr_ops_bitwise);
+}

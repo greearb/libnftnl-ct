@@ -201,3 +201,8 @@ struct expr_ops expr_ops_counter = {
 	.snprintf	= nft_rule_expr_counter_snprintf,
 	.xml_parse	= nft_rule_expr_counter_xml_parse,
 };
+
+static void __init expr_counter_init(void)
+{
+	nft_expr_ops_register(&expr_ops_counter);
+}

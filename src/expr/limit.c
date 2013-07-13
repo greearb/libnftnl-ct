@@ -203,3 +203,8 @@ struct expr_ops expr_ops_limit = {
 	.snprintf	= nft_rule_expr_limit_snprintf,
 	.xml_parse	= nft_rule_expr_limit_xml_parse,
 };
+
+static void __init expr_limit_init(void)
+{
+	nft_expr_ops_register(&expr_ops_limit);
+}

@@ -274,3 +274,8 @@ struct expr_ops expr_ops_log = {
 	.snprintf	= nft_rule_expr_log_snprintf,
 	.xml_parse	= nft_rule_expr_log_xml_parse,
 };
+
+static void __init expr_log_init(void)
+{
+	nft_expr_ops_register(&expr_ops_log);
+}

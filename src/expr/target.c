@@ -267,3 +267,8 @@ struct expr_ops expr_ops_target = {
 	.snprintf	= nft_rule_expr_target_snprintf,
 	.xml_parse	= nft_rule_expr_target_xml_parse,
 };
+
+static void __init expr_target_init(void)
+{
+	nft_expr_ops_register(&expr_ops_target);
+}

@@ -78,4 +78,6 @@ struct nft_set_elem {
 
 #define div_round_up(n, d)	(((n) + (d) - 1) / (d))
 
+#define __init __attribute__((constructor))
+
 #endif

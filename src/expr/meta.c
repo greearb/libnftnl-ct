@@ -238,3 +238,8 @@ struct expr_ops expr_ops_meta = {
 	.snprintf	= nft_rule_expr_meta_snprintf,
 	.xml_parse = nft_rule_expr_meta_xml_parse,
 };
+
+static void __init expr_meta_init(void)
+{
+	nft_expr_ops_register(&expr_ops_meta);
+}

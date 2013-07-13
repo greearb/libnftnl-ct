@@ -360,3 +360,8 @@ struct expr_ops expr_ops_immediate = {
 	.snprintf	= nft_rule_expr_immediate_snprintf,
 	.xml_parse	= nft_rule_expr_immediate_xml_parse,
 };
+
+static void __init expr_immediate_init(void)
+{
+	nft_expr_ops_register(&expr_ops_immediate);
+}
