@@ -31,7 +31,7 @@ static int
 nft_rule_expr_immediate_set(struct nft_rule_expr *e, uint16_t type,
 			    const void *data, size_t data_len)
 {
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	struct nft_expr_immediate *imm = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_EXPR_IMM_DREG:
@@ -60,7 +60,7 @@ static const void *
 nft_rule_expr_immediate_get(const struct nft_rule_expr *e, uint16_t type,
 			    size_t *data_len)
 {
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	struct nft_expr_immediate *imm = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_EXPR_IMM_DREG:
@@ -127,7 +127,7 @@ static int nft_rule_expr_immediate_cb(const struct nlattr *attr, void *data)
 static void
 nft_rule_expr_immediate_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 {
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	struct nft_expr_immediate *imm = nft_expr_data(e);
 
 	if (e->flags & (1 << NFT_EXPR_IMM_DREG))
 		mnl_attr_put_u32(nlh, NFTA_IMMEDIATE_DREG, htonl(imm->dreg));
@@ -157,7 +157,7 @@ nft_rule_expr_immediate_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 static int
 nft_rule_expr_immediate_parse(struct nft_rule_expr *e, struct nlattr *attr)
 {
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	struct nft_expr_immediate *imm = nft_expr_data(e);
 	struct nlattr *tb[NFTA_IMMEDIATE_MAX+1] = {};
 	int ret = 0;
 
@@ -199,7 +199,7 @@ static int
 nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	struct nft_expr_immediate *imm = nft_expr_data(e);
 	int datareg_type;
 	int32_t reg;
 
@@ -240,7 +240,7 @@ nft_rule_expr_immediate_snprintf_json(char *buf, size_t len,
 				     struct nft_rule_expr *e, uint32_t flags)
 {
 	int size = len, offset = 0, ret;
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	struct nft_expr_immediate *imm = nft_expr_data(e);
 
 	ret = snprintf(buf, len, "\"dreg\" : %u, "
 				"\"immediatedata\" : {", imm->dreg);
@@ -274,7 +274,7 @@ nft_rule_expr_immediate_snprintf_xml(char *buf, size_t len,
 				     struct nft_rule_expr *e, uint32_t flags)
 {
 	int size = len, offset = 0, ret;
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	struct nft_expr_immediate *imm = nft_expr_data(e);
 
 	ret = snprintf(buf, len, "<dreg>%u</dreg>"
 				"<immediatedata>", imm->dreg);
@@ -308,7 +308,7 @@ nft_rule_expr_immediate_snprintf_default(char *buf, size_t len,
 				struct nft_rule_expr *e, uint32_t flags)
 {
 	int size = len, offset = 0, ret;
-	struct nft_expr_immediate *imm = (struct nft_expr_immediate *)e->data;
+	struct nft_expr_immediate *imm = nft_expr_data(e);
 
 	ret = snprintf(buf, len, "reg %u ", imm->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);

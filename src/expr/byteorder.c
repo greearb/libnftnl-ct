@@ -35,8 +35,7 @@ static int
 nft_rule_expr_byteorder_set(struct nft_rule_expr *e, uint16_t type,
 			  const void *data, size_t data_len)
 {
-	struct nft_expr_byteorder *byteorder =
-		(struct nft_expr_byteorder *)e->data;
+	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_EXPR_BYTEORDER_SREG:
@@ -64,8 +63,7 @@ static const void *
 nft_rule_expr_byteorder_get(const struct nft_rule_expr *e, uint16_t type,
 			    size_t *data_len)
 {
-	struct nft_expr_byteorder *byteorder =
-		(struct nft_expr_byteorder *)e->data;
+	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_EXPR_BYTEORDER_SREG:
@@ -132,8 +130,7 @@ static int nft_rule_expr_byteorder_cb(const struct nlattr *attr, void *data)
 static void
 nft_rule_expr_byteorder_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 {
-	struct nft_expr_byteorder *byteorder =
-		(struct nft_expr_byteorder *)e->data;
+	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 
 	if (e->flags & (1 << NFT_EXPR_BYTEORDER_SREG)) {
 		mnl_attr_put_u32(nlh, NFTA_BYTEORDER_SREG,
@@ -160,7 +157,7 @@ nft_rule_expr_byteorder_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 static int
 nft_rule_expr_byteorder_parse(struct nft_rule_expr *e, struct nlattr *attr)
 {
-	struct nft_expr_byteorder *byteorder = (struct nft_expr_byteorder *)e->data;
+	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 	struct nlattr *tb[NFTA_BYTEORDER_MAX+1] = {};
 	int ret = 0;
 
@@ -205,8 +202,7 @@ static int
 nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
-	struct nft_expr_byteorder *byteorder =
-		(struct nft_expr_byteorder *)e->data;
+	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr = NULL;
@@ -327,7 +323,7 @@ static int
 nft_rule_expr_byteorder_snprintf(char *buf, size_t size, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
-	struct nft_expr_byteorder *byteorder = (struct nft_expr_byteorder *)e->data;
+	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:

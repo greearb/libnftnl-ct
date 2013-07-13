@@ -30,4 +30,6 @@ struct expr_ops {
 void nft_expr_ops_register(struct expr_ops *ops);
 struct expr_ops *nft_expr_ops_lookup(const char *name);
 
+#define nft_expr_data(ops) (void *)ops->data
+
 #endif

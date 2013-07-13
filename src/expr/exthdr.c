@@ -41,7 +41,7 @@ static int
 nft_rule_expr_exthdr_set(struct nft_rule_expr *e, uint16_t type,
 			  const void *data, size_t data_len)
 {
-	struct nft_expr_exthdr *exthdr = (struct nft_expr_exthdr *)e->data;
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_EXPR_EXTHDR_DREG:
@@ -66,7 +66,7 @@ static const void *
 nft_rule_expr_exthdr_get(const struct nft_rule_expr *e, uint16_t type,
 			 size_t *data_len)
 {
-	struct nft_expr_exthdr *exthdr = (struct nft_expr_exthdr *)e->data;
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_EXPR_EXTHDR_DREG:
@@ -135,7 +135,7 @@ static int nft_rule_expr_exthdr_cb(const struct nlattr *attr, void *data)
 static void
 nft_rule_expr_exthdr_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 {
-	struct nft_expr_exthdr *exthdr = (struct nft_expr_exthdr *)e->data;
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 
 	if (e->flags & (1 << NFT_EXPR_EXTHDR_DREG))
 		mnl_attr_put_u32(nlh, NFTA_EXTHDR_DREG, htonl(exthdr->dreg));
@@ -150,7 +150,7 @@ nft_rule_expr_exthdr_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 static int
 nft_rule_expr_exthdr_parse(struct nft_rule_expr *e, struct nlattr *attr)
 {
-	struct nft_expr_exthdr *exthdr = (struct nft_expr_exthdr *)e->data;
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 	struct nlattr *tb[NFTA_EXTHDR_MAX+1] = {};
 
 	if (mnl_attr_parse_nested(attr, nft_rule_expr_exthdr_cb, tb) < 0)
@@ -215,7 +215,7 @@ static int
 nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
-	struct nft_expr_exthdr *exthdr = (struct nft_expr_exthdr *)e->data;
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 	mxml_node_t *node = NULL;
 	uint64_t tmp;
 	char *endptr;
@@ -278,7 +278,7 @@ static int
 nft_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
-	struct nft_expr_exthdr *exthdr = (struct nft_expr_exthdr *)e->data;
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:

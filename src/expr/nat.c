@@ -36,7 +36,7 @@ static int
 nft_rule_expr_nat_set(struct nft_rule_expr *e, uint16_t type,
 		      const void *data, size_t data_len)
 {
-	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	struct nft_expr_nat *nat = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_EXPR_NAT_TYPE:
@@ -68,7 +68,7 @@ static const void *
 nft_rule_expr_nat_get(const struct nft_rule_expr *e, uint16_t type,
 		      size_t *data_len)
 {
-	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	struct nft_expr_nat *nat = nft_expr_data(e);
 
 	switch(type) {
 	case NFT_EXPR_NAT_TYPE:
@@ -143,7 +143,7 @@ static int nft_rule_expr_nat_cb(const struct nlattr *attr, void *data)
 static int
 nft_rule_expr_nat_parse(struct nft_rule_expr *e, struct nlattr *attr)
 {
-	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	struct nft_expr_nat *nat = nft_expr_data(e);
 	struct nlattr *tb[NFTA_NAT_MAX+1] = {};
 
 	if (mnl_attr_parse_nested(attr, nft_rule_expr_nat_cb, tb) < 0)
@@ -184,7 +184,7 @@ nft_rule_expr_nat_parse(struct nft_rule_expr *e, struct nlattr *attr)
 static void
 nft_rule_expr_nat_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 {
-	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	struct nft_expr_nat *nat = nft_expr_data(e);
 
 	if (e->flags & (1 << NFT_EXPR_NAT_TYPE))
 		mnl_attr_put_u32(nlh, NFTA_NAT_TYPE, htonl(nat->type));
@@ -208,7 +208,7 @@ nft_rule_expr_nat_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
-	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	struct nft_expr_nat *nat = nft_expr_data(e);
 	mxml_node_t *node;
 	int32_t reg;
 	int family;
@@ -280,7 +280,7 @@ static int
 nft_rule_expr_nat_snprintf_json(char *buf, size_t size,
 				struct nft_rule_expr *e)
 {
-	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	struct nft_expr_nat *nat = nft_expr_data(e);
 	int len = size, offset = 0, ret = 0;
 
 	if (nat->type == NFT_NAT_SNAT)
@@ -318,7 +318,7 @@ static int
 nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 				struct nft_rule_expr *e)
 {
-	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	struct nft_expr_nat *nat = nft_expr_data(e);
 	int len = size, offset = 0, ret = 0;
 
 	/* Is a mandatory element. Provide a default, even empty */
@@ -358,7 +358,7 @@ static int
 nft_rule_expr_nat_snprintf_default(char *buf, size_t size,
 				   struct nft_rule_expr *e)
 {
-	struct nft_expr_nat *nat = (struct nft_expr_nat *)e->data;
+	struct nft_expr_nat *nat = nft_expr_data(e);
 	int len = size, offset = 0, ret = 0;
 
 	switch (nat->type) {
