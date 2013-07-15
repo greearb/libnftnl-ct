@@ -385,34 +385,40 @@ int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_elems_nlmsg_parse);
 
-static int nft_set_elem_snprintf_json(char *buf, size_t size, struct nft_set_elem *e)
+static int nft_set_elem_snprintf_json(char *buf, size_t size,
+				       struct nft_set_elem *e, uint32_t flags)
 {
-	int ret, len = size, offset = 0, i, numregs;
+	int ret, len = size, offset = 0, type = -1;
 
-	ret = snprintf(buf, size, "\"flags\" : %u", e->set_elem_flags);
+	ret = snprintf(buf, size, "\"set_elem_flags\": %u", e->set_elem_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	numregs = div_round_up(e->key.len, sizeof(uint32_t));
-	if (numregs != 0) {
-		ret = snprintf(buf+offset, len, ", \"key\" : \"0x");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		for (i = 0; i < numregs; i++) {
-			ret = snprintf(buf+offset, len, "%.8x", e->key.val[i]);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-		ret = snprintf(buf+offset, len, "\"");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	ret = snprintf(buf+offset, size, ",\"set_elem_key\": {");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	numregs = div_round_up(e->data.len, sizeof(uint32_t));
-	if (numregs != 0) {
-		ret = snprintf(buf+offset, size, " ,\"data\" : \"0x");
+	ret = nft_data_reg_snprintf(buf+offset, len, &e->key,
+				    NFT_RULE_O_JSON, flags, DATA_VALUE);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = snprintf(buf+offset, size, "}");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (e->flags & (1 << NFT_SET_ELEM_ATTR_DATA))
+		type = DATA_VALUE;
+	else if (e->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN))
+		type = DATA_CHAIN;
+	else if (e->flags & (1 << NFT_SET_ELEM_ATTR_VERDICT))
+		type = DATA_VERDICT;
+
+	if (type != -1) {
+		ret = snprintf(buf+offset, size, ",\"set_elem_data\": {");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		for (i = 0; i < numregs; i++) {
-			ret = snprintf(buf+offset, len, "%.8x", e->data.val[i]);
+
+		ret = nft_data_reg_snprintf(buf+offset, len, &e->data,
+				    NFT_RULE_O_JSON, flags, type);
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-		ret = snprintf(buf+offset, len, "\"");
+
+		ret = snprintf(buf+offset, size, "}");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -514,7 +520,7 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 	case NFT_SET_O_XML:
 		return nft_set_elem_snprintf_xml(buf, size, e, flags);
 	case NFT_SET_O_JSON:
-		return nft_set_elem_snprintf_json(buf, size, e);
+		return nft_set_elem_snprintf_json(buf, size, e, flags);
 	default:
 		break;
 	}
