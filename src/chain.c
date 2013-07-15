@@ -717,9 +717,24 @@ int nft_chain_parse(struct nft_chain *c, enum nft_chain_parse_type type,
 }
 EXPORT_SYMBOL(nft_chain_parse);
 
+static const char *policy2str(int policy)
+{
+	switch (policy) {
+	case NF_ACCEPT:
+		return "accept";
+	case NF_DROP:
+		return "drop";
+	default:
+		break;
+	}
+	return "unknown";
+}
+
 static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 {
-	return snprintf(buf, size,
+	int ret, len = size, offset = 0;
+
+	ret = snprintf(buf, size,
 		"{ \"chain\": {"
 			"\"name\": \"%s\","
 			"\"handle\": %"PRIu64","
@@ -727,20 +742,32 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 			"\"packets\": %"PRIu64","
 			"\"version\": %d,"
 			"\"properties\": {"
-				"\"type\" : \"%s\","
-				"\"table\" : \"%s\","
-				"\"prio\" : %d,"
-				"\"use\" : %d,"
-				"\"hooknum\" : \"%s\","
-				"\"policy\" : %d,"
-				"\"family\" : \"%s\""
+				"\"family\": \"%s\","
+				"\"table\": \"%s\","
+				"\"use\": %d",
+			c->name, c->handle, c->bytes, c->packets,
+			NFT_CHAIN_JSON_VERSION, c->table,
+			nft_family2str(c->family), c->use);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
+		ret =  snprintf(buf+offset, size,
+				",\"type\": \"%s\","
+				"\"hooknum\": \"%s\","
+				"\"prio\": %d,"
+				"\"policy\": \"%s\"",
+			c->type, hooknum2str_array[c->hooknum], c->prio,
+			policy2str(c->policy));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, size,
 			"}"
 		"}"
-		"}",
-			c->name, c->handle, c->bytes, c->packets,
-			NFT_CHAIN_JSON_VERSION, c->type, c->table,
-			c->prio, c->use, hooknum2str_array[c->hooknum],
-			c->policy, nft_family2str(c->family));
+		"}");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
 }
 
 static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
@@ -778,19 +805,6 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
-}
-
-static const char *policy2str(int policy)
-{
-	switch (policy) {
-	case NF_ACCEPT:
-		return "accept";
-	case NF_DROP:
-		return "drop";
-	default:
-		break;
-	}
-	return "unknown";
 }
 
 static int nft_chain_snprintf_default(char *buf, size_t size,
