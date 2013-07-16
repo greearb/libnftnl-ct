@@ -20,6 +20,7 @@ global:
   nft_table_list_is_empty;
   nft_table_list_foreach;
   nft_table_list_add;
+  nft_table_list_add_tail;
   nft_table_list_iter_create;
   nft_table_list_iter_next;
   nft_table_list_iter_destroy;
@@ -47,6 +48,7 @@ global:
   nft_chain_list_free;
   nft_chain_list_is_empty;
   nft_chain_list_add;
+  nft_chain_list_add_tail;
   nft_chain_list_del;
   nft_chain_list_foreach;
   nft_chain_list_iter_create;
@@ -98,6 +100,7 @@ global:
   nft_rule_list_free;
   nft_rule_list_is_empty;
   nft_rule_list_add;
+  nft_rule_list_add_tail;
   nft_rule_list_foreach;
   nft_rule_list_iter_create;
   nft_rule_list_iter_cur;
@@ -122,6 +125,7 @@ global:
   nft_set_list_alloc;
   nft_set_list_free;
   nft_set_list_add;
+  nft_set_list_add_tail;
   nft_set_list_is_empty;
   nft_set_list_foreach;
 

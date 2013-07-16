@@ -492,9 +492,15 @@ EXPORT_SYMBOL(nft_set_list_is_empty);
 
 void nft_set_list_add(struct nft_set *s, struct nft_set_list *list)
 {
-	list_add_tail(&s->head, &list->list);
+	list_add(&s->head, &list->list);
 }
 EXPORT_SYMBOL(nft_set_list_add);
+
+void nft_set_list_add_tail(struct nft_set *s, struct nft_set_list *list)
+{
+	list_add_tail(&s->head, &list->list);
+}
+EXPORT_SYMBOL(nft_set_list_add_tail);
 
 int nft_set_list_foreach(struct nft_set_list *set_list,
 			 int (*cb)(struct nft_set *t, void *data), void *data)

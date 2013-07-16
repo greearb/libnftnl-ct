@@ -75,6 +75,7 @@ struct nft_rule_list *nft_rule_list_alloc(void);
 void nft_rule_list_free(struct nft_rule_list *list);
 int nft_rule_list_is_empty(struct nft_rule_list *list);
 void nft_rule_list_add(struct nft_rule *r, struct nft_rule_list *list);
+void nft_rule_list_add_tail(struct nft_rule *r, struct nft_rule_list *list);
 int nft_rule_list_foreach(struct nft_rule_list *rule_list, int (*cb)(struct nft_rule *t, void *data), void *data);
 
 struct nft_rule_list_iter;

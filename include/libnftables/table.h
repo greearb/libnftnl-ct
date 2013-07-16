@@ -57,6 +57,7 @@ int nft_table_list_is_empty(struct nft_table_list *list);
 int nft_table_list_foreach(struct nft_table_list *table_list, int (*cb)(struct nft_table *t, void *data), void *data);
 
 void nft_table_list_add(struct nft_table *r, struct nft_table_list *list);
+void nft_table_list_add_tail(struct nft_table *r, struct nft_table_list *list);
 
 struct nft_table_list_iter;
 

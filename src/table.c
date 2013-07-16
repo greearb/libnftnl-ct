@@ -418,9 +418,15 @@ EXPORT_SYMBOL(nft_table_list_is_empty);
 
 void nft_table_list_add(struct nft_table *r, struct nft_table_list *list)
 {
-	list_add_tail(&r->head, &list->list);
+	list_add(&r->head, &list->list);
 }
 EXPORT_SYMBOL(nft_table_list_add);
+
+void nft_table_list_add_tail(struct nft_table *r, struct nft_table_list *list)
+{
+	list_add_tail(&r->head, &list->list);
+}
+EXPORT_SYMBOL(nft_table_list_add_tail);
 
 int nft_table_list_foreach(struct nft_table_list *table_list,
 			   int (*cb)(struct nft_table *t, void *data),
