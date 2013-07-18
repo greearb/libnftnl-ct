@@ -24,7 +24,7 @@ const char *nft_family2str(uint32_t family)
 		return "ip6";
 	case AF_BRIDGE:
 		return "bridge";
-	case 0:
+	case 3: /* NFPROTO_ARP */
 		return "arp";
 	default:
 		return "unknown";
