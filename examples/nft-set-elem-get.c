@@ -14,6 +14,7 @@
 #include <string.h>
 #include <netinet/in.h>
 
+#include <linux/netfilter.h>
 #include <linux/netfilter/nf_tables.h>
 
 #include <libmnl/libmnl.h>
@@ -67,13 +68,15 @@ int main(int argc, char *argv[])
 	}
 	seq = time(NULL);
 	if (strcmp(argv[1], "ip") == 0)
-		family = AF_INET;
+		family = NFPROTO_IPV4;
 	else if (strcmp(argv[1], "ip6") == 0)
-		family = AF_INET6;
+		family = NFPROTO_IPV6;
 	else if (strcmp(argv[1], "bridge") == 0)
-		family = AF_BRIDGE;
+		family = NFPROTO_BRIDGE;
+	else if (strcmp(argv[1], "arp") == 0)
+		family = NFPROTO_ARP;
 	else {
-		fprintf(stderr, "Unknown family: ip, ip6, bridge\n");
+		fprintf(stderr, "Unknown family: ip, ip6, bridge, arp\n");
 		exit(EXIT_FAILURE);
 	}
 
