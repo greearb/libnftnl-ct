@@ -27,11 +27,11 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq;
 	struct nft_chain *t = NULL;
-	int ret, family, hooknum;
+	int ret, family, hooknum = 0;
 
-	if (argc != 6) {
+	if (argc != 4 && argc != 6) {
 		fprintf(stderr, "Usage: %s <family> <table> <chain> "
-					  "<hooknum> <prio>\n",
+					  "[<hooknum> <prio>]\n",
 			argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -49,19 +49,22 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (strcmp(argv[4], "NF_INET_LOCAL_IN") == 0)
-		hooknum = NF_INET_LOCAL_IN;
-	else if (strcmp(argv[4], "NF_INET_LOCAL_OUT") == 0)
-		hooknum = NF_INET_LOCAL_OUT;
-	else if (strcmp(argv[4], "NF_INET_PRE_ROUTING") == 0)
-		hooknum = NF_INET_PRE_ROUTING;
-	else if (strcmp(argv[4], "NF_INET_POST_ROUTING") == 0)
-		hooknum = NF_INET_POST_ROUTING;
-	else if (strcmp(argv[4], "NF_INET_FORWARD") == 0)
-		hooknum = NF_INET_FORWARD;
-	else {
-		fprintf(stderr, "Unknown hook: %s\n", argv[4]);
-		exit(EXIT_FAILURE);
+	if (argc == 6) {
+		/* This is a base chain, set the hook number */
+		if (strcmp(argv[4], "NF_INET_LOCAL_IN") == 0)
+			hooknum = NF_INET_LOCAL_IN;
+		else if (strcmp(argv[4], "NF_INET_LOCAL_OUT") == 0)
+			hooknum = NF_INET_LOCAL_OUT;
+		else if (strcmp(argv[4], "NF_INET_PRE_ROUTING") == 0)
+			hooknum = NF_INET_PRE_ROUTING;
+		else if (strcmp(argv[4], "NF_INET_POST_ROUTING") == 0)
+			hooknum = NF_INET_POST_ROUTING;
+		else if (strcmp(argv[4], "NF_INET_FORWARD") == 0)
+			hooknum = NF_INET_FORWARD;
+		else {
+			fprintf(stderr, "Unknown hook: %s\n", argv[4]);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	t = nft_chain_alloc();
@@ -74,8 +77,10 @@ int main(int argc, char *argv[])
 					NLM_F_EXCL|NLM_F_ACK, seq);
 	nft_chain_attr_set(t, NFT_CHAIN_ATTR_TABLE, argv[2]);
 	nft_chain_attr_set(t, NFT_CHAIN_ATTR_NAME, argv[3]);
-	nft_chain_attr_set_u32(t, NFT_CHAIN_ATTR_HOOKNUM, hooknum);
-	nft_chain_attr_set_u32(t, NFT_CHAIN_ATTR_PRIO, atoi(argv[5]));
+	if (argc == 6) {
+		nft_chain_attr_set_u32(t, NFT_CHAIN_ATTR_HOOKNUM, hooknum);
+		nft_chain_attr_set_u32(t, NFT_CHAIN_ATTR_PRIO, atoi(argv[5]));
+	}
 	nft_chain_nlmsg_build_payload(nlh, t);
 	nft_chain_free(t);
 
