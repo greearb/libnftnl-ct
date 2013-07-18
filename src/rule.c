@@ -1,5 +1,5 @@
 /*
- * (C) 2012 by Pablo Neira Ayuso <pablo@netfilter.org>
+ * (C) 2012-2013 by Pablo Neira Ayuso <pablo@netfilter.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -166,51 +166,26 @@ EXPORT_SYMBOL(nft_rule_attr_set_str);
 
 const void *nft_rule_attr_get(const struct nft_rule *r, uint16_t attr)
 {
+	if (!(r->flags & (1 << attr)))
+		return NULL;
+
 	switch(attr) {
 	case NFT_RULE_ATTR_FAMILY:
-		if (r->flags & (1 << NFT_RULE_ATTR_FAMILY))
-			return &r->family;
-		else
-			return NULL;
-		break;
+		return &r->family;
 	case NFT_RULE_ATTR_TABLE:
-		if (r->flags & (1 << NFT_RULE_ATTR_TABLE))
-			return r->table;
-		else
-			return NULL;
-		break;
+		return r->table;
 	case NFT_RULE_ATTR_CHAIN:
-		if (r->flags & (1 << NFT_RULE_ATTR_CHAIN))
-			return r->chain;
-		else
-			return NULL;
+		return r->chain;
 	case NFT_RULE_ATTR_HANDLE:
-		if (r->flags & (1 << NFT_RULE_ATTR_HANDLE))
-			return &r->handle;
-		else
-			return NULL;
-		break;
+		return &r->handle;
 	case NFT_RULE_ATTR_FLAGS:
-		if (r->flags & (1 << NFT_RULE_ATTR_FLAGS))
-			return &r->rule_flags;
-		else
-			return NULL;
-		break;
+		return &r->rule_flags;
 	case NFT_RULE_ATTR_COMPAT_PROTO:
-		if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO))
-			return &r->compat.proto;
-		else
-			return NULL;
-		break;
+		return &r->compat.proto;
 	case NFT_RULE_ATTR_COMPAT_FLAGS:
-		if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_FLAGS))
-			return &r->compat.flags;
-		else
-			return NULL;
-		break;
-	default:
-		return NULL;
+		return &r->compat.flags;
 	}
+	return NULL;
 }
 EXPORT_SYMBOL(nft_rule_attr_get);
 

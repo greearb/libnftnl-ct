@@ -58,21 +58,11 @@ nft_rule_expr_meta_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_META_KEY:
-		if (e->flags & (1 << NFT_EXPR_META_KEY)) {
-			*data_len = sizeof(meta->key);
-			return &meta->key;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(meta->key);
+		return &meta->key;
 	case NFT_EXPR_META_DREG:
-		if (e->flags & (1 << NFT_EXPR_META_DREG)) {
-			*data_len = sizeof(meta->dreg);
-			return &meta->dreg;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = sizeof(meta->dreg);
+		return &meta->dreg;
 	}
 	return NULL;
 }

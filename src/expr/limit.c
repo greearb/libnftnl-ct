@@ -55,21 +55,11 @@ nft_rule_expr_limit_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_LIMIT_RATE:
-		if (e->flags & (1 << NFT_EXPR_LIMIT_RATE)) {
-			*data_len = sizeof(uint64_t);
-			return &limit->rate;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(uint64_t);
+		return &limit->rate;
 	case NFT_EXPR_LIMIT_DEPTH:
-		if (e->flags & (1 << NFT_EXPR_LIMIT_DEPTH)) {
-			*data_len = sizeof(uint64_t);
-			return &limit->depth;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = sizeof(uint64_t);
+		return &limit->depth;
 	}
 	return NULL;
 }

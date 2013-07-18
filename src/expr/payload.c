@@ -65,35 +65,17 @@ nft_rule_expr_payload_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_PAYLOAD_DREG:
-		if (e->flags & (1 << NFT_EXPR_PAYLOAD_DREG)) {
-			*data_len = sizeof(payload->dreg);
-			return &payload->dreg;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(payload->dreg);
+		return &payload->dreg;
 	case NFT_EXPR_PAYLOAD_BASE:
-		if (e->flags & (1 << NFT_EXPR_PAYLOAD_BASE)) {
-			*data_len = sizeof(payload->base);
-			return &payload->base;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(payload->base);
+		return &payload->base;
 	case NFT_EXPR_PAYLOAD_OFFSET:
-		if (e->flags & (1 << NFT_EXPR_PAYLOAD_OFFSET)) {
-			*data_len = sizeof(payload->offset);
-			return &payload->offset;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(payload->offset);
+		return &payload->offset;
 	case NFT_EXPR_PAYLOAD_LEN:
-		if (e->flags & (1 << NFT_EXPR_PAYLOAD_LEN)) {
-			*data_len = sizeof(payload->len);
-			return &payload->len;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = sizeof(payload->len);
+		return &payload->len;
 	}
 	return NULL;
 }

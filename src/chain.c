@@ -1,5 +1,5 @@
 /*
- * (C) 2012 by Pablo Neira Ayuso <pablo@netfilter.org>
+ * (C) 2012-2013 by Pablo Neira Ayuso <pablo@netfilter.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -187,75 +187,34 @@ EXPORT_SYMBOL(nft_chain_attr_set_str);
 
 void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
 {
+	if (!(c->flags & (1 << attr)))
+		return NULL;
+
 	switch(attr) {
 	case NFT_CHAIN_ATTR_NAME:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_NAME))
-			return c->name;
-		else
-			return NULL;
-		break;
+		return c->name;
 	case NFT_CHAIN_ATTR_TABLE:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_TABLE))
-			return c->table;
-		else
-			return NULL;
+		return c->table;
 	case NFT_CHAIN_ATTR_HOOKNUM:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM))
-			return &c->hooknum;
-		else
-			return NULL;
-		break;
+		return &c->hooknum;
 	case NFT_CHAIN_ATTR_PRIO:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_PRIO))
-			return &c->prio;
-		else
-			return NULL;
-		break;
+		return &c->prio;
 	case NFT_CHAIN_ATTR_POLICY:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_POLICY))
-			return &c->policy;
-		else
-			return NULL;
-		break;
+		return &c->policy;
 	case NFT_CHAIN_ATTR_USE:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_USE))
-			return &c->use;
-		else
-			return NULL;
-		break;
+		return &c->use;
 	case NFT_CHAIN_ATTR_BYTES:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_BYTES))
-			return &c->bytes;
-		else
-			return NULL;
-		break;
+		return &c->bytes;
 	case NFT_CHAIN_ATTR_PACKETS:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_PACKETS))
-			return &c->packets;
-		else
-			return NULL;
-		break;
+		return &c->packets;
 	case NFT_CHAIN_ATTR_HANDLE:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_HANDLE))
-			return &c->handle;
-		else
-			return NULL;
-		break;
+		return &c->handle;
 	case NFT_CHAIN_ATTR_FAMILY:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_FAMILY))
-			return &c->family;
-		else
-			return NULL;
-		break;
+		return &c->family;
 	case NFT_CHAIN_ATTR_TYPE:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_TYPE))
-			return c->type;
-		else
-			return NULL;
-		break;
-	default:
-		return NULL;
+		return c->type;
 	}
+	return NULL;
 }
 EXPORT_SYMBOL(nft_chain_attr_get);
 

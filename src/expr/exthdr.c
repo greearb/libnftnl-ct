@@ -70,35 +70,17 @@ nft_rule_expr_exthdr_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_EXTHDR_DREG:
-		if (e->flags & (1 << NFT_EXPR_EXTHDR_DREG)) {
-			*data_len = sizeof(exthdr->dreg);
-			return &exthdr->dreg;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(exthdr->dreg);
+		return &exthdr->dreg;
 	case NFT_EXPR_EXTHDR_TYPE:
-		if (e->flags & (1 << NFT_EXPR_EXTHDR_TYPE)) {
-			*data_len = sizeof(exthdr->type);
-			return &exthdr->type;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(exthdr->type);
+		return &exthdr->type;
 	case NFT_EXPR_EXTHDR_OFFSET:
-		if (e->flags & (1 << NFT_EXPR_EXTHDR_OFFSET)) {
-			*data_len = sizeof(exthdr->offset);
-			return &exthdr->offset;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(exthdr->offset);
+		return &exthdr->offset;
 	case NFT_EXPR_EXTHDR_LEN:
-		if (e->flags & (1 << NFT_EXPR_EXTHDR_LEN)) {
-			*data_len = sizeof(exthdr->len);
-			return &exthdr->len;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = sizeof(exthdr->len);
+		return &exthdr->len;
 	}
 	return NULL;
 }

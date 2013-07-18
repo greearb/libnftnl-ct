@@ -67,37 +67,20 @@ nft_rule_expr_byteorder_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_BYTEORDER_SREG:
-		if (e->flags & (1 << NFT_EXPR_BYTEORDER_SREG)) {
-			*data_len = sizeof(byteorder->sreg);
-			return &byteorder->sreg;
-		}
-		break;
+		*data_len = sizeof(byteorder->sreg);
+		return &byteorder->sreg;
 	case NFT_EXPR_BYTEORDER_DREG:
-		if (e->flags & (1 << NFT_EXPR_BYTEORDER_DREG)) {
-			*data_len = sizeof(byteorder->dreg);
-			return &byteorder->dreg;
-		}
-		break;
+		*data_len = sizeof(byteorder->dreg);
+		return &byteorder->dreg;
 	case NFT_EXPR_BYTEORDER_OP:
-		if (e->flags & (1 << NFT_EXPR_BYTEORDER_OP)) {
-			*data_len = sizeof(byteorder->op);
-			return &byteorder->op;
-		}
-		break;
+		*data_len = sizeof(byteorder->op);
+		return &byteorder->op;
 	case NFT_EXPR_BYTEORDER_LEN:
-		if (e->flags & (1 << NFT_EXPR_BYTEORDER_LEN)) {
-			*data_len = sizeof(byteorder->len);
-			return &byteorder->len;
-		}
-		break;
+		*data_len = sizeof(byteorder->len);
+		return &byteorder->len;
 	case NFT_EXPR_BYTEORDER_SIZE:
-		if (e->flags & (1 << NFT_EXPR_BYTEORDER_SIZE)) {
-			*data_len = sizeof(byteorder->size);
-			return &byteorder->size;
-		}
-		break;
-	default:
-		break;
+		*data_len = sizeof(byteorder->size);
+		return &byteorder->size;
 	}
 	return NULL;
 }

@@ -64,23 +64,13 @@ nft_rule_expr_lookup_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_LOOKUP_SREG:
-		if (e->flags & (1 << NFT_EXPR_LOOKUP_SREG)) {
-			*data_len = sizeof(lookup->sreg);
-			return &lookup->sreg;
-		}
-		break;
+		*data_len = sizeof(lookup->sreg);
+		return &lookup->sreg;
 	case NFT_EXPR_LOOKUP_DREG:
-		if (e->flags & (1 << NFT_EXPR_LOOKUP_DREG)) {
-			*data_len = sizeof(lookup->dreg);
-			return &lookup->dreg;
-		}
-		break;
+		*data_len = sizeof(lookup->dreg);
+		return &lookup->dreg;
 	case NFT_EXPR_LOOKUP_SET:
-		if (e->flags & (1 << NFT_EXPR_LOOKUP_SET))
-			return lookup->set_name;
-		break;
-	default:
-		break;
+		return lookup->set_name;
 	}
 	return NULL;
 }

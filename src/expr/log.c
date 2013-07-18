@@ -65,31 +65,13 @@ nft_rule_expr_log_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_LOG_PREFIX:
-		if (e->flags & (1 << NFT_EXPR_LOG_PREFIX))
-			return log->prefix;
-		else
-			return NULL;
-		break;
+		return log->prefix;
 	case NFT_EXPR_LOG_GROUP:
-		if (e->flags & (1 << NFT_EXPR_LOG_GROUP))
-			return &log->group;
-		else
-			return NULL;
-		break;
+		return &log->group;
 	case NFT_EXPR_LOG_SNAPLEN:
-		if (e->flags & (1 << NFT_EXPR_LOG_SNAPLEN))
-			return &log->snaplen;
-		else
-			return NULL;
-		break;
+		return &log->snaplen;
 	case NFT_EXPR_LOG_QTHRESHOLD:
-		if (e->flags & (1 << NFT_EXPR_LOG_QTHRESHOLD))
-			return &log->qthreshold;
-		else
-			return NULL;
-		break;
-	default:
-		break;
+		return &log->qthreshold;
 	}
 	return NULL;
 }

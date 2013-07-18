@@ -1,5 +1,5 @@
 /*
- * (C) 2012 by Pablo Neira Ayuso <pablo@netfilter.org>
+ * (C) 2012-2013 by Pablo Neira Ayuso <pablo@netfilter.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -112,23 +112,18 @@ EXPORT_SYMBOL(nft_table_attr_set_str);
 
 const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
 {
-	const void *ret = NULL;
+	if (!(t->flags & (1 << attr)))
+		return NULL;
 
 	switch(attr) {
 	case NFT_TABLE_ATTR_NAME:
-		if (t->flags & (1 << NFT_TABLE_ATTR_NAME))
-			ret = t->name;
-		break;
+		return t->name;
 	case NFT_TABLE_ATTR_FLAGS:
-		if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS))
-			ret = &t->table_flags;
-		break;
+		return &t->table_flags;
 	case NFT_TABLE_ATTR_FAMILY:
-		if (t->flags & (1 << NFT_TABLE_ATTR_FAMILY))
-			ret = &t->family;
-		break;
+		return &t->family;
 	}
-	return ret;
+	return NULL;
 }
 EXPORT_SYMBOL(nft_table_attr_get);
 

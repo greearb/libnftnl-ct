@@ -72,45 +72,24 @@ nft_rule_expr_nat_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_NAT_TYPE:
-		if (e->flags & (1 << NFT_EXPR_NAT_TYPE)) {
-			*data_len = sizeof(nat->type);
-			return &nat->type;
-		}
-		break;
+		*data_len = sizeof(nat->type);
+		return &nat->type;
 	case NFT_EXPR_NAT_FAMILY:
-		if (e->flags & (1 << NFT_EXPR_NAT_FAMILY)) {
-			*data_len = sizeof(nat->family);
-			return &nat->family;
-		}
-		break;
+		*data_len = sizeof(nat->family);
+		return &nat->family;
 	case NFT_EXPR_NAT_REG_ADDR_MIN:
-		if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MIN)) {
-			*data_len = sizeof(nat->sreg_addr_min);
-			return &nat->sreg_addr_min;
-		}
-		break;
+		*data_len = sizeof(nat->sreg_addr_min);
+		return &nat->sreg_addr_min;
 	case NFT_EXPR_NAT_REG_ADDR_MAX:
-		if (e->flags & (1 << NFT_EXPR_NAT_REG_ADDR_MAX)) {
-			*data_len = sizeof(nat->sreg_addr_max);
-			return &nat->sreg_addr_max;
-		}
-		break;
+		*data_len = sizeof(nat->sreg_addr_max);
+		return &nat->sreg_addr_max;
 	case NFT_EXPR_NAT_REG_PROTO_MIN:
-		if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MIN)) {
-			*data_len = sizeof(nat->sreg_proto_min);
-			return &nat->sreg_proto_min;
-		}
-		break;
+		*data_len = sizeof(nat->sreg_proto_min);
+		return &nat->sreg_proto_min;
 	case NFT_EXPR_NAT_REG_PROTO_MAX:
-		if (e->flags & (1 << NFT_EXPR_NAT_REG_PROTO_MAX)) {
-			*data_len = sizeof(nat->sreg_proto_max);
-			return &nat->sreg_proto_max;
-		}
-		break;
-	default:
-		break;
+		*data_len = sizeof(nat->sreg_proto_max);
+		return &nat->sreg_proto_max;
 	}
-
 	return NULL;
 }
 

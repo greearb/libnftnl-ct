@@ -61,28 +61,14 @@ nft_rule_expr_cmp_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_CMP_SREG:
-		if (e->flags & (1 << NFT_EXPR_CMP_SREG)) {
-			*data_len = sizeof(cmp->sreg);
-			return &cmp->sreg;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(cmp->sreg);
+		return &cmp->sreg;
 	case NFT_EXPR_CMP_OP:
-		if (e->flags & (1 << NFT_EXPR_CMP_OP)) {
-			*data_len = sizeof(cmp->op);
-			return &cmp->op;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(cmp->op);
+		return &cmp->op;
 	case NFT_EXPR_CMP_DATA:
-		if (e->flags & (1 << NFT_EXPR_CMP_DATA)) {
-			*data_len = cmp->data.len;
-			return &cmp->data.val;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = cmp->data.len;
+		return &cmp->data.val;
 	}
 	return NULL;
 }

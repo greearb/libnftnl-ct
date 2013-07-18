@@ -69,37 +69,20 @@ nft_rule_expr_bitwise_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_BITWISE_SREG:
-		if (e->flags & (1 << NFT_EXPR_BITWISE_SREG)) {
-			*data_len = sizeof(bitwise->sreg);
-			return &bitwise->sreg;
-		}
-		break;
+		*data_len = sizeof(bitwise->sreg);
+		return &bitwise->sreg;
 	case NFT_EXPR_BITWISE_DREG:
-		if (e->flags & (1 << NFT_EXPR_BITWISE_DREG)) {
-			*data_len = sizeof(bitwise->dreg);
-			return &bitwise->dreg;
-		}
-		break;
+		*data_len = sizeof(bitwise->dreg);
+		return &bitwise->dreg;
 	case NFT_EXPR_BITWISE_LEN:
-		if (e->flags & (1 << NFT_EXPR_BITWISE_LEN)) {
-			*data_len = sizeof(bitwise->len);
-			return &bitwise->len;
-		}
-		break;
+		*data_len = sizeof(bitwise->len);
+		return &bitwise->len;
 	case NFT_EXPR_BITWISE_MASK:
-		if (e->flags & (1 << NFT_EXPR_BITWISE_MASK)) {
-			*data_len = bitwise->mask.len;
-			return &bitwise->mask.val;
-		}
-		break;
+		*data_len = bitwise->mask.len;
+		return &bitwise->mask.val;
 	case NFT_EXPR_BITWISE_XOR:
-		if (e->flags & (1 << NFT_EXPR_BITWISE_XOR)) {
-			*data_len = bitwise->xor.len;
-			return &bitwise->xor.val;
-		}
-		break;
-	default:
-		break;
+		*data_len = bitwise->xor.len;
+		return &bitwise->xor.val;
 	}
 	return NULL;
 }

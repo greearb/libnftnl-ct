@@ -55,21 +55,11 @@ nft_rule_expr_counter_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_CTR_BYTES:
-		if (e->flags & (1 << NFT_EXPR_CTR_BYTES)) {
-			*data_len = sizeof(ctr->bytes);
-			return &ctr->bytes;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(ctr->bytes);
+		return &ctr->bytes;
 	case NFT_EXPR_CTR_PACKETS:
-		if (e->flags & (1 << NFT_EXPR_CTR_PACKETS)) {
-			*data_len = sizeof(ctr->pkts);
-			return &ctr->pkts;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = sizeof(ctr->pkts);
+		return &ctr->pkts;
 	}
 	return NULL;
 }

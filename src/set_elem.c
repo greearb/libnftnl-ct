@@ -120,33 +120,22 @@ EXPORT_SYMBOL(nft_set_elem_attr_set_str);
 
 void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, size_t *data_len)
 {
+	if (!(s->flags & (1 << attr)))
+		return NULL;
+
 	switch(attr) {
 	case NFT_SET_ELEM_ATTR_FLAGS:
-		if (s->flags & (1 << NFT_SET_ELEM_ATTR_FLAGS))
-			return &s->set_elem_flags;
-		break;
+		return &s->set_elem_flags;
 	case NFT_SET_ELEM_ATTR_KEY:	/* NFTA_SET_ELEM_KEY */
-		if (s->flags & (1 << NFT_SET_ELEM_ATTR_KEY)) {
-			*data_len = s->key.len;
-			return &s->key.val;
-		}
-		break;
+		*data_len = s->key.len;
+		return &s->key.val;
 	case NFT_SET_ELEM_ATTR_VERDICT:	/* NFTA_SET_ELEM_DATA */
-		if (s->flags & (1 << NFT_SET_ELEM_ATTR_VERDICT))
-			return &s->data.verdict;
-		break;
+		return &s->data.verdict;
 	case NFT_SET_ELEM_ATTR_CHAIN:	/* NFTA_SET_ELEM_DATA */
-		if (s->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN))
-			return s->data.chain;
-		break;
+		return s->data.chain;
 	case NFT_SET_ELEM_ATTR_DATA:	/* NFTA_SET_ELEM_DATA */
-		if (s->flags & (1 << NFT_SET_ELEM_ATTR_DATA)) {
-			*data_len = s->data.len;
-			return &s->data.val;
-		}
-		break;
-	default:
-		break;
+		*data_len = s->data.len;
+		return &s->data.val;
 	}
 	return NULL;
 }

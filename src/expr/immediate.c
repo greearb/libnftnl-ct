@@ -64,35 +64,17 @@ nft_rule_expr_immediate_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_IMM_DREG:
-		if (e->flags & (1 << NFT_EXPR_IMM_DREG)) {
-			*data_len = sizeof(imm->dreg);
-			return &imm->dreg;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(imm->dreg);
+		return &imm->dreg;
 	case NFT_EXPR_IMM_DATA:
-		if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {
-			*data_len = imm->data.len;
-			return &imm->data.val;
-		} else
-			return NULL;
-		break;
+		*data_len = imm->data.len;
+		return &imm->data.val;
 	case NFT_EXPR_IMM_VERDICT:
-		if (e->flags & (1 << NFT_EXPR_IMM_VERDICT)) {
-			*data_len = sizeof(imm->data.verdict);
-			return &imm->data.verdict;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(imm->data.verdict);
+		return &imm->data.verdict;
 	case NFT_EXPR_IMM_CHAIN:
-		if (e->flags & (1 << NFT_EXPR_IMM_CHAIN)) {
-			*data_len = strlen(imm->data.chain)+1;
-			return imm->data.chain;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = strlen(imm->data.chain)+1;
+		return imm->data.chain;
 	}
 	return NULL;
 }

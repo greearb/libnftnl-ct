@@ -65,28 +65,14 @@ nft_rule_expr_ct_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_CT_KEY:
-		if (e->flags & (1 << NFT_EXPR_CT_KEY)) {
-			*data_len = sizeof(ct->key);
-			return &ct->key;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(ct->key);
+		return &ct->key;
 	case NFT_EXPR_CT_DIR:
-		if (e->flags & (1 << NFT_EXPR_CT_DIR)) {
-			*data_len = sizeof(ct->dir);
-			return &ct->dir;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(ct->dir);
+		return &ct->dir;
 	case NFT_EXPR_CT_DREG:
-		if (e->flags & (1 << NFT_EXPR_CT_DREG)) {
-			*data_len = sizeof(ct->dreg);
-			return &ct->dreg;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = sizeof(ct->dreg);
+		return &ct->dreg;
 	}
 	return NULL;
 }

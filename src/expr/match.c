@@ -69,28 +69,14 @@ nft_rule_expr_match_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_MT_NAME:
-		if (e->flags & (1 << NFT_EXPR_MT_NAME)) {
-			*data_len = sizeof(mt->name);
-			return mt->name;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(mt->name);
+		return mt->name;
 	case NFT_EXPR_MT_REV:
-		if (e->flags & (1 << NFT_EXPR_MT_REV)) {
-			*data_len = sizeof(mt->rev);
-			return &mt->rev;
-		} else
-			return NULL;
-		break;
+		*data_len = sizeof(mt->rev);
+		return &mt->rev;
 	case NFT_EXPR_MT_INFO:
-		if (e->flags & (1 << NFT_EXPR_MT_INFO)) {
-			*data_len = mt->data_len;
-			return mt->data;
-		} else
-			return NULL;
-		break;
-	default:
-		break;
+		*data_len = mt->data_len;
+		return mt->data;
 	}
 	return NULL;
 }

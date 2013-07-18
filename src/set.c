@@ -148,41 +148,26 @@ EXPORT_SYMBOL(nft_set_attr_set_str);
 
 void *nft_set_attr_get(struct nft_set *s, uint16_t attr)
 {
+	if (!(s->flags & (1 << attr)))
+		return NULL;
+
 	switch(attr) {
 	case NFT_SET_ATTR_TABLE:
-		if (s->flags & (1 << NFT_SET_ATTR_TABLE))
-			return s->table;
-		break;
+		return s->table;
 	case NFT_SET_ATTR_NAME:
-		if (s->flags & (1 << NFT_SET_ATTR_NAME))
-			return s->name;
-		break;
+		return s->name;
 	case NFT_SET_ATTR_FLAGS:
-		if (s->flags & (1 << NFT_SET_ATTR_FLAGS))
-			return &s->set_flags;
-		break;
+		return &s->set_flags;
 	case NFT_SET_ATTR_KEY_TYPE:
-		if (s->flags & (1 << NFT_SET_ATTR_KEY_TYPE))
-			return &s->key_type;
-		break;
+		return &s->key_type;
 	case NFT_SET_ATTR_KEY_LEN:
-		if (s->flags & (1 << NFT_SET_ATTR_KEY_LEN))
-			return &s->key_len;
-		break;
+		return &s->key_len;
 	case NFT_SET_ATTR_DATA_TYPE:
-		if (s->flags & (1 << NFT_SET_ATTR_DATA_TYPE))
-			return &s->data_type;
-		break;
+		return &s->data_type;
 	case NFT_SET_ATTR_DATA_LEN:
-		if (s->flags & (1 << NFT_SET_ATTR_DATA_LEN))
-			return &s->data_len;
-		break;
+		return &s->data_len;
 	case NFT_SET_ATTR_FAMILY:
-		if (s->flags & (1 << NFT_SET_ATTR_FAMILY))
-			return &s->family;
-		break;
-	default:
-		break;
+		return &s->family;
 	}
 	return NULL;
 }

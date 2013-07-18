@@ -114,6 +114,9 @@ const void *nft_rule_expr_get(const struct nft_rule_expr *expr, uint16_t type, s
 		ret = expr->ops->name;
 		break;
 	default:
+		if (!(expr->flags & (1 << type)))
+			return NULL;
+
 		ret = expr->ops->get(expr, type, data_len);
 		break;
 	}
