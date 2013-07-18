@@ -53,29 +53,30 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, type = NFT_CHAIN_O_DEFAULT;
 	struct nft_chain *t = NULL;
-	int ret;
+	int ret, family;
 
 	seq = time(NULL);
 
-	if (argc >= 1 && argc <= 2) {
-		nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, AF_INET,
-						NLM_F_DUMP, seq);
-	} else if (argc >= 4 && argc <= 5) {
-		int family;
+	if (argc < 2 || argc > 5) {
+		fprintf(stderr, "Usage: %s <family> [<table> <chain>] [xml]\n",
+			argv[0]);
+		exit(EXIT_FAILURE);
+	}
 
-		if (strcmp(argv[1], "ip") == 0)
-			family = NFPROTO_IPV4;
-		else if (strcmp(argv[1], "ip6") == 0)
-			family = NFPROTO_IPV6;
-		else if (strcmp(argv[1], "bridge") == 0)
-			family = NFPROTO_BRIDGE;
-		else if (strcmp(argv[1], "arp") == 0)
-			family = NFPROTO_ARP;
-		else {
-			fprintf(stderr, "Unknown family: ip, ip6, bridge, arp\n");
-			exit(EXIT_FAILURE);
-		}
+	if (strcmp(argv[1], "ip") == 0)
+		family = NFPROTO_IPV4;
+	else if (strcmp(argv[1], "ip6") == 0)
+		family = NFPROTO_IPV6;
+	else if (strcmp(argv[1], "bridge") == 0)
+		family = NFPROTO_BRIDGE;
+	else if (strcmp(argv[1], "arp") == 0)
+		family = NFPROTO_ARP;
+	else {
+		fprintf(stderr, "Unknown family: ip, ip6, bridge, arp\n");
+		exit(EXIT_FAILURE);
+	}
 
+	if (argc >= 4) {
 		t = nft_chain_alloc();
 		if (t == NULL) {
 			perror("OOM");
@@ -87,10 +88,9 @@ int main(int argc, char *argv[])
 		nft_chain_attr_set(t, NFT_CHAIN_ATTR_NAME, argv[3]);
 		nft_chain_nlmsg_build_payload(nlh, t);
 		nft_chain_free(t);
-	} else {
-		fprintf(stderr, "Usage: %s [<family> <table> <chain>] [xml]\n",
-			argv[0]);
-		exit(EXIT_FAILURE);
+	} else if (argc >= 2) {
+		nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
+						NLM_F_DUMP, seq);
 	}
 
 	if (strcmp(argv[argc-1], "xml") == 0){
