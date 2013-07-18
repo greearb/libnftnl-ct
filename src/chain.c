@@ -746,8 +746,8 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 				"\"table\": \"%s\","
 				"\"use\": %d",
 			c->name, c->handle, c->bytes, c->packets,
-			NFT_CHAIN_JSON_VERSION, c->table,
-			nft_family2str(c->family), c->use);
+			NFT_CHAIN_JSON_VERSION, nft_family2str(c->family),
+			c->table, c->use);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
