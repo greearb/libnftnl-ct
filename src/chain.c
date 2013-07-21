@@ -77,23 +77,24 @@ EXPORT_SYMBOL(nft_chain_attr_is_set);
 
 void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr)
 {
+	if (!(c->flags & (1 << attr)))
+		return;
+
 	switch (attr) {
 	case NFT_CHAIN_ATTR_TABLE:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_TABLE))
-			if (c->table) {
-				free(c->table);
-				c->table = NULL;
-			}
+		if (c->table) {
+			free(c->table);
+			c->table = NULL;
+		}
 		break;
 	case NFT_CHAIN_ATTR_USE:
 		/* cannot be unset?, ignore it */
 		return;
 	case NFT_CHAIN_ATTR_TYPE:
-		if (c->flags & (1 << NFT_CHAIN_ATTR_TYPE))
-			if (c->type) {
-				free(c->type);
-				c->type = NULL;
-			}
+		if (c->type) {
+			free(c->type);
+			c->type = NULL;
+		}
 		break;
 	case NFT_CHAIN_ATTR_NAME:
 	case NFT_CHAIN_ATTR_HOOKNUM:

@@ -57,20 +57,19 @@ EXPORT_SYMBOL(nft_table_attr_is_set);
 
 void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
 {
+	if (!(t->flags & (1 << attr)))
+		return;
+
 	switch (attr) {
 	case NFT_TABLE_ATTR_NAME:
-		if (t->flags & (1 << NFT_TABLE_ATTR_NAME)) {
-			if (t->name) {
-				free(t->name);
-				t->name = NULL;
-			}
+		if (t->name) {
+			free(t->name);
+			t->name = NULL;
 		}
 		break;
 	case NFT_TABLE_ATTR_FLAGS:
 	case NFT_TABLE_ATTR_FAMILY:
 		break;
-	default:
-		return;
 	}
 	t->flags &= ~(1 << attr);
 }
