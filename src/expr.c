@@ -102,21 +102,19 @@ nft_rule_expr_set_str(struct nft_rule_expr *expr, uint16_t type, const char *str
 }
 EXPORT_SYMBOL(nft_rule_expr_set_str);
 
-const void *nft_rule_expr_get(const struct nft_rule_expr *expr, uint16_t type, size_t *data_len)
+const void *nft_rule_expr_get(const struct nft_rule_expr *expr,
+			      uint16_t type, size_t *data_len)
 {
-	const void *ret = NULL;
+	const void *ret;
+
+	if (!(expr->flags & (1 << type)))
+		return NULL;
 
 	switch(type) {
 	case NFT_RULE_EXPR_ATTR_NAME:
-		if (!(expr->flags & (1 << NFT_RULE_EXPR_ATTR_NAME)))
-			return NULL;
-
 		ret = expr->ops->name;
 		break;
 	default:
-		if (!(expr->flags & (1 << type)))
-			return NULL;
-
 		ret = expr->ops->get(expr, type, data_len);
 		break;
 	}
