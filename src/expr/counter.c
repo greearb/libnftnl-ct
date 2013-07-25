@@ -123,33 +123,18 @@ nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_counter *ctr = nft_expr_data(e);
-	mxml_node_t *node = NULL;
-	char *endptr;
-	uint64_t tmp;
 
-	/* get and set <pkts>. Is not mandatory*/
-	node = mxmlFindElement(tree, tree, "pkts", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp == UINT64_MAX || tmp < 0 || *endptr )
-			return -1;
+	if (nft_mxml_num_parse(tree, "pkts", MXML_DESCEND_FIRST, BASE_DEC,
+                               &ctr->pkts, NFT_TYPE_U64) != 0)
+		return -1;
 
-		ctr->pkts = tmp;
-		e->flags |= (1 << NFT_EXPR_CTR_PACKETS);
-	}
+	e->flags |= (1 << NFT_EXPR_CTR_PACKETS);
 
-	/* get and set <bytes> */
-	node = mxmlFindElement(tree, tree, "bytes", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp == UINT64_MAX || tmp < 0 || *endptr)
-			return -1;
+	if (nft_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
+                               &ctr->bytes, NFT_TYPE_U64) != 0)
+		return -1;
 
-		ctr->bytes = tmp;
-		e->flags |= (1 << NFT_EXPR_CTR_BYTES);
-	}
+	e->flags |= (1 << NFT_EXPR_CTR_BYTES);
 
 	return 0;
 #else
