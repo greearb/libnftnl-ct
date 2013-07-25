@@ -162,7 +162,7 @@ const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
 		return NULL;
 	}
 
-	return node->child->value.opaque;
+	return strdup(node->child->value.opaque);
 }
 
 #endif
