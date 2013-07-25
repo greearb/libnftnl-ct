@@ -31,8 +31,8 @@ static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg, char *xml)
 {
 	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
-	char *endptr;
-	long int tmp;
+	int verdict;
+	const char *verdict_str;
 
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
@@ -47,33 +47,30 @@ static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg, char *xml)
 	}
 
 	/* Get and validate <data_reg type="verdict" >*/
-	if (mxmlElementGetAttr(tree, "type") == NULL) {
+	if (mxmlElementGetAttr(node, "type") == NULL) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	if (strcmp(mxmlElementGetAttr(tree, "type"), "verdict") != 0) {
+	if (strcmp(mxmlElementGetAttr(node, "type"), "verdict") != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
 	/* Get and set <verdict> */
-	node = mxmlFindElement(tree, tree, "verdict", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL) {
+	verdict_str = nft_mxml_str_parse(tree, "verdict", MXML_DESCEND);
+	if (verdict_str == NULL) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	errno = 0;
-	tmp = strtoll(node->child->value.opaque, &endptr, 10);
-	if (tmp > INT_MAX || tmp < INT_MIN || errno != 0
-						|| strlen(endptr) > 0) {
+	verdict = nft_str2verdict(verdict_str);
+	if (verdict < 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	reg->verdict = tmp;
+	reg->verdict = (uint32_t)verdict;
 
 	mxmlDelete(tree);
 	return 0;
@@ -97,33 +94,26 @@ static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg, char *xml)
 	}
 
 	/* Get and validate <data_reg type="chain" >*/
-	if (mxmlElementGetAttr(tree, "type") == NULL) {
+	if (mxmlElementGetAttr(node, "type") == NULL) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	if (strcmp(mxmlElementGetAttr(tree, "type"), "chain") != 0) {
+	if (strcmp(mxmlElementGetAttr(node, "type"), "chain") != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
 	/* Get and set <chain> */
-	node = mxmlFindElement(tree, tree, "chain", NULL, NULL, MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	/* no max len value to validate? */
-	if (strlen(node->child->value.opaque) < 1) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
 	if (reg->chain)
 		free(reg->chain);
 
-	reg->chain = strdup(node->child->value.opaque);
+	reg->chain = (char *)nft_mxml_str_parse(tree, "chain",
+						MXML_DESCEND);
+	if (reg->chain == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
 
 	mxmlDelete(tree);
 	return 0;
@@ -346,13 +336,15 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 		case NFT_RULE_O_XML:
 			return snprintf(buf, size,
 					"<data_reg type=\"verdict\">"
-						"<verdict>%d</verdict>"
-					"</data_reg>", reg->verdict);
+						"<verdict>%s</verdict>"
+					"</data_reg>",
+					nft_verdict2str(reg->verdict));
 		case NFT_RULE_O_JSON:
 			return snprintf(buf, size,
-					"\"data_reg\": { \"type\" : \"verdict\", "
-						"\"verdict\" : %d"
-					"}", reg->verdict);
+					"\"data_reg\": {"
+						"\"type\" : \"verdict\", "
+						"\"verdict\" : \"%s\""
+					"}", nft_verdict2str(reg->verdict));
 		default:
 			break;
 		}

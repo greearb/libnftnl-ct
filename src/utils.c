@@ -17,6 +17,9 @@
 #include <errno.h>
 #include <inttypes.h>
 
+#include <linux/netfilter.h>
+#include <linux/netfilter/nf_tables.h>
+
 const char *nft_family2str(uint32_t family)
 {
 	switch (family) {
@@ -116,4 +119,38 @@ int nft_strtoi(const char *string, int base, void *out, enum nft_type type)
 	}
 
 	return 0;
+}
+
+const char *nft_verdict2str(uint32_t verdict)
+{
+	switch (verdict) {
+	case NF_ACCEPT:
+		return "accept";
+	case NF_DROP:
+		return "drop";
+	case NFT_RETURN:
+		return "return";
+	case NFT_JUMP:
+		return "jump";
+	case NFT_GOTO:
+		return "goto";
+	default:
+		return "unknown";
+	}
+}
+
+int nft_str2verdict(const char *verdict)
+{
+	if (strcmp(verdict, "accept") == 0)
+		return NF_ACCEPT;
+	else if (strcmp(verdict, "drop") == 0)
+		return NF_DROP;
+	else if (strcmp(verdict, "return") == 0)
+		return NFT_RETURN;
+	else if (strcmp(verdict, "jump") == 0)
+		return NFT_JUMP;
+	else if (strcmp(verdict, "goto") == 0)
+		return NFT_GOTO;
+
+	return -1;
 }

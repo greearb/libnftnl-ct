@@ -49,6 +49,8 @@ const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name, uint32_
 const char *nft_family2str(uint32_t family);
 int nft_str2family(const char *family);
 int nft_strtoi(const char *string, int base, void *number, enum nft_type type);
+const char *nft_verdict2str(uint32_t verdict);
+int nft_str2verdict(const char *verdict);
 
 struct expr_ops;
 
