@@ -1,7 +1,7 @@
 include $(top_srcdir)/Make_global.am
 lib_LTLIBRARIES = libnftables.la
 
-libnftables_la_LIBADD = ${LIBMNL_LIBS} ${LIBXML_LIBS}
+libnftables_la_LIBADD = ${LIBMNL_LIBS} ${LIBXML_LIBS} ${LIBJSON_LIBS}
 libnftables_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libnftables.map \
 			 -version-info $(LIBVERSION)
 libnftables_la_SOURCES = utils.c		\
@@ -11,6 +11,7 @@ libnftables_la_SOURCES = utils.c		\
 			 set.c			\
 			 set_elem.c		\
 			 mxml.c			\
+			 jansson.c		\
 			 expr.c			\
 			 expr_ops.c		\
 			 expr/bitwise.c		\

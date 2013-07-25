@@ -66,6 +66,41 @@ static struct {
 	[NFT_TYPE_S64]	= { .len = sizeof(int64_t), .min = INT64_MIN, .max = INT64_MAX },
 };
 
+
+int nft_get_value(enum nft_type type, void *val, void *out)
+{
+	int64_t sval;
+	uint64_t uval;
+
+	switch (type) {
+	case NFT_TYPE_U8:
+	case NFT_TYPE_U16:
+	case NFT_TYPE_U32:
+	case NFT_TYPE_U64:
+		uval = *((uint64_t *)val);
+		if (uval > basetype[type].max) {
+			errno = ERANGE;
+			return -1;
+		}
+		memcpy(out, &uval, basetype[type].len);
+		break;
+	case NFT_TYPE_S8:
+	case NFT_TYPE_S16:
+	case NFT_TYPE_S32:
+	case NFT_TYPE_S64:
+		sval = *((int64_t *)val);
+		if (sval < basetype[type].min ||
+		    sval > (int64_t)basetype[type].max) {
+			errno = ERANGE;
+			return -1;
+		}
+		memcpy(out, &sval, basetype[type].len);
+		break;
+	}
+
+	return 0;
+}
+
 int nft_strtoi(const char *string, int base, void *out, enum nft_type type)
 {
 	int64_t sval = 0;
@@ -78,12 +113,14 @@ int nft_strtoi(const char *string, int base, void *out, enum nft_type type)
 	case NFT_TYPE_U32:
 	case NFT_TYPE_U64:
 		uval = strtoll(string, &endptr, base);
+		nft_get_value(type, &uval, out);
 		break;
 	case NFT_TYPE_S8:
 	case NFT_TYPE_S16:
 	case NFT_TYPE_S32:
 	case NFT_TYPE_S64:
 		sval = strtoull(string, &endptr, base);
+		nft_get_value(type, &sval, out);
 		break;
 	default:
 		errno = EINVAL;
@@ -93,30 +130,6 @@ int nft_strtoi(const char *string, int base, void *out, enum nft_type type)
 	if (*endptr) {
 		errno = EINVAL;
 		return -1;
-	}
-
-	switch (type) {
-	case NFT_TYPE_U8:
-	case NFT_TYPE_U16:
-	case NFT_TYPE_U32:
-	case NFT_TYPE_U64:
-		if (uval > basetype[type].max) {
-			errno = ERANGE;
-			return -1;
-		}
-		memcpy(out, &uval, basetype[type].len);
-		break;
-	case NFT_TYPE_S8:
-	case NFT_TYPE_S16:
-	case NFT_TYPE_S32:
-	case NFT_TYPE_S64:
-		if (sval < basetype[type].min ||
-		    sval > (int64_t)basetype[type].max) {
-			errno = ERANGE;
-			return -1;
-		}
-		memcpy(out, &sval, basetype[type].len);
-		break;
 	}
 
 	return 0;

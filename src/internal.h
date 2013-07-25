@@ -12,6 +12,7 @@
 #include "linux_list.h"
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define BASE_DEC 10
 #define BASE_HEX 16
@@ -37,6 +38,14 @@ int nft_mxml_num_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_f
 const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags);
 #endif
 
+#ifdef JSON_PARSING
+#include <jansson.h>
+int nft_jansson_value_parse_val(json_t *root, const char *tag,
+				  int type, void *out);
+const char *nft_jansson_value_parse_str(json_t *root, const char *tag);
+bool nft_jansson_node_exist(json_t *root, const char *tag);
+#endif
+
 #define NFT_TABLE_XML_VERSION 0
 #define NFT_CHAIN_XML_VERSION 0
 #define NFT_RULE_XML_VERSION 0
@@ -51,6 +60,7 @@ int nft_str2family(const char *family);
 int nft_strtoi(const char *string, int base, void *number, enum nft_type type);
 const char *nft_verdict2str(uint32_t verdict);
 int nft_str2verdict(const char *verdict);
+int nft_get_value(enum nft_type type, void *val, void *out);
 
 struct expr_ops;
 

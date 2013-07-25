@@ -18,7 +18,10 @@ AC_ARG_WITH([xml-parsing], AS_HELP_STRING([--with-xml-parsing], [XML parsing sup
 AS_IF([test "x$with_xml_parsing" = "xyes"], [
 	PKG_CHECK_MODULES([LIBXML], [mxml >= 2.6])
 ])
-
+AC_ARG_WITH([json-parsing], AS_HELP_STRING([--with-json-parsing], [JSON parsing support]))
+AS_IF([test "x$with_json_parsing" = "xyes"], [
+	PKG_CHECK_MODULES([LIBJSON], [jansson >= 2.3])
+])
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_DISABLE_STATIC
@@ -32,6 +35,10 @@ esac
 regular_CPPFLAGS="-D_FILE_OFFSET_BITS=64 -D_REENTRANT"
 AS_IF([test "x$with_xml_parsing" = "xyes"], [
 	regular_CPPFLAGS="$regular_CPPFLAGS -DXML_PARSING"
+])
+
+AS_IF([test "x$with_json_parsing" = "xyes"], [
+	regular_CPPFLAGS="$regular_CPPFLAGS -DJSON_PARSING"
 ])
 regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wshadow -Wstrict-prototypes \

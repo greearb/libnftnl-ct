@@ -40,6 +40,7 @@ enum {
 enum nft_table_parse_type {
 	NFT_TABLE_PARSE_NONE	= 0,
 	NFT_TABLE_PARSE_XML,
+	NFT_TABLE_PARSE_JSON,
 	NFT_TABLE_PARSE_MAX,
 };
 
