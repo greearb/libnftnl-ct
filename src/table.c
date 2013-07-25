@@ -302,26 +302,29 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 	json_error_t error;
 	uint64_t version;
 	uint32_t table_flag;
-	const char *str = NULL;
+	const char *str;
+	int family;
 
 	root = json_loadb(json, strlen(json), 0, &error);
 	if (!root) {
 		errno = EINVAL;
-		return -1;
+		goto err;
 	}
 
 	root = json_object_get(root, "table");
 	if (root == NULL) {
-		errno = ERANGE;
-		return -1;
+		errno = EINVAL;
+		goto err;
 	}
 
 	if (nft_jansson_value_parse_val(root, "version",
 					NFT_TYPE_U64, &version) == -1)
 		goto err;
 
-	if (version != NFT_TABLE_JSON_VERSION || version == -1)
+	if (version != NFT_TABLE_JSON_VERSION) {
+		errno = EINVAL;
 		goto err;
+	}
 
 	str = nft_jansson_value_parse_str(root, "name");
 	if (str == NULL)
@@ -330,17 +333,20 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, strdup(str));
 
 	root = json_object_get(root, "properties");
-	if (root == NULL)
+	if (root == NULL) {
+		errno = EINVAL;
 		goto err;
+	}
 
 	str = nft_jansson_value_parse_str(root, "family");
 	if (str == NULL)
 		goto err;
 
-	if (nft_str2family(str) < 0)
+	family = nft_str2family(str);
+	if (family < 0)
 		goto err;
 
-	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, nft_str2family(str));
+	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
 
 	if (nft_jansson_value_parse_val(root, "table_flags",
 					NFT_TYPE_U32, &table_flag) == -1)
@@ -352,9 +358,7 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 	return 0;
 err:
 	free(root);
-	errno = ERANGE;
 	return -1;
-
 #else
 	errno = EOPNOTSUPP;
 	return -1;

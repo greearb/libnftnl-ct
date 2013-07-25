@@ -31,14 +31,11 @@ static int nft_jansson_load_int_node(json_t *root, const char *tag,
 
 	if (!json_is_integer(node)) {
 		errno = ERANGE;
-		goto err;
+		return -1;
 	}
-
 	*val = json_integer_value(node);
 
 	return 0;
-err:
-	return -1;
 }
 
 const char *nft_jansson_value_parse_str(json_t *root, const char *tag)
@@ -47,9 +44,10 @@ const char *nft_jansson_value_parse_str(json_t *root, const char *tag)
 	const char *val;
 
 	node = json_object_get(root, tag);
-	if (node == NULL)
+	if (node == NULL) {
+		errno = EINVAL;
 		return NULL;
-
+	}
 	val = json_string_value(node);
 
 	return val;
@@ -61,15 +59,12 @@ int nft_jansson_value_parse_val(json_t *root, const char *tag, int type,
 	json_int_t val;
 
 	if (nft_jansson_load_int_node(root, tag, &val) == -1)
-		goto err;
+		return -1;
 
 	if (nft_get_value(type, &val, out) == -1)
-		goto err;
+		return -1;
 
 	return 0;
-err:
-	errno = ERANGE;
-	return -1;
 }
 
 bool nft_jansson_node_exist(json_t *root, const char *tag)
