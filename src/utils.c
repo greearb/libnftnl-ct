@@ -47,6 +47,7 @@ int nft_str2family(const char *family)
 	else if (strcmp(family, "arp") == 0)
 		return 0;
 
+	errno = EAFNOSUPPORT;
 	return -1;
 }
 
