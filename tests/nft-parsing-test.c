@@ -14,6 +14,47 @@
 #include <mxml.h>
 #endif
 
+#ifdef JSON_PARSING
+#include <jansson.h>
+#endif
+
+static int test_json(const char *filename)
+{
+#ifdef JSON_PARSING
+	int ret = -1;
+	struct nft_table *t = NULL;
+	json_t *root;
+	json_error_t error;
+	char *json = NULL;
+
+	root = json_load_file(filename, 0, &error);
+	if (!root) {
+		printf("Error on the line %d : %s", error.line, error.text);
+		return -1;
+	}
+
+	if (root == NULL)
+		return -1;
+
+	json = json_dumps(root, JSON_INDENT(0));
+
+	if (json_object_get(root, "table") != NULL) {
+		t = nft_table_alloc();
+		if (t != NULL) {
+			if (nft_table_parse(t, NFT_TABLE_PARSE_JSON, json) == 0)
+				ret = 0;
+
+			nft_table_free(t);
+		}
+	}
+
+	return ret;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int test_xml(const char *filename)
 {
 #ifdef XML_PARSING
@@ -99,6 +140,14 @@ int main(int argc, char *argv[])
 		if (strcmp(&dent->d_name[len-4], ".xml") == 0) {
 			printf("parsing %s: ", path);
 			if (test_xml(path) < 0)
+				printf("\033[31mFAILED\e[0m (%s)\n",
+					strerror(errno));
+			else
+				printf("\033[32mOK\e[0m\n");
+		}
+		if (strcmp(&dent->d_name[len-5], ".json") == 0) {
+			printf("parsing %s: ", path);
+			if (test_json(path) < 0)
 				printf("\033[31mFAILED\e[0m (%s)\n",
 					strerror(errno));
 			else
