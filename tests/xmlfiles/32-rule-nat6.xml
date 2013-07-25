@@ -1,11 +1,11 @@
 <rule family="ip6" table="nat" chain="OUTPUT" handle="100" version="0">
-  <rule_flags>0</rule_flags>
-  <expr type="nat">
-    <family>ip6</family>
-    <nat_type>snat</nat_type>
-    <sreg_addr_min>1</sreg_addr_min>
-    <sreg_addr_max>2</sreg_addr_max>
-    <sreg_proto_min>3</sreg_proto_min>
-    <sreg_proto_max>4</sreg_proto_max>
-  </expr>
+	<rule_flags>0</rule_flags>
+	<expr type="nat">
+		<family>ip6</family>
+		<nat_type>snat</nat_type>
+		<sreg_addr_min>1</sreg_addr_min>
+		<sreg_addr_max>2</sreg_addr_max>
+		<sreg_proto_min>3</sreg_proto_min>
+		<sreg_proto_max>4</sreg_proto_max>
+	</expr>
 </rule>

@@ -1,0 +1,22 @@
+<rule family="ip" table="filter" chain="output" handle="29" version="0">
+	<rule_flags>0</rule_flags>
+	<expr type="meta">
+		<dreg>1</dreg>
+		<key>secmark</key>
+	</expr>
+	<expr type="cmp">
+		<sreg>1</sreg>
+		<op>eq</op>
+		<cmpdata>
+			<data_reg type="value">
+				<len>4</len>
+				<data0>0x00000000</data0>
+			</data_reg>
+		</cmpdata>
+	</expr>
+	<expr type="counter">
+		<pkts>55</pkts>
+		<bytes>11407</bytes>
+	</expr>
+</rule>
+<!-- nft add rule ip filter output meta secmark 0 counter -->

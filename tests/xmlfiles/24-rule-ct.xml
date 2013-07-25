@@ -1,8 +1,9 @@
 <rule family="ip" table="filter" chain="INPUT" handle="100" version="0">
-  <rule_flags>0</rule_flags>
-  <expr type="ct">
-    <dreg>4</dreg>
-    <dir>1</dir>
-    <key>state</key>
-  </expr>
+	<rule_flags>0</rule_flags>
+	<expr type="ct">
+		<dreg>1</dreg>
+		<key>state</key>
+		<dir>0</dir>
+	</expr>
 </rule>
+<!-- nft add rule filter input ct state new,established accept -->

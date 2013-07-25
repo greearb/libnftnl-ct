@@ -1,7 +1,8 @@
-<rule family="ip" table="filter" chain="INPUT" handle="100" version="0">
-  <rule_flags>0</rule_flags>
-  <expr type="meta">
-    <dreg>1</dreg>
-    <key>oifname</key>
-  </expr>
+<rule family="ip6" table="filter" chain="test" handle="36" version="0">
+	<rule_flags>0</rule_flags>
+	<expr type="meta">
+		<dreg>1</dreg>
+		<key>iifname</key>
+	</expr>
 </rule>
+<!-- nft add rule ip6 filter test meta iifname bond10.139 accept -->

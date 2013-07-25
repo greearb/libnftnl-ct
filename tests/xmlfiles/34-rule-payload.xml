@@ -1,9 +1,10 @@
-<rule family="ip6" table="filter" chain="INPUT" handle="100" version="0">
-  <rule_flags>0</rule_flags>
-  <expr type="payload">
-    <dreg>1</dreg>
-    <base>transport</base>
-    <offset>12</offset>
-    <len>4</len>
-  </expr>
+<rule family="ip6" table="filter" chain="test" handle="34" version="0">
+	<rule_flags>0</rule_flags>
+	<expr type="payload">
+		<dreg>1</dreg>
+		<offset>2</offset>
+		<len>2</len>
+		<base>transport</base>
+	</expr>
 </rule>
+<!-- nft add rule ip6 filter test tcp dport 22 accept -->

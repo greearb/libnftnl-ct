@@ -1,0 +1,15 @@
+<rule family="ip" table="filter" chain="output" handle="33" version="0">
+	<rule_flags>0</rule_flags>
+	<expr type="payload">
+		<dreg>1</dreg>
+		<offset>16</offset>
+		<len>4</len>
+		<base>network</base>
+	</expr>
+	<expr type="lookup">
+		<set>set1</set>
+		<sreg>1</sreg>
+		<dreg>0</dreg>
+	</expr>
+</rule>
+<!-- nft add rule ip filter output ip daddr { 192.168.0.1, 192.168.0.2, 192.168.0.3 } -->

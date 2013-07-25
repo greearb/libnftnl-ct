@@ -1,0 +1,22 @@
+<rule family="ip" table="filter" chain="output" handle="20" version="0">
+	<rule_flags>0</rule_flags>
+	<expr type="meta">
+		<dreg>1</dreg>
+		<key>len</key>
+	</expr>
+	<expr type="cmp">
+		<sreg>1</sreg>
+		<op>eq</op>
+		<cmpdata>
+			<data_reg type="value">
+				<len>4</len>
+				<data0>0x000003e8</data0>
+			</data_reg>
+		</cmpdata>
+	</expr>
+	<expr type="counter">
+		<pkts>0</pkts>
+		<bytes>0</bytes>
+	</expr>
+</rule>
+<!-- nft add rule ip filter output meta length 1000 counter -->
