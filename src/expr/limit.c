@@ -122,32 +122,17 @@ static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, mxml_node_t *t
 {
 #ifdef XML_PARSING
 	struct nft_expr_limit *limit = nft_expr_data(e);
-	mxml_node_t *node = NULL;
-	uint64_t tmp;
-	char *endptr;
 
-	node = mxmlFindElement(tree, tree, "rate", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL)
+	if (nft_mxml_num_parse(tree, "rate", MXML_DESCEND_FIRST, BASE_DEC,
+			       &limit->rate, NFT_TYPE_U64) != 0)
 		goto err;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT64_MAX || tmp < 0 || *endptr)
-		goto err;
-
-	limit->rate = tmp;
 	e->flags |= (1 << NFT_EXPR_LIMIT_RATE);
 
-	node = mxmlFindElement(tree, tree, "depth", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
+	if (nft_mxml_num_parse(tree, "depth", MXML_DESCEND_FIRST, BASE_DEC,
+			       &limit->rate, NFT_TYPE_U64) != 0)
 		goto err;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT64_MAX || tmp < 0 || *endptr)
-		goto err;
-
-	limit->depth = tmp;
 	e->flags |= (1 << NFT_EXPR_LIMIT_DEPTH);
 
 	return 0;

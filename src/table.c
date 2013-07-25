@@ -224,7 +224,6 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
 	char *endptr = NULL;
-	uint64_t tmp;
 	int64_t stmp;
 	int family;
 
@@ -280,20 +279,12 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
 
 	/* Get and set <table_flags> */
-	node = mxmlFindElement(tree, tree, "table_flags", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL) {
+	if (nft_mxml_num_parse(tree, "table_flags", MXML_DESCEND, BASE_DEC,
+			       &t->table_flags, NFT_TYPE_U32) != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || *endptr || tmp < 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	t->table_flags = (uint32_t)tmp;
 	t->flags |= (1 << NFT_TABLE_ATTR_FLAGS);
 
 	mxmlDelete(tree);

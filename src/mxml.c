@@ -11,6 +11,8 @@
  */
 #include "internal.h"
 #include "expr_ops.h"
+#include <stdint.h>
+#include <limits.h>
 
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/rule.h>
@@ -58,7 +60,6 @@ err:
 int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags)
 {
 	mxml_node_t *node;
-	char *endptr;
 	uint64_t val;
 
 	node = mxmlFindElement(tree, tree, reg_name, NULL, NULL, flags);
@@ -67,8 +68,11 @@ int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags)
 		goto err;
 	}
 
-	val = strtoull(node->child->value.opaque, &endptr, 10);
-	if (val > NFT_REG_MAX || val < 0 || *endptr) {
+	if (nft_strtoi(node->child->value.opaque, BASE_DEC, &val,
+		       NFT_TYPE_U64) != 0)
+		goto err;
+
+	if (val > NFT_REG_MAX) {
 		errno = ERANGE;
 		goto err;
 	}
@@ -129,5 +133,21 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 		errno = EINVAL;
 err:
 	return -1;
+}
+
+int
+nft_mxml_num_parse(mxml_node_t *tree, const char *node_name,
+		   uint32_t mxml_flags, int base, void *number,
+		   enum nft_type type)
+{
+	mxml_node_t *node = NULL;
+
+	node = mxmlFindElement(tree, tree, node_name, NULL, NULL, mxml_flags);
+	if (node == NULL || node->child == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	return nft_strtoi(node->child->value.opaque, base, number, type);
 }
 #endif

@@ -13,12 +13,27 @@
 
 #include <stdint.h>
 
+#define BASE_DEC 10
+#define BASE_HEX 16
+
+enum nft_type {
+	NFT_TYPE_U8,
+	NFT_TYPE_U16,
+	NFT_TYPE_U32,
+	NFT_TYPE_U64,
+	NFT_TYPE_S8,
+	NFT_TYPE_S16,
+	NFT_TYPE_S32,
+	NFT_TYPE_S64,
+};
+
 #ifdef XML_PARSING
 #include <mxml.h>
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node);
 int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags);
 union nft_data_reg;
 int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name, union nft_data_reg *data_reg);
+int nft_mxml_num_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags, int base, void *number, enum nft_type type);
 #endif
 
 #define NFT_TABLE_XML_VERSION 0
@@ -32,6 +47,7 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name, union nft_
 
 const char *nft_family2str(uint32_t family);
 int nft_str2family(const char *family);
+int nft_strtoi(const char *string, int base, void *number, enum nft_type type);
 
 struct expr_ops;
 

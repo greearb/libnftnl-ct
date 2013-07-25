@@ -576,18 +576,12 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	c->flags |= (1 << NFT_CHAIN_ATTR_TABLE);
 
 	/* Get and set <prio> */
-	node = mxmlFindElement(tree, tree, "prio", NULL, NULL, MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-	tmp = strtoll(node->child->value.opaque, &endptr, 10);
-	if (tmp > INT32_MAX || tmp < INT32_MIN || *endptr) {
+	if (nft_mxml_num_parse(tree, "prio", MXML_DESCEND, BASE_DEC, &c->prio,
+			       NFT_TYPE_S32) != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	memcpy(&c->prio, &tmp, sizeof(c->prio));
 	c->flags |= (1 << NFT_CHAIN_ATTR_PRIO);
 
 	/* Ignore <use> (cannot be set)*/

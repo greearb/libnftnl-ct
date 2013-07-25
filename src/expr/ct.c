@@ -183,10 +183,9 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 #ifdef XML_PARSING
 	struct nft_expr_ct *ct = nft_expr_data(e);
 	mxml_node_t *node = NULL;
-	uint64_t tmp;
 	int32_t reg;
-	char *endptr;
 	int key;
+	uint8_t dir;
 
 	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
 	if (reg < 0)
@@ -206,18 +205,14 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	ct->key = key;
 	e->flags |= (1 << NFT_EXPR_CT_KEY);
 
-	node = mxmlFindElement(tree, tree, "dir", NULL, NULL, MXML_DESCEND);
-	if (node == NULL)
+	if (nft_mxml_num_parse(tree, "dir", MXML_DESCEND_FIRST, BASE_DEC, &dir,
+			       NFT_TYPE_U8) != 0)
 		goto err;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT8_MAX || tmp < 0 || *endptr)
+	if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)
 		goto err;
 
-	if (tmp != IP_CT_DIR_ORIGINAL && tmp != IP_CT_DIR_REPLY)
-		goto err;
-
-	ct->dir = tmp;
+	ct->dir = dir;
 	e->flags |= (1 << NFT_EXPR_CT_DIR);
 
 	return 0;

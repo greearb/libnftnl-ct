@@ -187,8 +187,6 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 #ifdef XML_PARSING
 	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 	mxml_node_t *node = NULL;
-	uint64_t tmp;
-	char *endptr = NULL;
 	int32_t reg;
 
 	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
@@ -218,26 +216,16 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_OP);
 
-	node = mxmlFindElement(tree, tree, "len", NULL, NULL, MXML_DESCEND);
-	if (node == NULL)
+	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
+			       &byteorder->len, NFT_TYPE_U8) != 0)
 		goto err;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT8_MAX || tmp < 0 || *endptr)
-		goto err;
-
-	byteorder->len = tmp;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_LEN);
 
-	node = mxmlFindElement(tree, tree, "size", NULL, NULL, MXML_DESCEND);
-	if (node == NULL)
+	if (nft_mxml_num_parse(tree, "size", MXML_DESCEND_FIRST, BASE_DEC,
+			       &byteorder->size, NFT_TYPE_U8) != 0)
 		goto err;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT8_MAX || tmp < 0 || *endptr)
-		goto err;
-
-	byteorder->size = tmp;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_SIZE);
 
 	return 0;

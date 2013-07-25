@@ -157,56 +157,36 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 #ifdef XML_PARSING
 	struct nft_expr_log *log = nft_expr_data(e);
 	mxml_node_t *node = NULL;
-	uint64_t tmp;
-	char *endptr;
 
 	node = mxmlFindElement(tree, tree, "prefix", NULL, NULL,
 			       MXML_DESCEND_FIRST);
-	if (node == NULL)
-		goto err;
+	if (node == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
 
 	log->prefix = strdup(node->child->value.opaque);
 	e->flags |= (1 << NFT_EXPR_LOG_PREFIX);
 
-	node = mxmlFindElement(tree, tree, "group", NULL, NULL, MXML_DESCEND);
-	if (node == NULL)
-		goto err;
+	if (nft_mxml_num_parse(tree, "group", MXML_DESCEND_FIRST, BASE_DEC,
+			       &log->group, NFT_TYPE_U32) != 0)
+		return -1;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-		goto err;
-
-	log->group = tmp;
 	e->flags |= (1 << NFT_EXPR_LOG_GROUP);
 
-	node = mxmlFindElement(tree, tree, "snaplen", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
-		goto err;
+	if (nft_mxml_num_parse(tree, "snaplen", MXML_DESCEND_FIRST, BASE_DEC,
+			       &log->snaplen, NFT_TYPE_U32) != 0)
+		return -1;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-		goto err;
-
-	log->snaplen = tmp;
 	e->flags |= (1 << NFT_EXPR_LOG_SNAPLEN);
 
-	node = mxmlFindElement(tree, tree, "qthreshold", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
-		goto err;
+	if (nft_mxml_num_parse(tree, "qthreshold", MXML_DESCEND_FIRST,
+			       BASE_DEC, &log->qthreshold, NFT_TYPE_U32) != 0)
+		return -1;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr)
-		goto err;
-
-	log->qthreshold = tmp;
 	e->flags |= (1 << NFT_EXPR_LOG_QTHRESHOLD);
 
 	return 0;
-err:
-	errno = EINVAL;
-	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;

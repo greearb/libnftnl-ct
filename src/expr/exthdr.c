@@ -199,8 +199,6 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 #ifdef XML_PARSING
 	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 	mxml_node_t *node = NULL;
-	uint64_t tmp;
-	char *endptr;
 	int32_t reg;
 	int type;
 
@@ -225,28 +223,17 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	e->flags |= (1 << NFT_EXPR_EXTHDR_TYPE);
 
 	/* Get and set <offset> */
-	node = mxmlFindElement(tree, tree, "offset", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
+	if (nft_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
+			       &exthdr->offset, NFT_TYPE_U32) != 0)
 		return -1;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT_MAX || tmp < 0 || *endptr)
-		return -1;
-
-	exthdr->offset = tmp;
 	e->flags |= (1 << NFT_EXPR_EXTHDR_OFFSET);
 
 	/* Get and set <len> */
-	node = mxmlFindElement(tree, tree, "len", NULL, NULL, MXML_DESCEND);
-	if (node == NULL)
+	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
+			       &exthdr->len, NFT_TYPE_U32) != 0)
 		return -1;
 
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT_MAX || tmp < 0 || *endptr)
-		return -1;
-
-	exthdr->len = tmp;
 	e->flags |= (1 << NFT_EXPR_EXTHDR_LEN);
 
 	return 0;

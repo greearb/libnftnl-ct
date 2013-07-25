@@ -551,19 +551,12 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 
 	/* get and set <rule_flags> */
-	node = mxmlFindElement(tree, tree, "rule_flags", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-	tmp = strtoull(node->child->value.opaque, &endptr, 10);
-	if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+	if (nft_mxml_num_parse(tree, "rule_flags", MXML_DESCEND_FIRST,
+			       BASE_DEC, &r->rule_flags, NFT_TYPE_U32) != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	r->rule_flags = (uint32_t)tmp;
 	r->flags |= (1 << NFT_RULE_ATTR_FLAGS);
 
 	/* <compat_proto> is optional */
