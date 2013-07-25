@@ -183,11 +183,8 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_payload *payload = nft_expr_data(e);
-	mxml_node_t *node = NULL;
 	const char *base_str;
-	uint64_t tmp;
 	int32_t reg;
-	char *endptr;
 
 	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
 	if (reg < 0)
@@ -211,28 +208,17 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 
 	e->flags |= (1 << NFT_EXPR_PAYLOAD_BASE);
 
-	/* Get and set <offset>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "offset", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT_MAX || tmp < 0 || *endptr)
-			return -1;
+	if (nft_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
+			       &payload->offset, NFT_TYPE_U8) != 0)
+		return -1;
 
-		payload->offset = (unsigned int)tmp;
-		e->flags |= (1 << NFT_EXPR_PAYLOAD_OFFSET);
-	}
+	e->flags |= (1 << NFT_EXPR_PAYLOAD_OFFSET);
 
-	/* Get and set <len>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "len", NULL, NULL, MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT_MAX || tmp < 0 || *endptr)
-			return -1;
+	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
+			       &payload->len, NFT_TYPE_U8) != 0)
+		return -1;
 
-		payload->len = (unsigned int)tmp;
-		e->flags |= (1 << NFT_EXPR_PAYLOAD_LEN);
-	}
+	e->flags |= (1 << NFT_EXPR_PAYLOAD_LEN);
 	return 0;
 err:
 	errno = EINVAL;
