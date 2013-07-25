@@ -211,27 +211,26 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 		byteorder->op = NFT_BYTEORDER_NTOH;
 	else if (strcmp(op, "hton") == 0)
 		byteorder->op = NFT_BYTEORDER_HTON;
-	else
-		goto err;
+	else {
+		errno = EINVAL;
+		return -1;
+	}
 
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_OP);
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
 			       &byteorder->len, NFT_TYPE_U8) != 0)
-		goto err;
+		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_LEN);
 
 	if (nft_mxml_num_parse(tree, "size", MXML_DESCEND_FIRST, BASE_DEC,
 			       &byteorder->size, NFT_TYPE_U8) != 0)
-		goto err;
+		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_SIZE);
 
 	return 0;
-err:
-	errno = EINVAL;
-	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;

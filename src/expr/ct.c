@@ -207,7 +207,7 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 
 	if (nft_mxml_num_parse(tree, "dir", MXML_DESCEND_FIRST, BASE_DEC, &dir,
 			       NFT_TYPE_U8) != 0)
-		goto err;
+		return -1;
 
 	if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)
 		goto err;
