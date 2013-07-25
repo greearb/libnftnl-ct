@@ -190,15 +190,11 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 		e->flags |= (1 << NFT_EXPR_CMP_OP);
 	}
 
-	/* Get and set <cmpdata>. Is not mandatory */
-	node = mxmlFindElement(tree, tree, "cmpdata", NULL, NULL, MXML_DESCEND);
-	if (node != NULL) {
-		if (nft_mxml_data_reg_parse(tree, "cmpdata",
-					    &cmp->data) != DATA_VALUE) {
-			return -1;
-		}
-		e->flags |= (1 << NFT_EXPR_CMP_DATA);
+	if (nft_mxml_data_reg_parse(tree, "cmpdata",
+				    &cmp->data) != DATA_VALUE) {
+		return -1;
 	}
+	e->flags |= (1 << NFT_EXPR_CMP_DATA);
 
 	return 0;
 #else
