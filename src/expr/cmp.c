@@ -158,7 +158,7 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 {
 #ifdef XML_PARSING
 	struct nft_expr_cmp *cmp = nft_expr_data(e);
-	mxml_node_t *node = NULL;
+	const char *op;
 	int32_t reg;
 
 	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
@@ -168,27 +168,26 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	cmp->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_CMP_SREG);
 
-	/* Get and set <op>. Is not mandatory*/
-	node = mxmlFindElement(tree, tree, "op", NULL, NULL, MXML_DESCEND);
-	if (node != NULL) {
-		if (strcmp(node->child->value.opaque, "eq") == 0) {
-			cmp->op = NFT_CMP_EQ;
-		} else if (strcmp(node->child->value.opaque, "neq") == 0) {
-			cmp->op = NFT_CMP_NEQ;
-		} else if (strcmp(node->child->value.opaque, "lt") == 0) {
-			cmp->op = NFT_CMP_LT;
-		} else if (strcmp(node->child->value.opaque, "lte") == 0) {
-			cmp->op = NFT_CMP_LTE;
-		} else if (strcmp(node->child->value.opaque, "gt") == 0) {
-			cmp->op = NFT_CMP_GT;
-		} else if (strcmp(node->child->value.opaque, "gte") == 0) {
-			cmp->op = NFT_CMP_GTE;
-		} else {
-			/* If <op> is present, a valid value is mandatory */
-			return -1;
-		}
-		e->flags |= (1 << NFT_EXPR_CMP_OP);
-	}
+	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST);
+	if (op == NULL)
+		return -1;
+
+	if (strcmp(op, "eq") == 0)
+		cmp->op = NFT_CMP_EQ;
+	else if (strcmp(op, "neq") == 0)
+		cmp->op = NFT_CMP_NEQ;
+	else if (strcmp(op, "lt") == 0)
+		cmp->op = NFT_CMP_LT;
+	else if (strcmp(op, "lte") == 0)
+		cmp->op = NFT_CMP_LTE;
+	else if (strcmp(op, "gt") == 0)
+		cmp->op = NFT_CMP_GT;
+	else if (strcmp(op, "gte") == 0)
+		cmp->op = NFT_CMP_GTE;
+	else
+		return -1;
+
+	e->flags |= (1 << NFT_EXPR_CMP_OP);
 
 	if (nft_mxml_data_reg_parse(tree, "cmpdata",
 				    &cmp->data) != DATA_VALUE) {

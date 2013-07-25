@@ -163,7 +163,7 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tr
 {
 #ifdef XML_PARSING
 	struct nft_expr_meta *meta = nft_expr_data(e);
-	mxml_node_t *node = NULL;
+	const char *key_str;
 	int32_t reg;
 	int key;
 
@@ -174,12 +174,11 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tr
 	meta->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_META_DREG);
 
-	/* Get and set <key>. Is mandatory */
-	node = mxmlFindElement(tree, tree, "key", NULL, NULL, MXML_DESCEND);
-	if (node == NULL)
+	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST);
+	if (key_str == NULL)
 		return -1;
 
-	key = str2meta_key(node->child->value.opaque);
+	key = str2meta_key(key_str);
 	if (key < 0)
 		return -1;
 

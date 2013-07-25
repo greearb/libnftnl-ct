@@ -175,17 +175,15 @@ nft_rule_expr_target_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_target *tg = nft_expr_data(e);
-	mxml_node_t *node = NULL;
+	const char *name;
 
-	/* Get and set <name>. Optional */
-	node = mxmlFindElement(tree, tree, "name", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node != NULL) {
-		memcpy(tg->name, node->child->value.opaque,
-					XT_EXTENSION_MAXNAMELEN);
-		tg->name[XT_EXTENSION_MAXNAMELEN-1] = '\0';
-		e->flags |= (1 << NFT_EXPR_TG_NAME);
-	}
+	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST);
+	if (name == NULL)
+		return -1;
+
+	strncpy(tg->name, name, XT_EXTENSION_MAXNAMELEN);
+	tg->name[XT_EXTENSION_MAXNAMELEN-1] = '\0';
+	e->flags |= (1 << NFT_EXPR_TG_NAME);
 
 	/* tg->info is ignored until other solution is reached */
 

@@ -188,32 +188,28 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 {
 #ifdef XML_PARSING
 	struct nft_expr_nat *nat = nft_expr_data(e);
-	mxml_node_t *node;
+	const char *nat_type, *family_str;
 	int32_t reg;
 	int family;
 
-	/* Get and set <nat_type>. Mandatory */
-	node = mxmlFindElement(tree, tree, "nat_type", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL)
+	nat_type = nft_mxml_str_parse(tree, "nat_type", MXML_DESCEND_FIRST);
+	if (nat_type == NULL)
 		return -1;
 
-	if (strcmp(node->child->value.opaque, "snat") == 0) {
+	if (strcmp(nat_type, "snat") == 0) {
 		nat->type = NFT_NAT_SNAT;
-	} else if (strcmp(node->child->value.opaque, "dnat") == 0) {
+	} else if (strcmp(nat_type, "dnat") == 0) {
 		nat->type = NFT_NAT_DNAT;
-	} else {
-		return -1;
-	}
+	} else
+		goto err;
+
 	e->flags |= (1 << NFT_EXPR_NAT_TYPE);
 
-	/* Get and set <family>. Mandatory */
-	node = mxmlFindElement(tree, tree, "family", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
+	family_str = nft_mxml_str_parse(tree, "family", MXML_DESCEND_FIRST);
+	if (family_str == NULL)
 		return -1;
 
-	family = nft_str2family(node->child->value.opaque);
+	family = nft_str2family(family_str);
 	if (family < 0)
 		return -1;
 
@@ -249,6 +245,9 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MAX);
 
 	return 0;
+err:
+	errno = EINVAL;
+	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;

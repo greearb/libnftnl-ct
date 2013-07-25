@@ -34,6 +34,7 @@ int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags);
 union nft_data_reg;
 int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name, union nft_data_reg *data_reg);
 int nft_mxml_num_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags, int base, void *number, enum nft_type type);
+const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags);
 #endif
 
 #define NFT_TABLE_XML_VERSION 0

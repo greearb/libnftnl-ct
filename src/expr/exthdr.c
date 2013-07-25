@@ -176,7 +176,7 @@ static const char *exthdr_type2str(uint32_t type)
 	}
 }
 
-static inline int str2exthdr_type(char *str)
+static inline int str2exthdr_type(const char *str)
 {
 	if (strcmp(str, "hopopts") == 0)
 		return IPPROTO_HOPOPTS;
@@ -198,7 +198,7 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
-	mxml_node_t *node = NULL;
+	const char *exthdr_type;
 	int32_t reg;
 	int type;
 
@@ -209,13 +209,12 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	exthdr->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_EXTHDR_DREG);
 
-	/* Get and set <exthdr_type> */
-	node = mxmlFindElement(tree, tree, "exthdr_type", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL)
+	exthdr_type = nft_mxml_str_parse(tree, "exthdr_type",
+					 MXML_DESCEND_FIRST);
+	if (exthdr_type == NULL)
 		return -1;
 
-	type = str2exthdr_type(node->child->value.opaque);
+	type = str2exthdr_type(exthdr_type);
 	if (type < 0)
 		return -1;
 

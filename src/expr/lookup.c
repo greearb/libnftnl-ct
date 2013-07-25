@@ -147,16 +147,14 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_lookup *lookup = nft_expr_data(e);
-	mxml_node_t *node = NULL;
+	const char *set_name;
 	int32_t reg;
 
-	/* get and set <set>. Is mandatory */
-	node = mxmlFindElement(tree, tree, "set", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL)
+	set_name = nft_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST);
+	if (set_name == NULL)
 		return -1;
 
-	memcpy(lookup->set_name, node->child->value.opaque, IFNAMSIZ);
+	strncpy(lookup->set_name, set_name, IFNAMSIZ);
 	lookup->set_name[IFNAMSIZ-1] = '\0';
 	e->flags |= (1 << NFT_EXPR_LOOKUP_SET);
 

@@ -150,4 +150,19 @@ nft_mxml_num_parse(mxml_node_t *tree, const char *node_name,
 
 	return nft_strtoi(node->child->value.opaque, base, number, type);
 }
+
+const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
+			       uint32_t mxml_flags)
+{
+	mxml_node_t *node;
+
+	node = mxmlFindElement(tree, tree, node_name, NULL, NULL, mxml_flags);
+	if (node == NULL || node->child == NULL) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	return node->child->value.opaque;
+}
+
 #endif

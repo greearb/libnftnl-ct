@@ -184,6 +184,7 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 #ifdef XML_PARSING
 	struct nft_expr_payload *payload = nft_expr_data(e);
 	mxml_node_t *node = NULL;
+	const char *base_str;
 	uint64_t tmp;
 	int32_t reg;
 	char *endptr;
@@ -195,23 +196,20 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	payload->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_PAYLOAD_DREG);
 
-	/* Get and set <base>. Not mandatory */
-	node = mxmlFindElement(tree, tree, "base", NULL, NULL, MXML_DESCEND);
-	if (node != NULL) {
+	base_str = nft_mxml_str_parse(tree, "base", MXML_DESCEND_FIRST);
+	if (base_str == NULL)
+		return -1;
 
-		if (strcmp(node->child->value.opaque, "link") == 0) {
-			payload->base = NFT_PAYLOAD_LL_HEADER;
-		} else if (strcmp(node->child->value.opaque, "network") == 0) {
-			payload->base = NFT_PAYLOAD_NETWORK_HEADER;
-		} else if (strcmp(node->child->value.opaque,
-				  "transport") == 0) {
-			payload->base = NFT_PAYLOAD_TRANSPORT_HEADER;
-		} else {
-			return -1;
-		}
+	if (strcmp(base_str, "link") == 0)
+		payload->base = NFT_PAYLOAD_LL_HEADER;
+	else if (strcmp(base_str, "network") == 0)
+		payload->base = NFT_PAYLOAD_NETWORK_HEADER;
+	else if (strcmp(base_str, "transport") == 0)
+		payload->base = NFT_PAYLOAD_TRANSPORT_HEADER;
+	else
+		goto err;
 
-		e->flags |= (1 << NFT_EXPR_PAYLOAD_BASE);
-	}
+	e->flags |= (1 << NFT_EXPR_PAYLOAD_BASE);
 
 	/* Get and set <offset>. Not mandatory */
 	node = mxmlFindElement(tree, tree, "offset", NULL, NULL,
@@ -236,6 +234,9 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 		e->flags |= (1 << NFT_EXPR_PAYLOAD_LEN);
 	}
 	return 0;
+err:
+	errno = EINVAL;
+	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
