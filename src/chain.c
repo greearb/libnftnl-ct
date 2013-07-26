@@ -475,7 +475,6 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	mxml_node_t *node = NULL;
 	char *endptr = NULL;
 	uint64_t utmp;
-	int64_t tmp;
 	int family;
 
 	/* NOTE: all XML nodes are mandatory */
@@ -484,17 +483,6 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
 		return -1;
-
-	/* Validate version */
-	if (mxmlElementGetAttr(tree, "version") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-	tmp = strtoll(mxmlElementGetAttr(tree, "version"), &endptr, 10);
-	if (tmp == LLONG_MAX || *endptr || tmp != NFT_CHAIN_XML_VERSION) {
-		mxmlDelete(tree);
-		return -1;
-	}
 
 	/* Get and set <chain name="xxx" ... >*/
 	if (mxmlElementGetAttr(tree, "name") == NULL) {
@@ -694,13 +682,12 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 			"\"handle\": %"PRIu64","
 			"\"bytes\": %"PRIu64","
 			"\"packets\": %"PRIu64","
-			"\"version\": %d,"
 			"\"properties\": {"
 				"\"family\": \"%s\","
 				"\"table\": \"%s\","
 				"\"use\": %d",
 			c->name, c->handle, c->bytes, c->packets,
-			NFT_CHAIN_JSON_VERSION, nft_family2str(c->family),
+			nft_family2str(c->family),
 			c->table, c->use);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -730,7 +717,7 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 
 	ret = snprintf(buf, size,
 		       "<chain name=\"%s\" handle=\"%"PRIu64"\""
-		       " bytes=\"%"PRIu64"\" packets=\"%"PRIu64"\" version=\"%d\">"
+		       " bytes=\"%"PRIu64"\" packets=\"%"PRIu64"\">"
 		       "<properties>"
 				"<type>%s</type>"
 				"<table>%s</table>"
@@ -738,7 +725,7 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 				"<use>%d</use>"
 				"<hooknum>%s</hooknum>",
 		       c->name, c->handle, c->bytes, c->packets,
-		       NFT_CHAIN_XML_VERSION, c->type, c->table,
+		       c->type, c->table,
 		       c->prio, c->use, hooknum2str_array[c->hooknum]);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 

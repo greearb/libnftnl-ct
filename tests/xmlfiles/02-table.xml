@@ -1,4 +1,4 @@
-<table name="nat" version="0">
+<table name="nat">
 	<properties>
 		<family>ip6</family>
 		<table_flags>0</table_flags>

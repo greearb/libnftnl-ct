@@ -1,7 +1,6 @@
 <set>
 	<set_name>set0</set_name>
 	<set_table>filter</set_table>
-	<set_xml_version>0</set_xml_version>
 	<family>ip6</family>
 	<set_flags>0</set_flags>
 	<key_type>0</key_type>

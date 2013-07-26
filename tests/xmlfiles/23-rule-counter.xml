@@ -1,4 +1,4 @@
-<rule family="ip6" table="filter" chain="test" handle="39" version="0">
+<rule family="ip6" table="filter" chain="test" handle="39">
 	<rule_flags>0</rule_flags>
 	<expr type="counter">
 		<pkts>3</pkts>

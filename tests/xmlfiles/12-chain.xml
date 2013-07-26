@@ -1,4 +1,4 @@
-<chain name="foo" handle="100" bytes="59264154979" packets="2548796325" version="0">
+<chain name="foo" handle="100" bytes="59264154979" packets="2548796325">
 	<properties>
 		<type>nat</type>
 		<table>nat</table>

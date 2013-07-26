@@ -1,4 +1,4 @@
-<chain name="test" handle="0" bytes="59" packets="1" version="0">
+<chain name="test" handle="0" bytes="59" packets="1">
 	<properties>
 		<type>filter</type>
 		<table>filter</table>

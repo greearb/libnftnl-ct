@@ -1,4 +1,4 @@
-<rule family="ip" table="filter" chain="INPUT" handle="100" version="0">
+<rule family="ip" table="filter" chain="INPUT" handle="100">
 	<rule_flags>0</rule_flags>
 	<expr type="target">
 		<name>LOG</name>

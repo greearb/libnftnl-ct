@@ -47,15 +47,6 @@ const char *nft_jansson_value_parse_str(json_t *root, const char *tag);
 bool nft_jansson_node_exist(json_t *root, const char *tag);
 #endif
 
-#define NFT_TABLE_XML_VERSION 0
-#define NFT_CHAIN_XML_VERSION 0
-#define NFT_RULE_XML_VERSION 0
-#define NFT_SET_XML_VERSION 0
-#define NFT_TABLE_JSON_VERSION 0
-#define NFT_CHAIN_JSON_VERSION 0
-#define NFT_RULE_JSON_VERSION 0
-#define NFT_SET_JSON_VERSION 0
-
 const char *nft_family2str(uint32_t family);
 int nft_str2family(const char *family);
 int nft_strtoi(const char *string, int base, void *number, enum nft_type type);

@@ -311,7 +311,6 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	struct nft_set_elem *elem;
 	char *name;
 	char *table;
-	int version;
 	int family;
 	char *family_str;
 
@@ -322,13 +321,6 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	}
 
 	if (strcmp(tree->value.opaque, "set") != 0)
-		goto err;
-
-	if (nft_mxml_num_parse(tree, "set_xml_version", MXML_DESCEND_FIRST,
-			       BASE_DEC, &version, NFT_TYPE_S32) != 0)
-		goto err;
-
-	if (version != NFT_SET_XML_VERSION)
 		goto err;
 
 	name = (char *)nft_mxml_str_parse(tree, "set_name",
@@ -448,10 +440,10 @@ static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
 	struct nft_set_elem *elem;
 
 	ret = snprintf(buf, size, "{ \"set\": { \"name\": \"%s\","
-				  "\"table\": \"%s\",\"version\": %d,"
+				  "\"table\": \"%s\","
 				  "\"flags\": %u,\"family\": \"%s\","
 				  "\"key_type\": %u,\"key_len\": %u",
-			s->name, s->table, NFT_SET_JSON_VERSION, s->set_flags,
+			s->name, s->table, s->set_flags,
 			nft_family2str(s->family), s->key_type, s->key_len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -529,14 +521,13 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 	ret = snprintf(buf, size, "<set><family>%s</family>"
 				  "<set_table>%s</set_table>"
 				  "<set_name>%s</set_name>"
-				  "<set_xml_version>%d</set_xml_version>"
 				  "<set_flags>%u</set_flags>"
 				  "<key_type>%u</key_type>"
 				  "<key_len>%u</key_len>"
 				  "<data_type>%u</data_type>"
 				  "<data_len>%u</data_len>",
 			nft_family2str(s->family), s->table, s->name,
-			NFT_SET_XML_VERSION,  s->set_flags, s->key_type,
+			s->set_flags, s->key_type,
 			s->key_len, s->data_type, s->data_len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 

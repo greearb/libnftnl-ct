@@ -1,4 +1,4 @@
-<rule family="ip" table="test" chain="test" handle="1000" version="0">
+<rule family="ip" table="test" chain="test" handle="1000">
 	<rule_flags>0</rule_flags>
 	<expr type="byteorder">
 		<sreg>3</sreg>

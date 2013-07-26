@@ -1,1 +1,1 @@
-{"table" : {"name" : "filter","version" : 0,"properties" : {"family" : "ip","table_flags" : 0}}}
+{"table" : {"name" : "filter","properties" : {"family" : "ip","table_flags" : 0}}}

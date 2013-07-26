@@ -1,4 +1,4 @@
-<rule family="ip" table="filter" chain="output" handle="10" version="0">
+<rule family="ip" table="filter" chain="output" handle="10">
 	<rule_flags>0</rule_flags>
 	<expr type="payload">
 		<dreg>1</dreg>

@@ -223,8 +223,6 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 #ifdef XML_PARSING
 	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
-	char *endptr = NULL;
-	int64_t stmp;
 	int family;
 
 	/* NOTE: all XML nodes are mandatory */
@@ -233,18 +231,6 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
 		return -1;
-
-	/* Check the version of the XML */
-	if (mxmlElementGetAttr(tree, "version") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	stmp = strtoll(mxmlElementGetAttr(tree, "version"), &endptr, 10);
-	if (stmp == LLONG_MAX || *endptr || stmp != NFT_TABLE_XML_VERSION) {
-		mxmlDelete(tree);
-		return -1;
-	}
 
 	/* Get and set the name of the table */
 	if (mxmlElementGetAttr(tree, "name") == NULL) {
@@ -300,7 +286,6 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 #ifdef JSON_PARSING
 	json_t *root;
 	json_error_t error;
-	uint64_t version;
 	uint32_t table_flag;
 	const char *str;
 	int family;
@@ -313,15 +298,6 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 
 	root = json_object_get(root, "table");
 	if (root == NULL) {
-		errno = EINVAL;
-		goto err;
-	}
-
-	if (nft_jansson_value_parse_val(root, "version",
-					NFT_TYPE_U64, &version) == -1)
-		goto err;
-
-	if (version != NFT_TABLE_JSON_VERSION) {
 		errno = EINVAL;
 		goto err;
 	}
@@ -392,27 +368,24 @@ static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 	return snprintf(buf, size,
 			"{\"table\" : {"
 			"\"name\" : \"%s\","
-			"\"version\" : %d,"
 			"\"properties\" : {"
 				"\"family\" : \"%s\","
 				"\"table_flags\" : %d"
 				"}"
 			"}"
 			"}" ,
-			t->name, NFT_TABLE_JSON_VERSION,
-			nft_family2str(t->family), t->table_flags);
+			t->name, nft_family2str(t->family), t->table_flags);
 }
 
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
-	return snprintf(buf, size, "<table name=\"%s\" version=\"%d\">"
+	return snprintf(buf, size, "<table name=\"%s\">"
 				"<properties>"
 					"<family>%s</family>"
 					"<table_flags>%d</table_flags>"
 				"</properties>"
 				"</table>",
-		       t->name, NFT_TABLE_XML_VERSION,
-		       nft_family2str(t->family), t->table_flags);
+		       t->name, nft_family2str(t->family), t->table_flags);
 }
 
 static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)
