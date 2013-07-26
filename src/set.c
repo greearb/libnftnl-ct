@@ -386,20 +386,18 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 	int len = size, offset = 0;
 	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, size,
-		       "<set name=\"%s\" table=\"%s\" version=\"%d\">",
-		       s->name, s->table, NFT_SET_XML_VERSION);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	ret = snprintf(buf+offset, size, "<family>%s</family>"
-					"<set_flags>%u</set_flags>"
-					"<key_type>%u</key_type>"
-					"<key_len>%u</key_len>"
-					"<data_type>%u</data_type>"
-					"<data_len>%u</data_len>",
-			nft_family2str(s->family),
-			s->set_flags, s->key_type, s->key_len,
-			s->data_type, s->data_len);
+	ret = snprintf(buf, size, "<set><family>%s</family>"
+				  "<set_table>%s</set_table>"
+				  "<set_name>%s</set_name>"
+				  "<set_xml_version>%d</set_xml_version>"
+				  "<set_flags>%u</set_flags>"
+				  "<key_type>%u</key_type>"
+				  "<key_len>%u</key_len>"
+				  "<data_type>%u</data_type>"
+				  "<data_len>%u</data_len>",
+			nft_family2str(s->family), s->table, s->name,
+			NFT_SET_XML_VERSION,  s->set_flags, s->key_type,
+			s->key_len, s->data_type, s->data_len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (!list_empty(&s->element_list)) {
