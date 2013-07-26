@@ -17,6 +17,7 @@
 #include <linux/netfilter/nf_tables.h>
 #include <libnftables/rule.h>
 #include <libnftables/expr.h>
+#include <libnftables/set.h>
 
 #ifdef XML_PARSING
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node)
@@ -165,4 +166,49 @@ const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
 	return strdup(node->child->value.opaque);
 }
 
+struct nft_set_elem *nft_mxml_set_elem_parse(mxml_node_t *node)
+{
+	mxml_node_t *save;
+	char *set_elem_str;
+	struct nft_set_elem *elem;
+
+	if (node == NULL)
+		goto einval;
+
+	if (strcmp(node->value.opaque, "set_elem") != 0)
+		goto einval;
+
+	elem = nft_set_elem_alloc();
+	if (elem == NULL)
+		goto enomem;
+
+	/* This is a hack for mxml to print just the current node */
+	save = node->next;
+	node->next = NULL;
+
+	set_elem_str = mxmlSaveAllocString(node, MXML_NO_CALLBACK);
+	node->next = save;
+
+	if (set_elem_str == NULL) {
+		free(elem);
+		goto enomem;
+	}
+
+	if (nft_set_elem_parse(elem, NFT_SET_PARSE_XML,
+			       set_elem_str) != 0) {
+		free(set_elem_str);
+		free(elem);
+		return NULL;
+	}
+
+	free(set_elem_str);
+
+	return elem;
+einval:
+	errno = EINVAL;
+	return NULL;
+enomem:
+	errno = ENOMEM;
+	return NULL;
+}
 #endif

@@ -1,0 +1,36 @@
+<set>
+	<set_name>set0</set_name>
+	<set_table>filter</set_table>
+	<set_xml_version>0</set_xml_version>
+	<family>ip6</family>
+	<set_flags>0</set_flags>
+	<key_type>0</key_type>
+	<key_len>0</key_len>
+	<data_type>0</data_type>
+	<data_len>0</data_len>
+	<set_elem>
+		<set_elem_flags>0</set_elem_flags>
+		<set_elem_key>
+			<data_reg type="value">
+				<len>16</len>
+				<data0>0xc09a002a</data0>
+				<data1>0x2700cac1</data1>
+				<data2>0x00000000</data2>
+				<data3>0x70010000</data3>
+			</data_reg>
+		</set_elem_key>
+	</set_elem>
+	<set_elem>
+		<set_elem_flags>0</set_elem_flags>
+		<set_elem_key>
+			<data_reg type="value">
+				<len>16</len>
+				<data0>0xc09a002a</data0>
+				<data1>0x2700cac1</data1>
+				<data2>0x00000000</data2>
+				<data3>0x50010000</data3>
+			</data_reg>
+		</set_elem_key>
+	</set_elem>
+</set>
+<!-- nft add rule ip6 filter test ip6 daddr { 2a00:9ac0:c1ca:27::150, 2a00:9ac0:c1ca:27::170, } counter accept -->

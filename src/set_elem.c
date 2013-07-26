@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <errno.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -374,8 +375,90 @@ int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_elems_nlmsg_parse);
 
+static int nft_set_elem_xml_parse(struct nft_set_elem *e, char *xml)
+{
+#ifdef XML_PARSING
+	mxml_node_t *tree;
+	mxml_node_t *node;
+	int set_elem_data;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (strcmp(tree->value.opaque, "set_elem") != 0) {
+		errno = EINVAL;
+		goto err;
+	}
+
+	if (nft_mxml_num_parse(tree, "set_elem_flags", MXML_DESCEND_FIRST,
+			       BASE_DEC, &e->set_elem_flags,
+			       NFT_TYPE_U32) != 0)
+		goto err;
+
+	e->flags |= (1 << NFT_SET_ELEM_ATTR_FLAGS);
+
+	if (nft_mxml_data_reg_parse(tree, "set_elem_key",
+				    &e->key) != DATA_VALUE)
+		goto err;
+
+	e->flags |= (1 << NFT_SET_ELEM_ATTR_KEY);
+
+	/* <set_elem_data> is not mandatory */
+	node = mxmlFindElement(tree, tree, "set_elem_data", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node != NULL && node->child != NULL) {
+		set_elem_data = nft_mxml_data_reg_parse(tree, "set_elem_data",
+							&e->data);
+		switch (set_elem_data) {
+		case DATA_VALUE:
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_DATA);
+			break;
+		case DATA_VERDICT:
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
+			break;
+		case DATA_CHAIN:
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
+			break;
+		default:
+			goto err;
+		}
+	}
+
+	mxmlDelete(tree);
+	return 0;
+
+err:
+	mxmlDelete(tree);
+	return -1;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+int nft_set_elem_parse(struct nft_set_elem *e,
+		       enum nft_set_parse_type type, char *data) {
+	int ret;
+
+	switch (type) {
+	case NFT_SET_PARSE_XML:
+		ret = nft_set_elem_xml_parse(e, data);
+		break;
+	default:
+		errno = EOPNOTSUPP;
+		ret = -1;
+		break;
+	}
+
+	return ret;
+}
+EXPORT_SYMBOL(nft_set_elem_parse);
+
 static int nft_set_elem_snprintf_json(char *buf, size_t size,
-				       struct nft_set_elem *e, uint32_t flags)
+				      struct nft_set_elem *e, uint32_t flags)
 {
 	int ret, len = size, offset = 0, type = -1;
 

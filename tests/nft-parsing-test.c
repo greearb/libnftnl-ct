@@ -9,6 +9,7 @@
 #include <libnftables/table.h>
 #include <libnftables/chain.h>
 #include <libnftables/rule.h>
+#include <libnftables/set.h>
 
 #ifdef XML_PARSING
 #include <mxml.h>
@@ -62,6 +63,7 @@ static int test_xml(const char *filename)
 	struct nft_table *t = NULL;
 	struct nft_chain *c = NULL;
 	struct nft_rule *r = NULL;
+	struct nft_set *s = NULL;
 	FILE *fp;
 	mxml_node_t *tree = NULL;;
 	char *xml = NULL;
@@ -101,6 +103,14 @@ static int test_xml(const char *filename)
 				ret = 0;
 
 			nft_rule_free(r);
+		}
+	} else if (strcmp(tree->value.opaque, "set") == 0) {
+		s = nft_set_alloc();
+		if (s != NULL) {
+			if (nft_set_parse(s, NFT_SET_PARSE_XML, xml) == 0)
+				ret = 0;
+
+			nft_set_free(s);
 		}
 	}
 

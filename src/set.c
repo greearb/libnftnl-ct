@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <limits.h>
+#include <errno.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -300,6 +302,144 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 	return ret;
 }
 EXPORT_SYMBOL(nft_set_nlmsg_parse);
+
+static int nft_set_xml_parse(struct nft_set *s, char *xml)
+{
+#ifdef XML_PARSING
+	mxml_node_t *tree;
+	mxml_node_t *node = NULL;
+	struct nft_set_elem *elem;
+	char *name;
+	char *table;
+	int version;
+	int family;
+	char *family_str;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (strcmp(tree->value.opaque, "set") != 0)
+		goto err;
+
+	if (nft_mxml_num_parse(tree, "set_xml_version", MXML_DESCEND_FIRST,
+			       BASE_DEC, &version, NFT_TYPE_S32) != 0)
+		goto err;
+
+	if (version != NFT_SET_XML_VERSION)
+		goto err;
+
+	name = (char *)nft_mxml_str_parse(tree, "set_name",
+					  MXML_DESCEND_FIRST);
+	if (name == NULL)
+		goto err;
+
+	if (s->name)
+		free(s->name);
+
+	s->name = name;
+	s->flags |= (1 << NFT_SET_ATTR_NAME);
+
+	table = (char *)nft_mxml_str_parse(tree, "set_table",
+					  MXML_DESCEND_FIRST);
+	if (table == NULL)
+		goto err;
+
+	if (s->table)
+		free(s->table);
+
+	s->table = strdup(table);
+	s->flags |= (1 << NFT_SET_ATTR_TABLE);
+
+	family_str = (char *)nft_mxml_str_parse(tree, "family",
+						MXML_DESCEND_FIRST);
+	if (family_str == NULL)
+		goto err;
+
+	family = nft_str2family(family_str);
+
+	if (family < 0)
+		goto err;
+
+	s->family = family;
+
+	s->flags |= (1 << NFT_SET_ATTR_FAMILY);
+
+	if (nft_mxml_num_parse(tree, "set_flags", MXML_DESCEND_FIRST,
+			       BASE_DEC, &s->set_flags, NFT_TYPE_U32) != 0)
+		goto err;
+
+	s->flags |= (1 << NFT_SET_ATTR_FLAGS);
+
+
+	if (nft_mxml_num_parse(tree, "key_type", MXML_DESCEND_FIRST,
+			       BASE_DEC, &s->key_type, NFT_TYPE_U32) != 0)
+		goto err;
+
+	s->flags |= (1 << NFT_SET_ATTR_KEY_TYPE);
+
+	if (nft_mxml_num_parse(tree, "key_len", MXML_DESCEND_FIRST,
+			       BASE_DEC, &s->key_type, NFT_TYPE_U32) != 0)
+		goto err;
+
+	s->flags |= (1 << NFT_SET_ATTR_KEY_LEN);
+
+	if (nft_mxml_num_parse(tree, "data_type", MXML_DESCEND_FIRST,
+			       BASE_DEC, &s->data_type, NFT_TYPE_U32) != 0)
+		goto err;
+
+	s->flags |= (1 << NFT_SET_ATTR_DATA_TYPE);
+
+	if (nft_mxml_num_parse(tree, "data_len", MXML_DESCEND_FIRST,
+			       BASE_DEC, &s->data_len, NFT_TYPE_U32) != 0)
+		goto err;
+
+	s->flags |= (1 << NFT_SET_ATTR_DATA_LEN);
+
+	/* Iterate over each <set_elem> */
+	for (node = mxmlFindElement(tree, tree, "set_elem", NULL,
+				    NULL, MXML_DESCEND);
+		node != NULL;
+		node = mxmlFindElement(node, tree, "set_elem", NULL,
+				       NULL, MXML_DESCEND)) {
+
+		elem = nft_mxml_set_elem_parse(node);
+		if (elem == NULL)
+			goto err;
+
+		list_add_tail(&elem->head, &s->element_list);
+	}
+
+	mxmlDelete(tree);
+	return 0;
+err:
+	mxmlDelete(tree);
+	return -1;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+int nft_set_parse(struct nft_set *s, enum nft_set_parse_type type, char *data)
+{
+	int ret;
+
+	switch (type) {
+	case NFT_SET_PARSE_XML:
+		ret = nft_set_xml_parse(s, data);
+		break;
+	default:
+		ret = -1;
+		errno = EOPNOTSUPP;
+		break;
+	}
+
+	return ret;
+}
+EXPORT_SYMBOL(nft_set_parse);
 
 static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
 				  uint32_t type, uint32_t flags)

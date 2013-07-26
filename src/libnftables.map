@@ -120,6 +120,7 @@ global:
   nft_set_nlmsg_build_hdr;
   nft_set_nlmsg_build_payload;
   nft_set_nlmsg_parse;
+  nft_set_parse;
   nft_set_snprintf;
 
   nft_set_list_alloc;
@@ -149,6 +150,7 @@ global:
   nft_set_elem_nlmsg_build_hdr;
   nft_set_elem_nlmsg_build_payload;
   nft_set_elem_nlmsg_parse;
+  nft_set_elem_parse;
   nft_set_elem_snprintf;
 
   nft_set_elems_nlmsg_build_payload;
