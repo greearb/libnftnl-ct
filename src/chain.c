@@ -468,6 +468,120 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 }
 EXPORT_SYMBOL(nft_chain_nlmsg_parse);
 
+static int nft_str2hooknum(const char *hook)
+{
+	int hooknum;
+
+	for (hooknum = 0; hooknum < NF_INET_NUMHOOKS; hooknum++) {
+		if (strcmp(hook, hooknum2str_array[hooknum]) == 0)
+			break;
+	}
+	return hooknum;
+}
+
+static int nft_chain_json_parse(struct nft_chain *c, char *json)
+{
+#ifdef JSON_PARSING
+	json_t *root;
+	json_error_t error;
+	uint64_t uval64;
+	uint32_t policy;
+	int32_t val32;
+	const char *valstr;
+
+	root = nft_jansson_get_root(json, "chain", &error);
+	if (root == NULL)
+		return -1;
+
+	valstr = nft_jansson_value_parse_str(root, "name");
+	if (valstr == NULL)
+		goto err;
+
+	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_NAME, strdup(valstr));
+
+	if (nft_jansson_value_parse_val(root, "handle", NFT_TYPE_U64,
+					&uval64) == -1)
+		goto err;
+
+	nft_chain_attr_set_u64(c,NFT_CHAIN_ATTR_HANDLE, uval64);
+
+	if (nft_jansson_value_parse_val(root, "bytes", NFT_TYPE_U64,
+					&uval64) == -1)
+		goto err;
+
+	nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_BYTES, uval64);
+
+	if (nft_jansson_value_parse_val(root, "packets", NFT_TYPE_U64,
+					&uval64) == -1)
+		goto err;
+
+	nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_PACKETS, uval64);
+
+	valstr = nft_jansson_value_parse_str(root, "family");
+
+	if (valstr == NULL)
+		goto err;
+
+	val32 = nft_str2family(valstr);
+	if (val32 == -1)
+		goto err;
+
+	nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_FAMILY, val32);
+
+	valstr = nft_jansson_value_parse_str(root, "table");
+
+	if (valstr == NULL)
+		goto err;
+
+	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TABLE, strdup(valstr));
+
+	if (nft_jansson_node_exist(root, "hooknum")) {
+		valstr = nft_jansson_value_parse_str(root, "type");
+
+		if (valstr == NULL)
+			goto err;
+
+		nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TYPE, strdup(valstr));
+
+		if (nft_jansson_value_parse_val(root, "prio", NFT_TYPE_S32,
+						&val32) == -1)
+			goto err;
+
+		nft_chain_attr_set_s32(c, NFT_CHAIN_ATTR_PRIO, val32);
+
+		valstr = nft_jansson_value_parse_str(root, "hooknum");
+		if (valstr == NULL)
+			goto err;
+
+		val32 = nft_str2hooknum(valstr);
+		if (val32 == -1)
+			goto err;
+
+		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_HOOKNUM, val32);
+
+		valstr = nft_jansson_value_parse_str(root, "policy");
+		if (valstr == NULL)
+			goto err;
+
+		policy = nft_str2verdict(valstr);
+		if (policy == -1)
+			goto err;
+
+		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_POLICY, policy);
+	}
+
+	free(root);
+	return 0;
+
+err:
+	free(root);
+	return -1;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 {
 #ifdef XML_PARSING
@@ -648,6 +762,9 @@ int nft_chain_parse(struct nft_chain *c, enum nft_chain_parse_type type,
 	switch (type) {
 	case NFT_CHAIN_PARSE_XML:
 		ret = nft_chain_xml_parse(c, data);
+		break;
+	case NFT_CHAIN_PARSE_JSON:
+		ret = nft_chain_json_parse(c, data);
 		break;
 	default:
 		ret = -1;

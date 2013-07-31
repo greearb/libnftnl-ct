@@ -52,6 +52,7 @@ enum {
 enum nft_chain_parse_type {
 	NFT_CHAIN_PARSE_NONE	= 0,
 	NFT_CHAIN_PARSE_XML,
+	NFT_CHAIN_PARSE_JSON,
 	NFT_CHAIN_PARSE_MAX
 };
 
