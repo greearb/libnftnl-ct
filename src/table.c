@@ -300,12 +300,6 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 
 	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, strdup(str));
 
-	root = json_object_get(root, "properties");
-	if (root == NULL) {
-		errno = EINVAL;
-		goto err;
-	}
-
 	str = nft_jansson_value_parse_str(root, "family");
 	if (str == NULL)
 		goto err;
@@ -360,10 +354,8 @@ static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 	return snprintf(buf, size,
 			"{\"table\" : {"
 			"\"name\" : \"%s\","
-			"\"properties\" : {"
-				"\"family\" : \"%s\","
-				"\"table_flags\" : %d"
-				"}"
+			"\"family\" : \"%s\","
+			"\"table_flags\" : %d"
 			"}"
 			"}" ,
 			t->name, nft_family2str(t->family), t->table_flags);
