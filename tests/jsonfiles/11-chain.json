@@ -1,0 +1,1 @@
+{ "chain": {"name": "input","handle": 1,"bytes": 1375696,"packets": 4136,"family": "ip","table": "filter","use": 0,"type": "filter","hooknum": "NF_INET_LOCAL_IN","prio": 0,"policy": "accept"}}

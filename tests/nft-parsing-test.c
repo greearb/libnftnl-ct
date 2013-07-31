@@ -24,6 +24,7 @@ static int test_json(const char *filename)
 #ifdef JSON_PARSING
 	int ret = -1;
 	struct nft_table *t = NULL;
+	struct nft_chain *c = NULL;
 	json_t *root;
 	json_error_t error;
 	char *json = NULL;
@@ -46,6 +47,14 @@ static int test_json(const char *filename)
 				ret = 0;
 
 			nft_table_free(t);
+		}
+	} else if (json_object_get(root, "chain") != NULL) {
+		c = nft_chain_alloc();
+		if (c != NULL) {
+			if (nft_chain_parse(c, NFT_CHAIN_PARSE_JSON, json) == 0)
+				ret = 0;
+
+			nft_chain_free(c);
 		}
 	}
 
