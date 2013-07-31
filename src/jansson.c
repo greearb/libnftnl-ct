@@ -71,4 +71,23 @@ bool nft_jansson_node_exist(json_t *root, const char *tag)
 {
 	return json_object_get(root, tag) != NULL;
 }
+
+json_t *nft_jansson_get_root(char *json, const char *tag, json_error_t *err)
+{
+	json_t *root;
+
+	root = json_loadb(json, strlen(json), 0, err);
+	if (root == NULL) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	root = json_object_get(root, tag);
+	if (root == NULL) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	return root;
+}
 #endif

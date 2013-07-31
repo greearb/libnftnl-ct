@@ -290,17 +290,9 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 	const char *str;
 	int family;
 
-	root = json_loadb(json, strlen(json), 0, &error);
-	if (!root) {
-		errno = EINVAL;
-		goto err;
-	}
-
-	root = json_object_get(root, "table");
-	if (root == NULL) {
-		errno = EINVAL;
-		goto err;
-	}
+	root = nft_jansson_get_root(json, "table", &error);
+	if (root == NULL)
+		return -1;
 
 	str = nft_jansson_value_parse_str(root, "name");
 	if (str == NULL)
