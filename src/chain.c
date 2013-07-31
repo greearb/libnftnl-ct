@@ -669,10 +669,9 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 			"\"handle\": %"PRIu64","
 			"\"bytes\": %"PRIu64","
 			"\"packets\": %"PRIu64","
-			"\"properties\": {"
-				"\"family\": \"%s\","
-				"\"table\": \"%s\","
-				"\"use\": %d",
+			"\"family\": \"%s\","
+			"\"table\": \"%s\","
+			"\"use\": %d",
 			c->name, c->handle, c->bytes, c->packets,
 			nft_family2str(c->family),
 			c->table, c->use);
@@ -690,7 +689,6 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 	}
 
 	ret = snprintf(buf+offset, size,
-			"}"
 		"}"
 		"}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
