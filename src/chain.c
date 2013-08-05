@@ -589,7 +589,8 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	mxml_node_t *node = NULL;
 	char *endptr = NULL;
 	uint64_t utmp;
-	int family;
+	const char *hooknum_str;
+	int family, hooknum;
 
 	/* NOTE: all XML nodes are mandatory */
 
@@ -686,28 +687,23 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	/* Ignore <use> (cannot be set)*/
 	node = mxmlFindElement(tree, tree, "use", NULL, NULL, MXML_DESCEND);
 
-	/* Get and set <hooknum> */
-	node = mxmlFindElement(tree, tree, "hooknum", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL) {
+
+	hooknum_str = nft_mxml_str_parse(tree, "hooknum", MXML_DESCEND_FIRST);
+	if (hooknum_str == NULL) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	/* iterate the list of hooks until a match is found */
-	for (utmp = 0; utmp < NF_INET_NUMHOOKS; utmp++) {
-		if (strcmp(node->child->value.opaque, hooknum2str_array[utmp]) == 0) {
-			c->hooknum = utmp;
-			c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
-			break;
-		}
-	}
+	hooknum = nft_str2hooknum(hooknum_str);
+	free((char *)hooknum_str);
 
-	/* if no hook was found, error */
-	if (!(c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM))) {
+	if (hooknum < 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
+
+	c->hooknum = hooknum;
+	c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
 
 	/* Get and set <policy> */
 	node = mxmlFindElement(tree, tree, "policy", NULL, NULL, MXML_DESCEND);
