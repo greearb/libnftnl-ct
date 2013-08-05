@@ -474,9 +474,9 @@ static int nft_str2hooknum(const char *hook)
 
 	for (hooknum = 0; hooknum < NF_INET_NUMHOOKS; hooknum++) {
 		if (strcmp(hook, hooknum2str_array[hooknum]) == 0)
-			break;
+			return hooknum;
 	}
-	return hooknum;
+	return -1;
 }
 
 static int nft_chain_json_parse(struct nft_chain *c, char *json)
