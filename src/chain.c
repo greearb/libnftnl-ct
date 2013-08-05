@@ -468,7 +468,7 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 }
 EXPORT_SYMBOL(nft_chain_nlmsg_parse);
 
-static int nft_str2hooknum(const char *hook)
+static inline int nft_str2hooknum(const char *hook)
 {
 	int hooknum;
 
