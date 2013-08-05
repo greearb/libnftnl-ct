@@ -244,12 +244,9 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	t->name = strdup(mxmlElementGetAttr(tree, "name"));
 	t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 
-	/* Ignore <properties> node */
-	node = mxmlFindElement(tree, tree, "properties", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-
 	/* Get the and set <family> node */
-	node = mxmlFindElement(tree, tree, "family", NULL, NULL, MXML_DESCEND);
+	node = mxmlFindElement(tree, tree, "family", NULL, NULL,
+			       MXML_DESCEND_FIRST);
 	if (node == NULL) {
 		mxmlDelete(tree);
 		return -1;
@@ -363,13 +360,9 @@ static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
-	return snprintf(buf, size, "<table name=\"%s\">"
-				"<properties>"
-					"<family>%s</family>"
-					"<table_flags>%d</table_flags>"
-				"</properties>"
-				"</table>",
-		       t->name, nft_family2str(t->family), t->table_flags);
+	return snprintf(buf, size, "<table name=\"%s\"><family>%s</family>"
+			"<table_flags>%d</table_flags></table>",
+			t->name, nft_family2str(t->family), t->table_flags);
 }
 
 static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)

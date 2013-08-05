@@ -648,12 +648,9 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	c->packets = utmp;
 	c->flags |= (1 << NFT_CHAIN_ATTR_PACKETS);
 
-	/* Ignore <properties> node */
-	node = mxmlFindElement(tree, tree, "properties", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-
 	/* Get and set <type> */
-	node = mxmlFindElement(tree, tree, "type", NULL, NULL, MXML_DESCEND);
+	node = mxmlFindElement(tree, tree, "type", NULL, NULL,
+			       MXML_DESCEND_FIRST);
 	if (node == NULL) {
 		mxmlDelete(tree);
 		return -1;
@@ -820,12 +817,8 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 	ret = snprintf(buf, size,
 		       "<chain name=\"%s\" handle=\"%"PRIu64"\""
 		       " bytes=\"%"PRIu64"\" packets=\"%"PRIu64"\">"
-		       "<properties>"
-				"<type>%s</type>"
-				"<table>%s</table>"
-				"<prio>%d</prio>"
-				"<use>%d</use>"
-				"<hooknum>%s</hooknum>",
+		       "<type>%s</type><table>%s</table><prio>%d</prio>"
+		       "<use>%d</use><hooknum>%s</hooknum>",
 		       c->name, c->handle, c->bytes, c->packets,
 		       c->type, c->table,
 		       c->prio, c->use, hooknum2str_array[c->hooknum]);
@@ -842,8 +835,7 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, size, "<family>%s</family>"
-		       "</properties></chain>",
+	ret = snprintf(buf+offset, size, "<family>%s</family></chain>",
 		       nft_family2str(c->family));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 

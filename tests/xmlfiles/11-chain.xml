@@ -1,11 +1,9 @@
 <chain name="test" handle="0" bytes="59" packets="1">
-	<properties>
-		<type>filter</type>
-		<table>filter</table>
-		<prio>0</prio>
-		<use>1</use>
-		<hooknum>NF_INET_FORWARD</hooknum>
-		<policy>drop</policy>
-		<family>ip6</family>
-	</properties>
+	<type>filter</type>
+	<table>filter</table>
+	<prio>0</prio>
+	<use>1</use>
+	<hooknum>NF_INET_FORWARD</hooknum>
+	<policy>drop</policy>
+	<family>ip6</family>
 </chain>

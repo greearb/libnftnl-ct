@@ -1,11 +1,9 @@
 <chain name="test" handle="0" bytes="0" packets="0">
-	<properties>
-		<type>filter</type>
-		<table>filter</table>
-		<prio>0</prio>
-		<use>1</use>
-		<hooknum>NF_INET_LOCAL_IN</hooknum>
-		<policy>accept</policy>
-		<family>ip</family>
-	</properties>
+	<type>filter</type>
+	<table>filter</table>
+	<prio>0</prio>
+	<use>1</use>
+	<hooknum>NF_INET_LOCAL_IN</hooknum>
+	<policy>accept</policy>
+	<family>ip</family>
 </chain>
