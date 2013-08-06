@@ -108,8 +108,7 @@ static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg, char *xml)
 	if (reg->chain)
 		xfree(reg->chain);
 
-	reg->chain = (char *)nft_mxml_str_parse(tree, "chain",
-						MXML_DESCEND);
+	reg->chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND);
 	if (reg->chain == NULL) {
 		mxmlDelete(tree);
 		return -1;

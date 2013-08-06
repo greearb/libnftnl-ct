@@ -14,7 +14,7 @@ union nft_data_reg {
 	};
 	struct {
 		int		verdict;
-		char		*chain;
+		const char	*chain;
 	};
 };
 

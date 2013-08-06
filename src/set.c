@@ -309,10 +309,8 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	mxml_node_t *tree;
 	mxml_node_t *node = NULL;
 	struct nft_set_elem *elem;
-	char *name;
-	char *table;
+	const char *name, *table, *family_str;
 	int family;
-	char *family_str;
 
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL) {
@@ -323,8 +321,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	if (strcmp(tree->value.opaque, "set") != 0)
 		goto err;
 
-	name = (char *)nft_mxml_str_parse(tree, "set_name",
-					  MXML_DESCEND_FIRST);
+	name = nft_mxml_str_parse(tree, "set_name", MXML_DESCEND_FIRST);
 	if (name == NULL)
 		goto err;
 
@@ -334,8 +331,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	s->name = name;
 	s->flags |= (1 << NFT_SET_ATTR_NAME);
 
-	table = (char *)nft_mxml_str_parse(tree, "set_table",
-					  MXML_DESCEND_FIRST);
+	table = nft_mxml_str_parse(tree, "set_table", MXML_DESCEND_FIRST);
 	if (table == NULL)
 		goto err;
 
@@ -345,8 +341,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	s->table = strdup(table);
 	s->flags |= (1 << NFT_SET_ATTR_TABLE);
 
-	family_str = (char *)nft_mxml_str_parse(tree, "family",
-						MXML_DESCEND_FIRST);
+	family_str = nft_mxml_str_parse(tree, "family", MXML_DESCEND_FIRST);
 	if (family_str == NULL)
 		goto err;
 
