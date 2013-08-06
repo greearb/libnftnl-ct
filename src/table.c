@@ -43,9 +43,9 @@ EXPORT_SYMBOL(nft_table_alloc);
 void nft_table_free(struct nft_table *t)
 {
 	if (t->flags & (1 << NFT_TABLE_ATTR_NAME))
-		free(t->name);
+		xfree(t->name);
 
-	free(t);
+	xfree(t);
 }
 EXPORT_SYMBOL(nft_table_free);
 
@@ -63,7 +63,7 @@ void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
 	switch (attr) {
 	case NFT_TABLE_ATTR_NAME:
 		if (t->name) {
-			free(t->name);
+			xfree(t->name);
 			t->name = NULL;
 		}
 		break;
@@ -80,7 +80,7 @@ void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data)
 	switch (attr) {
 	case NFT_TABLE_ATTR_NAME:
 		if (t->name)
-			free(t->name);
+			xfree(t->name);
 
 		t->name = strdup(data);
 		t->flags |= (1 << NFT_TABLE_ATTR_NAME);
@@ -239,7 +239,7 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	}
 
 	if (t->name)
-		free(t->name);
+		xfree(t->name);
 
 	t->name = strdup(mxmlElementGetAttr(tree, "name"));
 	t->flags |= (1 << NFT_TABLE_ATTR_NAME);
@@ -313,10 +313,10 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 
 	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, table_flag);
 
-	free(root);
+	xfree(root);
 	return 0;
 err:
-	free(root);
+	xfree(root);
 	return -1;
 #else
 	errno = EOPNOTSUPP;
@@ -414,7 +414,7 @@ void nft_table_list_free(struct nft_table_list *list)
 		list_del(&r->head);
 		nft_table_free(r);
 	}
-	free(list);
+	xfree(list);
 }
 EXPORT_SYMBOL(nft_table_list_free);
 
@@ -487,6 +487,6 @@ EXPORT_SYMBOL(nft_table_list_iter_next);
 
 void nft_table_list_iter_destroy(struct nft_table_list_iter *iter)
 {
-	free(iter);
+	xfree(iter);
 }
 EXPORT_SYMBOL(nft_table_list_iter_destroy);

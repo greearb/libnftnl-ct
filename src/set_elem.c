@@ -42,7 +42,7 @@ EXPORT_SYMBOL(nft_set_elem_alloc);
 
 void nft_set_elem_free(struct nft_set_elem *s)
 {
-	free(s);
+	xfree(s);
 }
 EXPORT_SYMBOL(nft_set_elem_free);
 
@@ -58,7 +58,7 @@ void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr)
 	case NFT_SET_ELEM_ATTR_CHAIN:
 		if (s->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN)) {
 			if (s->data.chain) {
-				free(s->data.chain);
+				xfree(s->data.chain);
 				s->data.chain = NULL;
 			}
 		}
@@ -92,7 +92,7 @@ void nft_set_elem_attr_set(struct nft_set_elem *s, uint16_t attr,
 		break;
 	case NFT_SET_ELEM_ATTR_CHAIN:	/* NFTA_SET_ELEM_DATA */
 		if (s->data.chain)
-			free(s->data.chain);
+			xfree(s->data.chain);
 
 		s->data.chain = strdup(data);
 		break;
@@ -299,7 +299,7 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 		}
         }
 	if (ret < 0)
-		free(e);
+		xfree(e);
 
 	/* Add this new element to this set */
 	list_add_tail(&e->head, &s->element_list);
@@ -656,6 +656,6 @@ EXPORT_SYMBOL(nft_set_elems_iter_next);
 
 void nft_set_elems_iter_destroy(struct nft_set_elems_iter *iter)
 {
-	free(iter);
+	xfree(iter);
 }
 EXPORT_SYMBOL(nft_set_elems_iter_destroy);

@@ -106,7 +106,7 @@ static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg, char *xml)
 
 	/* Get and set <chain> */
 	if (reg->chain)
-		free(reg->chain);
+		xfree(reg->chain);
 
 	reg->chain = (char *)nft_mxml_str_parse(tree, "chain",
 						MXML_DESCEND);

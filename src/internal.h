@@ -55,6 +55,8 @@ const char *nft_verdict2str(uint32_t verdict);
 int nft_str2verdict(const char *verdict);
 int nft_get_value(enum nft_type type, void *val, void *out);
 
+void xfree(const void *ptr);
+
 struct expr_ops;
 
 struct nft_rule_expr {

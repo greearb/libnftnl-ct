@@ -61,11 +61,11 @@ EXPORT_SYMBOL(nft_chain_alloc);
 void nft_chain_free(struct nft_chain *c)
 {
 	if (c->table != NULL)
-		free(c->table);
+		xfree(c->table);
 	if (c->type != NULL)
-		free(c->type);
+		xfree(c->type);
 
-	free(c);
+	xfree(c);
 }
 EXPORT_SYMBOL(nft_chain_free);
 
@@ -83,7 +83,7 @@ void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr)
 	switch (attr) {
 	case NFT_CHAIN_ATTR_TABLE:
 		if (c->table) {
-			free(c->table);
+			xfree(c->table);
 			c->table = NULL;
 		}
 		break;
@@ -92,7 +92,7 @@ void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr)
 		return;
 	case NFT_CHAIN_ATTR_TYPE:
 		if (c->type) {
-			free(c->type);
+			xfree(c->type);
 			c->type = NULL;
 		}
 		break;
@@ -121,7 +121,7 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
 		break;
 	case NFT_CHAIN_ATTR_TABLE:
 		if (c->table)
-			free(c->table);
+			xfree(c->table);
 
 		c->table = strdup(data);
 		break;
@@ -151,7 +151,7 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
 		break;
 	case NFT_CHAIN_ATTR_TYPE:
 		if (c->type)
-			free(c->type);
+			xfree(c->type);
 
 		c->type = strdup(data);
 		break;
@@ -570,11 +570,11 @@ static int nft_chain_json_parse(struct nft_chain *c, char *json)
 		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_POLICY, policy);
 	}
 
-	free(root);
+	xfree(root);
 	return 0;
 
 err:
-	free(root);
+	xfree(root);
 	return -1;
 #else
 	errno = EOPNOTSUPP;
@@ -658,7 +658,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	}
 
 	if (c->type)
-		free(c->type);
+		xfree(c->type);
 
 	c->type = strdup(node->child->value.opaque);
 	c->flags |= (1 << NFT_CHAIN_ATTR_TYPE);
@@ -670,7 +670,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		return -1;
 	}
 	if (c->table)
-		free(c->table);
+		xfree(c->table);
 
 	c->table = strdup(node->child->value.opaque);
 	c->flags |= (1 << NFT_CHAIN_ATTR_TABLE);
@@ -695,7 +695,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	}
 
 	hooknum = nft_str2hooknum(hooknum_str);
-	free((char *)hooknum_str);
+	xfree(hooknum_str);
 
 	if (hooknum < 0) {
 		mxmlDelete(tree);
@@ -903,7 +903,7 @@ void nft_chain_list_free(struct nft_chain_list *list)
 		list_del(&r->head);
 		nft_chain_free(r);
 	}
-	free(list);
+	xfree(list);
 }
 EXPORT_SYMBOL(nft_chain_list_free);
 
@@ -982,6 +982,6 @@ EXPORT_SYMBOL(nft_chain_list_iter_next);
 
 void nft_chain_list_iter_destroy(struct nft_chain_list_iter *iter)
 {
-	free(iter);
+	xfree(iter);
 }
 EXPORT_SYMBOL(nft_chain_list_iter_destroy);

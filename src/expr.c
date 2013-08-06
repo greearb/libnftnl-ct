@@ -49,7 +49,7 @@ EXPORT_SYMBOL(nft_rule_expr_alloc);
 
 void nft_rule_expr_free(struct nft_rule_expr *expr)
 {
-	free(expr);
+	xfree(expr);
 }
 EXPORT_SYMBOL(nft_rule_expr_free);
 

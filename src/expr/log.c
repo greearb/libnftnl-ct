@@ -38,7 +38,7 @@ nft_rule_expr_log_set(struct nft_rule_expr *e, uint16_t type,
 	switch(type) {
 	case NFT_EXPR_LOG_PREFIX:
 		if (log->prefix)
-			free(log->prefix);
+			xfree(log->prefix);
 
 		log->prefix = strdup(data);
 		break;
@@ -131,7 +131,7 @@ nft_rule_expr_log_parse(struct nft_rule_expr *e, struct nlattr *attr)
 
 	if (tb[NFTA_LOG_PREFIX]) {
 		if (log->prefix)
-			free(log->prefix);
+			xfree(log->prefix);
 
 		log->prefix = strdup(mnl_attr_get_str(tb[NFTA_LOG_PREFIX]));
 		e->flags |= (1 << NFT_EXPR_LOG_GROUP);

@@ -168,3 +168,8 @@ int nft_str2verdict(const char *verdict)
 
 	return -1;
 }
+
+void xfree(const void *ptr)
+{
+	free((void *)ptr);
+}

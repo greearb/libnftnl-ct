@@ -50,7 +50,7 @@ nft_rule_expr_target_set(struct nft_rule_expr *e, uint16_t type,
 		break;
 	case NFT_EXPR_TG_INFO:
 		if (tg->data)
-			free((void *)tg->data);
+			xfree(tg->data);
 
 		tg->data = data;
 		tg->data_len = data_len;
@@ -153,7 +153,7 @@ static int nft_rule_expr_target_parse(struct nft_rule_expr *e, struct nlattr *at
 		void *target_data;
 
 		if (target->data)
-			free((void *) target->data);
+			xfree(target->data);
 
 		target_data = calloc(1, len);
 		if (target_data == NULL)

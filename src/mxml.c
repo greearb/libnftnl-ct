@@ -41,7 +41,7 @@ struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node)
 		goto err_expr;
 
 	tree = mxmlLoadString(NULL, xml_text, MXML_OPAQUE_CALLBACK);
-	free(xml_text);
+	xfree(xml_text);
 
 	if (tree == NULL)
 		goto err_expr;
@@ -104,7 +104,7 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 	}
 
 	ret = nft_data_reg_xml_parse(data_reg, tmpstr);
-	free(tmpstr);
+	xfree(tmpstr);
 
 	if (ret < 0) {
 		errno = EINVAL;
@@ -190,18 +190,18 @@ struct nft_set_elem *nft_mxml_set_elem_parse(mxml_node_t *node)
 	node->next = save;
 
 	if (set_elem_str == NULL) {
-		free(elem);
+		xfree(elem);
 		goto enomem;
 	}
 
 	if (nft_set_elem_parse(elem, NFT_SET_PARSE_XML,
 			       set_elem_str) != 0) {
-		free(set_elem_str);
-		free(elem);
+		xfree(set_elem_str);
+		xfree(elem);
 		return NULL;
 	}
 
-	free(set_elem_str);
+	xfree(set_elem_str);
 
 	return elem;
 einval:

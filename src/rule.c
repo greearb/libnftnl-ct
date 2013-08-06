@@ -65,11 +65,11 @@ EXPORT_SYMBOL(nft_rule_alloc);
 void nft_rule_free(struct nft_rule *r)
 {
 	if (r->table != NULL)
-		free(r->table);
+		xfree(r->table);
 	if (r->chain != NULL)
-		free(r->chain);
+		xfree(r->chain);
 
-	free(r);
+	xfree(r);
 }
 EXPORT_SYMBOL(nft_rule_free);
 
@@ -87,13 +87,13 @@ void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr)
 	switch (attr) {
 	case NFT_RULE_ATTR_TABLE:
 		if (r->table) {
-			free(r->table);
+			xfree(r->table);
 			r->table = NULL;
 		}
 		break;
 	case NFT_RULE_ATTR_CHAIN:
 		if (r->chain) {
-			free(r->chain);
+			xfree(r->chain);
 			r->chain = NULL;
 		}
 		break;
@@ -115,13 +115,13 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
 	switch(attr) {
 	case NFT_RULE_ATTR_TABLE:
 		if (r->table)
-			free(r->table);
+			xfree(r->table);
 
 		r->table = strdup(data);
 		break;
 	case NFT_RULE_ATTR_CHAIN:
 		if (r->chain)
-			free(r->chain);
+			xfree(r->chain);
 
 		r->chain = strdup(data);
 		break;
@@ -371,7 +371,7 @@ static int nft_rule_parse_expr2(struct nlattr *attr, struct nft_rule *r)
 
 	if (tb[NFTA_EXPR_DATA]) {
 		if (expr->ops->parse(expr, tb[NFTA_EXPR_DATA]) < 0) {
-			free(expr);
+			xfree(expr);
 			return -1;
 		}
 	}
@@ -508,7 +508,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	}
 
 	if (r->table)
-		free(r->table);
+		xfree(r->table);
 
 	r->table = strdup(mxmlElementGetAttr(tree, "table"));
 	r->flags |= (1 << NFT_RULE_ATTR_TABLE);
@@ -520,7 +520,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	}
 
 	if (r->chain)
-		free(r->chain);
+		xfree(r->chain);
 
 	r->chain = strdup(mxmlElementGetAttr(tree, "chain"));
 	r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
@@ -806,7 +806,7 @@ EXPORT_SYMBOL(nft_rule_expr_iter_next);
 
 void nft_rule_expr_iter_destroy(struct nft_rule_expr_iter *iter)
 {
-	free(iter);
+	xfree(iter);
 }
 EXPORT_SYMBOL(nft_rule_expr_iter_destroy);
 
@@ -836,7 +836,7 @@ void nft_rule_list_free(struct nft_rule_list *list)
 		list_del(&r->head);
 		nft_rule_free(r);
 	}
-	free(list);
+	xfree(list);
 }
 EXPORT_SYMBOL(nft_rule_list_free);
 
@@ -915,6 +915,6 @@ EXPORT_SYMBOL(nft_rule_list_iter_next);
 
 void nft_rule_list_iter_destroy(struct nft_rule_list_iter *iter)
 {
-	free(iter);
+	xfree(iter);
 }
 EXPORT_SYMBOL(nft_rule_list_iter_destroy);

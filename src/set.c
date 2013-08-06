@@ -46,15 +46,15 @@ void nft_set_free(struct nft_set *s)
 	struct nft_set_elem *elem, *tmp;
 
 	if (s->table != NULL)
-		free(s->table);
+		xfree(s->table);
 	if (s->name != NULL)
-		free(s->name);
+		xfree(s->name);
 
 	list_for_each_entry_safe(elem, tmp, &s->element_list, head) {
 		list_del(&elem->head);
 		nft_set_elem_free(elem);
 	}
-	free(s);
+	xfree(s);
 }
 EXPORT_SYMBOL(nft_set_free);
 
@@ -70,14 +70,14 @@ void nft_set_attr_unset(struct nft_set *s, uint16_t attr)
 	case NFT_SET_ATTR_TABLE:
 		if (s->flags & (1 << NFT_SET_ATTR_TABLE))
 			if (s->table) {
-				free(s->table);
+				xfree(s->table);
 				s->table = NULL;
 			}
 		break;
 	case NFT_SET_ATTR_NAME:
 		if (s->flags & (1 << NFT_SET_ATTR_NAME))
 			if (s->name) {
-				free(s->name);
+				xfree(s->name);
 				s->name = NULL;
 			}
 		break;
@@ -101,13 +101,13 @@ void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data)
 	switch(attr) {
 	case NFT_SET_ATTR_TABLE:
 		if (s->table)
-			free(s->table);
+			xfree(s->table);
 
 		s->table = strdup(data);
 		break;
 	case NFT_SET_ATTR_NAME:
 		if (s->name)
-			free(s->name);
+			xfree(s->name);
 
 		s->name = strdup(data);
 		break;
@@ -329,7 +329,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 		goto err;
 
 	if (s->name)
-		free(s->name);
+		xfree(s->name);
 
 	s->name = name;
 	s->flags |= (1 << NFT_SET_ATTR_NAME);
@@ -340,7 +340,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 		goto err;
 
 	if (s->table)
-		free(s->table);
+		xfree(s->table);
 
 	s->table = strdup(table);
 	s->flags |= (1 << NFT_SET_ATTR_TABLE);
@@ -594,7 +594,7 @@ void nft_set_list_free(struct nft_set_list *list)
 		list_del(&s->head);
 		nft_set_free(s);
 	}
-	free(list);
+	xfree(list);
 }
 EXPORT_SYMBOL(nft_set_list_free);
 
@@ -672,6 +672,6 @@ EXPORT_SYMBOL(nft_set_list_iter_next);
 
 void nft_set_list_iter_destroy(struct nft_set_list_iter *iter)
 {
-	free(iter);
+	xfree(iter);
 }
 EXPORT_SYMBOL(nft_set_list_iter_destroy);

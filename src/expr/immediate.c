@@ -46,7 +46,7 @@ nft_rule_expr_immediate_set(struct nft_rule_expr *e, uint16_t type,
 		break;
 	case NFT_EXPR_IMM_CHAIN:
 		if (imm->data.chain)
-			free(imm->data.chain);
+			xfree(imm->data.chain);
 
 		imm->data.chain = strdup(data);
 		break;

@@ -50,7 +50,7 @@ nft_rule_expr_match_set(struct nft_rule_expr *e, uint16_t type,
 		break;
 	case NFT_EXPR_MT_INFO:
 		if (mt->data)
-			free((void *)mt->data);
+			xfree(mt->data);
 
 		mt->data = data;
 		mt->data_len = data_len;
@@ -153,7 +153,7 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 		void *match_data;
 
 		if (match->data)
-			free((void *) match->data);
+			xfree(match->data);
 
 		match_data = calloc(1, len);
 		if (match_data == NULL)
