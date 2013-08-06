@@ -188,7 +188,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 {
 #ifdef XML_PARSING
 	struct nft_expr_nat *nat = nft_expr_data(e);
-	const char *nat_type, *family_str;
+	const char *nat_type;
 	int32_t reg;
 	int family;
 
@@ -205,13 +205,11 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 
 	e->flags |= (1 << NFT_EXPR_NAT_TYPE);
 
-	family_str = nft_mxml_str_parse(tree, "family", MXML_DESCEND_FIRST);
-	if (family_str == NULL)
+	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
+	if (family < 0) {
+		mxmlDelete(tree);
 		return -1;
-
-	family = nft_str2family(family_str);
-	if (family < 0)
-		return -1;
+	}
 
 	nat->family = family;
 	e->flags |= (1 << NFT_EXPR_NAT_FAMILY);

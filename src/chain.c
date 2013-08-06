@@ -587,8 +587,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 #ifdef XML_PARSING
 	mxml_node_t *tree = NULL;
 	mxml_node_t *node = NULL;
-	char *endptr = NULL;
-	uint64_t utmp;
+	const char *name;
 	const char *hooknum_str;
 	int family, hooknum;
 
@@ -599,54 +598,43 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	if (tree == NULL)
 		return -1;
 
-	/* Get and set <chain name="xxx" ... >*/
-	if (mxmlElementGetAttr(tree, "name") == NULL) {
+	if (strcmp(tree->value.opaque, "chain") != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
-	strncpy(c->name, mxmlElementGetAttr(tree, "name"),
-		NFT_CHAIN_MAXNAMELEN);
+
+	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST);
+	if (name == NULL) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	strncpy(c->name, name, NFT_CHAIN_MAXNAMELEN);
+	xfree(name);
 	c->flags |= (1 << NFT_CHAIN_ATTR_NAME);
 
-	/* Get and set <chain handle="x" ... >*/
-	if (mxmlElementGetAttr(tree, "handle") == NULL) {
+	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
+			       &c->handle, NFT_TYPE_U64) != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	utmp = strtoull(mxmlElementGetAttr(tree, "handle"), &endptr, 10);
-	if (utmp == UINT64_MAX || utmp < 0 || *endptr) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	c->handle = utmp;
 	c->flags |= (1 << NFT_CHAIN_ATTR_HANDLE);
 
-	/* Get and set <chain bytes="x" ... >*/
-	if (mxmlElementGetAttr(tree, "bytes") == NULL) {
+	if (nft_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
+			       &c->bytes, NFT_TYPE_U64) != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
-	utmp = strtoull(mxmlElementGetAttr(tree, "bytes"), &endptr, 10);
-	if (utmp == UINT64_MAX || utmp < 0 || *endptr) {
-		mxmlDelete(tree);
-		return -1;
-	}
-	c->bytes = utmp;
+
 	c->flags |= (1 << NFT_CHAIN_ATTR_BYTES);
 
-	/* Get and set <chain packets="x" ... > */
-	if (mxmlElementGetAttr(tree, "packets") == NULL) {
+	if (nft_mxml_num_parse(tree, "packets", MXML_DESCEND_FIRST, BASE_DEC,
+			       &c->packets, NFT_TYPE_U64) != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
-	utmp = strtoull(mxmlElementGetAttr(tree, "packets"), &endptr, 10);
-	if (utmp == UINT64_MAX || utmp < 0 || *endptr) {
-		mxmlDelete(tree);
-		return -1;
-	}
-	c->packets = utmp;
+
 	c->flags |= (1 << NFT_CHAIN_ATTR_PACKETS);
 
 	/* Get and set <type> */
@@ -724,13 +712,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);
 
 	/* Get and set <family> */
-	node = mxmlFindElement(tree, tree, "family", NULL, NULL, MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	family = nft_str2family(node->child->value.opaque);
+	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
 	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;
@@ -810,11 +792,11 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 {
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, size,
-		       "<chain name=\"%s\" handle=\"%"PRIu64"\""
-		       " bytes=\"%"PRIu64"\" packets=\"%"PRIu64"\">"
-		       "<type>%s</type><table>%s</table><prio>%d</prio>"
-		       "<use>%d</use><hooknum>%s</hooknum>",
+	ret = snprintf(buf, size, "<chain><name>%s</name>"
+		       "<handle>%"PRIu64"</handle><bytes>%"PRIu64"</bytes>"
+		       "<packets>%"PRIu64"</packets><type>%s</type>"
+		       "<table>%s</table><prio>%d</prio><use>%d</use>"
+		       "<hooknum>%s</hooknum>",
 		       c->name, c->handle, c->bytes, c->packets,
 		       c->type, c->table,
 		       c->prio, c->use, hooknum2str_array[c->hooknum]);

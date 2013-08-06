@@ -1,4 +1,5 @@
-<table name="nat">
+<table>
+	<name>nat</name>
 	<family>ip6</family>
 	<table_flags>0</table_flags>
 </table>

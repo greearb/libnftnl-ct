@@ -1,4 +1,8 @@
-<rule family="ip" table="filter" chain="output" handle="17">
+<rule>
+	<family>ip</family>
+	<table>filter</table>
+	<chain>output</chain>
+	<handle>17</handle>
 	<rule_flags>0</rule_flags>
 	<expr type="ct">
 		<dreg>1</dreg>

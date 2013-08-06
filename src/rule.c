@@ -477,8 +477,8 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	mxml_node_t *node = NULL;
 	mxml_node_t *save = NULL;
 	struct nft_rule_expr *e;
-	char *endptr = NULL;
-	uint64_t tmp;
+	const char *table;
+	const char *chain;
 	int family;
 
 	/* Load the tree */
@@ -486,13 +486,12 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	if (tree == NULL)
 		return -1;
 
-	/* get and set <rule ... family=X ... > */
-	if (mxmlElementGetAttr(tree, "family") == NULL) {
+	if (strcmp(tree->value.opaque, "rule") != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	family = nft_str2family(mxmlElementGetAttr(tree, "family"));
+	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
 	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;
@@ -501,8 +500,8 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	r->family = family;
 	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
 
-	/* get and set <rule ... table=X ...> */
-	if (mxmlElementGetAttr(tree, "table") == NULL) {
+	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST);
+	if (table == NULL) {
 		mxmlDelete(tree);
 		return -1;
 	}
@@ -510,11 +509,11 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	if (r->table)
 		xfree(r->table);
 
-	r->table = strdup(mxmlElementGetAttr(tree, "table"));
+	r->table = (char *)table;
 	r->flags |= (1 << NFT_RULE_ATTR_TABLE);
 
-	/* get and set <rule ... chain=X ...> */
-	if (mxmlElementGetAttr(tree, "chain") == NULL) {
+	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST);
+	if (chain == NULL) {
 		mxmlDelete(tree);
 		return -1;
 	}
@@ -522,21 +521,15 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	if (r->chain)
 		xfree(r->chain);
 
-	r->chain = strdup(mxmlElementGetAttr(tree, "chain"));
+	r->chain = (char *)chain;
 	r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
 
-	/* get and set <rule ... handle=X ...> */
-	if (mxmlElementGetAttr(tree, "handle") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-	tmp = strtoull(mxmlElementGetAttr(tree, "handle"), &endptr, 10);
-	if (tmp == UINT64_MAX || tmp < 0 || *endptr) {
+	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
+			       &r->handle, NFT_TYPE_U64) != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
 
-	r->handle = tmp;
 	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 
 	/* get and set <rule_flags> */
@@ -551,28 +544,26 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	/* <compat_proto> is optional */
 	node = mxmlFindElement(tree, tree, "compat_proto", NULL, NULL,
 			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+	if (node != NULL && node->child != NULL) {
+		if (nft_strtoi(node->child->value.opaque, BASE_DEC,
+			       &r->compat.proto, NFT_TYPE_U32) != 0) {
 			mxmlDelete(tree);
 			return -1;
 		}
 
-		r->compat.proto = tmp;
 		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_PROTO);
 	}
 
 	/* <compat_flags> is optional */
 	node = mxmlFindElement(tree, tree, "compat_flags", NULL, NULL,
 			       MXML_DESCEND);
-	if (node != NULL) {
-		tmp = strtoull(node->child->value.opaque, &endptr, 10);
-		if (tmp > UINT32_MAX || tmp < 0 || *endptr) {
+	if (node != NULL && node->child != NULL) {
+		if (nft_strtoi(node->child->value.opaque, BASE_DEC,
+			       &r->compat.flags, NFT_TYPE_U32) != 0) {
 			mxmlDelete(tree);
 			return -1;
 		}
 
-		r->compat.flags = tmp;
 		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_FLAGS);
 	}
 
@@ -676,11 +667,11 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 	int ret, len = size, offset = 0;
 	struct nft_rule_expr *expr;
 
-	ret = snprintf(buf, size,
-		"<rule family=\"%s\" table=\"%s\" "
-			"chain=\"%s\" handle=\"%llu\">",
-				nft_family2str(r->family), r->table, r->chain,
-				(unsigned long long)r->handle);
+	ret = snprintf(buf, size, "<rule><family>%s</family>"
+		       "<table>%s</table><chain>%s</chain>"
+		       "<handle>%llu</handle>",
+		       nft_family2str(r->family), r->table, r->chain,
+		       (unsigned long long)r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "<rule_flags>%u</rule_flags>",

@@ -222,7 +222,7 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree = NULL;
-	mxml_node_t *node = NULL;
+	const char *name;
 	int family;
 
 	/* NOTE: all XML nodes are mandatory */
@@ -232,8 +232,13 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	if (tree == NULL)
 		return -1;
 
-	/* Get and set the name of the table */
-	if (mxmlElementGetAttr(tree, "name") == NULL) {
+	if (strcmp(tree->value.opaque, "table") != 0) {
+		mxmlDelete(tree);
+		return -1;
+	}
+
+	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST);
+	if (name == NULL) {
 		mxmlDelete(tree);
 		return -1;
 	}
@@ -241,18 +246,10 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	if (t->name)
 		xfree(t->name);
 
-	t->name = strdup(mxmlElementGetAttr(tree, "name"));
+	t->name = name;
 	t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 
-	/* Get the and set <family> node */
-	node = mxmlFindElement(tree, tree, "family", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	family = nft_str2family(node->child->value.opaque);
+	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
 	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;
@@ -261,7 +258,6 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	t->family = family;
 	t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
 
-	/* Get and set <table_flags> */
 	if (nft_mxml_num_parse(tree, "table_flags", MXML_DESCEND, BASE_DEC,
 			       &t->table_flags, NFT_TYPE_U32) != 0) {
 		mxmlDelete(tree);
@@ -360,7 +356,7 @@ static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
-	return snprintf(buf, size, "<table name=\"%s\"><family>%s</family>"
+	return snprintf(buf, size, "<table><name>%s</name><family>%s</family>"
 			"<table_flags>%d</table_flags></table>",
 			t->name, nft_family2str(t->family), t->table_flags);
 }

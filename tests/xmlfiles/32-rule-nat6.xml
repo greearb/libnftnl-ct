@@ -1,4 +1,8 @@
-<rule family="ip6" table="nat" chain="OUTPUT" handle="100">
+<rule>
+	<family>ip6</family>
+	<table>nat</table>
+	<chain>OUTPUT</chain>
+	<handle>100</handle>
 	<rule_flags>0</rule_flags>
 	<expr type="nat">
 		<family>ip6</family>

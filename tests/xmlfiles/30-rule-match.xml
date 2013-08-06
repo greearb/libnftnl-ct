@@ -1,4 +1,8 @@
-<rule family="ip" table="filter" chain="INPUT" handle="100">
+<rule>
+	<family>ip</family>
+	<table>filter</table>
+	<chain>INPUT</chain>
+	<handle>100</handle>
 	<rule_flags>0</rule_flags>
 	<expr type="match">
 		<name>state</name>

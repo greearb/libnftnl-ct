@@ -1,4 +1,8 @@
-<rule family="ip6" table="filter" chain="test" handle="36">
+<rule>
+	<family>ip6</family>
+	<table>filter</table>
+	<chain>test</chain>
+	<handle>36</handle>
 	<rule_flags>0</rule_flags>
 	<expr type="meta">
 		<dreg>1</dreg>

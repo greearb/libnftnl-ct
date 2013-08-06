@@ -166,6 +166,25 @@ const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
 	return strdup(node->child->value.opaque);
 }
 
+int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name,
+			  uint32_t mxml_flags)
+{
+	const char *family_str;
+	int family;
+
+	family_str = nft_mxml_str_parse(tree, node_name, mxml_flags);
+	if (family_str == NULL)
+		return -1;
+
+	family = nft_str2family(family_str);
+	xfree(family_str);
+
+	if (family < 0)
+		errno = EAFNOSUPPORT;
+
+	return family;
+}
+
 struct nft_set_elem *nft_mxml_set_elem_parse(mxml_node_t *node)
 {
 	mxml_node_t *save;

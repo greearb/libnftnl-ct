@@ -1,4 +1,8 @@
-<chain name="test" handle="0" bytes="0" packets="0">
+<chain>
+	<name>test</name>
+	<handle>0</handle>
+	<bytes>0</bytes>
+	<packets>0</packets>
 	<type>filter</type>
 	<table>filter</table>
 	<prio>0</prio>

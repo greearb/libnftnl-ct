@@ -1,4 +1,8 @@
-<chain name="foo" handle="100" bytes="59264154979" packets="2548796325">
+<chain>
+	<name>foo</name>
+	<handle>100</handle>
+	<bytes>59264154979</bytes>
+	<packets>2548796325</packets>
 	<type>nat</type>
 	<table>nat</table>
 	<prio>0</prio>

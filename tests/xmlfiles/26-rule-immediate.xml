@@ -1,4 +1,8 @@
-<rule family="ip" table="filter" chain="input" handle="32">
+<rule>
+	<family>ip</family>
+	<table>filter</table>
+	<chain>input</chain>
+	<handle>32</handle>
 	<rule_flags>0</rule_flags>
 	<expr type="immediate">
 		<dreg>0</dreg>
