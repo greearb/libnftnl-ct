@@ -221,27 +221,20 @@ EXPORT_SYMBOL(nft_table_nlmsg_parse);
 static int nft_table_xml_parse(struct nft_table *t, char *xml)
 {
 #ifdef XML_PARSING
-	mxml_node_t *tree = NULL;
+	mxml_node_t *tree;
 	const char *name;
 	int family;
 
-	/* NOTE: all XML nodes are mandatory */
-
-	/* Load the tree */
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
 		return -1;
 
-	if (strcmp(tree->value.opaque, "table") != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (strcmp(tree->value.opaque, "table") != 0)
+		goto err;
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST);
-	if (name == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (name == NULL)
+		goto err;
 
 	if (t->name)
 		xfree(t->name);
@@ -250,24 +243,23 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
-	if (family < 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (family < 0)
+		goto err;
 
 	t->family = family;
 	t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
 
 	if (nft_mxml_num_parse(tree, "table_flags", MXML_DESCEND, BASE_DEC,
-			       &t->table_flags, NFT_TYPE_U32) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+			       &t->table_flags, NFT_TYPE_U32) != 0)
+		goto err;
 
 	t->flags |= (1 << NFT_TABLE_ATTR_FLAGS);
 
 	mxmlDelete(tree);
 	return 0;
+err:
+	mxmlDelete(tree);
+	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;

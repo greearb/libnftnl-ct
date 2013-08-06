@@ -585,65 +585,49 @@ err:
 static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 {
 #ifdef XML_PARSING
-	mxml_node_t *tree = NULL;
-	mxml_node_t *node = NULL;
+	mxml_node_t *tree;
+	mxml_node_t *node;
 	const char *name;
 	const char *hooknum_str;
 	int family, hooknum;
 
-	/* NOTE: all XML nodes are mandatory */
-
-	/* Load the tree */
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
 		return -1;
 
-	if (strcmp(tree->value.opaque, "chain") != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (strcmp(tree->value.opaque, "chain") != 0)
+		goto err;
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST);
-	if (name == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (name == NULL)
+		goto err;
 
 	strncpy(c->name, name, NFT_CHAIN_MAXNAMELEN);
 	xfree(name);
 	c->flags |= (1 << NFT_CHAIN_ATTR_NAME);
 
 	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
-			       &c->handle, NFT_TYPE_U64) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+			       &c->handle, NFT_TYPE_U64) != 0)
+		goto err;
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_HANDLE);
 
 	if (nft_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
-			       &c->bytes, NFT_TYPE_U64) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+			       &c->bytes, NFT_TYPE_U64) != 0)
+		goto err;
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_BYTES);
 
 	if (nft_mxml_num_parse(tree, "packets", MXML_DESCEND_FIRST, BASE_DEC,
-			       &c->packets, NFT_TYPE_U64) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+			       &c->packets, NFT_TYPE_U64) != 0)
+		goto err;
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_PACKETS);
 
-	/* Get and set <type> */
 	node = mxmlFindElement(tree, tree, "type", NULL, NULL,
 			       MXML_DESCEND_FIRST);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (node == NULL)
+		goto err;
 
 	if (c->type)
 		xfree(c->type);
@@ -651,78 +635,61 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	c->type = strdup(node->child->value.opaque);
 	c->flags |= (1 << NFT_CHAIN_ATTR_TYPE);
 
-	/* Get and set <table> */
 	node = mxmlFindElement(tree, tree, "table", NULL, NULL,	MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (node == NULL)
+		goto err;
+
 	if (c->table)
 		xfree(c->table);
 
 	c->table = strdup(node->child->value.opaque);
 	c->flags |= (1 << NFT_CHAIN_ATTR_TABLE);
 
-	/* Get and set <prio> */
 	if (nft_mxml_num_parse(tree, "prio", MXML_DESCEND, BASE_DEC, &c->prio,
-			       NFT_TYPE_S32) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+			       NFT_TYPE_S32) != 0)
+		goto err;
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_PRIO);
 
-	/* Ignore <use> (cannot be set)*/
-	node = mxmlFindElement(tree, tree, "use", NULL, NULL, MXML_DESCEND);
-
-
 	hooknum_str = nft_mxml_str_parse(tree, "hooknum", MXML_DESCEND_FIRST);
-	if (hooknum_str == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (hooknum_str == NULL)
+		goto err;
 
 	hooknum = nft_str2hooknum(hooknum_str);
 	xfree(hooknum_str);
 
-	if (hooknum < 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (hooknum < 0)
+		goto err;
 
 	c->hooknum = hooknum;
 	c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
 
-	/* Get and set <policy> */
 	node = mxmlFindElement(tree, tree, "policy", NULL, NULL, MXML_DESCEND);
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (node == NULL)
+		goto err;
 
 	if (strcmp(node->child->value.opaque, "accept") == 0) {
 		c->policy = NF_ACCEPT;
 	} else if (strcmp(node->child->value.opaque, "drop") == 0) {
 		c->policy = NF_DROP;
-	} else {
-		mxmlDelete(tree);
-		return -1;
-	}
+	} else
+		goto err;
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);
 
 	/* Get and set <family> */
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
-	if (family < 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (family < 0)
+		goto err;
 
 	c->family = family;
 	c->flags |= (1 << NFT_CHAIN_ATTR_FAMILY);
 
 	mxmlDelete(tree);
 	return 0;
+err:
+	mxmlDelete(tree);
+	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
