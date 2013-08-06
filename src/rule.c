@@ -34,8 +34,8 @@ struct nft_rule {
 	struct list_head head;
 
 	uint32_t	flags;
-	char		*table;
-	char		*chain;
+	const char	*table;
+	const char	*chain;
 	uint8_t		family;
 	uint32_t	rule_flags;
 	uint64_t	handle;
@@ -509,7 +509,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	if (r->table)
 		xfree(r->table);
 
-	r->table = (char *)table;
+	r->table = table;
 	r->flags |= (1 << NFT_RULE_ATTR_TABLE);
 
 	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST);
@@ -521,7 +521,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	if (r->chain)
 		xfree(r->chain);
 
-	r->chain = (char *)chain;
+	r->chain = chain;
 	r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
 
 	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
