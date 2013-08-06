@@ -16,7 +16,7 @@ struct nft_rule_expr;
 struct expr_ops {
 	struct list_head head;
 
-	char	*name;
+	const char *name;
 	size_t	alloc_len;
 	int	max_attr;
 	int	(*set)(struct nft_rule_expr *e, uint16_t type, const void *data, size_t data_len);

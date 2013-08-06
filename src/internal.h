@@ -73,8 +73,8 @@ struct nft_set {
 
 	uint32_t		family;
 	uint32_t		set_flags;
-	char			*table;
-	char			*name;
+	const char		*table;
+	const char		*name;
 	uint32_t		key_type;
 	uint32_t		key_len;
 	uint32_t		data_type;

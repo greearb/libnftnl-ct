@@ -26,7 +26,7 @@ struct nft_expr_log {
 	uint32_t		group;
 	uint32_t		snaplen;
 	uint32_t		qthreshold;
-	char			*prefix;
+	const char		*prefix;
 };
 
 static int

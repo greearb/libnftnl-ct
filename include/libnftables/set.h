@@ -26,7 +26,7 @@ void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data);
 void nft_set_attr_set_u32(struct nft_set *s, uint16_t attr, uint32_t val);
 void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, const char *str);
 
-void *nft_set_attr_get(struct nft_set *s, uint16_t attr);
+const void *nft_set_attr_get(struct nft_set *s, uint16_t attr);
 const char *nft_set_attr_get_str(struct nft_set *s, uint16_t attr);
 uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr);
 

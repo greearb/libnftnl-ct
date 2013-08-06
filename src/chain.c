@@ -31,8 +31,8 @@ struct nft_chain {
 	struct list_head head;
 
 	char		name[NFT_CHAIN_MAXNAMELEN];
-	char		*type;
-	char		*table;
+	const char	*type;
+	const char	*table;
 	uint8_t		family;
 	uint32_t	policy;
 	uint32_t	hooknum;
@@ -186,7 +186,7 @@ void nft_chain_attr_set_str(struct nft_chain *c, uint16_t attr, const char *str)
 }
 EXPORT_SYMBOL(nft_chain_attr_set_str);
 
-void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
+const void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
 {
 	if (!(c->flags & (1 << attr)))
 		return NULL;
@@ -227,21 +227,21 @@ EXPORT_SYMBOL(nft_chain_attr_get_str);
 
 uint32_t nft_chain_attr_get_u32(struct nft_chain *c, uint16_t attr)
 {
-	uint32_t *val = nft_chain_attr_get(c, attr);
+	const uint32_t *val = nft_chain_attr_get(c, attr);
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_chain_attr_get_u32);
 
 int32_t nft_chain_attr_get_s32(struct nft_chain *c, uint16_t attr)
 {
-	int32_t *val = nft_chain_attr_get(c, attr);
+	const int32_t *val = nft_chain_attr_get(c, attr);
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_chain_attr_get_s32);
 
 uint64_t nft_chain_attr_get_u64(struct nft_chain *c, uint16_t attr)
 {
-	uint64_t *val = nft_chain_attr_get(c, attr);
+	const uint64_t *val = nft_chain_attr_get(c, attr);
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_chain_attr_get_u64);

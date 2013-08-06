@@ -28,7 +28,7 @@
 struct nft_table {
 	struct list_head head;
 
-	char		*name;
+	const char	*name;
 	uint8_t		family;
 	uint32_t	table_flags;
 	uint32_t	flags;

@@ -148,7 +148,7 @@ void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, const char *str)
 }
 EXPORT_SYMBOL(nft_set_attr_set_str);
 
-void *nft_set_attr_get(struct nft_set *s, uint16_t attr)
+const void *nft_set_attr_get(struct nft_set *s, uint16_t attr)
 {
 	if (!(s->flags & (1 << attr)))
 		return NULL;
