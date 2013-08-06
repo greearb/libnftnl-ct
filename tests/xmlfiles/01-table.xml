@@ -1,5 +1,5 @@
 <table>
 	<name>filter</name>
 	<family>ip</family>
-	<table_flags>0</table_flags>
+	<flags>0</flags>
 </table>

@@ -3,7 +3,7 @@
 	<table>filter</table>
 	<chain>output</chain>
 	<handle>11</handle>
-	<rule_flags>0</rule_flags>
+	<flags>0</flags>
 	<expr type="payload">
 		<dreg>1</dreg>
 		<offset>9</offset>

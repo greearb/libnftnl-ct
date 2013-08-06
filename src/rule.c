@@ -533,7 +533,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 
 	/* get and set <rule_flags> */
-	if (nft_mxml_num_parse(tree, "rule_flags", MXML_DESCEND_FIRST,
+	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
 			       BASE_DEC, &r->rule_flags, NFT_TYPE_U32) != 0) {
 		mxmlDelete(tree);
 		return -1;
@@ -669,13 +669,9 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 
 	ret = snprintf(buf, size, "<rule><family>%s</family>"
 		       "<table>%s</table><chain>%s</chain>"
-		       "<handle>%llu</handle>",
+		       "<handle>%llu</handle><flags>%u</flags>",
 		       nft_family2str(r->family), r->table, r->chain,
-		       (unsigned long long)r->handle);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	ret = snprintf(buf+offset, len, "<rule_flags>%u</rule_flags>",
-		       r->rule_flags);
+		       (unsigned long long)r->handle, r->rule_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (r->compat.flags != 0 || r->compat.proto != 0) {

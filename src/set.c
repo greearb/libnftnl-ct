@@ -321,7 +321,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	if (strcmp(tree->value.opaque, "set") != 0)
 		goto err;
 
-	name = nft_mxml_str_parse(tree, "set_name", MXML_DESCEND_FIRST);
+	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST);
 	if (name == NULL)
 		goto err;
 
@@ -331,14 +331,14 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	s->name = name;
 	s->flags |= (1 << NFT_SET_ATTR_NAME);
 
-	table = nft_mxml_str_parse(tree, "set_table", MXML_DESCEND_FIRST);
+	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST);
 	if (table == NULL)
 		goto err;
 
 	if (s->table)
 		xfree(s->table);
 
-	s->table = strdup(table);
+	s->table = table;
 	s->flags |= (1 << NFT_SET_ATTR_TABLE);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
@@ -349,7 +349,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 
 	s->flags |= (1 << NFT_SET_ATTR_FAMILY);
 
-	if (nft_mxml_num_parse(tree, "set_flags", MXML_DESCEND_FIRST,
+	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
 			       BASE_DEC, &s->set_flags, NFT_TYPE_U32) != 0)
 		goto err;
 
@@ -509,9 +509,9 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 	struct nft_set_elem *elem;
 
 	ret = snprintf(buf, size, "<set><family>%s</family>"
-				  "<set_table>%s</set_table>"
-				  "<set_name>%s</set_name>"
-				  "<set_flags>%u</set_flags>"
+				  "<table>%s</table>"
+				  "<name>%s</name>"
+				  "<flags>%u</flags>"
 				  "<key_type>%u</key_type>"
 				  "<key_len>%u</key_len>"
 				  "<data_type>%u</data_type>"

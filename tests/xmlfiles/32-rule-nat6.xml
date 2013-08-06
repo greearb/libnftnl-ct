@@ -3,7 +3,7 @@
 	<table>nat</table>
 	<chain>OUTPUT</chain>
 	<handle>100</handle>
-	<rule_flags>0</rule_flags>
+	<flags>0</flags>
 	<expr type="nat">
 		<family>ip6</family>
 		<nat_type>snat</nat_type>

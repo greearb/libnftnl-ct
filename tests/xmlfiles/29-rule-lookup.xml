@@ -3,7 +3,7 @@
 	<table>filter</table>
 	<chain>test</chain>
 	<handle>37</handle>
-	<rule_flags>0</rule_flags>
+	<flags>0</flags>
 	<expr type="lookup">
 		<set>set0</set>
 		<sreg>1</sreg>

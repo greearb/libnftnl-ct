@@ -3,7 +3,7 @@
 	<table>filter</table>
 	<chain>output</chain>
 	<handle>23</handle>
-	<rule_flags>0</rule_flags>
+	<flags>0</flags>
 	<expr type="meta">
 		<dreg>1</dreg>
 		<key>iif</key>

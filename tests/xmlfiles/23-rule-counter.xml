@@ -3,7 +3,7 @@
 	<table>filter</table>
 	<chain>test</chain>
 	<handle>39</handle>
-	<rule_flags>0</rule_flags>
+	<flags>0</flags>
 	<expr type="counter">
 		<pkts>3</pkts>
 		<bytes>177</bytes>

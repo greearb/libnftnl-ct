@@ -249,7 +249,7 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	t->family = family;
 	t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
 
-	if (nft_mxml_num_parse(tree, "table_flags", MXML_DESCEND, BASE_DEC,
+	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND, BASE_DEC,
 			       &t->table_flags, NFT_TYPE_U32) != 0)
 		goto err;
 
@@ -349,7 +349,7 @@ static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
 	return snprintf(buf, size, "<table><name>%s</name><family>%s</family>"
-			"<table_flags>%d</table_flags></table>",
+			"<flags>%d</flags></table>",
 			t->name, nft_family2str(t->family), t->table_flags);
 }
 
