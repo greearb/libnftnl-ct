@@ -355,7 +355,6 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 
 	s->flags |= (1 << NFT_SET_ATTR_FLAGS);
 
-
 	if (nft_mxml_num_parse(tree, "key_type", MXML_DESCEND_FIRST,
 			       BASE_DEC, &s->key_type, NFT_TYPE_U32) != 0)
 		goto err;
@@ -380,15 +379,17 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 
 	s->flags |= (1 << NFT_SET_ATTR_DATA_LEN);
 
-	/* Iterate over each <set_elem> */
 	for (node = mxmlFindElement(tree, tree, "set_elem", NULL,
 				    NULL, MXML_DESCEND);
 		node != NULL;
 		node = mxmlFindElement(node, tree, "set_elem", NULL,
 				       NULL, MXML_DESCEND)) {
 
-		elem = nft_mxml_set_elem_parse(node);
+		elem = nft_set_elem_alloc();
 		if (elem == NULL)
+			goto err;
+
+		if (nft_mxml_set_elem_parse(node, elem) < 0)
 			goto err;
 
 		list_add_tail(&elem->head, &s->element_list);

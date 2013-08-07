@@ -37,7 +37,9 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name, union nft_
 int nft_mxml_num_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags, int base, void *number, enum nft_type type);
 const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags);
 int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags);
-struct nft_set_elem *nft_mxml_set_elem_parse(mxml_node_t *node);
+
+struct nft_set_elem;
+int nft_mxml_set_elem_parse(mxml_node_t *node, struct nft_set_elem *e);
 #endif
 
 #ifdef JSON_PARSING

@@ -375,34 +375,21 @@ int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_elems_nlmsg_parse);
 
-static int nft_set_elem_xml_parse(struct nft_set_elem *e, char *xml)
-{
 #ifdef XML_PARSING
-	mxml_node_t *tree;
+int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e)
+{
 	mxml_node_t *node;
 	int set_elem_data;
-
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL) {
-		errno = EINVAL;
-		return -1;
-	}
-
-	if (strcmp(tree->value.opaque, "set_elem") != 0) {
-		errno = EINVAL;
-		goto err;
-	}
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
 			       BASE_DEC, &e->set_elem_flags,
 			       NFT_TYPE_U32) != 0)
-		goto err;
+		return -1;
 
 	e->flags |= (1 << NFT_SET_ELEM_ATTR_FLAGS);
 
-	if (nft_mxml_data_reg_parse(tree, "key",
-				    &e->key) != DATA_VALUE)
-		goto err;
+	if (nft_mxml_data_reg_parse(tree, "key", &e->key) != DATA_VALUE)
+		return -1;
 
 	e->flags |= (1 << NFT_SET_ELEM_ATTR_KEY);
 
@@ -423,13 +410,33 @@ static int nft_set_elem_xml_parse(struct nft_set_elem *e, char *xml)
 			e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
 			break;
 		default:
-			goto err;
+			return -1;
 		}
 	}
-
-	mxmlDelete(tree);
 	return 0;
+}
+#endif
 
+static int nft_set_elem_xml_parse(struct nft_set_elem *e, char *xml)
+{
+#ifdef XML_PARSING
+	mxml_node_t *tree;
+	int ret;
+
+	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	if (tree == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (strcmp(tree->value.opaque, "set_elem") != 0) {
+		errno = EINVAL;
+		goto err;
+	}
+
+	ret = nft_mxml_set_elem_parse(tree, e);
+	mxmlDelete(tree);
+	return ret;
 err:
 	mxmlDelete(tree);
 	return -1;
