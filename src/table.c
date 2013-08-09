@@ -285,13 +285,8 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 
 	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, strdup(str));
 
-	str = nft_jansson_value_parse_str(root, "family");
-	if (str == NULL)
-		goto err;
-
-	family = nft_str2family(str);
-	if (family < 0)
-		goto err;
+	if (nft_jansson_parse_family(root, &family) != 0)
+		return -1;
 
 	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
 

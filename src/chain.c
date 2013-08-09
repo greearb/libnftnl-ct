@@ -517,14 +517,8 @@ static int nft_chain_json_parse(struct nft_chain *c, char *json)
 
 	nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_PACKETS, uval64);
 
-	valstr = nft_jansson_value_parse_str(root, "family");
-
-	if (valstr == NULL)
-		goto err;
-
-	val32 = nft_str2family(valstr);
-	if (val32 == -1)
-		goto err;
+	if (nft_jansson_parse_family(root, &val32) != 0)
+		return -1;
 
 	nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_FAMILY, val32);
 

@@ -90,4 +90,22 @@ json_t *nft_jansson_get_root(char *json, const char *tag, json_error_t *err)
 
 	return root;
 }
+int nft_jansson_parse_family(json_t *root, void *out)
+{
+	const char *str;
+	int family;
+
+	str = nft_jansson_value_parse_str(root, "family");
+	if (str == NULL)
+		return -1;
+
+	family = nft_str2family(str);
+	if (family < 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	memcpy(out, &family, sizeof(family));
+	return 0;
+}
 #endif
