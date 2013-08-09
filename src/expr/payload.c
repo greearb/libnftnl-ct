@@ -216,6 +216,7 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	if (base < 0)
 		return -1;
 
+	payload->base = base;
 	e->flags |= (1 << NFT_EXPR_PAYLOAD_BASE);
 
 	if (nft_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
