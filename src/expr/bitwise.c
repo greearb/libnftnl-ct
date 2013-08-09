@@ -238,8 +238,9 @@ nft_rule_expr_bitwise_snprintf_json(char *buf, size_t size,
 	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "\"sreg\" : %u, "
-				"\"dreg\" : %u, ",
-		       bitwise->sreg, bitwise->dreg);
+				"\"dreg\" : %u, "
+				"\"len\" : %u, ",
+		       bitwise->sreg, bitwise->dreg, bitwise->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "\"mask\" : {");

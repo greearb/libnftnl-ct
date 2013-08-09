@@ -250,10 +250,10 @@ nft_data_reg_value_snprintf_json(char *buf, size_t size,
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 
-		ret = snprintf(buf+offset, len, "\"");
+		ret = snprintf(buf+offset, len, "\", ");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
+	offset -= 2;
 	ret = snprintf(buf+offset, len, "}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
