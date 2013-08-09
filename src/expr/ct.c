@@ -226,6 +226,30 @@ err:
 }
 
 static int
+nft_expr_ct_snprintf_json(char *buf, size_t size, struct nft_rule_expr *e)
+{
+	int ret, len = size, offset = 0;
+	struct nft_expr_ct *ct = nft_expr_data(e);
+
+	ret = snprintf(buf, size, "\"dreg\" : %u", ct->dreg);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (e->flags & (1 << NFT_EXPR_CT_KEY)) {
+		ret = snprintf(buf+offset, size, ", \"key\" : \"%s\"",
+						ctkey2str(ct->key));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFT_EXPR_CT_DIR)) {
+		ret = snprintf(buf+offset, size, ", \"dir\" : %u", ct->dir);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+
+}
+
+static int
 nft_rule_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
 			    uint32_t flags, struct nft_rule_expr *e)
 {
@@ -241,10 +265,7 @@ nft_rule_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
 					  "<dir>%u</dir>",
 				ct->dreg, ctkey2str(ct->key), ct->dir);
 	case NFT_RULE_O_JSON:
-		return snprintf(buf, len, "\"dreg\" : %u, "
-					  "\"key\" : \"%s\", "
-					  "\"dir\" : %u",
-				ct->dreg, ctkey2str(ct->key), ct->dir);
+		return nft_expr_ct_snprintf_json(buf, len, e);
 	default:
 		break;
 	}
