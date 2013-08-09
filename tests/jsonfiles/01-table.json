@@ -1,1 +1,1 @@
-{"table" : {"name" : "filter","family" : "ip","table_flags" : 0}}
+{"table" : {"name" : "filter","family" : "ip","flags" : 0}}

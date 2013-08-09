@@ -629,8 +629,7 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 				(unsigned long long)r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "\"rule_flags\" : %u, ",
-					r->rule_flags);
+	ret = snprintf(buf+offset, len, "\"flags\" : %u, ", r->rule_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO) ||
