@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <limits.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -178,13 +179,27 @@ nft_rule_expr_payload_snprintf_json(char *buf, size_t len, uint32_t flags,
 	return offset;
 }
 
+static inline int nft_str2base(const char *base)
+{
+	if (strcmp(base, "link") == 0)
+		return NFT_PAYLOAD_LL_HEADER;
+	else if (strcmp(base, "network") == 0)
+		return NFT_PAYLOAD_NETWORK_HEADER;
+	else if (strcmp(base, "transport") == 0)
+		return NFT_PAYLOAD_TRANSPORT_HEADER;
+	else {
+		errno = EINVAL;
+		return -1;
+	}
+}
+
 static int
 nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_payload *payload = nft_expr_data(e);
 	const char *base_str;
-	int32_t reg;
+	int32_t reg, base;
 
 	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
 	if (reg < 0)
@@ -197,14 +212,9 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	if (base_str == NULL)
 		return -1;
 
-	if (strcmp(base_str, "link") == 0)
-		payload->base = NFT_PAYLOAD_LL_HEADER;
-	else if (strcmp(base_str, "network") == 0)
-		payload->base = NFT_PAYLOAD_NETWORK_HEADER;
-	else if (strcmp(base_str, "transport") == 0)
-		payload->base = NFT_PAYLOAD_TRANSPORT_HEADER;
-	else
-		goto err;
+	base = nft_str2base(base_str);
+	if (base < 0)
+		return -1;
 
 	e->flags |= (1 << NFT_EXPR_PAYLOAD_BASE);
 
@@ -220,9 +230,6 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 
 	e->flags |= (1 << NFT_EXPR_PAYLOAD_LEN);
 	return 0;
-err:
-	errno = EINVAL;
-	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
