@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <limits.h>
+#include <string.h>
 #include <errno.h>
 #include <arpa/inet.h>
 #include <libmnl/libmnl.h>
@@ -183,6 +184,17 @@ nft_rule_expr_nat_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 				 htonl(nat->sreg_proto_max));
 }
 
+static inline int nft_str2nat(const char *nat)
+{
+	if (strcmp(nat, "snat") == 0)
+		return NFT_NAT_SNAT;
+	else if (strcmp(nat, "dnat") == 0)
+		return NFT_NAT_DNAT;
+	else {
+		errno = EINVAL;
+		return -1;
+	}
+}
 
 static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
@@ -190,19 +202,17 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	struct nft_expr_nat *nat = nft_expr_data(e);
 	const char *nat_type;
 	int32_t reg;
-	int family;
+	int family, nat_type_value;
 
 	nat_type = nft_mxml_str_parse(tree, "nat_type", MXML_DESCEND_FIRST);
 	if (nat_type == NULL)
 		return -1;
 
-	if (strcmp(nat_type, "snat") == 0) {
-		nat->type = NFT_NAT_SNAT;
-	} else if (strcmp(nat_type, "dnat") == 0) {
-		nat->type = NFT_NAT_DNAT;
-	} else
-		goto err;
+	nat_type_value = nft_str2nat(nat_type);
+	if (nat_type_value < 0)
+		return -1;
 
+	nat->type = nat_type_value;
 	e->flags |= (1 << NFT_EXPR_NAT_TYPE);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
@@ -243,9 +253,6 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MAX);
 
 	return 0;
-err:
-	errno = EINVAL;
-	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
