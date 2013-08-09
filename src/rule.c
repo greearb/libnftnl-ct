@@ -633,10 +633,11 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 					r->rule_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	if(NFT_RULE_ATTR_COMPAT_PROTO != 0 || NFT_RULE_ATTR_COMPAT_FLAGS != 0){
-		ret = snprintf(buf+offset,len,"\"compat_flags\" : %u, "
-									  "\"compat_proto\" : %u, ",
-					r->compat.flags, r->compat.proto);
+	if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO) ||
+	    r->flags & (1 << NFT_RULE_ATTR_COMPAT_FLAGS)) {
+		ret = snprintf(buf+offset, len, "\"compat_flags\" : %u, "
+					        "\"compat_proto\" : %u, ",
+			       r->compat.flags, r->compat.proto);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
