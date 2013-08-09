@@ -262,7 +262,7 @@ nft_rule_expr_nat_snprintf_json(char *buf, size_t size,
 	if (nat->type == NFT_NAT_SNAT)
 		ret = snprintf(buf, len, "\"nat_type\" : \"snat\", ");
 	else if (nat->type == NFT_NAT_DNAT)
-		ret = snprintf(buf, len, "\nat_type\" : \"dnat\", ");
+		ret = snprintf(buf, len, "\"nat_type\" : \"dnat\", ");
 
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
