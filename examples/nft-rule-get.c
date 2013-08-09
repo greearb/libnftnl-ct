@@ -14,6 +14,7 @@
 #include <string.h>
 #include <netinet/in.h>
 
+#include <linux/netfilter.h>
 #include <linux/netfilter/nf_tables.h>
 
 #include <libmnl/libmnl.h>
@@ -52,12 +53,32 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, type = NFT_RULE_O_DEFAULT;
 	struct nft_rule *t = NULL;
-	int ret;
+	int ret, family;
 
-	if (argc == 2 && strcmp(argv[1], "xml") == 0 ){
-		type = NFT_RULE_O_XML;
-	}else if (argc == 2 && strcmp(argv[1], "json") == 0 ){
-		type = NFT_RULE_O_JSON;
+	if (argc < 2 || argc > 3) {
+		fprintf(stderr, "Usage: %s <family> [xml|json]\n",
+			argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	if (strcmp(argv[1], "ip") == 0)
+		family = NFPROTO_IPV4;
+	else if (strcmp(argv[1], "ip6") == 0)
+		family = NFPROTO_IPV6;
+	else if (strcmp(argv[1], "bridge") == 0)
+		family = NFPROTO_BRIDGE;
+	else if (strcmp(argv[1], "arp") == 0)
+		family = NFPROTO_ARP;
+	else {
+		fprintf(stderr, "Unknown family: ip, ip6, bridge, arp\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (argc == 3) {
+		if (strcmp(argv[2], "xml") == 0)
+			type = NFT_RULE_O_XML;
+		else if (strcmp(argv[2], "json") == 0)
+			type = NFT_RULE_O_JSON;
 	}
 
 	/* XXX requires table, chain and handle attributes for selective get */
@@ -69,7 +90,7 @@ int main(int argc, char *argv[])
 	}
 
 	seq = time(NULL);
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, AF_INET,
+	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
 					NLM_F_DUMP, seq);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
