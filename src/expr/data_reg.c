@@ -359,8 +359,8 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 		case NFT_RULE_O_JSON:
 			return snprintf(buf, size,
 					"\"data_reg\": { \"type\" : \"chain\", "
-						"\"chain\" : %d"
-					"}", reg->verdict);
+						"\"chain\" : \"%s\""
+					"}", reg->chain);
 		default:
 			break;
 		}
