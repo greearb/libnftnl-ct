@@ -242,21 +242,21 @@ nft_rule_expr_bitwise_snprintf_json(char *buf, size_t size,
 		       bitwise->sreg, bitwise->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "\"mask\" : ");
+	ret = snprintf(buf+offset, len, "\"mask\" : {");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->mask,
 				    NFT_RULE_O_JSON, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, ", \"xor\" : ");
+	ret = snprintf(buf+offset, len, "}, \"xor\" : {");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->xor,
 				    NFT_RULE_O_JSON, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "\"");
+	ret = snprintf(buf+offset, len, "}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
