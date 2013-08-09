@@ -154,12 +154,32 @@ static char *expr_cmp_str[] = {
 	[NFT_CMP_GTE]	= "gte",
 };
 
+static inline int nft_str2cmp(const char *op)
+{
+	if (strcmp(op, "eq") == 0)
+		return NFT_CMP_EQ;
+	else if (strcmp(op, "neq") == 0)
+		return NFT_CMP_NEQ;
+	else if (strcmp(op, "lt") == 0)
+		return NFT_CMP_LT;
+	else if (strcmp(op, "lte") == 0)
+		return NFT_CMP_LTE;
+	else if (strcmp(op, "gt") == 0)
+		return NFT_CMP_GT;
+	else if (strcmp(op, "gte") == 0)
+		return NFT_CMP_GTE;
+	else {
+		errno = EINVAL;
+		return -1;
+	}
+}
+
 static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_cmp *cmp = nft_expr_data(e);
 	const char *op;
-	int32_t reg;
+	int32_t reg, op_value;
 
 	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
 	if (reg < 0)
@@ -172,21 +192,11 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	if (op == NULL)
 		return -1;
 
-	if (strcmp(op, "eq") == 0)
-		cmp->op = NFT_CMP_EQ;
-	else if (strcmp(op, "neq") == 0)
-		cmp->op = NFT_CMP_NEQ;
-	else if (strcmp(op, "lt") == 0)
-		cmp->op = NFT_CMP_LT;
-	else if (strcmp(op, "lte") == 0)
-		cmp->op = NFT_CMP_LTE;
-	else if (strcmp(op, "gt") == 0)
-		cmp->op = NFT_CMP_GT;
-	else if (strcmp(op, "gte") == 0)
-		cmp->op = NFT_CMP_GTE;
-	else
+	op_value = nft_str2cmp(op);
+	if (op_value < 0)
 		return -1;
 
+	cmp->op = op_value;
 	e->flags |= (1 << NFT_EXPR_CMP_OP);
 
 	if (nft_mxml_data_reg_parse(tree, "cmpdata",
