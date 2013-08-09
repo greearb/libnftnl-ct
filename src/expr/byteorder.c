@@ -181,13 +181,25 @@ static char *expr_byteorder_str[] = {
 	[NFT_BYTEORDER_NTOH] = "ntoh",
 };
 
+static inline int nft_str2ntoh(const char *op)
+{
+	if (strcmp(op, "ntoh") == 0)
+		return NFT_BYTEORDER_NTOH;
+	else if (strcmp(op, "hton") == 0)
+		return NFT_BYTEORDER_HTON;
+	else {
+		errno = EINVAL;
+		return -1;
+	}
+}
+
 static int
 nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
 	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 	const char *op;
-	int32_t reg;
+	int32_t reg, ntoh;
 
 	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
 	if (reg < 0)
@@ -207,15 +219,11 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	if (op == NULL)
 		return -1;
 
-	if (strcmp(op, "ntoh") == 0)
-		byteorder->op = NFT_BYTEORDER_NTOH;
-	else if (strcmp(op, "hton") == 0)
-		byteorder->op = NFT_BYTEORDER_HTON;
-	else {
-		errno = EINVAL;
+	ntoh = nft_str2ntoh(op);
+	if (ntoh < 0)
 		return -1;
-	}
 
+	byteorder->op = ntoh;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_OP);
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
