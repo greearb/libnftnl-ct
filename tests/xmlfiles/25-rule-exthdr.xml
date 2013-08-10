@@ -1,13 +1,1 @@
-<rule>
-	<family>ip6</family>
-	<table>filter</table>
-	<chain>INPUT</chain>
-	<handle>100</handle>
-	<flags>0</flags>
-	<expr type="exthdr">
-		<dreg>1</dreg>
-		<exthdr_type>mh</exthdr_type>
-		<offset>2</offset>
-		<len>16</len>
-	</expr>
-</rule>
+<rule><family>ip6</family><table>filter</table><chain>INPUT</chain><handle>100</handle><flags>0</flags><expr type="exthdr"><dreg>1</dreg><exthdr_type>mh</exthdr_type><offset>2</offset><len>16</len></expr></rule>

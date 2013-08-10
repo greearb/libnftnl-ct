@@ -1,11 +1,1 @@
-<rule>
-	<family>ip</family>
-	<table>filter</table>
-	<chain>INPUT</chain>
-	<handle>100</handle>
-	<flags>0</flags>
-	<expr type="limit">
-		<rate>123123</rate>
-		<depth>321321</depth>
-	</expr>
-</rule>
+<rule><family>ip</family><table>filter</table><chain>INPUT</chain><handle>100</handle><flags>0</flags><expr type="limit"><rate>123123</rate><depth>321321</depth></expr></rule>

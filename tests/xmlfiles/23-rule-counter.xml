@@ -1,12 +1,2 @@
-<rule>
-	<family>ip6</family>
-	<table>filter</table>
-	<chain>test</chain>
-	<handle>39</handle>
-	<flags>0</flags>
-	<expr type="counter">
-		<pkts>3</pkts>
-		<bytes>177</bytes>
-	</expr>
-</rule>
+<rule><family>ip6</family><table>filter</table><chain>test</chain><handle>39</handle><flags>0</flags><expr type="counter"><pkts>3</pkts><bytes>177</bytes></expr></rule>
 <!-- nft add rule ip6 filter test udp dport 53 counter accept -->
