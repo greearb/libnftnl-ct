@@ -19,6 +19,138 @@
 #include <jansson.h>
 #endif
 
+enum {
+	TEST_XML_TABLE = 0,
+	TEST_XML_CHAIN,
+	TEST_XML_RULE,
+	TEST_XML_SET,
+	TEST_JSON_TABLE,
+	TEST_JSON_CHAIN,
+	TEST_JSON_RULE,
+	TEST_JSON_SET,
+};
+
+#if defined(XML_PARSING) || defined(JSON_PARSING)
+static void print_detail_error(char *a, char *b)
+{
+	int i;
+	int from = -1;
+
+	for (i = 0; i < strlen(b); i++) {
+		if (from == -1 && a[i] != b[i]) {
+			from = i;
+			break;
+
+		}
+	}
+
+	if (from != -1) {
+		int k = from - 10;
+
+		if (k < 0)
+			k = 0;
+
+		fprintf(stderr, "from file:     ");
+		for (i = k; i < from + 10; i++)
+			fprintf(stderr, "%c", a[i]);
+
+		fprintf(stderr, "\nfrom snprintf: ");
+		for (i = k; i < from + 10; i++)
+			fprintf(stderr, "%c", b[i]);
+
+		/* Don't look twice below this comment ;-) */
+		fprintf(stderr, "\n               ");
+		for (i = k; i < from + 10; i++) {
+			if (i == from)
+				fprintf(stderr, "^");
+			else
+				fprintf(stderr, " ");
+		}
+		fprintf(stderr, "\n");
+	}
+}
+
+static int compare_test(uint32_t type, void *input, const char *filename)
+{
+	struct nft_table *t = NULL;
+	struct nft_chain *c = NULL;
+	struct nft_rule *r = NULL;
+	struct nft_set *s = NULL;
+	char orig[4096];
+	char out[4096];
+	FILE *fp;
+
+	switch (type) {
+	case TEST_XML_TABLE:
+	case TEST_JSON_TABLE:
+		t = (struct nft_table *)input;
+		break;
+	case TEST_XML_CHAIN:
+	case TEST_JSON_CHAIN:
+		c = (struct nft_chain *)input;
+		break;
+	case TEST_XML_RULE:
+	case TEST_JSON_RULE:
+		r = (struct nft_rule *)input;
+		break;
+	case TEST_XML_SET:
+	case TEST_JSON_SET:
+		s = (struct nft_set *)input;
+		break;
+	default:
+		errno = EINVAL;
+		return -1;
+	}
+
+	switch (type) {
+	case TEST_XML_TABLE:
+		nft_table_snprintf(out, sizeof(out), t, NFT_TABLE_O_XML, 0);
+		break;
+	case TEST_JSON_TABLE:
+		nft_table_snprintf(out, sizeof(out), t, NFT_TABLE_O_JSON, 0);
+		break;
+	case TEST_XML_CHAIN:
+		nft_chain_snprintf(out, sizeof(out), c, NFT_CHAIN_O_XML, 0);
+		break;
+	case TEST_JSON_CHAIN:
+		nft_chain_snprintf(out, sizeof(out), c, NFT_CHAIN_O_JSON, 0);
+		break;
+	case TEST_XML_RULE:
+		nft_rule_snprintf(out, sizeof(out), r, NFT_RULE_O_XML, 0);
+		break;
+	case TEST_JSON_RULE:
+		nft_rule_snprintf(out, sizeof(out), r, NFT_RULE_O_JSON, 0);
+		break;
+	case TEST_XML_SET:
+		nft_set_snprintf(out, sizeof(out), s, NFT_SET_O_XML, 0);
+		break;
+	case TEST_JSON_SET:
+		nft_set_snprintf(out, sizeof(out), s, NFT_SET_O_JSON, 0);
+		break;
+	default:
+		errno = EINVAL;
+		return -1;
+	}
+
+	fp = fopen(filename, "r");
+	if (fp == NULL) {
+		perror("open");
+		exit(EXIT_FAILURE);
+	}
+
+	fgets(orig, sizeof(orig), fp);
+	fclose(fp);
+
+	if (strncmp(orig, out, strlen(out)) == 0)
+		return 0;
+
+	printf("validating %s: ", filename);
+	printf("\033[31mFAILED\e[0m\n");
+	print_detail_error(orig, out);
+	return -1;
+}
+#endif
+
 static int test_json(const char *filename)
 {
 #ifdef JSON_PARSING
@@ -44,7 +176,9 @@ static int test_json(const char *filename)
 		t = nft_table_alloc();
 		if (t != NULL) {
 			if (nft_table_parse(t, NFT_TABLE_PARSE_JSON, json) == 0)
-				ret = 0;
+				ret = compare_test(TEST_JSON_TABLE, t, filename);
+			else
+				goto failparsing;
 
 			nft_table_free(t);
 		}
@@ -52,13 +186,22 @@ static int test_json(const char *filename)
 		c = nft_chain_alloc();
 		if (c != NULL) {
 			if (nft_chain_parse(c, NFT_CHAIN_PARSE_JSON, json) == 0)
-				ret = 0;
+				ret = compare_test(TEST_JSON_CHAIN, c, filename);
+			else
+				goto failparsing;
 
 			nft_chain_free(c);
 		}
 	}
 
+	free(root);
 	return ret;
+
+failparsing:
+	printf("parsing %s: ", filename);
+	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
+	free(root);
+	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
@@ -93,7 +236,9 @@ static int test_xml(const char *filename)
 		t = nft_table_alloc();
 		if (t != NULL) {
 			if (nft_table_parse(t, NFT_TABLE_PARSE_XML, xml) == 0)
-				ret = 0;
+				ret = compare_test(TEST_XML_TABLE, t, filename);
+			else
+				goto failparsing;
 
 			nft_table_free(t);
 		}
@@ -101,7 +246,9 @@ static int test_xml(const char *filename)
 		c = nft_chain_alloc();
 		if (c != NULL) {
 			if (nft_chain_parse(c, NFT_CHAIN_PARSE_XML, xml) == 0)
-				ret = 0;
+				ret = compare_test(TEST_XML_CHAIN, c, filename);
+			else
+				goto failparsing;
 
 			nft_chain_free(c);
 		}
@@ -109,7 +256,9 @@ static int test_xml(const char *filename)
 		r = nft_rule_alloc();
 		if (r != NULL) {
 			if (nft_rule_parse(r, NFT_RULE_PARSE_XML, xml) == 0)
-				ret = 0;
+				ret = compare_test(TEST_XML_RULE, r, filename);
+			else
+				goto failparsing;
 
 			nft_rule_free(r);
 		}
@@ -117,13 +266,20 @@ static int test_xml(const char *filename)
 		s = nft_set_alloc();
 		if (s != NULL) {
 			if (nft_set_parse(s, NFT_SET_PARSE_XML, xml) == 0)
-				ret = 0;
+				ret = compare_test(TEST_XML_SET, s, filename);
+			else
+				goto failparsing;
 
 			nft_set_free(s);
 		}
 	}
 
 	return ret;
+
+failparsing:
+	printf("parsing %s: ", filename);
+	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
+	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
@@ -157,20 +313,16 @@ int main(int argc, char *argv[])
 		snprintf(path, sizeof(path), "%s/%s", argv[1], dent->d_name);
 
 		if (strcmp(&dent->d_name[len-4], ".xml") == 0) {
-			printf("parsing %s: ", path);
-			if (test_xml(path) < 0)
-				printf("\033[31mFAILED\e[0m (%s)\n",
-					strerror(errno));
-			else
+			if (test_xml(path) == 0) {
+				printf("parsing and validating %s: ", path);
 				printf("\033[32mOK\e[0m\n");
+			}
 		}
 		if (strcmp(&dent->d_name[len-5], ".json") == 0) {
-			printf("parsing %s: ", path);
-			if (test_json(path) < 0)
-				printf("\033[31mFAILED\e[0m (%s)\n",
-					strerror(errno));
-			else
+			if (test_json(path) == 0) {
+				printf("parsing and validating %s: ", path);
 				printf("\033[32mOK\e[0m\n");
+			}
 		}
 	}
 
