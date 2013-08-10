@@ -149,31 +149,31 @@ nft_rule_expr_payload_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
+static char *base2str_array[NFT_PAYLOAD_TRANSPORT_HEADER+1] = {
+	[NFT_PAYLOAD_LL_HEADER]		= "link",
+	[NFT_PAYLOAD_NETWORK_HEADER] 	= "network",
+	[NFT_PAYLOAD_TRANSPORT_HEADER]	= "transport",
+};
+
+static const char *base2str(enum nft_payload_bases base)
+{
+	if (base > NFT_PAYLOAD_TRANSPORT_HEADER)
+		return "unknown";
+
+	return base2str_array[base];
+}
+
 static int
 nft_rule_expr_payload_snprintf_json(char *buf, size_t len, uint32_t flags,
 				   struct nft_expr_payload *p)
 {
 	int size = len, offset = 0, ret;
 
-	ret = snprintf(buf, len, "\"dreg\" : %u, \"offset\" : %u, \"len\" : %u, ",
-					p->dreg, p->offset, p->len);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	switch (p->base) {
-	case NFT_PAYLOAD_LL_HEADER:
-		ret = snprintf(buf+offset, len, "\"base\" : \"link\"");
-		break;
-	case NFT_PAYLOAD_NETWORK_HEADER:
-		ret = snprintf(buf+offset, len, "\"base\" : \"network\"");
-		break;
-	case NFT_PAYLOAD_TRANSPORT_HEADER:
-		ret = snprintf(buf+offset, len, "\"base\" : \"transport\"");
-		break;
-	default:
-		ret = snprintf(buf+offset, len, "\"base\" : \"unknown\"");
-		break;
-	}
-
+	ret = snprintf(buf, len, "\"dreg\" : %u, "
+				 "\"offset\" : %u, "
+				 "\"len\" : %u, "
+				 "\"base\" : \"%s\"",
+		       p->dreg, p->offset, p->len, base2str(p->base));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -243,46 +243,14 @@ nft_rule_expr_payload_snprintf_xml(char *buf, size_t len, uint32_t flags,
 {
 	int size = len, offset = 0, ret;
 
-	ret = snprintf(buf, len, "<dreg>%u</dreg><offset>%u</offset>"
-		       "<len>%u</len>", p->dreg, p->offset, p->len);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	/* A default option is not provided.
-	 * The <base> node will be missing; Is not mandatory.
-	 */
-
-	switch (p->base) {
-	case NFT_PAYLOAD_LL_HEADER:
-		ret = snprintf(buf+offset, len, "<base>link</base>");
-		break;
-	case NFT_PAYLOAD_NETWORK_HEADER:
-		ret = snprintf(buf+offset, len, "<base>network</base>");
-		break;
-	case NFT_PAYLOAD_TRANSPORT_HEADER:
-		ret = snprintf(buf+offset, len, "<base>transport</base>");
-		break;
-	default:
-		ret = snprintf(buf+offset, len, "<base>unknown</base>");
-		break;
-	}
-
+	ret = snprintf(buf, len, "<dreg>%u</dreg>"
+				 "<offset>%u</offset>"
+				 "<len>%u</len>"
+				 "<base>%s</base>",
+		       p->dreg, p->offset, p->len, base2str(p->base));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
-}
-
-static char *base2str_array[NFT_PAYLOAD_TRANSPORT_HEADER+1] = {
-	[NFT_PAYLOAD_LL_HEADER]		= "link",
-	[NFT_PAYLOAD_NETWORK_HEADER] 	= "network",
-	[NFT_PAYLOAD_TRANSPORT_HEADER]	= "transport",
-};
-
-static const char *base2str(enum nft_payload_bases base)
-{
-	if (base > NFT_PAYLOAD_TRANSPORT_HEADER)
-		return "unknown";
-
-	return base2str_array[base];
 }
 
 static int
