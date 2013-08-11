@@ -167,9 +167,6 @@ static int test_json(const char *filename)
 		return -1;
 	}
 
-	if (root == NULL)
-		return -1;
-
 	json = json_dumps(root, JSON_INDENT(0));
 
 	if (json_object_get(root, "table") != NULL) {
