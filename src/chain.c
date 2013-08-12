@@ -756,11 +756,11 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 	ret = snprintf(buf, size, "<chain><name>%s</name>"
 		       "<handle>%"PRIu64"</handle><bytes>%"PRIu64"</bytes>"
 		       "<packets>%"PRIu64"</packets><type>%s</type>"
-		       "<table>%s</table><prio>%d</prio><use>%d</use>"
+		       "<table>%s</table><prio>%d</prio>"
 		       "<hooknum>%s</hooknum>",
 		       c->name, c->handle, c->bytes, c->packets,
 		       c->type, c->table,
-		       c->prio, c->use, hooknum2str_array[c->hooknum]);
+		       c->prio, hooknum2str_array[c->hooknum]);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	/* The parsing will fail both if there are something different
