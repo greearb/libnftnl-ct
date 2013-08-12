@@ -204,7 +204,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	int32_t reg;
 	int family, nat_type_value;
 
-	nat_type = nft_mxml_str_parse(tree, "nat_type", MXML_DESCEND_FIRST);
+	nat_type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST);
 	if (nat_type == NULL)
 		return -1;
 
@@ -306,9 +306,9 @@ nft_rule_expr_nat_snprintf_xml(char *buf, size_t size,
 
 	/* Is a mandatory element. Provide a default, even empty */
 	if (nat->type == NFT_NAT_SNAT)
-		ret = snprintf(buf, len, "<nat_type>snat</nat_type>");
+		ret = snprintf(buf, len, "<type>snat</type>");
 	else if (nat->type == NFT_NAT_DNAT)
-		ret = snprintf(buf, len, "<nat_type>dnat</nat_type>");
+		ret = snprintf(buf, len, "<type>dnat</type>");
 	else
 		ret = snprintf(buf, len, "<type>unknown</type>");
 
