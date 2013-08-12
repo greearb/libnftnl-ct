@@ -130,7 +130,7 @@ static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, mxml_node_t *t
 	e->flags |= (1 << NFT_EXPR_LIMIT_RATE);
 
 	if (nft_mxml_num_parse(tree, "depth", MXML_DESCEND_FIRST, BASE_DEC,
-			       &limit->rate, NFT_TYPE_U64) != 0)
+			       &limit->depth, NFT_TYPE_U64) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LIMIT_DEPTH);
