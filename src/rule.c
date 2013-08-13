@@ -64,6 +64,11 @@ EXPORT_SYMBOL(nft_rule_alloc);
 
 void nft_rule_free(struct nft_rule *r)
 {
+	struct nft_rule_expr *e, *tmp;
+
+	list_for_each_entry_safe(e, tmp, &r->expr_list, head)
+		nft_rule_expr_free(e);
+
 	if (r->table != NULL)
 		xfree(r->table);
 	if (r->chain != NULL)
