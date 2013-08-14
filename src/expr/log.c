@@ -23,15 +23,14 @@
 #include "expr_ops.h"
 
 struct nft_expr_log {
-	uint32_t		group;
 	uint32_t		snaplen;
-	uint32_t		qthreshold;
+	uint16_t		group;
+	uint16_t		qthreshold;
 	const char		*prefix;
 };
 
-static int
-nft_rule_expr_log_set(struct nft_rule_expr *e, uint16_t type,
-		       const void *data, size_t data_len)
+static int nft_rule_expr_log_set(struct nft_rule_expr *e, uint16_t type,
+				 const void *data, size_t data_len)
 {
 	struct nft_expr_log *log = nft_expr_data(e);
 
@@ -43,13 +42,13 @@ nft_rule_expr_log_set(struct nft_rule_expr *e, uint16_t type,
 		log->prefix = strdup(data);
 		break;
 	case NFT_EXPR_LOG_GROUP:
-		log->group = *((uint32_t *)data);
+		log->group = *((uint16_t *)data);
 		break;
 	case NFT_EXPR_LOG_SNAPLEN:
 		log->snaplen = *((uint32_t *)data);
 		break;
 	case NFT_EXPR_LOG_QTHRESHOLD:
-		log->qthreshold = *((uint32_t *)data);
+		log->qthreshold = *((uint16_t *)data);
 		break;
 	default:
 		return -1;
@@ -93,6 +92,11 @@ static int nft_rule_expr_log_cb(const struct nlattr *attr, void *data)
 		break;
 	case NFTA_LOG_GROUP:
 	case NFTA_LOG_SNAPLEN:
+		if (mnl_attr_validate(attr, MNL_TYPE_U16) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
 	case NFTA_LOG_QTHRESHOLD:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
 			perror("mnl_attr_validate");
@@ -113,11 +117,11 @@ nft_rule_expr_log_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 	if (e->flags & (1 << NFT_EXPR_LOG_PREFIX))
 		mnl_attr_put_str(nlh, NFTA_LOG_PREFIX, log->prefix);
 	if (e->flags & (1 << NFT_EXPR_LOG_GROUP))
-		mnl_attr_put_u32(nlh, NFTA_LOG_GROUP, htonl(log->group));
+		mnl_attr_put_u16(nlh, NFTA_LOG_GROUP, htons(log->group));
 	if (e->flags & (1 << NFT_EXPR_LOG_SNAPLEN))
 		mnl_attr_put_u32(nlh, NFTA_LOG_SNAPLEN, htonl(log->snaplen));
 	if (e->flags & (1 << NFT_EXPR_LOG_QTHRESHOLD))
-		mnl_attr_put_u32(nlh, NFTA_LOG_QTHRESHOLD, htonl(log->qthreshold));
+		mnl_attr_put_u16(nlh, NFTA_LOG_QTHRESHOLD, htons(log->qthreshold));
 }
 
 static int
@@ -137,7 +141,7 @@ nft_rule_expr_log_parse(struct nft_rule_expr *e, struct nlattr *attr)
 		e->flags |= (1 << NFT_EXPR_LOG_GROUP);
 	}
 	if (tb[NFTA_LOG_GROUP]) {
-		log->group = ntohl(mnl_attr_get_u32(tb[NFTA_LOG_GROUP]));
+		log->group = ntohs(mnl_attr_get_u16(tb[NFTA_LOG_GROUP]));
 		e->flags |= (1 << NFT_EXPR_LOG_GROUP);
 	}
 	if (tb[NFTA_LOG_SNAPLEN]) {
@@ -145,7 +149,7 @@ nft_rule_expr_log_parse(struct nft_rule_expr *e, struct nlattr *attr)
 		e->flags |= (1 << NFT_EXPR_LOG_SNAPLEN);
 	}
 	if (tb[NFTA_LOG_QTHRESHOLD]) {
-		log->qthreshold = ntohl(mnl_attr_get_u32(tb[NFTA_LOG_QTHRESHOLD]));
+		log->qthreshold = ntohs(mnl_attr_get_u16(tb[NFTA_LOG_QTHRESHOLD]));
 		e->flags |= (1 << NFT_EXPR_LOG_QTHRESHOLD);
 	}
 
@@ -166,7 +170,7 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	e->flags |= (1 << NFT_EXPR_LOG_PREFIX);
 
 	if (nft_mxml_num_parse(tree, "group", MXML_DESCEND_FIRST, BASE_DEC,
-			       &log->group, NFT_TYPE_U32) != 0)
+			       &log->group, NFT_TYPE_U16) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LOG_GROUP);
@@ -178,7 +182,7 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	e->flags |= (1 << NFT_EXPR_LOG_SNAPLEN);
 
 	if (nft_mxml_num_parse(tree, "qthreshold", MXML_DESCEND_FIRST,
-			       BASE_DEC, &log->qthreshold, NFT_TYPE_U32) != 0)
+			       BASE_DEC, &log->qthreshold, NFT_TYPE_U16) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LOG_QTHRESHOLD);
