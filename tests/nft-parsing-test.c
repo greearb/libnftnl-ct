@@ -191,13 +191,15 @@ static int test_json(const char *filename)
 		}
 	}
 
-	free(root);
+	free(json);
+	json_decref(root);
 	return ret;
 
 failparsing:
 	printf("parsing %s: ", filename);
 	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
-	free(root);
+	free(json);
+	json_decref(root);
 	return -1;
 #else
 	errno = EOPNOTSUPP;
