@@ -239,7 +239,7 @@ static int nft_table_xml_parse(struct nft_table *t, char *xml)
 	if (t->name)
 		xfree(t->name);
 
-	t->name = name;
+	t->name = strdup(name);
 	t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);

@@ -328,7 +328,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	if (s->name)
 		xfree(s->name);
 
-	s->name = name;
+	s->name = strdup(name);
 	s->flags |= (1 << NFT_SET_ATTR_NAME);
 
 	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST);
@@ -338,7 +338,7 @@ static int nft_set_xml_parse(struct nft_set *s, char *xml)
 	if (s->table)
 		xfree(s->table);
 
-	s->table = table;
+	s->table = strdup(table);
 	s->flags |= (1 << NFT_SET_ATTR_TABLE);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);

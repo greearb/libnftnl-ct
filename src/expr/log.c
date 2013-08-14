@@ -162,7 +162,7 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	if (prefix == NULL)
 		return -1;
 
-	log->prefix = prefix;
+	log->prefix = strdup(prefix);
 	e->flags |= (1 << NFT_EXPR_LOG_PREFIX);
 
 	if (nft_mxml_num_parse(tree, "group", MXML_DESCEND_FIRST, BASE_DEC,

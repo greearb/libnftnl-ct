@@ -597,7 +597,6 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		goto err;
 
 	strncpy(c->name, name, NFT_CHAIN_MAXNAMELEN);
-	xfree(name);
 	c->flags |= (1 << NFT_CHAIN_ATTR_NAME);
 
 	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
@@ -650,8 +649,6 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 		goto err;
 
 	hooknum = nft_str2hooknum(hooknum_str);
-	xfree(hooknum_str);
-
 	if (hooknum < 0)
 		goto err;
 

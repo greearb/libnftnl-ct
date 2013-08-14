@@ -163,7 +163,7 @@ const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
 		return NULL;
 	}
 
-	return strdup(node->child->value.opaque);
+	return node->child->value.opaque;
 }
 
 int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name,
@@ -177,8 +177,6 @@ int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name,
 		return -1;
 
 	family = nft_str2family(family_str);
-	xfree(family_str);
-
 	if (family < 0)
 		errno = EAFNOSUPPORT;
 

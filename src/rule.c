@@ -514,7 +514,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	if (r->table)
 		xfree(r->table);
 
-	r->table = table;
+	r->table = strdup(table);
 	r->flags |= (1 << NFT_RULE_ATTR_TABLE);
 
 	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST);
@@ -526,7 +526,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 	if (r->chain)
 		xfree(r->chain);
 
-	r->chain = chain;
+	r->chain = strdup(chain);
 	r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
 
 	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
