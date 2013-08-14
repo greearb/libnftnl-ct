@@ -580,10 +580,8 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree;
-	mxml_node_t *node;
-	const char *name;
-	const char *hooknum_str;
-	int family, hooknum;
+	const char *table, *name, *hooknum_str, *policy_str, *type;
+	int family, hooknum, policy;
 
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL)
@@ -617,25 +615,24 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_PACKETS);
 
-	node = mxmlFindElement(tree, tree, "type", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL)
+	type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST);
+	if (type == NULL)
 		goto err;
 
 	if (c->type)
 		xfree(c->type);
 
-	c->type = strdup(node->child->value.opaque);
+	c->type = strdup(type);
 	c->flags |= (1 << NFT_CHAIN_ATTR_TYPE);
 
-	node = mxmlFindElement(tree, tree, "table", NULL, NULL,	MXML_DESCEND);
-	if (node == NULL)
+	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST);
+	if (table == NULL)
 		goto err;
 
 	if (c->table)
 		xfree(c->table);
 
-	c->table = strdup(node->child->value.opaque);
+	c->table = strdup(table);
 	c->flags |= (1 << NFT_CHAIN_ATTR_TABLE);
 
 	if (nft_mxml_num_parse(tree, "prio", MXML_DESCEND, BASE_DEC, &c->prio,
@@ -655,20 +652,17 @@ static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
 	c->hooknum = hooknum;
 	c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
 
-	node = mxmlFindElement(tree, tree, "policy", NULL, NULL, MXML_DESCEND);
-	if (node == NULL)
+	policy_str = nft_mxml_str_parse(tree, "policy", MXML_DESCEND);
+	if (policy_str == NULL)
 		goto err;
 
-	if (strcmp(node->child->value.opaque, "accept") == 0) {
-		c->policy = NF_ACCEPT;
-	} else if (strcmp(node->child->value.opaque, "drop") == 0) {
-		c->policy = NF_DROP;
-	} else
+	policy = nft_str2verdict(policy_str);
+	if (policy == -1)
 		goto err;
 
+	c->policy = policy;
 	c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);
 
-	/* Get and set <family> */
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
 	if (family < 0)
 		goto err;
