@@ -482,14 +482,18 @@ static inline int nft_str2hooknum(const char *hook)
 static int nft_chain_json_parse(struct nft_chain *c, char *json)
 {
 #ifdef JSON_PARSING
-	json_t *root;
+	json_t *root, *node;
 	json_error_t error;
 	uint64_t uval64;
 	uint32_t policy;
 	int32_t val32;
 	const char *valstr;
 
-	root = nft_jansson_get_root(json, "chain", &error);
+	node = nft_jansson_create_root(json, &error);
+	if (node == NULL)
+		return -1;
+
+	root = nft_jansson_get_node(node, "chain");
 	if (root == NULL)
 		return -1;
 
@@ -497,7 +501,7 @@ static int nft_chain_json_parse(struct nft_chain *c, char *json)
 	if (valstr == NULL)
 		goto err;
 
-	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_NAME, strdup(valstr));
+	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_NAME, valstr);
 
 	if (nft_jansson_value_parse_val(root, "handle", NFT_TYPE_U64,
 					&uval64) == -1)
@@ -518,7 +522,7 @@ static int nft_chain_json_parse(struct nft_chain *c, char *json)
 	nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_PACKETS, uval64);
 
 	if (nft_jansson_parse_family(root, &val32) != 0)
-		return -1;
+		goto err;
 
 	nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_FAMILY, val32);
 
@@ -527,7 +531,7 @@ static int nft_chain_json_parse(struct nft_chain *c, char *json)
 	if (valstr == NULL)
 		goto err;
 
-	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TABLE, strdup(valstr));
+	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TABLE, valstr);
 
 	if (nft_jansson_node_exist(root, "hooknum")) {
 		valstr = nft_jansson_value_parse_str(root, "type");
@@ -535,7 +539,7 @@ static int nft_chain_json_parse(struct nft_chain *c, char *json)
 		if (valstr == NULL)
 			goto err;
 
-		nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TYPE, strdup(valstr));
+		nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TYPE, valstr);
 
 		if (nft_jansson_value_parse_val(root, "prio", NFT_TYPE_S32,
 						&val32) == -1)
@@ -564,11 +568,11 @@ static int nft_chain_json_parse(struct nft_chain *c, char *json)
 		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_POLICY, policy);
 	}
 
-	xfree(root);
+	nft_jansson_free_root(node);
 	return 0;
 
 err:
-	xfree(root);
+	nft_jansson_free_root(node);
 	return -1;
 #else
 	errno = EOPNOTSUPP;

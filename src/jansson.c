@@ -72,7 +72,7 @@ bool nft_jansson_node_exist(json_t *root, const char *tag)
 	return json_object_get(root, tag) != NULL;
 }
 
-json_t *nft_jansson_get_root(char *json, const char *tag, json_error_t *err)
+json_t *nft_jansson_create_root(char *json, json_error_t *err)
 {
 	json_t *root;
 
@@ -82,14 +82,27 @@ json_t *nft_jansson_get_root(char *json, const char *tag, json_error_t *err)
 		return NULL;
 	}
 
-	root = json_object_get(root, tag);
-	if (root == NULL) {
+	return root;
+}
+
+json_t *nft_jansson_get_node(json_t *root, const char *tag)
+{
+	json_t *node;
+
+	node = json_object_get(root, tag);
+	if (node == NULL) {
 		errno = EINVAL;
 		return NULL;
 	}
 
-	return root;
+	return node;
 }
+
+void nft_jansson_free_root(json_t *root)
+{
+	json_decref(root);
+}
+
 int nft_jansson_parse_family(json_t *root, void *out)
 {
 	const char *str;

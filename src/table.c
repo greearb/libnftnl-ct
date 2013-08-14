@@ -269,13 +269,17 @@ err:
 static int nft_table_json_parse(struct nft_table *t, char *json)
 {
 #ifdef JSON_PARSING
-	json_t *root;
+	json_t *root, *node;
 	json_error_t error;
 	uint32_t table_flag;
 	const char *str;
 	int family;
 
-	root = nft_jansson_get_root(json, "table", &error);
+	node = nft_jansson_create_root(json, &error);
+	if (node == NULL)
+		return -1;
+
+	root = nft_jansson_get_node(node, "table");
 	if (root == NULL)
 		return -1;
 
@@ -283,10 +287,10 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 	if (str == NULL)
 		goto err;
 
-	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, strdup(str));
+	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, str);
 
 	if (nft_jansson_parse_family(root, &family) != 0)
-		return -1;
+		goto err;
 
 	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
 
@@ -296,10 +300,10 @@ static int nft_table_json_parse(struct nft_table *t, char *json)
 
 	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, table_flag);
 
-	xfree(root);
+	nft_jansson_free_root(node);
 	return 0;
 err:
-	xfree(root);
+	nft_jansson_free_root(node);
 	return -1;
 #else
 	errno = EOPNOTSUPP;
