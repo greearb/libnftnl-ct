@@ -82,6 +82,13 @@ nft_rule_expr_set_u8(struct nft_rule_expr *expr, uint16_t type, uint8_t data)
 EXPORT_SYMBOL(nft_rule_expr_set_u8);
 
 void
+nft_rule_expr_set_u16(struct nft_rule_expr *expr, uint16_t type, uint16_t data)
+{
+	nft_rule_expr_set(expr, type, &data, sizeof(uint16_t));
+}
+EXPORT_SYMBOL(nft_rule_expr_set_u16);
+
+void
 nft_rule_expr_set_u32(struct nft_rule_expr *expr, uint16_t type, uint32_t data)
 {
 	nft_rule_expr_set(expr, type, &data, sizeof(uint32_t));
@@ -138,6 +145,22 @@ uint8_t nft_rule_expr_get_u8(const struct nft_rule_expr *expr, uint16_t type)
 	return *((uint8_t *)data);
 }
 EXPORT_SYMBOL(nft_rule_expr_get_u8);
+
+uint16_t nft_rule_expr_get_u16(const struct nft_rule_expr *expr, uint16_t type)
+{
+	const void *data;
+	size_t data_len;
+
+	data = nft_rule_expr_get(expr, type, &data_len);
+	if (data == NULL)
+		return 0;
+
+	if (data_len != sizeof(uint16_t))
+		return 0;
+
+	return *((uint16_t *)data);
+}
+EXPORT_SYMBOL(nft_rule_expr_get_u16);
 
 uint32_t nft_rule_expr_get_u32(const struct nft_rule_expr *expr, uint16_t type)
 {

@@ -84,11 +84,13 @@ global:
   nft_rule_expr_is_set;
   nft_rule_expr_set;
   nft_rule_expr_set_u8;
+  nft_rule_expr_set_u16;
   nft_rule_expr_set_u32;
   nft_rule_expr_set_u64;
   nft_rule_expr_set_str;
   nft_rule_expr_get;
   nft_rule_expr_get_u8;
+  nft_rule_expr_get_u16;
   nft_rule_expr_get_u32;
   nft_rule_expr_get_u64;
   nft_rule_expr_get_str;
