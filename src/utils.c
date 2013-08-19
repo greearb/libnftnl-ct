@@ -103,6 +103,7 @@ int nft_get_value(enum nft_type type, void *val, void *out)
 
 int nft_strtoi(const char *string, int base, void *out, enum nft_type type)
 {
+	int ret;
 	int64_t sval = 0;
 	uint64_t uval = -1;
 	char *endptr;
@@ -113,14 +114,14 @@ int nft_strtoi(const char *string, int base, void *out, enum nft_type type)
 	case NFT_TYPE_U32:
 	case NFT_TYPE_U64:
 		uval = strtoll(string, &endptr, base);
-		nft_get_value(type, &uval, out);
+		ret = nft_get_value(type, &uval, out);
 		break;
 	case NFT_TYPE_S8:
 	case NFT_TYPE_S16:
 	case NFT_TYPE_S32:
 	case NFT_TYPE_S64:
 		sval = strtoull(string, &endptr, base);
-		nft_get_value(type, &sval, out);
+		ret = nft_get_value(type, &sval, out);
 		break;
 	default:
 		errno = EINVAL;
@@ -132,7 +133,7 @@ int nft_strtoi(const char *string, int base, void *out, enum nft_type type)
 		return -1;
 	}
 
-	return 0;
+	return ret;
 }
 
 const char *nft_verdict2str(uint32_t verdict)
