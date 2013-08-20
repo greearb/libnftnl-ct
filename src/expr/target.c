@@ -171,6 +171,25 @@ static int nft_rule_expr_target_parse(struct nft_rule_expr *e, struct nlattr *at
 }
 
 static int
+nft_rule_expr_target_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *name;
+
+	name = nft_jansson_value_parse_str(root, "name");
+	if (name == NULL)
+		return -1;
+
+	nft_rule_expr_set_str(e, NFT_EXPR_TG_NAME, name);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_target_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -250,6 +269,7 @@ struct expr_ops expr_ops_target = {
 	.build		= nft_rule_expr_target_build,
 	.snprintf	= nft_rule_expr_target_snprintf,
 	.xml_parse	= nft_rule_expr_target_xml_parse,
+	.json_parse	= nft_rule_expr_target_json_parse,
 };
 
 static void __init expr_target_init(void)

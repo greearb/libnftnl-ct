@@ -475,6 +475,93 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 }
 EXPORT_SYMBOL(nft_rule_nlmsg_parse);
 
+static int nft_rule_json_parse(struct nft_rule *r, char *json)
+{
+#ifdef JSON_PARSING
+	json_t *root, *node, *array;
+	json_error_t error;
+	struct nft_rule_expr *e;
+	const char *str = NULL;
+	uint64_t uval64;
+	uint32_t uval32;
+	int i, family;
+
+	node = nft_jansson_create_root(json, &error);
+	if (node == NULL)
+		return -1;
+
+	root = nft_jansson_get_node(node, "rule");
+	if (root == NULL)
+		return -1;
+
+	if (nft_jansson_parse_family(root, &family) != 0)
+		goto err;
+
+	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, family);
+
+	str = nft_jansson_value_parse_str(root, "table");
+	if (str == NULL)
+		goto err;
+
+	nft_rule_attr_set_str(r, NFT_RULE_ATTR_TABLE, str);
+
+	str = nft_jansson_value_parse_str(root, "chain");
+	if (str == NULL)
+		goto err;
+
+	nft_rule_attr_set_str(r, NFT_RULE_ATTR_CHAIN, str);
+
+	if (nft_jansson_value_parse_val(root, "handle",
+					NFT_TYPE_U64, &uval64) == -1)
+		goto err;
+
+	nft_rule_attr_set_u64(r, NFT_RULE_ATTR_HANDLE, uval64);
+
+	if (nft_jansson_value_parse_val(root, "flags",
+					NFT_TYPE_U32, &uval32) == -1)
+		goto err;
+
+	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS, uval32);
+
+	if (nft_jansson_node_exist(root, "compat_proto") ||
+	    nft_jansson_node_exist(root, "compat_flags")) {
+		if (nft_jansson_value_parse_val(root, "compat_proto",
+						NFT_TYPE_U32, &uval32) == -1)
+			goto err;
+
+		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_PROTO, uval32);
+
+		if (nft_jansson_value_parse_val(root, "compat_flags",
+						NFT_TYPE_U32, &uval32) == -1)
+			goto err;
+
+		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_FLAGS, uval32);
+	}
+
+	array = json_object_get(root, "expr");
+	if (array == NULL)
+		goto err;
+
+	for (i = 0; i < json_array_size(array); ++i) {
+
+		e = nft_jansson_expr_parse(json_array_get(array, i));
+		if (e == NULL)
+			goto err;
+
+		nft_rule_add_expr(r, e);
+	}
+
+	json_decref(node);
+	return 0;
+err:
+	json_decref(node);
+	return -1;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
 {
 #ifdef XML_PARSING
@@ -588,6 +675,9 @@ int nft_rule_parse(struct nft_rule *r, enum nft_rule_parse_type type, char *data
 	switch (type) {
 	case NFT_RULE_PARSE_XML:
 		ret = nft_rule_xml_parse(r, data);
+		break;
+	case NFT_RULE_PARSE_JSON:
+		ret = nft_rule_json_parse(r, data);
 		break;
 	default:
 		ret = -1;

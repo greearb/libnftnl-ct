@@ -13,6 +13,10 @@ struct nft_rule_expr;
 #define mxml_node_t void
 #endif
 
+#ifndef JSON_PARSING
+#define json_t void
+#endif
+
 struct expr_ops {
 	struct list_head head;
 
@@ -25,6 +29,7 @@ struct expr_ops {
 	void	(*build)(struct nlmsghdr *nlh, struct nft_rule_expr *e);
 	int	(*snprintf)(char *buf, size_t len, uint32_t type, uint32_t flags, struct nft_rule_expr *e);
 	int	(*xml_parse)(struct nft_rule_expr *e, mxml_node_t *tree);
+	int	(*json_parse)(struct nft_rule_expr *e, json_t *data);
 };
 
 void nft_expr_ops_register(struct expr_ops *ops);

@@ -181,6 +181,50 @@ nft_rule_expr_bitwise_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_bitwise_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
+	uint32_t reg, len;
+
+	if (nft_jansson_value_parse_reg(root, "sreg", NFT_TYPE_U32, &reg) == -1)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_BITWISE_SREG, reg);
+
+	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) == -1)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_BITWISE_DREG, reg);
+
+	if (nft_jansson_value_parse_val(root, "len", NFT_TYPE_U32, &len) == -1)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_BITWISE_LEN, len);
+
+	if (nft_jansson_data_reg_parse(root, "mask",
+				       &bitwise->mask) != DATA_VALUE)
+		return -1;
+
+	e->flags |= (1 << NFT_EXPR_BITWISE_MASK);
+
+	if (nft_jansson_data_reg_parse(root, "xor",
+				       &bitwise->xor) != DATA_VALUE)
+		return -1;
+
+	e->flags |= (1 << NFT_EXPR_BITWISE_XOR);
+
+	if (bitwise->mask.len != bitwise->xor.len)
+		return -1;
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -349,6 +393,7 @@ struct expr_ops expr_ops_bitwise = {
 	.build		= nft_rule_expr_bitwise_build,
 	.snprintf	= nft_rule_expr_bitwise_snprintf,
 	.xml_parse	= nft_rule_expr_bitwise_xml_parse,
+	.json_parse	= nft_rule_expr_bitwise_json_parse,
 };
 
 static void __init expr_bitwise(void)

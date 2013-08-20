@@ -143,6 +143,36 @@ nft_rule_expr_lookup_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_lookup_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *set_name;
+	int32_t reg;
+
+	set_name = nft_jansson_value_parse_str(root, "set");
+	if (set_name == NULL)
+		return -1;
+
+	nft_rule_expr_set_str(e, NFT_EXPR_LOOKUP_SET, set_name);
+
+	if (nft_jansson_value_parse_reg(root, "sreg", NFT_TYPE_U32, &reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SREG, reg);
+
+	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_DREG, reg);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -248,6 +278,7 @@ struct expr_ops expr_ops_lookup = {
 	.build		= nft_rule_expr_lookup_build,
 	.snprintf	= nft_rule_expr_lookup_snprintf,
 	.xml_parse	= nft_rule_expr_lookup_xml_parse,
+	.json_parse	= nft_rule_expr_lookup_json_parse,
 };
 
 static void __init expr_lookup_init(void)

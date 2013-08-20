@@ -178,6 +178,45 @@ nft_rule_expr_immediate_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
+nft_rule_expr_immediate_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	struct nft_expr_immediate *imm = nft_expr_data(e);
+	int datareg_type;
+	uint32_t reg;
+
+	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_IMM_DREG, reg);
+
+	datareg_type = nft_jansson_data_reg_parse(root, "immediatedata",
+						  &imm->data);
+	if (datareg_type < 0)
+		return -1;
+
+	switch (datareg_type) {
+	case DATA_VALUE:
+		e->flags |= (1 << NFT_EXPR_IMM_DATA);
+		break;
+	case DATA_VERDICT:
+		e->flags |= (1 << NFT_EXPR_IMM_VERDICT);
+		break;
+	case DATA_CHAIN:
+		e->flags |= (1 << NFT_EXPR_IMM_CHAIN);
+		break;
+	default:
+		return -1;
+	}
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -342,6 +381,7 @@ struct expr_ops expr_ops_immediate = {
 	.build		= nft_rule_expr_immediate_build,
 	.snprintf	= nft_rule_expr_immediate_snprintf,
 	.xml_parse	= nft_rule_expr_immediate_xml_parse,
+	.json_parse	= nft_rule_expr_immediate_json_parse,
 };
 
 static void __init expr_immediate_init(void)

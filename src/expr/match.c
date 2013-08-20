@@ -170,6 +170,25 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 	return 0;
 }
 
+static int nft_rule_expr_match_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *name;
+
+	name = nft_jansson_value_parse_str(root, "name");
+	if (name == NULL)
+		return -1;
+
+	nft_rule_expr_set_str(e, NFT_EXPR_MT_NAME, name);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+
 static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -247,7 +266,8 @@ struct expr_ops expr_ops_match = {
 	.parse		= nft_rule_expr_match_parse,
 	.build		= nft_rule_expr_match_build,
 	.snprintf	= nft_rule_expr_match_snprintf,
-	.xml_parse = nft_rule_expr_match_xml_parse,
+	.xml_parse 	= nft_rule_expr_match_xml_parse,
+	.json_parse 	= nft_rule_expr_match_json_parse,
 };
 
 static void __init expr_match_init(void)

@@ -192,6 +192,48 @@ static inline int str2exthdr_type(const char *str)
 	return -1;
 }
 
+static int
+nft_rule_expr_exthdr_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *exthdr_type;
+	uint32_t uval32;
+	int type;
+
+	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_EXTHDR_DREG, uval32);
+
+	exthdr_type = nft_jansson_value_parse_str(root, "exthdr_type");
+	if (exthdr_type == NULL)
+		return -1;
+
+	type = str2exthdr_type(exthdr_type);
+	if (type < 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_EXTHDR_TYPE, type);
+
+	if (nft_jansson_value_parse_val(root, "offset", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_EXTHDR_OFFSET, uval32);
+
+	if (nft_jansson_value_parse_val(root, "len", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	 nft_rule_expr_set_u32(e, NFT_EXPR_EXTHDR_LEN, uval32);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
 
 static int
 nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
@@ -284,6 +326,7 @@ struct expr_ops expr_ops_exthdr = {
 	.build		= nft_rule_expr_exthdr_build,
 	.snprintf	= nft_rule_expr_exthdr_snprintf,
 	.xml_parse	= nft_rule_expr_exthdr_xml_parse,
+	.json_parse	= nft_rule_expr_exthdr_json_parse,
 };
 
 static void __init expr_exthdr_init(void)

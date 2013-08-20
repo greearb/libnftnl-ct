@@ -51,6 +51,7 @@ enum {
 enum nft_rule_parse_type {
 	NFT_RULE_PARSE_NONE	= 0,
 	NFT_RULE_PARSE_XML,
+	NFT_RULE_PARSE_JSON,
 	NFT_RULE_PARSE_MAX,
 };
 

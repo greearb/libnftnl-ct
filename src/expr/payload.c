@@ -194,6 +194,48 @@ static inline int nft_str2base(const char *base)
 }
 
 static int
+nft_rule_expr_payload_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *base_str;
+	uint32_t reg, uval32;
+	int base;
+
+	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_DREG, reg);
+
+	base_str = nft_jansson_value_parse_str(root, "base");
+	if (base_str == NULL)
+		return -1;
+
+	base = nft_str2base(base_str);
+	if (base < 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_BASE, base);
+
+	if (nft_jansson_value_parse_val(root, "offset", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_OFFSET, uval32);
+
+	if (nft_jansson_value_parse_val(root, "len", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_LEN, uval32);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -286,6 +328,7 @@ struct expr_ops expr_ops_payload = {
 	.build		= nft_rule_expr_payload_build,
 	.snprintf	= nft_rule_expr_payload_snprintf,
 	.xml_parse	= nft_rule_expr_payload_xml_parse,
+	.json_parse	= nft_rule_expr_payload_json_parse,
 };
 
 static void __init expr_payload_init(void)

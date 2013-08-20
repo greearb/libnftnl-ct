@@ -194,6 +194,55 @@ static inline int nft_str2ntoh(const char *op)
 }
 
 static int
+nft_rule_expr_byteorder_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *op;
+	uint32_t uval32;
+	int ntoh;
+
+	if (nft_jansson_value_parse_reg(root, "sreg", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SREG, uval32);
+
+	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_DREG, uval32);
+
+	op = nft_jansson_value_parse_str(root, "op");
+	if (op == NULL)
+		return -1;
+
+	ntoh = nft_str2ntoh(op);
+	if (ntoh < 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_OP, ntoh);
+
+	if (nft_jansson_value_parse_val(root, "len", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_LEN, uval32);
+
+	if (nft_jansson_value_parse_val(root, "size", NFT_TYPE_U32,
+					&uval32) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SIZE, uval32);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+static int
 nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -329,6 +378,7 @@ struct expr_ops expr_ops_byteorder = {
 	.build		= nft_rule_expr_byteorder_build,
 	.snprintf	= nft_rule_expr_byteorder_snprintf,
 	.xml_parse	= nft_rule_expr_byteorder_xml_parse,
+	.json_parse	= nft_rule_expr_byteorder_json_parse,
 };
 
 static void __init expr_byteorder_init(void)

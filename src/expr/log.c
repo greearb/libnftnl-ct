@@ -156,6 +156,44 @@ nft_rule_expr_log_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
+static int nft_rule_expr_log_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *prefix;
+	uint32_t snaplen;
+	uint16_t uval16;
+
+	prefix = nft_jansson_value_parse_str(root, "prefix");
+	if (prefix == NULL)
+		return -1;
+
+	nft_rule_expr_set_str(e, NFT_EXPR_LOG_PREFIX, prefix);
+
+	if (nft_jansson_value_parse_val(root, "group", NFT_TYPE_U16,
+					&uval16) != 0)
+		return -1;
+
+	nft_rule_expr_set_u16(e, NFT_EXPR_LOG_GROUP, uval16);
+
+	if (nft_jansson_value_parse_val(root, "snaplen", NFT_TYPE_U32,
+					&snaplen) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_LOG_SNAPLEN, snaplen);
+
+	if (nft_jansson_value_parse_val(root, "qthreshold", NFT_TYPE_U16,
+					&uval16) != 0)
+		return -1;
+
+	nft_rule_expr_set_u16(e, NFT_EXPR_LOG_QTHRESHOLD, uval16);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -236,6 +274,7 @@ struct expr_ops expr_ops_log = {
 	.build		= nft_rule_expr_log_build,
 	.snprintf	= nft_rule_expr_log_snprintf,
 	.xml_parse	= nft_rule_expr_log_xml_parse,
+	.json_parse	= nft_rule_expr_log_json_parse,
 };
 
 static void __init expr_log_init(void)

@@ -156,8 +156,39 @@ static inline int str2meta_key(const char *str)
 			return i;
 	}
 
+	errno = EINVAL;
 	return -1;
 }
+
+static int nft_rule_expr_meta_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *key_str;
+	uint32_t reg;
+	int key;
+
+	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) != 0)
+                return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_META_DREG, reg);
+
+	key_str = nft_jansson_value_parse_str(root, "key");
+	if (key_str == NULL)
+		return -1;
+
+	key = str2meta_key(key_str);
+	if (key < 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_META_KEY, key);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 
 static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
@@ -225,7 +256,8 @@ struct expr_ops expr_ops_meta = {
 	.parse		= nft_rule_expr_meta_parse,
 	.build		= nft_rule_expr_meta_build,
 	.snprintf	= nft_rule_expr_meta_snprintf,
-	.xml_parse = nft_rule_expr_meta_xml_parse,
+	.xml_parse 	= nft_rule_expr_meta_xml_parse,
+	.json_parse 	= nft_rule_expr_meta_json_parse,
 };
 
 static void __init expr_meta_init(void)

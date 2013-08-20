@@ -178,6 +178,54 @@ static inline int str2ctkey(const char *ctkey)
 	return -1;
 }
 
+static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *key_str;
+	uint32_t reg;
+	uint8_t dir;
+	int key;
+
+	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_CT_DREG, reg);
+
+	if (nft_jansson_node_exist(root, "key")) {
+		key_str = nft_jansson_value_parse_str(root, "key");
+		if (key_str == NULL)
+			return -1;
+
+		key = str2ctkey(key_str);
+		if (key < 0)
+			goto err;
+
+		nft_rule_expr_set_u32(e, NFT_EXPR_CT_KEY, key);
+
+	}
+
+	if (nft_jansson_node_exist(root, "dir")) {
+		if (nft_jansson_value_parse_val(root, "dir", NFT_TYPE_U8,
+						&dir) != 0)
+			return -1;
+
+		if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)
+			goto err;
+
+		nft_rule_expr_set_u8(e, NFT_EXPR_CT_DIR, dir);
+	}
+
+	return 0;
+err:
+	errno = EINVAL;
+	return -1;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
+
 static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -282,6 +330,7 @@ struct expr_ops expr_ops_ct = {
 	.build		= nft_rule_expr_ct_build,
 	.snprintf	= nft_rule_expr_ct_snprintf,
 	.xml_parse	= nft_rule_expr_ct_xml_parse,
+	.json_parse	= nft_rule_expr_ct_json_parse,
 };
 
 static void __init expr_ct_init(void)

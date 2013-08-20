@@ -196,6 +196,64 @@ static inline int nft_str2nat(const char *nat)
 	}
 }
 
+static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root)
+{
+#ifdef JSON_PARSING
+	const char *nat_type, *family_str;
+	uint32_t reg;
+	int val32;
+
+	nat_type = nft_jansson_value_parse_str(root, "nat_type");
+	if (nat_type == NULL)
+		return -1;
+
+	val32 = nft_str2nat(nat_type);
+	if (val32 < 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_TYPE, val32);
+
+	family_str = nft_jansson_value_parse_str(root, "family");
+	if (family_str == NULL)
+		return -1;
+
+	val32 = nft_str2family(family_str);
+	if (val32 < 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_FAMILY, val32);
+
+	if (nft_jansson_value_parse_reg(root, "sreg_addr_min", NFT_TYPE_U32,
+					&reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MIN, reg);
+
+	if (nft_jansson_value_parse_reg(root, "sreg_addr_max", NFT_TYPE_U32,
+					&reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MAX, reg);
+
+	if (nft_jansson_value_parse_reg(root, "sreg_proto_min", NFT_TYPE_U32,
+					&reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MIN, reg);
+
+	if (nft_jansson_value_parse_reg(root, "sreg_proto_max", NFT_TYPE_U32,
+					&reg) != 0)
+		return -1;
+
+	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MAX, reg);
+
+	return 0;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
@@ -402,6 +460,7 @@ struct expr_ops expr_ops_nat = {
 	.build		= nft_rule_expr_nat_build,
 	.snprintf	= nft_rule_expr_nat_snprintf,
 	.xml_parse	= nft_rule_expr_nat_xml_parse,
+	.json_parse	= nft_rule_expr_nat_json_parse,
 };
 
 static void __init expr_nat_init(void)
