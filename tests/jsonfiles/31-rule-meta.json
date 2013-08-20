@@ -1,0 +1,1 @@
+{ "rule": { "family" : "ip", "table" : "filter", "chain"  : "output", "handle" : 8,"flags" : 0, "expr" : [ { "type" : "meta", "dreg" : 1, "key" : "protocol"}, { "type" : "cmp", "sreg" : 1, "op" : "eq", "cmpdata" : {"data_reg": { "type" : "value", "len" : 4, "data0" : "0x000003e8"}}}, { "type" : "counter", "pkts" : 0, "bytes" : 0}]}}

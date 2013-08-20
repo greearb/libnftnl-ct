@@ -1,0 +1,1 @@
+{ "rule": { "family" : "ip", "table" : "filter", "chain"  : "INPUT", "handle" : 20,"flags" : 0, "expr" : [ { "type" : "counter", "pkts" : 17, "bytes" : 4436}, { "type" : "target", "name" : "LOG"}]}}
