@@ -14,6 +14,7 @@ check_PROGRAMS = nft-table-add		\
 		 nft-rule-add		\
 		 nft-rule-insert	\
 		 nft-rule-xml-add	\
+		 nft-rule-json-add	\
 		 nft-rule-del		\
 		 nft-rule-get		\
 		 nft-events		\
@@ -66,6 +67,9 @@ nft_rule_insert_LDADD = ../src/libnftables.la ${LIBMNL_LIBS} ${LIBXML_LIBS}
 
 nft_rule_xml_add_SOURCES = nft-rule-xml-add.c
 nft_rule_xml_add_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+
+nft_rule_json_add_SOURCES = nft-rule-json-add.c
+nft_rule_json_add_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
 
 nft_rule_del_SOURCES = nft-rule-del.c
 nft_rule_del_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
