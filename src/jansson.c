@@ -76,7 +76,7 @@ bool nft_jansson_node_exist(json_t *root, const char *tag)
 	return json_object_get(root, tag) != NULL;
 }
 
-json_t *nft_jansson_create_root(char *json, json_error_t *err)
+json_t *nft_jansson_create_root(const char *json, json_error_t *err)
 {
 	json_t *root;
 

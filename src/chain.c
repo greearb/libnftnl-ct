@@ -479,7 +479,7 @@ static inline int nft_str2hooknum(const char *hook)
 	return -1;
 }
 
-static int nft_chain_json_parse(struct nft_chain *c, char *json)
+static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 {
 #ifdef JSON_PARSING
 	json_t *root, *node;
@@ -580,7 +580,7 @@ err:
 #endif
 }
 
-static int nft_chain_xml_parse(struct nft_chain *c, char *xml)
+static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree;
@@ -686,7 +686,7 @@ err:
 }
 
 int nft_chain_parse(struct nft_chain *c, enum nft_chain_parse_type type,
-		    char *data)
+		    const char *data)
 {
 	int ret;
 

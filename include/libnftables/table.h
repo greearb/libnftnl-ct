@@ -44,7 +44,7 @@ enum nft_table_parse_type {
 	NFT_TABLE_PARSE_MAX,
 };
 
-int nft_table_parse(struct nft_table *t, enum nft_table_parse_type type, char *data);
+int nft_table_parse(struct nft_table *t, enum nft_table_parse_type type, const char *data);
 int nft_table_snprintf(char *buf, size_t size, struct nft_table *t, uint32_t type, uint32_t flags);
 
 struct nlmsghdr *nft_table_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);

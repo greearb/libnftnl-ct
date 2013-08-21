@@ -417,7 +417,7 @@ int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e)
 }
 #endif
 
-static int nft_set_elem_xml_parse(struct nft_set_elem *e, char *xml)
+static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree;
@@ -447,7 +447,7 @@ err:
 }
 
 int nft_set_elem_parse(struct nft_set_elem *e,
-		       enum nft_set_parse_type type, char *data) {
+		       enum nft_set_parse_type type, const char *data) {
 	int ret;
 
 	switch (type) {

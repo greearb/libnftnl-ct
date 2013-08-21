@@ -303,7 +303,7 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_nlmsg_parse);
 
-static int nft_set_xml_parse(struct nft_set *s, char *xml)
+static int nft_set_xml_parse(struct nft_set *s, const char *xml)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree;
@@ -406,7 +406,8 @@ err:
 #endif
 }
 
-int nft_set_parse(struct nft_set *s, enum nft_set_parse_type type, char *data)
+int nft_set_parse(struct nft_set *s, enum nft_set_parse_type type,
+		  const char *data)
 {
 	int ret;
 

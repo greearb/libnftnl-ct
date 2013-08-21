@@ -475,7 +475,7 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 }
 EXPORT_SYMBOL(nft_rule_nlmsg_parse);
 
-static int nft_rule_json_parse(struct nft_rule *r, char *json)
+static int nft_rule_json_parse(struct nft_rule *r, const char *json)
 {
 #ifdef JSON_PARSING
 	json_t *root, *node, *array;
@@ -562,7 +562,7 @@ err:
 #endif
 }
 
-static int nft_rule_xml_parse(struct nft_rule *r, char *xml)
+static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree, *node, *save;
@@ -668,7 +668,8 @@ err:
 #endif
 }
 
-int nft_rule_parse(struct nft_rule *r, enum nft_rule_parse_type type, char *data)
+int nft_rule_parse(struct nft_rule *r, enum nft_rule_parse_type type,
+		   const char *data)
 {
 	int ret;
 

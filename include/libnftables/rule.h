@@ -55,7 +55,7 @@ enum nft_rule_parse_type {
 	NFT_RULE_PARSE_MAX,
 };
 
-int nft_rule_parse(struct nft_rule *r, enum nft_rule_parse_type type, char *data);
+int nft_rule_parse(struct nft_rule *r, enum nft_rule_parse_type type, const char *data);
 int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *t, uint32_t type, uint32_t flags);
 
 struct nlmsghdr *nft_rule_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);

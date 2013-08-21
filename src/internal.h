@@ -48,7 +48,7 @@ int nft_jansson_value_parse_val(json_t *root, const char *tag,
 				  int type, void *out);
 const char *nft_jansson_value_parse_str(json_t *root, const char *tag);
 bool nft_jansson_node_exist(json_t *root, const char *tag);
-json_t *nft_jansson_create_root(char *json, json_error_t *err);
+json_t *nft_jansson_create_root(const char *json, json_error_t *err);
 json_t *nft_jansson_get_node(json_t *root, const char *tag);
 void nft_jansson_free_root(json_t *root);
 int nft_jansson_parse_family(json_t *root, void *out);

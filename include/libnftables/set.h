@@ -58,7 +58,7 @@ enum nft_set_parse_type {
 	NFT_SET_PARSE_MAX,
 };
 
-int nft_set_parse(struct nft_set *s, enum nft_set_parse_type type, char *data);
+int nft_set_parse(struct nft_set *s, enum nft_set_parse_type type, const char *data);
 
 /*
  * Set elements
@@ -102,7 +102,7 @@ void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set_elem 
 
 int nft_set_elem_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set_elem *s);
 
-int nft_set_elem_parse(struct nft_set_elem *e, enum nft_set_parse_type type, char *data);
+int nft_set_elem_parse(struct nft_set_elem *e, enum nft_set_parse_type type, const char *data);
 int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *s, uint32_t type, uint32_t flags);
 
 int nft_set_elem_foreach(struct nft_set *s, int (*cb)(struct nft_set_elem *e, void *data), void *data);

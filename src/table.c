@@ -218,7 +218,7 @@ int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t)
 }
 EXPORT_SYMBOL(nft_table_nlmsg_parse);
 
-static int nft_table_xml_parse(struct nft_table *t, char *xml)
+static int nft_table_xml_parse(struct nft_table *t, const char *xml)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree;
@@ -266,7 +266,7 @@ err:
 #endif
 }
 
-static int nft_table_json_parse(struct nft_table *t, char *json)
+static int nft_table_json_parse(struct nft_table *t, const char *json)
 {
 #ifdef JSON_PARSING
 	json_t *root, *node;
@@ -312,7 +312,7 @@ err:
 }
 
 int nft_table_parse(struct nft_table *t, enum nft_table_parse_type type,
-		    char *data)
+		    const char *data)
 {
 	int ret;
 
