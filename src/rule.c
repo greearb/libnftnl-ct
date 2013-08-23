@@ -538,6 +538,14 @@ static int nft_rule_json_parse(struct nft_rule *r, const char *json)
 		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_FLAGS, uval32);
 	}
 
+	if (nft_jansson_node_exist(root, "position")) {
+		if (nft_jansson_value_parse_val(root, "position",
+						NFT_TYPE_U64, &uval64) == -1)
+			goto err;
+
+		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_POSITION, uval64);
+	}
+
 	array = json_object_get(root, "expr");
 	if (array == NULL)
 		goto err;
@@ -636,6 +644,16 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_FLAGS);
 	}
 
+	node = mxmlFindElement(tree, tree, "position", NULL, NULL,
+			       MXML_DESCEND_FIRST);
+	if (node != NULL && node->child != NULL) {
+		if (nft_strtoi(node->child->value.opaque, BASE_DEC,
+			       &r->position, NFT_TYPE_U64) != 0)
+			goto err;
+
+		r->flags |= (1 << NFT_RULE_ATTR_POSITION);
+	}
+
 	/* Iterating over <expr> */
 	for (node = mxmlFindElement(tree, tree, "expr", "type",
 				    NULL, MXML_DESCEND);
@@ -714,6 +732,13 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
+	if (r->flags & (1 << NFT_RULE_ATTR_POSITION)) {
+		ret = snprintf(buf+offset, len,
+			       "\"position\" : %"PRIu64", ",
+			       r->position);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
 	ret = snprintf(buf+offset, len, "\"expr\" : [");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -753,6 +778,13 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 			       "<compat_flags>%u</compat_flags>"
 			       "<compat_proto>%u</compat_proto>",
 			       r->compat.flags, r->compat.proto);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->flags & (1 << NFT_RULE_ATTR_POSITION)) {
+		ret = snprintf(buf+offset, len,
+			       "<position>%"PRIu64"</position>",
+			       r->position);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
