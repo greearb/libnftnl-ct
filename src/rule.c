@@ -499,13 +499,13 @@ static int nft_rule_json_parse(struct nft_rule *r, const char *json)
 
 	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, family);
 
-	str = nft_jansson_value_parse_str(root, "table");
+	str = nft_jansson_parse_str(root, "table");
 	if (str == NULL)
 		goto err;
 
 	nft_rule_attr_set_str(r, NFT_RULE_ATTR_TABLE, str);
 
-	str = nft_jansson_value_parse_str(root, "chain");
+	str = nft_jansson_parse_str(root, "chain");
 	if (str == NULL)
 		goto err;
 

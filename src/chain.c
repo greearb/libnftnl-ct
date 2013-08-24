@@ -497,7 +497,7 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 	if (root == NULL)
 		return -1;
 
-	valstr = nft_jansson_value_parse_str(root, "name");
+	valstr = nft_jansson_parse_str(root, "name");
 	if (valstr == NULL)
 		goto err;
 
@@ -526,7 +526,7 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 
 	nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_FAMILY, val32);
 
-	valstr = nft_jansson_value_parse_str(root, "table");
+	valstr = nft_jansson_parse_str(root, "table");
 
 	if (valstr == NULL)
 		goto err;
@@ -534,7 +534,7 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TABLE, valstr);
 
 	if (nft_jansson_node_exist(root, "hooknum")) {
-		valstr = nft_jansson_value_parse_str(root, "type");
+		valstr = nft_jansson_parse_str(root, "type");
 
 		if (valstr == NULL)
 			goto err;
@@ -547,7 +547,7 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 
 		nft_chain_attr_set_s32(c, NFT_CHAIN_ATTR_PRIO, val32);
 
-		valstr = nft_jansson_value_parse_str(root, "hooknum");
+		valstr = nft_jansson_parse_str(root, "hooknum");
 		if (valstr == NULL)
 			goto err;
 
@@ -557,7 +557,7 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 
 		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_HOOKNUM, val32);
 
-		valstr = nft_jansson_value_parse_str(root, "policy");
+		valstr = nft_jansson_parse_str(root, "policy");
 		if (valstr == NULL)
 			goto err;
 

@@ -283,7 +283,7 @@ static int nft_table_json_parse(struct nft_table *t, const char *json)
 	if (root == NULL)
 		return -1;
 
-	str = nft_jansson_value_parse_str(root, "name");
+	str = nft_jansson_parse_str(root, "name");
 	if (str == NULL)
 		goto err;
 

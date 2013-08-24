@@ -42,7 +42,7 @@ static int nft_jansson_load_int_node(json_t *root, const char *tag,
 	return 0;
 }
 
-const char *nft_jansson_value_parse_str(json_t *root, const char *tag)
+const char *nft_jansson_parse_str(json_t *root, const char *tag)
 {
 	json_t *node;
 	const char *val;
@@ -112,7 +112,7 @@ int nft_jansson_parse_family(json_t *root, void *out)
 	const char *str;
 	int family;
 
-	str = nft_jansson_value_parse_str(root, "family");
+	str = nft_jansson_parse_str(root, "family");
 	if (str == NULL)
 		return -1;
 
@@ -145,7 +145,7 @@ int nft_jansson_str2num(json_t *root, const char *tag, int base,
 {
 	const char *str;
 
-	str = nft_jansson_value_parse_str(root, tag);
+	str = nft_jansson_parse_str(root, tag);
 	if (str == NULL)
 		return -1;
 
@@ -158,7 +158,7 @@ struct nft_rule_expr *nft_jansson_expr_parse(json_t *root)
 	const char *type;
 	int ret;
 
-	type = nft_jansson_value_parse_str(root, "type");
+	type = nft_jansson_parse_str(root, "type");
 	if (type == NULL)
 		return NULL;
 
@@ -197,7 +197,7 @@ int nft_jansson_data_reg_parse(json_t *root, const char *tag,
 		return -1;
 	}
 
-	type = nft_jansson_value_parse_str(data, "type");
+	type = nft_jansson_parse_str(data, "type");
 	if (type == NULL)
 		return -1;
 

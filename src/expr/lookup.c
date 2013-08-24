@@ -149,7 +149,7 @@ nft_rule_expr_lookup_json_parse(struct nft_rule_expr *e, json_t *root)
 	const char *set_name;
 	int32_t reg;
 
-	set_name = nft_jansson_value_parse_str(root, "set");
+	set_name = nft_jansson_parse_str(root, "set");
 	if (set_name == NULL)
 		return -1;
 

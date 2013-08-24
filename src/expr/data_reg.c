@@ -32,7 +32,7 @@ static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data
 	int verdict;
 	const char *verdict_str;
 
-	verdict_str = nft_jansson_value_parse_str(data, "verdict");
+	verdict_str = nft_jansson_parse_str(data, "verdict");
 	if (verdict_str == NULL)
 		return -1;
 
@@ -47,7 +47,7 @@ static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data
 
 static int nft_data_reg_chain_json_parse(union nft_data_reg *reg, json_t *data)
 {
-	reg->chain = strdup(nft_jansson_value_parse_str(data, "chain"));
+	reg->chain = strdup(nft_jansson_parse_str(data, "chain"));
 	if (reg->chain == NULL) {
 		return -1;
 	}
@@ -82,10 +82,9 @@ int nft_data_reg_json_parse(union nft_data_reg *reg, json_t *data)
 
 	const char *type;
 
-	type = nft_jansson_value_parse_str(data, "type");
-	if (type == NULL) {
+	type = nft_jansson_parse_str(data, "type");
+	if (type == NULL)
 		return -1;
-	}
 
 	/* Select what type of parsing is needed */
 	if (strcmp(type, "value") == 0) {

@@ -176,7 +176,7 @@ nft_rule_expr_target_json_parse(struct nft_rule_expr *e, json_t *root)
 #ifdef JSON_PARSING
 	const char *name;
 
-	name = nft_jansson_value_parse_str(root, "name");
+	name = nft_jansson_parse_str(root, "name");
 	if (name == NULL)
 		return -1;
 

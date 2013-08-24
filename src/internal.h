@@ -46,7 +46,7 @@ int nft_mxml_set_elem_parse(mxml_node_t *node, struct nft_set_elem *e);
 #include <jansson.h>
 int nft_jansson_value_parse_val(json_t *root, const char *tag,
 				  int type, void *out);
-const char *nft_jansson_value_parse_str(json_t *root, const char *tag);
+const char *nft_jansson_parse_str(json_t *root, const char *tag);
 bool nft_jansson_node_exist(json_t *root, const char *tag);
 json_t *nft_jansson_create_root(const char *json, json_error_t *err);
 json_t *nft_jansson_get_node(json_t *root, const char *tag);

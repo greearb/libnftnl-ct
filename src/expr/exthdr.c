@@ -206,7 +206,7 @@ nft_rule_expr_exthdr_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_EXTHDR_DREG, uval32);
 
-	exthdr_type = nft_jansson_value_parse_str(root, "exthdr_type");
+	exthdr_type = nft_jansson_parse_str(root, "exthdr_type");
 	if (exthdr_type == NULL)
 		return -1;
 

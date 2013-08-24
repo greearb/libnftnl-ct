@@ -163,7 +163,7 @@ static int nft_rule_expr_log_json_parse(struct nft_rule_expr *e, json_t *root)
 	uint32_t snaplen;
 	uint16_t uval16;
 
-	prefix = nft_jansson_value_parse_str(root, "prefix");
+	prefix = nft_jansson_parse_str(root, "prefix");
 	if (prefix == NULL)
 		return -1;
 

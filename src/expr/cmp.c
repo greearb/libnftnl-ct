@@ -188,7 +188,7 @@ static int nft_rule_expr_cmp_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_CMP_SREG, uval32);
 
-	op = nft_jansson_value_parse_str(root, "op");
+	op = nft_jansson_parse_str(root, "op");
 	if (op == NULL)
 		return -1;
 

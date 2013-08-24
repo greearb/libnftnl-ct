@@ -206,7 +206,7 @@ nft_rule_expr_payload_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_DREG, reg);
 
-	base_str = nft_jansson_value_parse_str(root, "base");
+	base_str = nft_jansson_parse_str(root, "base");
 	if (base_str == NULL)
 		return -1;
 

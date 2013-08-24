@@ -203,7 +203,7 @@ static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root)
 	uint32_t reg;
 	int val32;
 
-	nat_type = nft_jansson_value_parse_str(root, "nat_type");
+	nat_type = nft_jansson_parse_str(root, "nat_type");
 	if (nat_type == NULL)
 		return -1;
 
@@ -213,7 +213,7 @@ static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_TYPE, val32);
 
-	family_str = nft_jansson_value_parse_str(root, "family");
+	family_str = nft_jansson_parse_str(root, "family");
 	if (family_str == NULL)
 		return -1;
 

@@ -192,7 +192,7 @@ static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
 	nft_rule_expr_set_u32(e, NFT_EXPR_CT_DREG, reg);
 
 	if (nft_jansson_node_exist(root, "key")) {
-		key_str = nft_jansson_value_parse_str(root, "key");
+		key_str = nft_jansson_parse_str(root, "key");
 		if (key_str == NULL)
 			return -1;
 
