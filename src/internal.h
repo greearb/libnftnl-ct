@@ -53,8 +53,7 @@ void nft_jansson_free_root(json_t *root);
 int nft_jansson_parse_family(json_t *root, void *out);
 int nft_jansson_str2num(json_t *root, const char *tag, int base, void *out,
 			enum nft_type type);
-int nft_jansson_value_parse_reg(json_t *root, const char *tag,
-				int type, void *out);
+int nft_jansson_parse_reg(json_t *root, const char *tag, int type, void *out);
 struct nft_rule_expr *nft_jansson_expr_parse(json_t *root);
 union nft_data_reg;
 int nft_jansson_data_reg_parse(json_t *root, const char *tag,

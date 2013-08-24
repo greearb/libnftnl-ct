@@ -125,8 +125,7 @@ int nft_jansson_parse_family(json_t *root, void *out)
 	return 0;
 }
 
-int nft_jansson_value_parse_reg(json_t *root, const char *tag, int type,
-				void *out)
+int nft_jansson_parse_reg(json_t *root, const char *tag, int type, void *out)
 {
 	if (nft_jansson_parse_val(root, tag, type, out) < 0)
 		return -1;

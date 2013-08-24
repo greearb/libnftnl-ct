@@ -201,14 +201,12 @@ nft_rule_expr_byteorder_json_parse(struct nft_rule_expr *e, json_t *root)
 	uint32_t uval32;
 	int ntoh;
 
-	if (nft_jansson_value_parse_reg(root, "sreg", NFT_TYPE_U32,
-					&uval32) != 0)
+	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &uval32) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SREG, uval32);
 
-	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32,
-					&uval32) != 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &uval32) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_DREG, uval32);

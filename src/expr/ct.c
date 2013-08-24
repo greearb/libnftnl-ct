@@ -186,7 +186,7 @@ static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
 	uint8_t dir;
 	int key;
 
-	if (nft_jansson_value_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) != 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_CT_DREG, reg);
