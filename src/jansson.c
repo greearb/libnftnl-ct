@@ -57,8 +57,7 @@ const char *nft_jansson_parse_str(json_t *root, const char *tag)
 	return val;
 }
 
-int nft_jansson_value_parse_val(json_t *root, const char *tag, int type,
-				  void *out)
+int nft_jansson_parse_val(json_t *root, const char *tag, int type, void *out)
 {
 	json_int_t val;
 
@@ -129,7 +128,7 @@ int nft_jansson_parse_family(json_t *root, void *out)
 int nft_jansson_value_parse_reg(json_t *root, const char *tag, int type,
 				void *out)
 {
-	if (nft_jansson_value_parse_val(root, tag, type, out) != 0)
+	if (nft_jansson_parse_val(root, tag, type, out) < 0)
 		return -1;
 
 	if (*((uint32_t *)out) > NFT_REG_MAX){

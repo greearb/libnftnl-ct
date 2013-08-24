@@ -182,8 +182,7 @@ static int nft_rule_expr_cmp_json_parse(struct nft_rule_expr *e, json_t *root)
 	uint32_t uval32;
 	int base;
 
-	if (nft_jansson_value_parse_val(root, "sreg", NFT_TYPE_U32,
-					&uval32) != 0)
+	if (nft_jansson_parse_val(root, "sreg", NFT_TYPE_U32, &uval32) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_CMP_SREG, uval32);

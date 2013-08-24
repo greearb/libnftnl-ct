@@ -271,7 +271,7 @@ static int nft_table_json_parse(struct nft_table *t, const char *json)
 #ifdef JSON_PARSING
 	json_t *root, *node;
 	json_error_t error;
-	uint32_t table_flag;
+	uint32_t flags;
 	const char *str;
 	int family;
 
@@ -294,11 +294,10 @@ static int nft_table_json_parse(struct nft_table *t, const char *json)
 
 	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
 
-	if (nft_jansson_value_parse_val(root, "flags",
-					NFT_TYPE_U32, &table_flag) == -1)
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &flags) < 0)
 		goto err;
 
-	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, table_flag);
+	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
 
 	nft_jansson_free_root(node);
 	return 0;

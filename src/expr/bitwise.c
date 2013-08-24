@@ -197,7 +197,7 @@ nft_rule_expr_bitwise_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BITWISE_DREG, reg);
 
-	if (nft_jansson_value_parse_val(root, "len", NFT_TYPE_U32, &len) == -1)
+	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &len) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BITWISE_LEN, len);

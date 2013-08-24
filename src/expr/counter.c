@@ -124,14 +124,12 @@ nft_rule_expr_counter_json_parse(struct nft_rule_expr *e, json_t *root)
 #ifdef JSON_PARSING
 	uint64_t uval64;
 
-	if (nft_jansson_value_parse_val(root, "pkts", NFT_TYPE_U64,
-					&uval64) != 0)
+	if (nft_jansson_parse_val(root, "pkts", NFT_TYPE_U64, &uval64) < 0)
 		return -1;
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_CTR_PACKETS, uval64);
 
-	if (nft_jansson_value_parse_val(root, "bytes", NFT_TYPE_U64,
-					&uval64) != 0)
+	if (nft_jansson_parse_val(root, "bytes", NFT_TYPE_U64, &uval64) < 0)
 		return -1;
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_CTR_BYTES, uval64);

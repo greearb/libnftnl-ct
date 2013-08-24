@@ -503,20 +503,17 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 
 	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_NAME, valstr);
 
-	if (nft_jansson_value_parse_val(root, "handle", NFT_TYPE_U64,
-					&uval64) == -1)
+	if (nft_jansson_parse_val(root, "handle", NFT_TYPE_U64, &uval64) < 0)
 		goto err;
 
 	nft_chain_attr_set_u64(c,NFT_CHAIN_ATTR_HANDLE, uval64);
 
-	if (nft_jansson_value_parse_val(root, "bytes", NFT_TYPE_U64,
-					&uval64) == -1)
+	if (nft_jansson_parse_val(root, "bytes", NFT_TYPE_U64, &uval64) < 0)
 		goto err;
 
 	nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_BYTES, uval64);
 
-	if (nft_jansson_value_parse_val(root, "packets", NFT_TYPE_U64,
-					&uval64) == -1)
+	if (nft_jansson_parse_val(root, "packets", NFT_TYPE_U64, &uval64) < 0)
 		goto err;
 
 	nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_PACKETS, uval64);
@@ -541,8 +538,8 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 
 		nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TYPE, valstr);
 
-		if (nft_jansson_value_parse_val(root, "prio", NFT_TYPE_S32,
-						&val32) == -1)
+		if (nft_jansson_parse_val(root, "prio", NFT_TYPE_S32,
+					  &val32) < 0)
 			goto err;
 
 		nft_chain_attr_set_s32(c, NFT_CHAIN_ATTR_PRIO, val32);

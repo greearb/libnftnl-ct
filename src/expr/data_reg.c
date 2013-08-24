@@ -60,8 +60,7 @@ static int nft_data_reg_value_json_parse(union nft_data_reg *reg, json_t *data)
 	int i;
 	char node_name[6];
 
-	if (nft_jansson_value_parse_val(data, "len", NFT_TYPE_U8,
-					&reg->len) != 0)
+	if (nft_jansson_parse_val(data, "len", NFT_TYPE_U8, &reg->len) < 0)
 			return -1;
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {

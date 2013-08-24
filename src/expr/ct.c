@@ -205,8 +205,7 @@ static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
 	}
 
 	if (nft_jansson_node_exist(root, "dir")) {
-		if (nft_jansson_value_parse_val(root, "dir", NFT_TYPE_U8,
-						&dir) != 0)
+		if (nft_jansson_parse_val(root, "dir", NFT_TYPE_U8, &dir) < 0)
 			return -1;
 
 		if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)

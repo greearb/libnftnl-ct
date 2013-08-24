@@ -511,36 +511,34 @@ static int nft_rule_json_parse(struct nft_rule *r, const char *json)
 
 	nft_rule_attr_set_str(r, NFT_RULE_ATTR_CHAIN, str);
 
-	if (nft_jansson_value_parse_val(root, "handle",
-					NFT_TYPE_U64, &uval64) == -1)
+	if (nft_jansson_parse_val(root, "handle", NFT_TYPE_U64, &uval64) < 0)
 		goto err;
 
 	nft_rule_attr_set_u64(r, NFT_RULE_ATTR_HANDLE, uval64);
 
-	if (nft_jansson_value_parse_val(root, "flags",
-					NFT_TYPE_U32, &uval32) == -1)
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &uval32) < 0)
 		goto err;
 
 	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS, uval32);
 
 	if (nft_jansson_node_exist(root, "compat_proto") ||
 	    nft_jansson_node_exist(root, "compat_flags")) {
-		if (nft_jansson_value_parse_val(root, "compat_proto",
-						NFT_TYPE_U32, &uval32) == -1)
+		if (nft_jansson_parse_val(root, "compat_proto", NFT_TYPE_U32,
+					  &uval32) < 0)
 			goto err;
 
 		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_PROTO, uval32);
 
-		if (nft_jansson_value_parse_val(root, "compat_flags",
-						NFT_TYPE_U32, &uval32) == -1)
+		if (nft_jansson_parse_val(root, "compat_flags", NFT_TYPE_U32,
+					  &uval32) < 0)
 			goto err;
 
 		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_FLAGS, uval32);
 	}
 
 	if (nft_jansson_node_exist(root, "position")) {
-		if (nft_jansson_value_parse_val(root, "position",
-						NFT_TYPE_U64, &uval64) == -1)
+		if (nft_jansson_parse_val(root, "position", NFT_TYPE_U64,
+					  &uval64) < 0)
 			goto err;
 
 		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_POSITION, uval64);

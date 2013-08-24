@@ -123,14 +123,12 @@ static int nft_rule_expr_limit_json_parse(struct nft_rule_expr *e, json_t *root)
 #ifdef JSON_PARSING
 	uint64_t uval64;
 
-	if (nft_jansson_value_parse_val(root, "rate", NFT_TYPE_U64,
-					&uval64) != 0)
+	if (nft_jansson_parse_val(root, "rate", NFT_TYPE_U64, &uval64) < 0)
 		return -1;
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_RATE, uval64);
 
-	if (nft_jansson_value_parse_val(root, "depth", NFT_TYPE_U64,
-					&uval64) != 0)
+	if (nft_jansson_parse_val(root, "depth", NFT_TYPE_U64, &uval64) < 0)
 		return -1;
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_DEPTH, uval64);

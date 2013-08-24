@@ -216,14 +216,12 @@ nft_rule_expr_exthdr_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_EXTHDR_TYPE, type);
 
-	if (nft_jansson_value_parse_val(root, "offset", NFT_TYPE_U32,
-					&uval32) != 0)
+	if (nft_jansson_parse_val(root, "offset", NFT_TYPE_U32, &uval32) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_EXTHDR_OFFSET, uval32);
 
-	if (nft_jansson_value_parse_val(root, "len", NFT_TYPE_U32,
-					&uval32) != 0)
+	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &uval32) < 0)
 		return -1;
 
 	 nft_rule_expr_set_u32(e, NFT_EXPR_EXTHDR_LEN, uval32);

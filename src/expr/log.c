@@ -169,20 +169,18 @@ static int nft_rule_expr_log_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_str(e, NFT_EXPR_LOG_PREFIX, prefix);
 
-	if (nft_jansson_value_parse_val(root, "group", NFT_TYPE_U16,
-					&uval16) != 0)
+	if (nft_jansson_parse_val(root, "group", NFT_TYPE_U16, &uval16) < 0)
 		return -1;
 
 	nft_rule_expr_set_u16(e, NFT_EXPR_LOG_GROUP, uval16);
 
-	if (nft_jansson_value_parse_val(root, "snaplen", NFT_TYPE_U32,
-					&snaplen) != 0)
+	if (nft_jansson_parse_val(root, "snaplen", NFT_TYPE_U32, &snaplen) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_LOG_SNAPLEN, snaplen);
 
-	if (nft_jansson_value_parse_val(root, "qthreshold", NFT_TYPE_U16,
-					&uval16) != 0)
+	if (nft_jansson_parse_val(root, "qthreshold", NFT_TYPE_U16,
+				  &uval16) < 0)
 		return -1;
 
 	nft_rule_expr_set_u16(e, NFT_EXPR_LOG_QTHRESHOLD, uval16);
