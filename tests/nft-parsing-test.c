@@ -158,6 +158,7 @@ static int test_json(const char *filename)
 	struct nft_table *t;
 	struct nft_chain *c;
 	struct nft_rule *r;
+	struct nft_set *s;
 	json_t *root;
 	json_error_t error;
 	char *json;
@@ -200,6 +201,16 @@ static int test_json(const char *filename)
 
 			nft_rule_free(r);
 		}
+	} else if (json_object_get(root, "set") != NULL) {
+		s = nft_set_alloc();
+		if (s != NULL) {
+			if (nft_set_parse(s, NFT_SET_PARSE_JSON, json) == 0)
+				ret = compare_test(TEST_JSON_SET, s, filename);
+			else
+				goto failparsing;
+
+			nft_set_free(s);
+			}
 	}
 
 	free(json);
