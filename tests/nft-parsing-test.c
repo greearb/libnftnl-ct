@@ -155,12 +155,12 @@ static int test_json(const char *filename)
 {
 #ifdef JSON_PARSING
 	int ret = -1;
-	struct nft_table *t = NULL;
-	struct nft_chain *c = NULL;
-	struct nft_rule *r = NULL;
+	struct nft_table *t;
+	struct nft_chain *c;
+	struct nft_rule *r;
 	json_t *root;
 	json_error_t error;
-	char *json = NULL;
+	char *json;
 
 	root = json_load_file(filename, 0, &error);
 	if (!root) {
@@ -222,13 +222,13 @@ static int test_xml(const char *filename)
 {
 #ifdef XML_PARSING
 	int ret = -1;
-	struct nft_table *t = NULL;
-	struct nft_chain *c = NULL;
-	struct nft_rule *r = NULL;
-	struct nft_set *s = NULL;
+	struct nft_table *t;
+	struct nft_chain *c;
+	struct nft_rule *r;
+	struct nft_set *s;
 	FILE *fp;
-	mxml_node_t *tree = NULL;;
-	char *xml = NULL;
+	mxml_node_t *tree;
+	char *xml;
 
 	fp = fopen(filename, "r");
 	tree = mxmlLoadFile(NULL, fp, MXML_NO_CALLBACK);
