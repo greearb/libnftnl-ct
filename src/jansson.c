@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <string.h>
 #include "expr_ops.h"
+#include <libnftables/set.h>
 
 #include <libnftables/expr.h>
 #include <linux/netfilter/nf_tables.h>
@@ -209,5 +210,41 @@ int nft_jansson_data_reg_parse(json_t *root, const char *tag,
 		errno = EINVAL;
 		return -1;
 	}
+}
+
+int nft_set_elem_json_parse(struct nft_set_elem *e, json_t *root)
+{
+	uint32_t uval32;
+	int set_elem_data;
+
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &uval32) < 0)
+		return -1;
+
+	nft_set_elem_attr_set_u32(e, NFT_SET_ELEM_ATTR_FLAGS, uval32);
+
+	if (nft_jansson_data_reg_parse(root, "key", &e->key) != DATA_VALUE)
+		return -1;
+
+	e->flags |= (1 << NFT_SET_ELEM_ATTR_KEY);
+
+	if (nft_jansson_node_exist(root, "data")) {
+		set_elem_data = nft_jansson_data_reg_parse(root, "data",
+							   &e->data);
+		switch (set_elem_data) {
+		case DATA_VALUE:
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_DATA);
+			break;
+		case DATA_VERDICT:
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
+			break;
+		case DATA_CHAIN:
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
+			break;
+		default:
+			return -1;
+		}
+	}
+
+	return 0;
 }
 #endif

@@ -303,6 +303,102 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_nlmsg_parse);
 
+static int nft_set_json_parse(struct nft_set *s, const char *json)
+{
+#ifdef JSON_PARSING
+	json_t *root, *node, *array, *json_elem;
+	json_error_t error;
+	uint32_t uval32;
+	int family, i;
+	const char *valstr;
+	struct nft_set_elem *elem;
+
+	node = nft_jansson_create_root(json, &error);
+	if (node == NULL)
+		return -1;
+
+	root = nft_jansson_get_node(node, "set");
+	if (root == NULL)
+		return -1;
+
+	valstr = nft_jansson_parse_str(root, "name");
+	if (valstr == NULL)
+		return -1;
+
+	nft_set_attr_set_str(s, NFT_SET_ATTR_NAME, valstr);
+
+	valstr = nft_jansson_parse_str(root, "table");
+	if (valstr == NULL)
+		return -1;
+
+	nft_set_attr_set_str(s, NFT_SET_ATTR_TABLE, valstr);
+
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &uval32) < 0)
+		return -1;
+
+	nft_set_attr_set_u32(s, NFT_SET_ATTR_FLAGS, uval32);
+
+	if (nft_jansson_parse_family(root, &family) < 0)
+		return -1;
+
+	nft_set_attr_set_u32(s, NFT_SET_ATTR_FAMILY, family);
+
+	if (nft_jansson_parse_val(root, "key_type", NFT_TYPE_U32, &uval32) < 0)
+		return -1;
+
+	nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_TYPE, uval32);
+
+	if (nft_jansson_parse_val(root, "key_len", NFT_TYPE_U32, &uval32) < 0)
+		return -1;
+
+	nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_LEN, uval32);
+
+	if (nft_jansson_node_exist(root, "data_type")) {
+		if (nft_jansson_parse_val(root, "data_type", NFT_TYPE_U32,
+					  &uval32) < 0)
+			goto err;
+
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_TYPE, uval32);
+	}
+
+	if (nft_jansson_node_exist(root, "data_len")) {
+		if (nft_jansson_parse_val(root, "data_len", NFT_TYPE_U32,
+					  &uval32) < 0)
+			goto err;
+
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_LEN, uval32);
+	}
+
+	if (nft_jansson_node_exist(root, "set_elem")) {
+		array = json_object_get(root, "set_elem");
+		for (i = 0; i < json_array_size(array); i++) {
+			elem = nft_set_elem_alloc();
+			if (elem == NULL)
+				goto err;
+
+			json_elem = json_array_get(array, i);
+			if (json_elem == NULL)
+				goto err;
+
+			if (nft_set_elem_json_parse(elem, json_elem) < 0)
+				goto err;
+
+			list_add_tail(&elem->head, &s->element_list);
+		}
+
+	}
+
+	nft_jansson_free_root(node);
+	return 0;
+err:
+	nft_jansson_free_root(node);
+	return -1;
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 static int nft_set_xml_parse(struct nft_set *s, const char *xml)
 {
 #ifdef XML_PARSING
@@ -414,6 +510,9 @@ int nft_set_parse(struct nft_set *s, enum nft_set_parse_type type,
 	switch (type) {
 	case NFT_SET_PARSE_XML:
 		ret = nft_set_xml_parse(s, data);
+		break;
+	case NFT_SET_PARSE_JSON:
+		ret = nft_set_json_parse(s, data);
 		break;
 	default:
 		ret = -1;

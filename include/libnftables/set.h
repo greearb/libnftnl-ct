@@ -55,6 +55,7 @@ void nft_set_list_iter_destroy(struct nft_set_list_iter *iter);
 enum nft_set_parse_type {
 	NFT_SET_PARSE_NONE	= 0,
 	NFT_SET_PARSE_XML,
+	NFT_SET_PARSE_JSON,
 	NFT_SET_PARSE_MAX,
 };
 
