@@ -1,1 +1,1 @@
-<chain><name>foo</name><handle>100</handle><bytes>59264154979</bytes><packets>2548796325</packets><type>nat</type><table>nat</table><prio>0</prio><hooknum>NF_INET_POST_ROUTING</hooknum><policy>accept</policy><family>ip</family></chain>
+<chain><name>foo</name><handle>100</handle><bytes>59264154979</bytes><packets>2548796325</packets><table>nat</table><type>nat</type><hooknum>NF_INET_POST_ROUTING</hooknum><prio>0</prio><policy>accept</policy><family>ip</family></chain>

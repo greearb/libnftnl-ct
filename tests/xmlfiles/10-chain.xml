@@ -1,1 +1,1 @@
-<chain><name>test</name><handle>0</handle><bytes>0</bytes><packets>0</packets><type>filter</type><table>filter</table><prio>0</prio><hooknum>NF_INET_LOCAL_IN</hooknum><policy>accept</policy><family>ip</family></chain>
+<chain><name>test</name><handle>0</handle><bytes>0</bytes><packets>0</packets><table>filter</table><type>filter</type><hooknum>NF_INET_LOCAL_IN</hooknum><prio>0</prio><policy>accept</policy><family>ip</family></chain>

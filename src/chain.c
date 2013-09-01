@@ -616,16 +616,6 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_PACKETS);
 
-	type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST);
-	if (type == NULL)
-		goto err;
-
-	if (c->type)
-		xfree(c->type);
-
-	c->type = strdup(type);
-	c->flags |= (1 << NFT_CHAIN_ATTR_TYPE);
-
 	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST);
 	if (table == NULL)
 		goto err;
@@ -636,40 +626,50 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 	c->table = strdup(table);
 	c->flags |= (1 << NFT_CHAIN_ATTR_TABLE);
 
-	if (nft_mxml_num_parse(tree, "prio", MXML_DESCEND, BASE_DEC, &c->prio,
-			       NFT_TYPE_S32) != 0)
-		goto err;
-
-	c->flags |= (1 << NFT_CHAIN_ATTR_PRIO);
-
-	hooknum_str = nft_mxml_str_parse(tree, "hooknum", MXML_DESCEND_FIRST);
-	if (hooknum_str == NULL)
-		goto err;
-
-	hooknum = nft_str2hooknum(hooknum_str);
-	if (hooknum < 0)
-		goto err;
-
-	c->hooknum = hooknum;
-	c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
-
-	policy_str = nft_mxml_str_parse(tree, "policy", MXML_DESCEND);
-	if (policy_str == NULL)
-		goto err;
-
-	policy = nft_str2verdict(policy_str);
-	if (policy == -1)
-		goto err;
-
-	c->policy = policy;
-	c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);
-
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
 	if (family < 0)
 		goto err;
 
 	c->family = family;
 	c->flags |= (1 << NFT_CHAIN_ATTR_FAMILY);
+
+	hooknum_str = nft_mxml_str_parse(tree, "hooknum", MXML_DESCEND_FIRST);
+	if (hooknum_str != NULL) {
+		hooknum = nft_str2hooknum(hooknum_str);
+		if (hooknum < 0)
+			goto err;
+
+		c->hooknum = hooknum;
+		c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
+
+		type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST);
+		if (type == NULL)
+			goto err;
+
+		if (c->type)
+			xfree(c->type);
+
+		c->type = strdup(type);
+		c->flags |= (1 << NFT_CHAIN_ATTR_TYPE);
+
+
+		if (nft_mxml_num_parse(tree, "prio", MXML_DESCEND, BASE_DEC,
+				       &c->prio, NFT_TYPE_S32) != 0)
+			goto err;
+
+		c->flags |= (1 << NFT_CHAIN_ATTR_PRIO);
+
+		policy_str = nft_mxml_str_parse(tree, "policy", MXML_DESCEND);
+		if (policy_str == NULL)
+			goto err;
+
+		policy = nft_str2verdict(policy_str);
+		if (policy == -1)
+			goto err;
+
+		c->policy = policy;
+		c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);
+	}
 
 	mxmlDelete(tree);
 	return 0;
@@ -747,22 +747,18 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 
 	ret = snprintf(buf, size, "<chain><name>%s</name>"
 		       "<handle>%"PRIu64"</handle><bytes>%"PRIu64"</bytes>"
-		       "<packets>%"PRIu64"</packets><type>%s</type>"
-		       "<table>%s</table><prio>%d</prio>"
-		       "<hooknum>%s</hooknum>",
-		       c->name, c->handle, c->bytes, c->packets,
-		       c->type, c->table,
-		       c->prio, hooknum2str_array[c->hooknum]);
+		       "<packets>%"PRIu64"</packets><table>%s</table>",
+		       c->name, c->handle, c->bytes, c->packets, c->table);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	/* The parsing will fail both if there are something different
-	 * than {accept|drop} or if the <policy> node is missing.
-	 */
-	if (c->policy == NF_ACCEPT) {
-		ret = snprintf(buf+offset, size, "<policy>accept</policy>");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	} else if (c->policy == NF_DROP) {
-		ret = snprintf(buf+offset, size, "<policy>drop</policy>");
+	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
+		ret =  snprintf(buf+offset, size,
+				"<type>%s</type>"
+				"<hooknum>%s</hooknum>"
+				"<prio>%d</prio>"
+				"<policy>%s</policy>",
+			c->type, hooknum2str_array[c->hooknum], c->prio,
+			nft_verdict2str(c->policy));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
