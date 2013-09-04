@@ -458,7 +458,7 @@ static int nft_set_xml_parse(struct nft_set *s, const char *xml)
 	s->flags |= (1 << NFT_SET_ATTR_KEY_TYPE);
 
 	if (nft_mxml_num_parse(tree, "key_len", MXML_DESCEND_FIRST,
-			       BASE_DEC, &s->key_type, NFT_TYPE_U32) != 0)
+			       BASE_DEC, &s->key_len, NFT_TYPE_U32) != 0)
 		goto err;
 
 	s->flags |= (1 << NFT_SET_ATTR_KEY_LEN);
