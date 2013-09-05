@@ -14,11 +14,16 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl Dependencies
 PKG_CHECK_MODULES([LIBMNL], [libmnl >= 1.0.0])
-AC_ARG_WITH([xml-parsing], AS_HELP_STRING([--with-xml-parsing], [XML parsing support]))
+AC_ARG_WITH([xml-parsing],
+	AS_HELP_STRING([--with-xml-parsing], [XML parsing support]),
+	[with_xml_parsing="yes"], [with_xml_parsing="no"])
+AC_ARG_WITH([json-parsing],
+	AS_HELP_STRING([--with-json-parsing], [JSON parsing support]),
+	[with_json_parsing="yes"], [with_json_parsing="no"])
+
 AS_IF([test "x$with_xml_parsing" = "xyes"], [
 	PKG_CHECK_MODULES([LIBXML], [mxml >= 2.6])
 ])
-AC_ARG_WITH([json-parsing], AS_HELP_STRING([--with-json-parsing], [JSON parsing support]))
 AS_IF([test "x$with_json_parsing" = "xyes"], [
 	PKG_CHECK_MODULES([LIBJSON], [jansson >= 2.3])
 ])
@@ -47,3 +52,8 @@ AC_SUBST([regular_CPPFLAGS])
 AC_SUBST([regular_CFLAGS])
 AC_CONFIG_FILES([Makefile src/Makefile include/Makefile include/libnftables/Makefile include/linux/Makefile include/linux/netfilter/Makefile examples/Makefile tests/Makefile libnftables.pc doxygen.cfg])
 AC_OUTPUT
+
+echo "
+libnftables configuration:
+  XML support:				${with_xml_parsing}
+  JSON support:				${with_json_parsing}"
