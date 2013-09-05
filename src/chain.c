@@ -24,6 +24,7 @@
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nf_tables.h>
 #include <linux/netfilter.h>
+#include <linux/netfilter_arp.h>
 
 #include <libnftables/chain.h>
 
@@ -44,13 +45,38 @@ struct nft_chain {
 	uint32_t	flags;
 };
 
-static const char *hooknum2str_array[NF_INET_NUMHOOKS] = {
-	[NF_INET_PRE_ROUTING]	= "NF_INET_PRE_ROUTING",
-	[NF_INET_LOCAL_IN]	= "NF_INET_LOCAL_IN",
-	[NF_INET_FORWARD]	= "NF_INET_FORWARD",
-	[NF_INET_LOCAL_OUT]	= "NF_INET_LOCAL_OUT",
-	[NF_INET_POST_ROUTING]	= "NF_INET_POST_ROUTING",
-};
+static const char *nft_hooknum2str(int family, int hooknum)
+{
+	switch (family) {
+	case NFPROTO_IPV4:
+	case NFPROTO_IPV6:
+	case NFPROTO_BRIDGE:
+		switch (hooknum) {
+		case NF_INET_PRE_ROUTING:
+			return "prerouting";
+		case NF_INET_LOCAL_IN:
+			return "input";
+		case NF_INET_FORWARD:
+			return "forward";
+		case NF_INET_LOCAL_OUT:
+			return "output";
+		case NF_INET_POST_ROUTING:
+			return "postrouting";
+		}
+		break;
+	case NFPROTO_ARP:
+		switch (hooknum) {
+		case NF_ARP_IN:
+			return "input";
+		case NF_ARP_OUT:
+			return "output";
+		case NF_ARP_FORWARD:
+			return "forward";
+		}
+		break;
+	}
+	return "unknown";
+}
 
 struct nft_chain *nft_chain_alloc(void)
 {
@@ -468,12 +494,12 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 }
 EXPORT_SYMBOL(nft_chain_nlmsg_parse);
 
-static inline int nft_str2hooknum(const char *hook)
+static inline int nft_str2hooknum(int family, const char *hook)
 {
 	int hooknum;
 
 	for (hooknum = 0; hooknum < NF_INET_NUMHOOKS; hooknum++) {
-		if (strcmp(hook, hooknum2str_array[hooknum]) == 0)
+		if (strcmp(hook, nft_hooknum2str(family, hooknum)) == 0)
 			return hooknum;
 	}
 	return -1;
@@ -548,7 +574,7 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 		if (valstr == NULL)
 			goto err;
 
-		val32 = nft_str2hooknum(valstr);
+		val32 = nft_str2hooknum(c->family, valstr);
 		if (val32 == -1)
 			goto err;
 
@@ -635,7 +661,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 
 	hooknum_str = nft_mxml_str_parse(tree, "hooknum", MXML_DESCEND_FIRST);
 	if (hooknum_str != NULL) {
-		hooknum = nft_str2hooknum(hooknum_str);
+		hooknum = nft_str2hooknum(c->family, hooknum_str);
 		if (hooknum < 0)
 			goto err;
 
@@ -728,8 +754,8 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 				"\"hooknum\": \"%s\","
 				"\"prio\": %d,"
 				"\"policy\": \"%s\"",
-			c->type, hooknum2str_array[c->hooknum], c->prio,
-			nft_verdict2str(c->policy));
+			c->type, nft_hooknum2str(c->family, c->hooknum),
+			c->prio, nft_verdict2str(c->policy));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -757,8 +783,8 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 				"<hooknum>%s</hooknum>"
 				"<prio>%d</prio>"
 				"<policy>%s</policy>",
-			c->type, hooknum2str_array[c->hooknum], c->prio,
-			nft_verdict2str(c->policy));
+			c->type, nft_hooknum2str(c->family, c->hooknum),
+			c->prio, nft_verdict2str(c->policy));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -782,8 +808,8 @@ static int nft_chain_snprintf_default(char *buf, size_t size,
 		ret = snprintf(buf+offset, size,
 			       " type %s hook %s prio %d policy %s use %d "
 			       "packets %"PRIu64" bytes %"PRIu64"",
-			       c->type, hooknum2str_array[c->hooknum], c->prio,
-			       nft_verdict2str(c->policy), c->use,
+			       c->type, nft_hooknum2str(c->family, c->hooknum),
+			       c->prio, nft_verdict2str(c->policy), c->use,
 			       c->packets, c->bytes);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
