@@ -58,6 +58,7 @@ struct nft_rule_expr *nft_jansson_expr_parse(json_t *root);
 union nft_data_reg;
 int nft_jansson_data_reg_parse(json_t *root, const char *tag,
 			       union nft_data_reg *data_reg);
+struct nft_set_elem;
 int nft_set_elem_json_parse(struct nft_set_elem *e, json_t *root);
 #endif
 
