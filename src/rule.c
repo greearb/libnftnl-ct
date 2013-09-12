@@ -475,22 +475,17 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 }
 EXPORT_SYMBOL(nft_rule_nlmsg_parse);
 
-static int nft_rule_json_parse(struct nft_rule *r, const char *json)
-{
 #ifdef JSON_PARSING
-	json_t *root, *node, *array;
-	json_error_t error;
+static int nft_jansson_parse_rule(struct nft_rule *r, json_t *tree)
+{
+	json_t *root, *array;
 	struct nft_rule_expr *e;
 	const char *str = NULL;
 	uint64_t uval64;
 	uint32_t uval32;
 	int i, family;
 
-	node = nft_jansson_create_root(json, &error);
-	if (node == NULL)
-		return -1;
-
-	root = nft_jansson_get_node(node, "rule");
+	root = nft_jansson_get_node(tree, "rule");
 	if (root == NULL)
 		return -1;
 
@@ -557,11 +552,25 @@ static int nft_rule_json_parse(struct nft_rule *r, const char *json)
 		nft_rule_add_expr(r, e);
 	}
 
-	nft_jansson_free_root(node);
+	nft_jansson_free_root(tree);
 	return 0;
 err:
-	nft_jansson_free_root(node);
+	nft_jansson_free_root(tree);
 	return -1;
+}
+#endif
+
+static int nft_rule_json_parse(struct nft_rule *r, const char *json)
+{
+#ifdef JSON_PARSING
+	json_t *tree;
+	json_error_t error;
+
+	tree = nft_jansson_create_root(json, &error);
+	if (tree == NULL)
+		return -1;
+
+	return nft_jansson_parse_rule(r, tree);
 #else
 	errno = EOPNOTSUPP;
 	return -1;

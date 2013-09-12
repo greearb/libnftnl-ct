@@ -505,21 +505,16 @@ static inline int nft_str2hooknum(int family, const char *hook)
 	return -1;
 }
 
-static int nft_chain_json_parse(struct nft_chain *c, const char *json)
-{
 #ifdef JSON_PARSING
-	json_t *root, *node;
-	json_error_t error;
+static int nft_jansson_parse_chain(struct nft_chain *c, json_t *tree)
+{
+	json_t *root;
 	uint64_t uval64;
 	uint32_t policy;
 	int32_t val32;
 	const char *valstr;
 
-	node = nft_jansson_create_root(json, &error);
-	if (node == NULL)
-		return -1;
-
-	root = nft_jansson_get_node(node, "chain");
+	root = nft_jansson_get_node(tree, "chain");
 	if (root == NULL)
 		return -1;
 
@@ -591,12 +586,26 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_POLICY, policy);
 	}
 
-	nft_jansson_free_root(node);
+	nft_jansson_free_root(tree);
 	return 0;
 
 err:
-	nft_jansson_free_root(node);
+	nft_jansson_free_root(tree);
 	return -1;
+}
+#endif
+
+static int nft_chain_json_parse(struct nft_chain *c, const char *json)
+{
+#ifdef JSON_PARSING
+	json_t *tree;
+	json_error_t error;
+
+	tree = nft_jansson_create_root(json, &error);
+	if (tree == NULL)
+		return -1;
+
+	return nft_jansson_parse_chain(c, tree);
 #else
 	errno = EOPNOTSUPP;
 	return -1;

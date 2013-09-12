@@ -303,21 +303,16 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 }
 EXPORT_SYMBOL(nft_set_nlmsg_parse);
 
-static int nft_set_json_parse(struct nft_set *s, const char *json)
-{
 #ifdef JSON_PARSING
-	json_t *root, *node, *array, *json_elem;
-	json_error_t error;
+static int nft_jansson_parse_set(struct nft_set *s, json_t *tree)
+{
+	json_t *root, *array, *json_elem;
 	uint32_t uval32;
 	int family, i;
 	const char *valstr;
 	struct nft_set_elem *elem;
 
-	node = nft_jansson_create_root(json, &error);
-	if (node == NULL)
-		return -1;
-
-	root = nft_jansson_get_node(node, "set");
+	root = nft_jansson_get_node(tree, "set");
 	if (root == NULL)
 		return -1;
 
@@ -388,11 +383,26 @@ static int nft_set_json_parse(struct nft_set *s, const char *json)
 
 	}
 
-	nft_jansson_free_root(node);
+	nft_jansson_free_root(tree);
 	return 0;
 err:
-	nft_jansson_free_root(node);
+	nft_jansson_free_root(tree);
 	return -1;
+
+}
+#endif
+
+static int nft_set_json_parse(struct nft_set *s, const char *json)
+{
+#ifdef JSON_PARSING
+	json_t *tree;
+	json_error_t error;
+
+	tree = nft_jansson_create_root(json, &error);
+	if (tree == NULL)
+		return -1;
+
+	return nft_jansson_parse_set(s, tree);
 #else
 	errno = EOPNOTSUPP;
 	return -1;
