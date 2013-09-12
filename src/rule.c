@@ -557,10 +557,10 @@ static int nft_rule_json_parse(struct nft_rule *r, const char *json)
 		nft_rule_add_expr(r, e);
 	}
 
-	json_decref(node);
+	nft_jansson_free_root(node);
 	return 0;
 err:
-	json_decref(node);
+	nft_jansson_free_root(node);
 	return -1;
 #else
 	errno = EOPNOTSUPP;
