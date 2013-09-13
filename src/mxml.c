@@ -86,68 +86,17 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 			    union nft_data_reg *data_reg, uint16_t flags)
 {
 	mxml_node_t *node;
-	const char *type;
-	char *tmpstr = NULL;
-	int ret;
 
 	node = mxmlFindElement(tree, tree, node_name, NULL, NULL,
 			       MXML_DESCEND_FIRST);
 	if (node == NULL || node->child == NULL) {
-		if (flags & NFT_XML_OPT)
-			return 0;
+		if (!(flags & NFT_XML_OPT))
+			errno = EINVAL;
 
-		errno = EINVAL;
-		goto err;
-	}
-
-	tmpstr = mxmlSaveAllocString(node, MXML_NO_CALLBACK);
-	if (tmpstr == NULL) {
-		errno = ENOMEM;
-		goto err;
-	}
-
-	ret = nft_data_reg_xml_parse(data_reg, tmpstr);
-	xfree(tmpstr);
-
-	if (ret < 0) {
-		if (flags & NFT_XML_OPT)
-			return 0;
-
-		errno = EINVAL;
-		goto err;
-	}
-
-	node = mxmlFindElement(node, node, "data_reg", NULL, NULL,
-			       MXML_DESCEND);
-	if (node == NULL || node->child == NULL) {
-		if (flags & NFT_XML_OPT)
-			return 0;
-
-		errno = EINVAL;
-		goto err;
-	}
-
-	type = mxmlElementGetAttr(node, "type");
-	if (type == NULL) {
-		if (flags & NFT_XML_OPT)
-			return DATA_NONE;
-
-		errno = EINVAL;
-		goto err;
-	}
-
-	if (strcmp(type, "value") == 0)
-		return DATA_VALUE;
-	else if (strcmp(type, "verdict") == 0)
-		return DATA_VERDICT;
-	else if (strcmp(type, "chain") == 0)
-		return DATA_CHAIN;
-	else if (flags & NFT_XML_OPT)
 		return DATA_NONE;
+	}
 
-	errno = EINVAL;
-err:
-	return -1;
+	return nft_data_reg_xml_parse(data_reg, node);
 }
 
 int

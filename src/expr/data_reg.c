@@ -102,117 +102,48 @@ int nft_data_reg_json_parse(union nft_data_reg *reg, json_t *data)
 }
 
 #ifdef XML_PARSING
-static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg, char *xml)
+static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg,
+					  mxml_node_t *tree)
 {
-	mxml_node_t *tree = NULL;
-	mxml_node_t *node = NULL;
 	int verdict;
 	const char *verdict_str;
 
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	/* Get and validate <data_reg type="verdict" >*/
-	if (mxmlElementGetAttr(node, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (strcmp(mxmlElementGetAttr(node, "type"), "verdict") != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	/* Get and set <verdict> */
-	verdict_str = nft_mxml_str_parse(tree, "verdict", MXML_DESCEND,
+	verdict_str = nft_mxml_str_parse(tree, "verdict", MXML_DESCEND_FIRST,
 					 NFT_XML_MAND);
-	if (verdict_str == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (verdict_str == NULL)
+		return DATA_NONE;
 
 	verdict = nft_str2verdict(verdict_str);
-	if (verdict < 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (verdict < 0)
+		return DATA_NONE;
 
 	reg->verdict = (uint32_t)verdict;
 
-	mxmlDelete(tree);
-	return 0;
+	return DATA_VERDICT;
 }
 
-static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg, char *xml)
+static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg,
+					mxml_node_t *tree)
 {
-	mxml_node_t *tree = NULL;
-	mxml_node_t *node = NULL;
+	const char *chain;
 
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
+	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST,
+				   NFT_XML_MAND);
+	if (chain == NULL)
+		return DATA_NONE;
 
-	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	/* Get and validate <data_reg type="chain" >*/
-	if (mxmlElementGetAttr(node, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (strcmp(mxmlElementGetAttr(node, "type"), "chain") != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	/* Get and set <chain> */
 	if (reg->chain)
 		xfree(reg->chain);
 
-	reg->chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND,
-					NFT_XML_MAND);
-	if (reg->chain == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	mxmlDelete(tree);
-	return 0;
+	reg->chain = strdup(chain);
+	return DATA_CHAIN;
 }
 
-static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
+static int nft_data_reg_value_xml_parse(union nft_data_reg *reg,
+					mxml_node_t *tree)
 {
-	mxml_node_t *tree = NULL;
-	mxml_node_t *node = NULL;
 	int i;
 	char node_name[6];
-
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-
-	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
 
 	/*
 	* <data_reg type="value">
@@ -224,77 +155,52 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 	* </data_reg>
 	*/
 
-	/* Get and validate <data_reg type="value" ... >*/
-	if (mxmlElementGetAttr(node, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (strcmp(mxmlElementGetAttr(node, "type"), "value") != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
-
-	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND, BASE_DEC, &reg->len,
-			       NFT_TYPE_U8, NFT_XML_MAND) != 0) {
-		mxmlDelete(tree);
-		return -1;
-	}
+	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
+			       &reg->len, NFT_TYPE_U8, NFT_XML_MAND) != 0)
+		return DATA_NONE;
 
 	/* Get and set <dataN> */
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
 		sprintf(node_name, "data%d", i);
 
-		if (nft_mxml_num_parse(tree, node_name, MXML_DESCEND, BASE_HEX,
-				       &reg->val[i], NFT_TYPE_U32,
-				       NFT_XML_MAND) != 0) {
-			mxmlDelete(tree);
-			return -1;
-		}
-
+		if (nft_mxml_num_parse(tree, node_name, MXML_DESCEND_FIRST,
+				       BASE_HEX, &reg->val[i], NFT_TYPE_U32,
+				       NFT_XML_MAND) != 0)
+			return DATA_NONE;
 	}
 
-	mxmlDelete(tree);
-	return 0;
+	return DATA_VALUE;
 }
 #endif
 
-int nft_data_reg_xml_parse(union nft_data_reg *reg, char *xml)
+int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree)
 {
 #ifdef XML_PARSING
-	mxml_node_t *node = NULL;
-	mxml_node_t *tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	const char *type;
+	mxml_node_t *node;
 
-	if (tree == NULL)
-		return -1;
-
-	node = mxmlFindElement(tree, tree, "data_reg", NULL, NULL,
+	node = mxmlFindElement(tree, tree, "data_reg", "type", NULL,
 			       MXML_DESCEND_FIRST);
 	if (node == NULL) {
-		mxmlDelete(tree);
-		return -1;
+		errno = EINVAL;
+		return DATA_NONE;
 	}
 
-	/* Get <data_reg type="xxx" ... >*/
-	if (mxmlElementGetAttr(node, "type") == NULL) {
-		mxmlDelete(tree);
-		return -1;
+	type = mxmlElementGetAttr(node, "type");
+
+	if (type == NULL) {
+		errno = EINVAL;
+		return DATA_NONE;
 	}
 
-	/* Select what type of parsing is needed */
-	if (strcmp(mxmlElementGetAttr(node, "type"), "value") == 0) {
-		mxmlDelete(tree);
-		return nft_data_reg_value_xml_parse(reg, xml);
-	} else if (strcmp(mxmlElementGetAttr(node, "type"), "verdict") == 0) {
-		mxmlDelete(tree);
-		return nft_data_reg_verdict_xml_parse(reg, xml);
-	} else if (strcmp(mxmlElementGetAttr(node, "type"), "chain") == 0) {
-		mxmlDelete(tree);
-		return nft_data_reg_chain_xml_parse(reg, xml);
-	}
+	if (strcmp(type, "value") == 0)
+		return nft_data_reg_value_xml_parse(reg, node);
+	else if (strcmp(type, "verdict") == 0)
+		return nft_data_reg_verdict_xml_parse(reg, node);
+	else if (strcmp(type, "chain") == 0)
+		return nft_data_reg_chain_xml_parse(reg, node);
 
-	mxmlDelete(tree);
-	return -1;
+	return DATA_NONE;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
