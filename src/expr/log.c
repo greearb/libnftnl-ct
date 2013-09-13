@@ -64,12 +64,16 @@ nft_rule_expr_log_get(const struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_LOG_PREFIX:
+		*data_len = strlen(log->prefix)+1;
 		return log->prefix;
 	case NFT_EXPR_LOG_GROUP:
+		*data_len = sizeof(log->group);
 		return &log->group;
 	case NFT_EXPR_LOG_SNAPLEN:
+		*data_len = sizeof(log->snaplen);
 		return &log->snaplen;
 	case NFT_EXPR_LOG_QTHRESHOLD:
+		*data_len = sizeof(log->qthreshold);
 		return &log->qthreshold;
 	}
 	return NULL;
@@ -91,13 +95,13 @@ static int nft_rule_expr_log_cb(const struct nlattr *attr, void *data)
 		}
 		break;
 	case NFTA_LOG_GROUP:
-	case NFTA_LOG_SNAPLEN:
+	case NFTA_LOG_QTHRESHOLD:
 		if (mnl_attr_validate(attr, MNL_TYPE_U16) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
 		}
 		break;
-	case NFTA_LOG_QTHRESHOLD:
+	case NFTA_LOG_SNAPLEN:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
