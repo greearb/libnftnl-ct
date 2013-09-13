@@ -148,13 +148,13 @@ nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	struct nft_expr_counter *ctr = nft_expr_data(e);
 
 	if (nft_mxml_num_parse(tree, "pkts", MXML_DESCEND_FIRST, BASE_DEC,
-                               &ctr->pkts, NFT_TYPE_U64) != 0)
+			       &ctr->pkts, NFT_TYPE_U64, NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_CTR_PACKETS);
 
 	if (nft_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
-                               &ctr->bytes, NFT_TYPE_U64) != 0)
+			       &ctr->bytes, NFT_TYPE_U64, NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_CTR_BYTES);

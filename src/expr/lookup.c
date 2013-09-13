@@ -180,7 +180,8 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	const char *set_name;
 	int32_t reg;
 
-	set_name = nft_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST);
+	set_name = nft_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST,
+				      NFT_XML_MAND);
 	if (set_name == NULL)
 		return -1;
 

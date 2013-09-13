@@ -30,13 +30,15 @@ enum nft_type {
 
 #ifdef XML_PARSING
 #include <mxml.h>
+#define NFT_XML_MAND 0
+#define NFT_XML_OPT (1 << 0)
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node);
 int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags);
 union nft_data_reg;
-int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name, union nft_data_reg *data_reg);
-int nft_mxml_num_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags, int base, void *number, enum nft_type type);
-const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags);
-int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags);
+int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name, union nft_data_reg *data_reg, uint16_t flags);
+int nft_mxml_num_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags, int base, void *number, enum nft_type type, uint16_t flags);
+const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags, uint16_t flags);
+int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name, uint32_t mxml_flags, uint16_t flags);
 
 struct nft_set_elem;
 int nft_mxml_set_elem_parse(mxml_node_t *node, struct nft_set_elem *e);

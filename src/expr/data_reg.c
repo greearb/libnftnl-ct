@@ -133,7 +133,8 @@ static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg, char *xml)
 	}
 
 	/* Get and set <verdict> */
-	verdict_str = nft_mxml_str_parse(tree, "verdict", MXML_DESCEND);
+	verdict_str = nft_mxml_str_parse(tree, "verdict", MXML_DESCEND,
+					 NFT_XML_MAND);
 	if (verdict_str == NULL) {
 		mxmlDelete(tree);
 		return -1;
@@ -183,7 +184,8 @@ static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg, char *xml)
 	if (reg->chain)
 		xfree(reg->chain);
 
-	reg->chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND);
+	reg->chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND,
+					NFT_XML_MAND);
 	if (reg->chain == NULL) {
 		mxmlDelete(tree);
 		return -1;
@@ -234,7 +236,7 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 	}
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND, BASE_DEC, &reg->len,
-			       NFT_TYPE_U8) != 0) {
+			       NFT_TYPE_U8, NFT_XML_MAND) != 0) {
 		mxmlDelete(tree);
 		return -1;
 	}
@@ -244,7 +246,8 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg, char *xml)
 		sprintf(node_name, "data%d", i);
 
 		if (nft_mxml_num_parse(tree, node_name, MXML_DESCEND, BASE_HEX,
-				       &reg->val[i], NFT_TYPE_U32) != 0) {
+				       &reg->val[i], NFT_TYPE_U32,
+				       NFT_XML_MAND) != 0) {
 			mxmlDelete(tree);
 			return -1;
 		}

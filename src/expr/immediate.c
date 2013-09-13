@@ -232,10 +232,7 @@ nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	e->flags |= (1 << NFT_EXPR_IMM_DREG);
 
 	datareg_type = nft_mxml_data_reg_parse(tree, "immediatedata",
-					       &imm->data);
-	if (datareg_type < 0)
-		return -1;
-
+					       &imm->data, NFT_XML_MAND);
 	switch (datareg_type) {
 	case DATA_VALUE:
 		e->flags |= (1 << NFT_EXPR_IMM_DATA);

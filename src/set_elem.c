@@ -378,41 +378,36 @@ EXPORT_SYMBOL(nft_set_elems_nlmsg_parse);
 #ifdef XML_PARSING
 int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e)
 {
-	mxml_node_t *node;
 	int set_elem_data;
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
 			       BASE_DEC, &e->set_elem_flags,
-			       NFT_TYPE_U32) != 0)
+			       NFT_TYPE_U32, NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_SET_ELEM_ATTR_FLAGS);
 
-	if (nft_mxml_data_reg_parse(tree, "key", &e->key) != DATA_VALUE)
+	if (nft_mxml_data_reg_parse(tree, "key", &e->key,
+				    NFT_XML_MAND) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_SET_ELEM_ATTR_KEY);
 
 	/* <set_elem_data> is not mandatory */
-	node = mxmlFindElement(tree, tree, "data", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node != NULL && node->child != NULL) {
-		set_elem_data = nft_mxml_data_reg_parse(tree, "data",
-							&e->data);
-		switch (set_elem_data) {
-		case DATA_VALUE:
-			e->flags |= (1 << NFT_SET_ELEM_ATTR_DATA);
-			break;
-		case DATA_VERDICT:
-			e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
-			break;
-		case DATA_CHAIN:
-			e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
-			break;
-		default:
-			return -1;
-		}
+	set_elem_data = nft_mxml_data_reg_parse(tree, "data",
+						&e->data, NFT_XML_OPT);
+	switch (set_elem_data) {
+	case DATA_VALUE:
+		e->flags |= (1 << NFT_SET_ELEM_ATTR_DATA);
+		break;
+	case DATA_VERDICT:
+		e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
+		break;
+	case DATA_CHAIN:
+		e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
+		break;
 	}
+
 	return 0;
 }
 #endif

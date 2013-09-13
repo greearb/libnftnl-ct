@@ -83,7 +83,7 @@ err:
 }
 
 int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
-			    union nft_data_reg *data_reg)
+			    union nft_data_reg *data_reg, uint16_t flags)
 {
 	mxml_node_t *node;
 	const char *type;
@@ -93,6 +93,9 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 	node = mxmlFindElement(tree, tree, node_name, NULL, NULL,
 			       MXML_DESCEND_FIRST);
 	if (node == NULL || node->child == NULL) {
+		if (flags & NFT_XML_OPT)
+			return 0;
+
 		errno = EINVAL;
 		goto err;
 	}
@@ -107,6 +110,9 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 	xfree(tmpstr);
 
 	if (ret < 0) {
+		if (flags & NFT_XML_OPT)
+			return 0;
+
 		errno = EINVAL;
 		goto err;
 	}
@@ -114,12 +120,18 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 	node = mxmlFindElement(node, node, "data_reg", NULL, NULL,
 			       MXML_DESCEND);
 	if (node == NULL || node->child == NULL) {
+		if (flags & NFT_XML_OPT)
+			return 0;
+
 		errno = EINVAL;
 		goto err;
 	}
 
 	type = mxmlElementGetAttr(node, "type");
 	if (type == NULL) {
+		if (flags & NFT_XML_OPT)
+			return DATA_NONE;
+
 		errno = EINVAL;
 		goto err;
 	}
@@ -130,8 +142,10 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 		return DATA_VERDICT;
 	else if (strcmp(type, "chain") == 0)
 		return DATA_CHAIN;
-	else
-		errno = EINVAL;
+	else if (flags & NFT_XML_OPT)
+		return DATA_NONE;
+
+	errno = EINVAL;
 err:
 	return -1;
 }
@@ -139,27 +153,30 @@ err:
 int
 nft_mxml_num_parse(mxml_node_t *tree, const char *node_name,
 		   uint32_t mxml_flags, int base, void *number,
-		   enum nft_type type)
+		   enum nft_type type, uint16_t flags)
 {
 	mxml_node_t *node = NULL;
 
 	node = mxmlFindElement(tree, tree, node_name, NULL, NULL, mxml_flags);
 	if (node == NULL || node->child == NULL) {
-		errno = EINVAL;
+		if (!(flags & NFT_XML_OPT))
+			errno = EINVAL;
+
 		return -1;
 	}
-
 	return nft_strtoi(node->child->value.opaque, base, number, type);
 }
 
 const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
-			       uint32_t mxml_flags)
+			       uint32_t mxml_flags, uint16_t flags)
 {
 	mxml_node_t *node;
 
 	node = mxmlFindElement(tree, tree, node_name, NULL, NULL, mxml_flags);
 	if (node == NULL || node->child == NULL) {
-		errno = EINVAL;
+		if (!(flags & NFT_XML_OPT))
+			errno = EINVAL;
+
 		return NULL;
 	}
 
@@ -167,12 +184,13 @@ const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
 }
 
 int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name,
-			  uint32_t mxml_flags)
+			  uint32_t mxml_flags, uint16_t flags)
 {
 	const char *family_str;
 	int family;
 
-	family_str = nft_mxml_str_parse(tree, node_name, mxml_flags);
+	family_str = nft_mxml_str_parse(tree, node_name, mxml_flags,
+					flags);
 	if (family_str == NULL)
 		return -1;
 

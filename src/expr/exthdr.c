@@ -249,7 +249,7 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	e->flags |= (1 << NFT_EXPR_EXTHDR_DREG);
 
 	exthdr_type = nft_mxml_str_parse(tree, "exthdr_type",
-					 MXML_DESCEND_FIRST);
+					 MXML_DESCEND_FIRST, NFT_XML_MAND);
 	if (exthdr_type == NULL)
 		return -1;
 
@@ -262,14 +262,15 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 
 	/* Get and set <offset> */
 	if (nft_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
-			       &exthdr->offset, NFT_TYPE_U32) != 0)
+			       &exthdr->offset, NFT_TYPE_U32,
+			       NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_EXTHDR_OFFSET);
 
 	/* Get and set <len> */
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &exthdr->len, NFT_TYPE_U32) != 0)
+			       &exthdr->len, NFT_TYPE_U32, NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_EXTHDR_LEN);

@@ -205,7 +205,8 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tr
 	meta->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_META_DREG);
 
-	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST);
+	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST,
+				     NFT_XML_MAND);
 	if (key_str == NULL)
 		return -1;
 

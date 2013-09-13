@@ -2,6 +2,7 @@
 #define _DATA_H_
 
 enum {
+	DATA_NONE,
 	DATA_VALUE,
 	DATA_VERDICT,
 	DATA_CHAIN,

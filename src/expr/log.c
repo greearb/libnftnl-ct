@@ -202,7 +202,8 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	struct nft_expr_log *log = nft_expr_data(e);
 	const char *prefix;
 
-	prefix = nft_mxml_str_parse(tree, "prefix", MXML_DESCEND_FIRST);
+	prefix = nft_mxml_str_parse(tree, "prefix", MXML_DESCEND_FIRST,
+				    NFT_XML_MAND);
 	if (prefix == NULL)
 		return -1;
 
@@ -210,19 +211,20 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	e->flags |= (1 << NFT_EXPR_LOG_PREFIX);
 
 	if (nft_mxml_num_parse(tree, "group", MXML_DESCEND_FIRST, BASE_DEC,
-			       &log->group, NFT_TYPE_U16) != 0)
+			       &log->group, NFT_TYPE_U16, NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LOG_GROUP);
 
 	if (nft_mxml_num_parse(tree, "snaplen", MXML_DESCEND_FIRST, BASE_DEC,
-			       &log->snaplen, NFT_TYPE_U32) != 0)
+			       &log->snaplen, NFT_TYPE_U32, NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LOG_SNAPLEN);
 
 	if (nft_mxml_num_parse(tree, "qthreshold", MXML_DESCEND_FIRST,
-			       BASE_DEC, &log->qthreshold, NFT_TYPE_U16) != 0)
+			       BASE_DEC, &log->qthreshold,
+			       NFT_TYPE_U16, NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LOG_QTHRESHOLD);

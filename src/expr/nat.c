@@ -262,7 +262,8 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	int32_t reg;
 	int family, nat_type_value;
 
-	nat_type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST);
+	nat_type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST,
+				      NFT_XML_MAND);
 	if (nat_type == NULL)
 		return -1;
 
@@ -273,7 +274,8 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	nat->type = nat_type_value;
 	e->flags |= (1 << NFT_EXPR_NAT_TYPE);
 
-	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
+	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
+				       NFT_XML_MAND);
 	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;

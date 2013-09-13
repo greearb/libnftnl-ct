@@ -246,18 +246,20 @@ nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	e->flags |= (1 << NFT_EXPR_BITWISE_DREG);
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST,
-			       BASE_DEC, &bitwise->len, NFT_TYPE_U8) != 0)
+			       BASE_DEC, &bitwise->len, NFT_TYPE_U8,
+			       NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BITWISE_LEN);
 
-	if (nft_mxml_data_reg_parse(tree, "mask",
-				    &bitwise->mask) != DATA_VALUE)
+	if (nft_mxml_data_reg_parse(tree, "mask", &bitwise->mask,
+				    NFT_XML_MAND) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BITWISE_MASK);
 
-	if (nft_mxml_data_reg_parse(tree, "xor", &bitwise->xor) != DATA_VALUE)
+	if (nft_mxml_data_reg_parse(tree, "xor", &bitwise->xor,
+				    NFT_XML_MAND) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BITWISE_XOR);

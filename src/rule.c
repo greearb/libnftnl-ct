@@ -592,14 +592,16 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 	if (strcmp(tree->value.opaque, "rule") != 0)
 		goto err;
 
-	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST);
+	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
+				       NFT_XML_MAND);
 	if (family < 0)
 		goto err;
 
 	r->family = family;
 	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
 
-	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST);
+	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
+				   NFT_XML_MAND);
 	if (table == NULL)
 		goto err;
 
@@ -609,7 +611,8 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 	r->table = strdup(table);
 	r->flags |= (1 << NFT_RULE_ATTR_TABLE);
 
-	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST);
+	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST,
+				   NFT_XML_MAND);
 	if (chain == NULL)
 		goto err;
 
@@ -620,46 +623,38 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 	r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
 
 	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
-			       &r->handle, NFT_TYPE_U64) != 0)
+			       &r->handle, NFT_TYPE_U64, NFT_XML_MAND) != 0)
 		goto err;
 
 	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
-			       BASE_DEC, &r->rule_flags, NFT_TYPE_U32) != 0)
+			       BASE_DEC, &r->rule_flags, NFT_TYPE_U32,
+			       NFT_XML_MAND) != 0)
 		goto err;
 
 	r->flags |= (1 << NFT_RULE_ATTR_FLAGS);
 
-	node = mxmlFindElement(tree, tree, "compat_proto", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL && node->child != NULL) {
-		if (nft_strtoi(node->child->value.opaque, BASE_DEC,
-			       &r->compat.proto, NFT_TYPE_U32) != 0)
-			goto err;
-
+	if (nft_mxml_num_parse(tree, "compat_proto", MXML_DESCEND_FIRST,
+			       BASE_DEC, &r->compat.proto, NFT_TYPE_U32,
+			       NFT_XML_OPT) >= 0)
 		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_PROTO);
-	}
 
-	node = mxmlFindElement(tree, tree, "compat_flags", NULL, NULL,
-			       MXML_DESCEND);
-	if (node != NULL && node->child != NULL) {
-		if (nft_strtoi(node->child->value.opaque, BASE_DEC,
-			       &r->compat.flags, NFT_TYPE_U32) != 0)
-			goto err;
-
+	if (nft_mxml_num_parse(tree, "compat_flags", MXML_DESCEND_FIRST,
+			       BASE_DEC, &r->compat.flags, NFT_TYPE_U32,
+			       NFT_XML_OPT) >= 0)
 		r->flags |= (1 << NFT_RULE_ATTR_COMPAT_FLAGS);
+
+	if (nft_rule_attr_is_set(r, NFT_RULE_ATTR_COMPAT_PROTO) !=
+			nft_rule_attr_is_set(r, NFT_RULE_ATTR_COMPAT_FLAGS)) {
+		errno = EINVAL;
+		goto err;
 	}
 
-	node = mxmlFindElement(tree, tree, "position", NULL, NULL,
-			       MXML_DESCEND_FIRST);
-	if (node != NULL && node->child != NULL) {
-		if (nft_strtoi(node->child->value.opaque, BASE_DEC,
-			       &r->position, NFT_TYPE_U64) != 0)
-			goto err;
-
+	if (nft_mxml_num_parse(tree, "position", MXML_DESCEND_FIRST,
+			       BASE_DEC, &r->position, NFT_TYPE_U64,
+			       NFT_XML_OPT) >= 0)
 		r->flags |= (1 << NFT_RULE_ATTR_POSITION);
-	}
 
 	/* Iterating over <expr> */
 	for (node = mxmlFindElement(tree, tree, "expr", "type",

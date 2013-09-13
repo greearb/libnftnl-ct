@@ -241,7 +241,8 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	ct->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_CT_DREG);
 
-	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST);
+	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST,
+				     NFT_XML_MAND);
 	if (key_str == NULL)
 		return -1;
 
@@ -252,8 +253,8 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	ct->key = key;
 	e->flags |= (1 << NFT_EXPR_CT_KEY);
 
-	if (nft_mxml_num_parse(tree, "dir", MXML_DESCEND_FIRST, BASE_DEC, &dir,
-			       NFT_TYPE_U8) != 0)
+	if (nft_mxml_num_parse(tree, "dir", MXML_DESCEND_FIRST, BASE_DEC,
+			       &dir, NFT_TYPE_U8, NFT_XML_MAND) != 0)
 		return -1;
 
 	if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)

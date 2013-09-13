@@ -260,7 +260,7 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	byteorder->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_DREG);
 
-	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST);
+	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFT_XML_MAND);
 	if (op == NULL)
 		return -1;
 
@@ -272,13 +272,15 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_OP);
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &byteorder->len, NFT_TYPE_U8) != 0)
+			       &byteorder->len, NFT_TYPE_U8,
+			       NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_LEN);
 
 	if (nft_mxml_num_parse(tree, "size", MXML_DESCEND_FIRST, BASE_DEC,
-			       &byteorder->size, NFT_TYPE_U8) != 0)
+			       &byteorder->size, NFT_TYPE_U8,
+			       NFT_XML_MAND) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_SIZE);

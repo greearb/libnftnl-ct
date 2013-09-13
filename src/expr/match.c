@@ -195,7 +195,8 @@ static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, mxml_node_t *t
 	struct nft_expr_match *mt = nft_expr_data(e);
 	const char *name;
 
-	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST);
+	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
+				  NFT_XML_MAND);
 	if (name == NULL)
 		return -1;
 
