@@ -23,6 +23,10 @@ union nft_data_reg {
 #define json_t void
 #endif
 
+#ifndef XML_PARSING
+#define mxml_node_t void
+#endif
+
 int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
                         uint32_t output_format, uint32_t flags, int reg_type);
 int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree);
