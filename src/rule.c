@@ -577,25 +577,18 @@ static int nft_rule_json_parse(struct nft_rule *r, const char *json)
 #endif
 }
 
-static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
-{
 #ifdef XML_PARSING
-	mxml_node_t *tree, *node, *save;
+int nft_mxml_rule_parse(mxml_node_t *tree, struct nft_rule *r)
+{
+	mxml_node_t *node;
 	struct nft_rule_expr *e;
 	const char *table, *chain;
 	int family;
 
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (strcmp(tree->value.opaque, "rule") != 0)
-		goto err;
-
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFT_XML_MAND);
 	if (family < 0)
-		goto err;
+		return -1;
 
 	r->family = family;
 	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
@@ -603,7 +596,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
 				   NFT_XML_MAND);
 	if (table == NULL)
-		goto err;
+		return -1;
 
 	if (r->table)
 		xfree(r->table);
@@ -614,7 +607,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST,
 				   NFT_XML_MAND);
 	if (chain == NULL)
-		goto err;
+		return -1;
 
 	if (r->chain)
 		xfree(r->chain);
@@ -624,14 +617,14 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 
 	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
 			       &r->handle, NFT_TYPE_U64, NFT_XML_MAND) != 0)
-		goto err;
+		return -1;
 
 	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
 			       BASE_DEC, &r->rule_flags, NFT_TYPE_U32,
 			       NFT_XML_MAND) != 0)
-		goto err;
+		return -1;
 
 	r->flags |= (1 << NFT_RULE_ATTR_FLAGS);
 
@@ -648,7 +641,7 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 	if (nft_rule_attr_is_set(r, NFT_RULE_ATTR_COMPAT_PROTO) !=
 			nft_rule_attr_is_set(r, NFT_RULE_ATTR_COMPAT_FLAGS)) {
 		errno = EINVAL;
-		goto err;
+		return -1;
 	}
 
 	if (nft_mxml_num_parse(tree, "position", MXML_DESCEND_FIRST,
@@ -662,26 +655,28 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 		node != NULL;
 		node = mxmlFindElement(node, tree, "expr", "type",
 				       NULL, MXML_DESCEND)) {
-
-		/* This is a hack for mxml to print just the current node */
-		save = node->next;
-		node->next = NULL;
-
 		e = nft_mxml_expr_parse(node);
 		if (e == NULL)
-			goto err;
+			return -1;
 
 		nft_rule_add_expr(r, e);
-
-		node->next = save;
-		save = NULL;
 	}
 
-	mxmlDelete(tree);
 	return 0;
-err:
+}
+#endif
+
+static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
+{
+#ifdef XML_PARSING
+	int ret;
+	mxml_node_t *tree = nft_mxml_build_tree(xml, "rule");
+	if (tree == NULL)
+		return -1;
+
+	ret = nft_mxml_rule_parse(tree, r);
 	mxmlDelete(tree);
-	return -1;
+	return ret;
 #else
 	errno = EOPNOTSUPP;
 	return -1;

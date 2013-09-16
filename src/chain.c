@@ -612,50 +612,42 @@ static int nft_chain_json_parse(struct nft_chain *c, const char *json)
 #endif
 }
 
-static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
-{
 #ifdef XML_PARSING
-	mxml_node_t *tree;
+int nft_mxml_chain_parse(mxml_node_t *tree, struct nft_chain *c)
+{
 	const char *table, *name, *hooknum_str, *policy_str, *type;
 	int family, hooknum, policy;
-
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL)
-		return -1;
-
-	if (strcmp(tree->value.opaque, "chain") != 0)
-		goto err;
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFT_XML_MAND);
 	if (name == NULL)
-		goto err;
+		return -1;
 
 	strncpy(c->name, name, NFT_CHAIN_MAXNAMELEN);
 	c->flags |= (1 << NFT_CHAIN_ATTR_NAME);
 
 	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
 			       &c->handle, NFT_TYPE_U64, NFT_XML_MAND) != 0)
-		goto err;
+		return -1;
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_HANDLE);
 
 	if (nft_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
 			       &c->bytes, NFT_TYPE_U64, NFT_XML_MAND) != 0)
-		goto err;
+		return -1;
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_BYTES);
 
 	if (nft_mxml_num_parse(tree, "packets", MXML_DESCEND_FIRST, BASE_DEC,
 			       &c->packets, NFT_TYPE_U64, NFT_XML_MAND) != 0)
-		goto err;
+		return -1;
 
 	c->flags |= (1 << NFT_CHAIN_ATTR_PACKETS);
 
 	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
 				   NFT_XML_MAND);
 	if (table == NULL)
-		goto err;
+		return -1;
 
 	if (c->table)
 		xfree(c->table);
@@ -666,7 +658,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFT_XML_MAND);
 	if (family < 0)
-		goto err;
+		return -1;
 
 	c->family = family;
 	c->flags |= (1 << NFT_CHAIN_ATTR_FAMILY);
@@ -676,7 +668,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 	if (hooknum_str != NULL) {
 		hooknum = nft_str2hooknum(c->family, hooknum_str);
 		if (hooknum < 0)
-			goto err;
+			return -1;
 
 		c->hooknum = hooknum;
 		c->flags |= (1 << NFT_CHAIN_ATTR_HOOKNUM);
@@ -684,7 +676,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 		type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST,
 					  NFT_XML_MAND);
 		if (type == NULL)
-			goto err;
+			return -1;
 
 		if (c->type)
 			xfree(c->type);
@@ -696,7 +688,7 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 		if (nft_mxml_num_parse(tree, "prio", MXML_DESCEND, BASE_DEC,
 				       &c->prio, NFT_TYPE_S32,
 				       NFT_XML_MAND) != 0)
-			goto err;
+			return -1;
 
 		c->flags |= (1 << NFT_CHAIN_ATTR_PRIO);
 
@@ -704,21 +696,31 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 						MXML_DESCEND_FIRST,
 						NFT_XML_MAND);
 		if (policy_str == NULL)
-			goto err;
+			return -1;
 
 		policy = nft_str2verdict(policy_str);
 		if (policy == -1)
-			goto err;
+			return -1;
 
 		c->policy = policy;
 		c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);
 	}
 
-	mxmlDelete(tree);
 	return 0;
-err:
+}
+#endif
+
+static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
+{
+#ifdef XML_PARSING
+	int ret;
+	mxml_node_t *tree = nft_mxml_build_tree(xml, "chain");
+	if (tree == NULL)
+		return -1;
+
+	ret = nft_mxml_chain_parse(tree, c);
 	mxmlDelete(tree);
-	return -1;
+	return ret;
 #else
 	errno = EOPNOTSUPP;
 	return -1;

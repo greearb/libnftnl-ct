@@ -418,23 +418,13 @@ static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml)
 	mxml_node_t *tree;
 	int ret;
 
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
-	if (tree == NULL) {
-		errno = EINVAL;
+	tree = nft_mxml_build_tree(xml, "set_elem");
+	if (tree == NULL)
 		return -1;
-	}
-
-	if (strcmp(tree->value.opaque, "set_elem") != 0) {
-		errno = EINVAL;
-		goto err;
-	}
 
 	ret = nft_mxml_set_elem_parse(tree, e);
 	mxmlDelete(tree);
 	return ret;
-err:
-	mxmlDelete(tree);
-	return -1;
 #else
 	errno = EOPNOTSUPP;
 	return -1;

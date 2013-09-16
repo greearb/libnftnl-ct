@@ -32,6 +32,7 @@ enum nft_type {
 #include <mxml.h>
 #define NFT_XML_MAND 0
 #define NFT_XML_OPT (1 << 0)
+mxml_node_t *nft_mxml_build_tree(const char *xml, const char *treename);
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node);
 int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags);
 union nft_data_reg;
@@ -42,6 +43,14 @@ int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name, uint32_t mxm
 
 struct nft_set_elem;
 int nft_mxml_set_elem_parse(mxml_node_t *node, struct nft_set_elem *e);
+struct nft_table;
+int nft_mxml_table_parse(mxml_node_t *tree, struct nft_table *t);
+struct nft_chain;
+int nft_mxml_chain_parse(mxml_node_t *tree, struct nft_chain *c);
+struct nft_rule;
+int nft_mxml_rule_parse(mxml_node_t *tree, struct nft_rule *r);
+struct nft_set;
+int nft_mxml_set_parse(mxml_node_t *tree, struct nft_set *s);
 #endif
 
 #ifdef JSON_PARSING
