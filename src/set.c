@@ -720,6 +720,12 @@ void nft_set_list_add_tail(struct nft_set *s, struct nft_set_list *list)
 }
 EXPORT_SYMBOL(nft_set_list_add_tail);
 
+void nft_set_list_del(struct nft_set *s)
+{
+	list_del(&s->head);
+}
+EXPORT_SYMBOL(nft_set_list_del);
+
 int nft_set_list_foreach(struct nft_set_list *set_list,
 			 int (*cb)(struct nft_set *t, void *data), void *data)
 {

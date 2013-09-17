@@ -71,7 +71,7 @@ int nft_chain_list_foreach(struct nft_chain_list *chain_list, int (*cb)(struct n
 
 void nft_chain_list_add(struct nft_chain *r, struct nft_chain_list *list);
 void nft_chain_list_add_tail(struct nft_chain *r, struct nft_chain_list *list);
-void nft_chain_list_del(struct nft_chain *r);
+void nft_chain_list_del(struct nft_chain *c);
 
 struct nft_chain_list_iter;
 

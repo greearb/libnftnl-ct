@@ -948,6 +948,12 @@ void nft_rule_list_add_tail(struct nft_rule *r, struct nft_rule_list *list)
 }
 EXPORT_SYMBOL(nft_rule_list_add_tail);
 
+void nft_rule_list_del(struct nft_rule *r)
+{
+	list_del(&r->head);
+}
+EXPORT_SYMBOL(nft_rule_list_del);
+
 int nft_rule_list_foreach(struct nft_rule_list *rule_list,
 			  int (*cb)(struct nft_rule *r, void *data),
 			  void *data)
