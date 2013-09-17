@@ -264,11 +264,13 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *r)
 	if (r->flags & (1 << NFT_RULE_ATTR_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_RULE_FLAGS, htonl(r->rule_flags));
 
-	nest = mnl_attr_nest_start(nlh, NFTA_RULE_EXPRESSIONS);
-	list_for_each_entry(expr, &r->expr_list, head) {
-		nft_rule_expr_build_payload(nlh, expr);
+	if (!list_empty(&r->expr_list)) {
+		nest = mnl_attr_nest_start(nlh, NFTA_RULE_EXPRESSIONS);
+		list_for_each_entry(expr, &r->expr_list, head) {
+			nft_rule_expr_build_payload(nlh, expr);
+		}
+		mnl_attr_nest_end(nlh, nest);
 	}
-	mnl_attr_nest_end(nlh, nest);
 
 	if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO) &&
 	    r->flags & (1 << NFT_RULE_ATTR_COMPAT_FLAGS)) {
