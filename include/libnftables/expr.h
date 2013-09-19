@@ -19,14 +19,14 @@ struct nft_rule_expr *nft_rule_expr_alloc(const char *name);
 void nft_rule_expr_free(struct nft_rule_expr *expr);
 
 bool nft_rule_expr_is_set(const struct nft_rule_expr *expr, uint16_t type);
-void nft_rule_expr_set(struct nft_rule_expr *expr, uint16_t type, const void *data, size_t data_len);
+void nft_rule_expr_set(struct nft_rule_expr *expr, uint16_t type, const void *data, uint32_t data_len);
 void nft_rule_expr_set_u8(struct nft_rule_expr *expr, uint16_t type, uint8_t data);
 void nft_rule_expr_set_u16(struct nft_rule_expr *expr, uint16_t type, uint16_t data);
 void nft_rule_expr_set_u32(struct nft_rule_expr *expr, uint16_t type, uint32_t data);
 void nft_rule_expr_set_u64(struct nft_rule_expr *expr, uint16_t type, uint64_t data);
 void nft_rule_expr_set_str(struct nft_rule_expr *expr, uint16_t type, const char *str);
 
-const void *nft_rule_expr_get(const struct nft_rule_expr *expr, uint16_t type, size_t *data_len);
+const void *nft_rule_expr_get(const struct nft_rule_expr *expr, uint16_t type, uint32_t *data_len);
 uint8_t nft_rule_expr_get_u8(const struct nft_rule_expr *expr, uint16_t type);
 uint16_t nft_rule_expr_get_u16(const struct nft_rule_expr *expr, uint16_t type);
 uint32_t nft_rule_expr_get_u32(const struct nft_rule_expr *expr, uint16_t type);

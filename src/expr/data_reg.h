@@ -11,7 +11,7 @@ enum {
 union nft_data_reg {
 	struct {
 		uint32_t	val[4];
-		size_t		len;
+		uint32_t	len;
 	};
 	struct {
 		int		verdict;

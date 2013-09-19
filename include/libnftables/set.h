@@ -88,11 +88,11 @@ void nft_set_elem_free(struct nft_set_elem *s);
 void nft_set_elem_add(struct nft_set *s, struct nft_set_elem *elem);
 
 void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr);
-void nft_set_elem_attr_set(struct nft_set_elem *s, uint16_t attr, const void *data, size_t data_len);
+void nft_set_elem_attr_set(struct nft_set_elem *s, uint16_t attr, const void *data, uint32_t data_len);
 void nft_set_elem_attr_set_u32(struct nft_set_elem *s, uint16_t attr, uint32_t val);
 void nft_set_elem_attr_set_str(struct nft_set_elem *s, uint16_t attr, const char *str);
 
-const void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, size_t *data_len);
+const void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, uint32_t *data_len);
 const char *nft_set_elem_attr_get_str(struct nft_set_elem *s, uint16_t attr);
 uint32_t nft_set_elem_attr_get_u32(struct nft_set_elem *s, uint16_t attr);
 

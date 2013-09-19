@@ -35,7 +35,7 @@ struct nft_expr_nat {
 
 static int
 nft_rule_expr_nat_set(struct nft_rule_expr *e, uint16_t type,
-		      const void *data, size_t data_len)
+		      const void *data, uint32_t data_len)
 {
 	struct nft_expr_nat *nat = nft_expr_data(e);
 
@@ -67,7 +67,7 @@ nft_rule_expr_nat_set(struct nft_rule_expr *e, uint16_t type,
 
 static const void *
 nft_rule_expr_nat_get(const struct nft_rule_expr *e, uint16_t type,
-		      size_t *data_len)
+		      uint32_t *data_len)
 {
 	struct nft_expr_nat *nat = nft_expr_data(e);
 

@@ -21,10 +21,10 @@ struct expr_ops {
 	struct list_head head;
 
 	const char *name;
-	size_t	alloc_len;
+	uint32_t alloc_len;
 	int	max_attr;
-	int	(*set)(struct nft_rule_expr *e, uint16_t type, const void *data, size_t data_len);
-	const void *(*get)(const struct nft_rule_expr *e, uint16_t type, size_t *data_len);
+	int	(*set)(struct nft_rule_expr *e, uint16_t type, const void *data, uint32_t data_len);
+	const void *(*get)(const struct nft_rule_expr *e, uint16_t type, uint32_t *data_len);
 	int 	(*parse)(struct nft_rule_expr *e, struct nlattr *attr);
 	void	(*build)(struct nlmsghdr *nlh, struct nft_rule_expr *e);
 	int	(*snprintf)(char *buf, size_t len, uint32_t type, uint32_t flags, struct nft_rule_expr *e);

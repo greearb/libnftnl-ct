@@ -77,7 +77,7 @@ void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr)
 EXPORT_SYMBOL(nft_set_elem_attr_unset);
 
 void nft_set_elem_attr_set(struct nft_set_elem *s, uint16_t attr,
-			   const void *data, size_t data_len)
+			   const void *data, uint32_t data_len)
 {
 	switch(attr) {
 	case NFT_SET_ELEM_ATTR_FLAGS:
@@ -119,7 +119,7 @@ void nft_set_elem_attr_set_str(struct nft_set_elem *s, uint16_t attr, const char
 }
 EXPORT_SYMBOL(nft_set_elem_attr_set_str);
 
-const void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, size_t *data_len)
+const void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, uint32_t *data_len)
 {
 	if (!(s->flags & (1 << attr)))
 		return NULL;
@@ -144,7 +144,7 @@ EXPORT_SYMBOL(nft_set_elem_attr_get);
 
 const char *nft_set_elem_attr_get_str(struct nft_set_elem *s, uint16_t attr)
 {
-	size_t size;
+	uint32_t size;
 
 	return nft_set_elem_attr_get(s, attr, &size);
 }
@@ -152,7 +152,7 @@ EXPORT_SYMBOL(nft_set_elem_attr_get_str);
 
 uint32_t nft_set_elem_attr_get_u32(struct nft_set_elem *s, uint16_t attr)
 {
-	size_t size;
+	uint32_t size;
 	uint32_t val = *((uint32_t *)nft_set_elem_attr_get(s, attr, &size));
 	return val;
 }

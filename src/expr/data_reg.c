@@ -219,7 +219,7 @@ nft_data_reg_value_snprintf_json(char *buf, size_t size,
 	ret = snprintf(buf, len, "\"data_reg\": { \"type\" : \"value\", ");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "\"len\" : %zd, ", reg->len);
+	ret = snprintf(buf+offset, len, "\"len\" : %u, ", reg->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
@@ -255,7 +255,7 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 	ret = snprintf(buf, len, "<data_reg type=\"value\">");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "<len>%zd</len>", reg->len);
+	ret = snprintf(buf+offset, len, "<len>%u</len>", reg->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
@@ -452,7 +452,7 @@ static int
 __nft_parse_data(union nft_data_reg *data, const struct nlattr *attr)
 {
 	void *orig = mnl_attr_get_payload(attr);
-	size_t data_len = mnl_attr_get_payload_len(attr);
+	uint32_t data_len = mnl_attr_get_payload_len(attr);
 
 	if (data_len == 0)
 		return -1;
