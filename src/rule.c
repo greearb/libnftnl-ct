@@ -706,10 +706,10 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 	struct nft_rule_expr *expr;
 
 	ret = snprintf(buf, size,
-				"{ \"rule\": { \"family\" : \"%s\", \"table\" : \"%s\", "
-				"\"chain\"  : \"%s\", \"handle\" : %llu,",
-				nft_family2str(r->family), r->table, r->chain,
-				(unsigned long long)r->handle);
+		       "{ \"rule\": { \"family\" : \"%s\", \"table\" : \"%s\", "
+		       "\"chain\"  : \"%s\", \"handle\" : %llu,",
+		       nft_family2str(r->family), r->table, r->chain,
+		       (unsigned long long)r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "\"flags\" : %u, ", r->rule_flags);
@@ -731,11 +731,11 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 	}
 
 	ret = snprintf(buf+offset, len, "\"expr\" : [");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(expr, &r->expr_list, head) {
 		ret = snprintf(buf+offset, len,
-				" { \"type\" : \"%s\", ", expr->ops->name);
+			       " { \"type\" : \"%s\", ", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
@@ -746,7 +746,7 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 
 	}
 	ret = snprintf(buf+offset-1, len, "]}}");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }
