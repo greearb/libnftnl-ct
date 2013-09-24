@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
 	struct nft_set *t = NULL;
 	int ret;
 
-	if (argc < 3 || argc > 4) {
-		fprintf(stderr, "%s <family> <table> [<json|xml>]\n", argv[0]);
+	if (argc < 2 || argc > 3) {
+		fprintf(stderr, "%s <family> [<json|xml>]\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 	t = nft_set_alloc();
@@ -79,14 +79,15 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (argc == 4 && strcmp(argv[3], "json") == 0)
+	if (argc == 3 && strcmp(argv[2], "json") == 0)
 		type = NFT_SET_O_JSON;
-	else if (argc == 4 && strcmp(argv[3], "xml") == 0)
+	else if (argc == 3 && strcmp(argv[2], "xml") == 0)
 		type = NFT_SET_O_XML;
 
 	nlh = nft_set_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
 					NLM_F_DUMP|NLM_F_ACK, seq);
-	nft_set_attr_set(t, NFT_SET_ATTR_TABLE, argv[2]);
+	/* Use this below if you want to obtain sets per table */
+/*	nft_set_attr_set(t, NFT_SET_ATTR_TABLE, argv[2]); */
 	nft_set_nlmsg_build_payload(nlh, t);
 	nft_set_free(t);
 
