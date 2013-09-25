@@ -753,7 +753,7 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 {
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, size,
+	ret = snprintf(buf, len,
 		"{ \"chain\": {"
 			"\"name\": \"%s\","
 			"\"handle\": %"PRIu64","
@@ -768,7 +768,7 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
-		ret =  snprintf(buf+offset, size,
+		ret =  snprintf(buf+offset, len,
 				",\"type\": \"%s\","
 				"\"hooknum\": \"%s\","
 				"\"prio\": %d,"
@@ -778,9 +778,7 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, size,
-		"}"
-		"}");
+	ret = snprintf(buf+offset, len, "}}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -790,14 +788,14 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 {
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, size, "<chain><name>%s</name>"
+	ret = snprintf(buf, len, "<chain><name>%s</name>"
 		       "<handle>%"PRIu64"</handle><bytes>%"PRIu64"</bytes>"
 		       "<packets>%"PRIu64"</packets><table>%s</table>",
 		       c->name, c->handle, c->bytes, c->packets, c->table);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
-		ret =  snprintf(buf+offset, size,
+		ret =  snprintf(buf+offset, len,
 				"<type>%s</type>"
 				"<hooknum>%s</hooknum>"
 				"<prio>%d</prio>"
@@ -807,7 +805,7 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, size, "<family>%s</family></chain>",
+	ret = snprintf(buf+offset, len, "<family>%s</family></chain>",
 		       nft_family2str(c->family));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -819,12 +817,12 @@ static int nft_chain_snprintf_default(char *buf, size_t size,
 {
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, size, "%s %s %s",
-			nft_family2str(c->family), c->table, c->name);
+	ret = snprintf(buf, len, "%s %s %s",
+		       nft_family2str(c->family), c->table, c->name);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
-		ret = snprintf(buf+offset, size,
+		ret = snprintf(buf+offset, len,
 			       " type %s hook %s prio %d policy %s use %d "
 			       "packets %"PRIu64" bytes %"PRIu64"",
 			       c->type, nft_hooknum2str(c->family, c->hooknum),

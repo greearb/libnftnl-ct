@@ -705,7 +705,7 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 	int ret, len = size, offset = 0;
 	struct nft_rule_expr *expr;
 
-	ret = snprintf(buf, size,
+	ret = snprintf(buf, len,
 		       "{ \"rule\": { \"family\" : \"%s\", \"table\" : \"%s\", "
 		       "\"chain\"  : \"%s\", \"handle\" : %llu,",
 		       nft_family2str(r->family), r->table, r->chain,
@@ -759,7 +759,7 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 	int ret, len = size, offset = 0;
 	struct nft_rule_expr *expr;
 
-	ret = snprintf(buf, size, "<rule><family>%s</family>"
+	ret = snprintf(buf, len, "<rule><family>%s</family>"
 		       "<table>%s</table><chain>%s</chain>"
 		       "<handle>%llu</handle><flags>%u</flags>",
 		       nft_family2str(r->family), r->table, r->chain,
@@ -786,7 +786,8 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 				"<expr type=\"%s\">", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = nft_rule_expr_snprintf(buf+offset, size, expr, type, flags);
+		ret = nft_rule_expr_snprintf(buf+offset, len, expr,
+					     type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = snprintf(buf+offset, len, "</expr>");
@@ -805,7 +806,7 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 	struct nft_rule_expr *expr;
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, size, "%s %s %s %"PRIu64" %"PRIu64"\n",
+	ret = snprintf(buf, len, "%s %s %s %"PRIu64" %"PRIu64"\n",
 			nft_family2str(r->family), r->table, r->chain,
 			r->handle, r->position);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
@@ -814,7 +815,8 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 		ret = snprintf(buf+offset, len, "  [ %s ", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = nft_rule_expr_snprintf(buf+offset, size, expr, type, flags);
+		ret = nft_rule_expr_snprintf(buf+offset, len, expr,
+					     type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = snprintf(buf+offset, len, "]\n");

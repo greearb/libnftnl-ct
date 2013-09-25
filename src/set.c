@@ -543,7 +543,7 @@ static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
 	int len = size, offset = 0, ret;
 	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, size, "{ \"set\": { \"name\": \"%s\","
+	ret = snprintf(buf, len, "{ \"set\": { \"name\": \"%s\","
 				  "\"table\": \"%s\","
 				  "\"flags\": %u,\"family\": \"%s\","
 				  "\"key_type\": %u,\"key_len\": %u",
@@ -553,7 +553,7 @@ static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
 
 	if(s->flags & (1 << NFT_SET_ATTR_DATA_TYPE) &&
 	   s->flags & (1 << NFT_SET_ATTR_DATA_LEN)){
-		ret = snprintf(buf+offset, size,
+		ret = snprintf(buf+offset, len,
 				  ",\"data_type\": %u,\"data_len\": %u",
 			s->data_type, s->data_len);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
@@ -561,26 +561,26 @@ static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
 
 	/* Empty set? Skip printinf of elements */
 	if (list_empty(&s->element_list)){
-		ret = snprintf(buf+offset, size, "}}");
+		ret = snprintf(buf+offset, len, "}}");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		return offset;
 	}
 
-	ret = snprintf(buf+offset, size, ",\"set_elem\": [");
+	ret = snprintf(buf+offset, len, ",\"set_elem\": [");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(elem, &s->element_list, head) {
-		ret = snprintf(buf+offset, size, "{");
+		ret = snprintf(buf+offset, len, "{");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = nft_set_elem_snprintf(buf+offset, size, elem, type, flags);
+		ret = nft_set_elem_snprintf(buf+offset, len, elem, type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = snprintf(buf+offset, size, "}, ");
+		ret = snprintf(buf+offset, len, "}, ");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset-2, size, "]}}");
+	ret = snprintf(buf+offset, len, "]}}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -593,7 +593,7 @@ static int nft_set_snprintf_default(char *buf, size_t size, struct nft_set *s,
 	int len = size, offset = 0;
 	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, size, "%s %s %x",
+	ret = snprintf(buf, len, "%s %s %x",
 			s->name, s->table, s->set_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -601,14 +601,14 @@ static int nft_set_snprintf_default(char *buf, size_t size, struct nft_set *s,
 	if (list_empty(&s->element_list))
 		return offset;
 
-	ret = snprintf(buf+offset, size, "\n");
+	ret = snprintf(buf+offset, len, "\n");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(elem, &s->element_list, head) {
-		ret = snprintf(buf+offset, size, "\t");
+		ret = snprintf(buf+offset, len, "\t");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = nft_set_elem_snprintf(buf+offset, size, elem, type, flags);
+		ret = nft_set_elem_snprintf(buf+offset, len, elem, type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -622,7 +622,7 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 	int len = size, offset = 0;
 	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, size, "<set><family>%s</family>"
+	ret = snprintf(buf, len, "<set><family>%s</family>"
 				  "<table>%s</table>"
 				  "<name>%s</name>"
 				  "<flags>%u</flags>"
@@ -637,13 +637,13 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 
 	if (!list_empty(&s->element_list)) {
 		list_for_each_entry(elem, &s->element_list, head) {
-			ret = nft_set_elem_snprintf(buf+offset, size, elem,
+			ret = nft_set_elem_snprintf(buf+offset, len, elem,
 						    NFT_SET_O_XML, flags);
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 	}
 
-	ret = snprintf(buf+offset, size, "</set>");
+	ret = snprintf(buf+offset, len, "</set>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
