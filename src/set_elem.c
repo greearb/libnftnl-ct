@@ -519,7 +519,7 @@ static int nft_set_elem_snprintf_default(char *buf, size_t size,
 static int nft_set_elem_snprintf_xml(char *buf, size_t size,
 				     struct nft_set_elem *e, uint32_t flags)
 {
-	int ret, len = size, offset = 0;
+	int ret, len = size, offset = 0, type = DATA_NONE;
 
 	ret = snprintf(buf, size, "<set_elem>"
 				"<flags>%u</flags><key>",
@@ -533,33 +533,19 @@ static int nft_set_elem_snprintf_xml(char *buf, size_t size,
 	ret = snprintf(buf+offset, size, "</key>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	if (e->flags & (1 << NFT_SET_ELEM_ATTR_DATA)) {
+	if (e->flags & (1 << NFT_SET_ELEM_ATTR_DATA))
+		type = DATA_VALUE;
+	else if (e->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN))
+		type = DATA_CHAIN;
+	else if (e->flags & (1 << NFT_SET_ELEM_ATTR_VERDICT))
+		type = DATA_VERDICT;
+
+	if (type != DATA_NONE) {
 		ret = snprintf(buf+offset, size, "<data>");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = nft_data_reg_snprintf(buf+offset, len, &e->data,
-					    NFT_RULE_O_XML, flags, DATA_VALUE);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		ret = snprintf(buf+offset, size, "</data>");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	} else if (e->flags & (1 << NFT_SET_ELEM_ATTR_VERDICT)) {
-		ret = snprintf(buf+offset, size, "<data>");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		ret = nft_data_reg_snprintf(buf+offset, len, &e->data,
-					    NFT_RULE_O_XML, flags,
-					    DATA_VERDICT);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		ret = snprintf(buf+offset, size, "</data>");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	} else if (e->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN)) {
-		ret = snprintf(buf+offset, size, "<data>");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		ret = nft_data_reg_snprintf(buf+offset, len, &e->data,
-					    NFT_RULE_O_XML, flags, DATA_CHAIN);
+					    NFT_RULE_O_XML, flags, type);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = snprintf(buf+offset, size, "</data>");
