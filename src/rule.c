@@ -745,7 +745,9 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	}
-	ret = snprintf(buf+offset-1, len, "]}}");
+	/* Remove comma from last element */
+	offset--;
+	ret = snprintf(buf+offset, len, "]}}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
