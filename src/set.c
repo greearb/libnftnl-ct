@@ -579,6 +579,8 @@ static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
 		ret = snprintf(buf+offset, len, "}, ");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
+	/* Overwrite trailing ", " from last set element */
+	offset -= 2;
 
 	ret = snprintf(buf+offset, len, "]}}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
