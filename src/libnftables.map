@@ -168,5 +168,14 @@ global:
   nft_set_elems_iter_next;
   nft_set_elems_iter_destroy;
 
+  nft_ruleset_alloc;
+  nft_ruleset_free;
+  nft_ruleset_attr_is_set;
+  nft_ruleset_attr_unset;
+  nft_ruleset_attr_set;
+  nft_ruleset_attr_get;
+  nft_ruleset_parse;
+  nft_ruleset_snprintf;
+
 local: *;
 };

@@ -470,7 +470,7 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 EXPORT_SYMBOL(nft_rule_nlmsg_parse);
 
 #ifdef JSON_PARSING
-static int nft_jansson_parse_rule(struct nft_rule *r, json_t *tree)
+int nft_jansson_parse_rule(struct nft_rule *r, json_t *tree)
 {
 	json_t *root, *array;
 	struct nft_rule_expr *e;

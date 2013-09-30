@@ -272,7 +272,7 @@ static int nft_table_xml_parse(struct nft_table *t, const char *xml)
 }
 
 #ifdef JSON_PARSING
-static int nft_jansson_parse_table(struct nft_table *t, json_t *tree)
+int nft_jansson_parse_table(struct nft_table *t, json_t *tree)
 {
 	json_t *root;
 	uint32_t flags;

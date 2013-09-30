@@ -6,6 +6,7 @@
 #include <errno.h>
 
 #include <libmnl/libmnl.h> /*nlmsghdr*/
+#include <libnftables/ruleset.h>
 #include <libnftables/table.h>
 #include <libnftables/chain.h>
 #include <libnftables/rule.h>
@@ -24,10 +25,12 @@ enum {
 	TEST_XML_CHAIN,
 	TEST_XML_RULE,
 	TEST_XML_SET,
+	TEST_XML_RULESET,
 	TEST_JSON_TABLE,
 	TEST_JSON_CHAIN,
 	TEST_JSON_RULE,
 	TEST_JSON_SET,
+	TEST_JSON_RULESET,
 };
 
 #if defined(XML_PARSING) || defined(JSON_PARSING)
@@ -76,6 +79,7 @@ static int compare_test(uint32_t type, void *input, const char *filename)
 	struct nft_chain *c = NULL;
 	struct nft_rule *r = NULL;
 	struct nft_set *s = NULL;
+	struct nft_ruleset *rs = NULL;
 	char orig[4096];
 	char out[4096];
 	FILE *fp;
@@ -96,6 +100,10 @@ static int compare_test(uint32_t type, void *input, const char *filename)
 	case TEST_XML_SET:
 	case TEST_JSON_SET:
 		s = (struct nft_set *)input;
+		break;
+	case TEST_XML_RULESET:
+	case TEST_JSON_RULESET:
+		rs = (struct nft_ruleset *)input;
 		break;
 	default:
 		errno = EINVAL;
@@ -126,6 +134,14 @@ static int compare_test(uint32_t type, void *input, const char *filename)
 		break;
 	case TEST_JSON_SET:
 		nft_set_snprintf(out, sizeof(out), s, NFT_SET_O_JSON, 0);
+		break;
+	case TEST_XML_RULESET:
+		nft_ruleset_snprintf(out, sizeof(out), rs,
+				     NFT_RULESET_O_XML, 0);
+		break;
+	case TEST_JSON_RULESET:
+		nft_ruleset_snprintf(out, sizeof(out), rs,
+				     NFT_RULESET_O_JSON, 0);
 		break;
 	default:
 		errno = EINVAL;
@@ -159,6 +175,7 @@ static int test_json(const char *filename)
 	struct nft_chain *c;
 	struct nft_rule *r;
 	struct nft_set *s;
+	struct nft_ruleset *rs;
 	json_t *root;
 	json_error_t error;
 	char *json;
@@ -211,6 +228,16 @@ static int test_json(const char *filename)
 
 			nft_set_free(s);
 			}
+	} else if (json_object_get(root, "nftables") != NULL) {
+		rs = nft_ruleset_alloc();
+		if (rs != NULL) {
+			if (nft_ruleset_parse(rs, NFT_RULESET_PARSE_JSON, json) == 0)
+				ret = compare_test(TEST_JSON_RULESET, rs, filename);
+			else
+				ret = -1;
+
+			nft_ruleset_free(rs);
+			}
 	}
 
 	free(json);
@@ -237,6 +264,7 @@ static int test_xml(const char *filename)
 	struct nft_chain *c;
 	struct nft_rule *r;
 	struct nft_set *s;
+	struct nft_ruleset *rs;
 	FILE *fp;
 	mxml_node_t *tree;
 	char *xml;
@@ -292,6 +320,18 @@ static int test_xml(const char *filename)
 				goto failparsing;
 
 			nft_set_free(s);
+		}
+	} else if (strcmp(tree->value.opaque, "nftables") == 0) {
+		rs = nft_ruleset_alloc();
+		if (rs != NULL) {
+			if (nft_ruleset_parse(rs, NFT_RULESET_PARSE_XML,
+					      xml) == 0)
+				ret = compare_test(TEST_XML_RULESET, rs,
+						   filename);
+			else
+				ret = -1;
+
+			nft_ruleset_free(rs);
 		}
 	}
 

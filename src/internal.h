@@ -71,6 +71,14 @@ int nft_jansson_data_reg_parse(json_t *root, const char *tag,
 			       union nft_data_reg *data_reg);
 struct nft_set_elem;
 int nft_set_elem_json_parse(struct nft_set_elem *e, json_t *root);
+struct nft_table;
+int nft_jansson_parse_table(struct nft_table *t, json_t *tree);
+struct nft_chain;
+int nft_jansson_parse_chain(struct nft_chain *c, json_t *tree);
+struct nft_rule;
+int nft_jansson_parse_rule(struct nft_rule *r, json_t *tree);
+struct nft_set;
+int nft_jansson_parse_set(struct nft_set *s, json_t *tree);
 #endif
 
 const char *nft_family2str(uint32_t family);

@@ -304,7 +304,7 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 EXPORT_SYMBOL(nft_set_nlmsg_parse);
 
 #ifdef JSON_PARSING
-static int nft_jansson_parse_set(struct nft_set *s, json_t *tree)
+int nft_jansson_parse_set(struct nft_set *s, json_t *tree)
 {
 	json_t *root, *array, *json_elem;
 	uint32_t uval32;

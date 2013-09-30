@@ -506,7 +506,7 @@ static inline int nft_str2hooknum(int family, const char *hook)
 }
 
 #ifdef JSON_PARSING
-static int nft_jansson_parse_chain(struct nft_chain *c, json_t *tree)
+int nft_jansson_parse_chain(struct nft_chain *c, json_t *tree)
 {
 	json_t *root;
 	uint64_t uval64;

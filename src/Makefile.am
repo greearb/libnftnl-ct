@@ -10,6 +10,7 @@ libnftables_la_SOURCES = utils.c		\
 			 rule.c			\
 			 set.c			\
 			 set_elem.c		\
+			 ruleset.c		\
 			 mxml.c			\
 			 jansson.c		\
 			 expr.c			\
