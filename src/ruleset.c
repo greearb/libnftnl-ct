@@ -14,6 +14,7 @@
 #include <errno.h>
 
 #include "internal.h"
+#include <stdlib.h>
 
 #include <libmnl/libmnl.h>
 #include <libnftables/ruleset.h>
