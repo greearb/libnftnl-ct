@@ -754,14 +754,14 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 	int ret, len = size, offset = 0;
 
 	ret = snprintf(buf, len,
-		"{ \"chain\": {"
-			"\"name\": \"%s\","
-			"\"handle\": %"PRIu64","
-			"\"bytes\": %"PRIu64","
-			"\"packets\": %"PRIu64","
-			"\"family\": \"%s\","
-			"\"table\": \"%s\","
-			"\"use\": %d",
+			"{\"chain\":{"
+			"\"name\":\"%s\","
+			"\"handle\":%"PRIu64","
+			"\"bytes\":%"PRIu64","
+			"\"packets\":%"PRIu64","
+			"\"family\":\"%s\","
+			"\"table\":\"%s\","
+			"\"use\":%d",
 			c->name, c->handle, c->bytes, c->packets,
 			nft_family2str(c->family),
 			c->table, c->use);
@@ -769,10 +769,10 @@ static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 
 	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
 		ret =  snprintf(buf+offset, len,
-				",\"type\": \"%s\","
-				"\"hooknum\": \"%s\","
-				"\"prio\": %d,"
-				"\"policy\": \"%s\"",
+				",\"type\":\"%s\","
+				"\"hooknum\":\"%s\","
+				"\"prio\":%d,"
+				"\"policy\":\"%s\"",
 			c->type, nft_hooknum2str(c->family, c->hooknum),
 			c->prio, nft_verdict2str(c->policy));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);

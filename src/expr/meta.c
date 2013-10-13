@@ -239,8 +239,8 @@ nft_rule_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 					  "<key>%s</key>",
 				meta->dreg, meta_key2str(meta->key));
 	case NFT_RULE_O_JSON:
-		return snprintf(buf, len, "\"dreg\" : %u, "
-					  "\"key\" : \"%s\"",
+		return snprintf(buf, len, "\"dreg\":%u,"
+					  "\"key\":\"%s\"",
 				meta->dreg, meta_key2str(meta->key));
 	default:
 		break;

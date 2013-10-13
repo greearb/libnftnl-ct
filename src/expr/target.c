@@ -220,7 +220,7 @@ int nft_rule_exp_target_snprintf_json(char *buf, size_t len,
 {
 	int ret, size = len, offset = 0;
 
-	ret = snprintf(buf, len, "\"name\" : \"%s\"",
+	ret = snprintf(buf, len, "\"name\":\"%s\"",
 			tg->name);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 

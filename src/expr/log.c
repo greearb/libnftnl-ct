@@ -256,10 +256,10 @@ nft_rule_expr_log_snprintf(char *buf, size_t len, uint32_t type,
 				log->prefix, log->group,
 				log->snaplen, log->qthreshold);
 	case NFT_RULE_O_JSON:
-		return snprintf(buf, len, "\"prefix\" : \"%s\", "
-					  "\"group\" : %u, "
-					  "\"snaplen\" : %u, "
-					  "\"qthreshold\" : %u ",
+		return snprintf(buf, len, "\"prefix\":\"%s\","
+					  "\"group\":%u,"
+					  "\"snaplen\":%u,"
+					  "\"qthreshold\":%u",
 				log->prefix, log->group,
 				log->snaplen, log->qthreshold);
 	default:

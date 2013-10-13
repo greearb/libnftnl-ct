@@ -261,8 +261,8 @@ nft_rule_expr_immediate_snprintf_json(char *buf, size_t len,
 	int size = len, offset = 0, ret;
 	struct nft_expr_immediate *imm = nft_expr_data(e);
 
-	ret = snprintf(buf, len, "\"dreg\" : %u, "
-				"\"immediatedata\" : {", imm->dreg);
+	ret = snprintf(buf, len, "\"dreg\":%u,"
+				 "\"immediatedata\":{", imm->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 

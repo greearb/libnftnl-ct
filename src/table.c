@@ -349,10 +349,10 @@ EXPORT_SYMBOL(nft_table_parse);
 static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 {
 	return snprintf(buf, size,
-			"{\"table\" : {"
-			"\"name\" : \"%s\","
-			"\"family\" : \"%s\","
-			"\"flags\" : %d"
+			"{\"table\":{"
+			"\"name\":\"%s\","
+			"\"family\":\"%s\","
+			"\"flags\":%d"
 			"}"
 			"}" ,
 			t->name, nft_family2str(t->family), t->table_flags);

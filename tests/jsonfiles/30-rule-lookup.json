@@ -1,1 +1,1 @@
-{ "rule": { "family" : "ip", "table" : "filter", "chain"  : "input", "handle" : 8,"flags" : 0, "expr" : [ { "type" : "payload", "dreg" : 1, "offset" : 12, "len" : 4, "base" : "network"}, { "type" : "lookup", "set" : "set0", "sreg" : 1, "dreg" : 0}]}}
+{"rule":{"family":"ip","table":"filter","chain":"input","handle":8,"flags":0,"expr":[{"type":"payload","dreg":1,"offset":12,"len":4,"base":"network"},{"type":"lookup","set":"set0","sreg":1,"dreg":0}]}}

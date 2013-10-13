@@ -179,8 +179,8 @@ nft_rule_expr_limit_snprintf(char *buf, size_t len, uint32_t type,
 					  "<depth>%"PRIu64"</depth>",
 				limit->rate, limit->depth);
 	case NFT_RULE_O_JSON:
-		return snprintf(buf, len, "\"rate\" : %"PRIu64", "
-					  "\"depth\" : %"PRIu64" ",
+		return snprintf(buf, len, "\"rate\":%"PRIu64","
+					  "\"depth\":%"PRIu64"",
 				limit->rate, limit->depth);
 	default:
 		break;

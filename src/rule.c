@@ -705,37 +705,35 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 	int ret, len = size, offset = 0;
 	struct nft_rule_expr *expr;
 
-	ret = snprintf(buf, len,
-		       "{ \"rule\": { \"family\" : \"%s\", \"table\" : \"%s\", "
-		       "\"chain\"  : \"%s\", \"handle\" : %llu,",
+	ret = snprintf(buf, len, "{\"rule\":{\"family\":\"%s\",\"table\":\"%s\","
+				 "\"chain\":\"%s\",\"handle\":%llu,",
 		       nft_family2str(r->family), r->table, r->chain,
 		       (unsigned long long)r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "\"flags\" : %u, ", r->rule_flags);
+	ret = snprintf(buf+offset, len, "\"flags\":%u,", r->rule_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO) ||
 	    r->flags & (1 << NFT_RULE_ATTR_COMPAT_FLAGS)) {
-		ret = snprintf(buf+offset, len, "\"compat_flags\" : %u, "
-					        "\"compat_proto\" : %u, ",
+		ret = snprintf(buf+offset, len, "\"compat_flags\":%u,"
+					        "\"compat_proto\":%u,",
 			       r->compat.flags, r->compat.proto);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	if (r->flags & (1 << NFT_RULE_ATTR_POSITION)) {
-		ret = snprintf(buf+offset, len,
-			       "\"position\" : %"PRIu64", ",
+		ret = snprintf(buf+offset, len, "\"position\":%"PRIu64",",
 			       r->position);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, len, "\"expr\" : [");
+	ret = snprintf(buf+offset, len, "\"expr\":[");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(expr, &r->expr_list, head) {
 		ret = snprintf(buf+offset, len,
-			       " { \"type\" : \"%s\", ", expr->ops->name);
+			       "{\"type\":\"%s\",", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);

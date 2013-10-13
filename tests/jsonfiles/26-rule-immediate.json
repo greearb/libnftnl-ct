@@ -1,1 +1,1 @@
-{ "rule": { "family" : "ip", "table" : "filter", "chain"  : "input", "handle" : 26,"flags" : 0, "expr" : [ { "type" : "immediate", "dreg" : 0, "immediatedata" : {"data_reg": {"type" : "verdict", "verdict" : "accept"}}}]}}
+{"rule":{"family":"ip","table":"filter","chain":"input","handle":26,"flags":0,"expr":[{"type":"immediate","dreg":0,"immediatedata":{"data_reg":{"type":"verdict","verdict":"accept"}}}]}}

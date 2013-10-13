@@ -298,11 +298,11 @@ nft_rule_expr_byteorder_snprintf_json(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "\"sreg\" : %u, "
-				 "\"dreg\" : %u, "
-				 "\"op\" : \"%s\", "
-				 "\"len\" : %u, "
-				 "\"size\" : %u",
+	ret = snprintf(buf, len, "\"sreg\":%u,"
+				 "\"dreg\":%u,"
+				 "\"op\":\"%s\","
+				 "\"len\":%u,"
+				 "\"size\":%u",
 		       byteorder->sreg, byteorder->dreg,
 		       expr_byteorder_str[byteorder->op],
 		       byteorder->len, byteorder->size);

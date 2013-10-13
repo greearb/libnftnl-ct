@@ -180,7 +180,7 @@ nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 		return snprintf(buf, len, "<pkts>%"PRIu64"</pkts><bytes>%"PRIu64"</bytes>",
 				ctr->pkts, ctr->bytes);
 	case NFT_RULE_O_JSON:
-		return snprintf(buf, len, "\"pkts\" : %"PRIu64", \"bytes\" : %"PRIu64"",
+		return snprintf(buf, len, "\"pkts\":%"PRIu64",\"bytes\":%"PRIu64"",
 				ctr->pkts, ctr->bytes);
 	default:
 		break;

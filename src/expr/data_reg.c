@@ -216,14 +216,14 @@ nft_data_reg_value_snprintf_json(char *buf, size_t size,
 	uint32_t utemp;
 	uint8_t *tmp;
 
-	ret = snprintf(buf, len, "\"data_reg\": { \"type\" : \"value\", ");
+	ret = snprintf(buf, len, "\"data_reg\":{\"type\":\"value\",");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "\"len\" : %u, ", reg->len);
+	ret = snprintf(buf+offset, len, "\"len\":%u,", reg->len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		ret = snprintf(buf+offset, len, "\"data%d\" : \"0x", i);
+		ret = snprintf(buf+offset, len, "\"data%d\":\"0x", i);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		utemp = htonl(reg->val[i]);
@@ -234,10 +234,10 @@ nft_data_reg_value_snprintf_json(char *buf, size_t size,
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 
-		ret = snprintf(buf+offset, len, "\", ");
+		ret = snprintf(buf+offset, len, "\",");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-	offset -= 2;
+	offset--;
 	ret = snprintf(buf+offset, len, "}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -324,9 +324,9 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 					nft_verdict2str(reg->verdict));
 		case NFT_RULE_O_JSON:
 			return snprintf(buf, size,
-					"\"data_reg\": {"
-						"\"type\" : \"verdict\", "
-						"\"verdict\" : \"%s\""
+					"\"data_reg\":{"
+					"\"type\":\"verdict\","
+					"\"verdict\":\"%s\""
 					"}", nft_verdict2str(reg->verdict));
 		default:
 			break;
@@ -342,8 +342,8 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 					"</data_reg>", reg->chain);
 		case NFT_RULE_O_JSON:
 			return snprintf(buf, size,
-					"\"data_reg\": { \"type\" : \"chain\", "
-						"\"chain\" : \"%s\""
+					"\"data_reg\":{\"type\":\"chain\","
+					"\"chain\":\"%s\""
 					"}", reg->chain);
 		default:
 			break;

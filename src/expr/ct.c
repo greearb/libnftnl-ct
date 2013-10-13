@@ -279,17 +279,17 @@ nft_expr_ct_snprintf_json(char *buf, size_t size, struct nft_rule_expr *e)
 	int ret, len = size, offset = 0;
 	struct nft_expr_ct *ct = nft_expr_data(e);
 
-	ret = snprintf(buf, len, "\"dreg\" : %u", ct->dreg);
+	ret = snprintf(buf, len, "\"dreg\":%u", ct->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (e->flags & (1 << NFT_EXPR_CT_KEY)) {
-		ret = snprintf(buf+offset, len, ", \"key\" : \"%s\"",
+		ret = snprintf(buf+offset, len, ",\"key\":\"%s\"",
 						ctkey2str(ct->key));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	if (e->flags & (1 << NFT_EXPR_CT_DIR)) {
-		ret = snprintf(buf+offset, len, ", \"dir\" : %u", ct->dir);
+		ret = snprintf(buf+offset, len, ",\"dir\":%u", ct->dir);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 

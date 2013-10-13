@@ -169,10 +169,10 @@ nft_rule_expr_payload_snprintf_json(char *buf, size_t len, uint32_t flags,
 {
 	int size = len, offset = 0, ret;
 
-	ret = snprintf(buf, len, "\"dreg\" : %u, "
-				 "\"offset\" : %u, "
-				 "\"len\" : %u, "
-				 "\"base\" : \"%s\"",
+	ret = snprintf(buf, len, "\"dreg\":%u,"
+				 "\"offset\":%u,"
+				 "\"len\":%u,"
+				 "\"base\":\"%s\"",
 		       p->dreg, p->offset, p->len, base2str(p->base));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 

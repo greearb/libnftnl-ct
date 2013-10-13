@@ -783,7 +783,7 @@ nft_ruleset_snprintf_json(char *buf, size_t size, const struct nft_ruleset *rs,
 {
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, size, "{ \"nftables\": [");
+	ret = snprintf(buf, size, "{\"nftables\":[");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_ruleset_do_snprintf(buf+offset, len, rs, NFT_RULESET_O_JSON,

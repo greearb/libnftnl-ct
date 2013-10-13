@@ -1,1 +1,1 @@
-{ "chain": {"name": "chain1","handle": 4,"bytes": 0,"packets": 0,"family": "ip","table": "filter","use": 0}}
+{"chain":{"name":"chain1","handle":4,"bytes":0,"packets":0,"family":"ip","table":"filter","use":0}}

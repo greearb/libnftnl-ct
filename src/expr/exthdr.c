@@ -302,9 +302,9 @@ nft_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 					exthdr_type2str(exthdr->type),
 					exthdr->offset, exthdr->len);
 	case NFT_RULE_O_JSON:
-		return snprintf(buf, len, "\"dreg\" : %u, "
-					  "\"exthdr_type\" : \"%s\", \"offset\" : %u, "
-					  "\"len\" : %u",
+		return snprintf(buf, len, "\"dreg\":%u,"
+					  "\"exthdr_type\":\"%s\",\"offset\":%u,"
+					  "\"len\":%u",
 					exthdr->dreg,
 					exthdr_type2str(exthdr->type),
 					exthdr->offset, exthdr->len);

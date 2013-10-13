@@ -1,1 +1,1 @@
-{ "rule": { "family" : "ip", "table" : "filter", "chain"  : "input", "handle" : 27,"flags" : 0, "expr" : [ { "type" : "limit", "rate" : 321321, "depth" : 0 }]}}
+{"rule":{"family":"ip","table":"filter","chain":"input","handle":27,"flags":0,"expr":[{"type":"limit","rate":321321,"depth":0}]}}
