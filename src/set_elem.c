@@ -298,8 +298,10 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 			break;
 		}
         }
-	if (ret < 0)
+	if (ret < 0) {
 		xfree(e);
+		return -1;
+	}
 
 	/* Add this new element to this set */
 	list_add_tail(&e->head, &s->element_list);
