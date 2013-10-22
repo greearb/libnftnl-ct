@@ -164,23 +164,28 @@ static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, mxml_node_t *t
 #endif
 }
 
+static const char *get_unit(uint64_t u)
+{
+	switch (u) {
+	case 1: return "seconds";
+	case 60: return "minute";
+	case 60 * 60: return "hour";
+	case 60 * 60 * 24: return "day";
+	case 60 * 60 * 24 * 7: return "week";
+	}
+	return "error";
+}
+
 static int
 nft_rule_expr_limit_snprintf(char *buf, size_t len, uint32_t type,
 			    uint32_t flags, struct nft_rule_expr *e)
 {
 	struct nft_expr_limit *limit = nft_expr_data(e);
-	static const char *units[] = {
-		[1]			= "second",
-		[1 * 60]		= "minute",
-		[1 * 60 * 60]		= "hour",
-		[1 * 60 * 60 * 24]	= "day",
-		[1 * 60 * 60 * 24 * 7]	= "week",
-	};
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
 		return snprintf(buf, len, "rate %"PRIu64"/%s ",
-				limit->rate, units[limit->unit]);
+				limit->rate, get_unit(limit->unit));
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<rate>%"PRIu64"</rate>"
 					  "<unit>%"PRIu64"</unit>",
