@@ -167,7 +167,7 @@ static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, mxml_node_t *t
 static const char *get_unit(uint64_t u)
 {
 	switch (u) {
-	case 1: return "seconds";
+	case 1: return "second";
 	case 60: return "minute";
 	case 60 * 60: return "hour";
 	case 60 * 60 * 24: return "day";
