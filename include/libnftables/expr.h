@@ -134,7 +134,7 @@ enum {
 
 enum {
 	NFT_EXPR_LIMIT_RATE	= NFT_RULE_EXPR_ATTR_BASE,
-	NFT_EXPR_LIMIT_DEPTH,
+	NFT_EXPR_LIMIT_UNIT,
 };
 
 #ifdef __cplusplus

@@ -25,7 +25,7 @@
 
 struct nft_expr_limit {
 	uint64_t		rate;
-	uint64_t		depth;
+	uint64_t		unit;
 };
 
 static int
@@ -38,8 +38,8 @@ nft_rule_expr_limit_set(struct nft_rule_expr *e, uint16_t type,
 	case NFT_EXPR_LIMIT_RATE:
 		limit->rate = *((uint64_t *)data);
 		break;
-	case NFT_EXPR_LIMIT_DEPTH:
-		limit->depth = *((uint64_t *)data);
+	case NFT_EXPR_LIMIT_UNIT:
+		limit->unit = *((uint64_t *)data);
 		break;
 	default:
 		return -1;
@@ -57,9 +57,9 @@ nft_rule_expr_limit_get(const struct nft_rule_expr *e, uint16_t type,
 	case NFT_EXPR_LIMIT_RATE:
 		*data_len = sizeof(uint64_t);
 		return &limit->rate;
-	case NFT_EXPR_LIMIT_DEPTH:
+	case NFT_EXPR_LIMIT_UNIT:
 		*data_len = sizeof(uint64_t);
-		return &limit->depth;
+		return &limit->unit;
 	}
 	return NULL;
 }
@@ -74,7 +74,7 @@ static int nft_rule_expr_limit_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTA_LIMIT_RATE:
-	case NFTA_LIMIT_DEPTH:
+	case NFTA_LIMIT_UNIT:
 		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
@@ -93,8 +93,8 @@ nft_rule_expr_limit_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 
 	if (e->flags & (1 << NFT_EXPR_LIMIT_RATE))
 		mnl_attr_put_u64(nlh, NFTA_LIMIT_RATE, htobe64(limit->rate));
-	if (e->flags & (1 << NFT_EXPR_LIMIT_DEPTH))
-		mnl_attr_put_u64(nlh, NFTA_LIMIT_DEPTH, htobe64(limit->depth));
+	if (e->flags & (1 << NFT_EXPR_LIMIT_UNIT))
+		mnl_attr_put_u64(nlh, NFTA_LIMIT_UNIT, htobe64(limit->unit));
 }
 
 static int
@@ -110,9 +110,9 @@ nft_rule_expr_limit_parse(struct nft_rule_expr *e, struct nlattr *attr)
 		limit->rate = be64toh(mnl_attr_get_u64(tb[NFTA_LIMIT_RATE]));
 		e->flags |= (1 << NFT_EXPR_LIMIT_RATE);
 	}
-	if (tb[NFTA_LIMIT_DEPTH]) {
-		limit->depth = be64toh(mnl_attr_get_u64(tb[NFTA_LIMIT_DEPTH]));
-		e->flags |= (1 << NFT_EXPR_LIMIT_DEPTH);
+	if (tb[NFTA_LIMIT_UNIT]) {
+		limit->unit = be64toh(mnl_attr_get_u64(tb[NFTA_LIMIT_UNIT]));
+		e->flags |= (1 << NFT_EXPR_LIMIT_UNIT);
 	}
 
 	return 0;
@@ -128,10 +128,10 @@ static int nft_rule_expr_limit_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_RATE, uval64);
 
-	if (nft_jansson_parse_val(root, "depth", NFT_TYPE_U64, &uval64) < 0)
+	if (nft_jansson_parse_val(root, "unit", NFT_TYPE_U64, &uval64) < 0)
 		return -1;
 
-	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_DEPTH, uval64);
+	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_UNIT, uval64);
 
 	return 0;
 #else
@@ -151,11 +151,11 @@ static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, mxml_node_t *t
 
 	e->flags |= (1 << NFT_EXPR_LIMIT_RATE);
 
-	if (nft_mxml_num_parse(tree, "depth", MXML_DESCEND_FIRST, BASE_DEC,
-			       &limit->depth, NFT_TYPE_U64, NFT_XML_MAND) != 0)
+	if (nft_mxml_num_parse(tree, "unit", MXML_DESCEND_FIRST, BASE_DEC,
+			       &limit->unit, NFT_TYPE_U64, NFT_XML_MAND) != 0)
 		return -1;
 
-	e->flags |= (1 << NFT_EXPR_LIMIT_DEPTH);
+	e->flags |= (1 << NFT_EXPR_LIMIT_UNIT);
 
 	return 0;
 #else
@@ -169,19 +169,26 @@ nft_rule_expr_limit_snprintf(char *buf, size_t len, uint32_t type,
 			    uint32_t flags, struct nft_rule_expr *e)
 {
 	struct nft_expr_limit *limit = nft_expr_data(e);
+	static const char *units[] = {
+		[1]			= "second",
+		[1 * 60]		= "minute",
+		[1 * 60 * 60]		= "hour",
+		[1 * 60 * 60 * 24]	= "day",
+		[1 * 60 * 60 * 24 * 7]	= "week",
+	};
 
 	switch(type) {
 	case NFT_RULE_O_DEFAULT:
-		return snprintf(buf, len, "rate %"PRIu64" depth %"PRIu64" ",
-				limit->rate, limit->depth);
+		return snprintf(buf, len, "rate %"PRIu64"/%s ",
+				limit->rate, units[limit->unit]);
 	case NFT_RULE_O_XML:
 		return snprintf(buf, len, "<rate>%"PRIu64"</rate>"
-					  "<depth>%"PRIu64"</depth>",
-				limit->rate, limit->depth);
+					  "<unit>%"PRIu64"</unit>",
+				limit->rate, limit->unit);
 	case NFT_RULE_O_JSON:
 		return snprintf(buf, len, "\"rate\":%"PRIu64","
-					  "\"depth\":%"PRIu64"",
-				limit->rate, limit->depth);
+					  "\"unit\":%"PRIu64"",
+				limit->rate, limit->unit);
 	default:
 		break;
 	}
