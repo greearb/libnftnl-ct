@@ -1,2 +1,2 @@
-<rule><family>ip6</family><table>filter</table><chain>test</chain><handle>37</handle><flags>0</flags><expr type="lookup"><set>set0</set><sreg>1</sreg><dreg>0</dreg></expr></rule>
+<rule><family>ip6</family><table>filter</table><chain>test</chain><handle>37</handle><expr type="lookup"><set>set0</set><sreg>1</sreg><dreg>0</dreg></expr></rule>
 <!-- nft add rule ip6 filter test ip6 saddr { ::2 , ::3 } drop -->

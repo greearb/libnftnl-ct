@@ -1,1 +1,1 @@
-<rule><family>ip</family><table>filter</table><chain>INPUT</chain><handle>100</handle><flags>0</flags><expr type="target"><name>LOG</name></expr></rule>
+<rule><family>ip</family><table>filter</table><chain>INPUT</chain><handle>100</handle><expr type="target"><name>LOG</name></expr></rule>

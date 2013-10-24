@@ -37,7 +37,6 @@ struct nft_rule {
 	const char	*table;
 	const char	*chain;
 	uint8_t		family;
-	uint32_t	rule_flags;
 	uint64_t	handle;
 	uint64_t	position;
 	struct {
@@ -103,7 +102,6 @@ void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr)
 		}
 		break;
 	case NFT_RULE_ATTR_HANDLE:
-	case NFT_RULE_ATTR_FLAGS:
 	case NFT_RULE_ATTR_COMPAT_PROTO:
 	case NFT_RULE_ATTR_COMPAT_FLAGS:
 	case NFT_RULE_ATTR_POSITION:
@@ -132,9 +130,6 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
 		break;
 	case NFT_RULE_ATTR_HANDLE:
 		r->handle = *((uint64_t *)data);
-		break;
-	case NFT_RULE_ATTR_FLAGS:
-		r->rule_flags = *((uint32_t *)data);
 		break;
 	case NFT_RULE_ATTR_COMPAT_PROTO:
 		r->compat.proto = *((uint32_t *)data);
@@ -187,8 +182,6 @@ const void *nft_rule_attr_get(const struct nft_rule *r, uint16_t attr)
 		return r->chain;
 	case NFT_RULE_ATTR_HANDLE:
 		return &r->handle;
-	case NFT_RULE_ATTR_FLAGS:
-		return &r->rule_flags;
 	case NFT_RULE_ATTR_COMPAT_PROTO:
 		return &r->compat.proto;
 	case NFT_RULE_ATTR_COMPAT_FLAGS:
@@ -505,11 +498,6 @@ int nft_jansson_parse_rule(struct nft_rule *r, json_t *tree)
 
 	nft_rule_attr_set_u64(r, NFT_RULE_ATTR_HANDLE, uval64);
 
-	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &uval32) < 0)
-		goto err;
-
-	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS, uval32);
-
 	if (nft_jansson_node_exist(root, "compat_proto") ||
 	    nft_jansson_node_exist(root, "compat_flags")) {
 		if (nft_jansson_parse_val(root, "compat_proto", NFT_TYPE_U32,
@@ -615,13 +603,6 @@ int nft_mxml_rule_parse(mxml_node_t *tree, struct nft_rule *r)
 
 	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 
-	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
-			       BASE_DEC, &r->rule_flags, NFT_TYPE_U32,
-			       NFT_XML_MAND) != 0)
-		return -1;
-
-	r->flags |= (1 << NFT_RULE_ATTR_FLAGS);
-
 	if (nft_mxml_num_parse(tree, "compat_proto", MXML_DESCEND_FIRST,
 			       BASE_DEC, &r->compat.proto, NFT_TYPE_U32,
 			       NFT_XML_OPT) >= 0)
@@ -711,9 +692,6 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 		       (unsigned long long)r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "\"flags\":%u,", r->rule_flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
 	if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO) ||
 	    r->flags & (1 << NFT_RULE_ATTR_COMPAT_FLAGS)) {
 		ret = snprintf(buf+offset, len, "\"compat_flags\":%u,"
@@ -759,9 +737,9 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 
 	ret = snprintf(buf, len, "<rule><family>%s</family>"
 		       "<table>%s</table><chain>%s</chain>"
-		       "<handle>%llu</handle><flags>%u</flags>",
+		       "<handle>%llu</handle>",
 		       nft_family2str(r->family), r->table, r->chain,
-		       (unsigned long long)r->handle, r->rule_flags);
+		       (unsigned long long)r->handle);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (r->compat.flags != 0 || r->compat.proto != 0) {

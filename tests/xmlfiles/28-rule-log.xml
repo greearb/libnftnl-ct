@@ -1,2 +1,2 @@
-<rule><family>ip6</family><table>filter</table><chain>test</chain><handle>96</handle><flags>0</flags><expr type="log"><prefix>test_chain</prefix><group>1</group><snaplen>0</snaplen><qthreshold>0</qthreshold></expr></rule>
+<rule><family>ip6</family><table>filter</table><chain>test</chain><handle>96</handle><expr type="log"><prefix>test_chain</prefix><group>1</group><snaplen>0</snaplen><qthreshold>0</qthreshold></expr></rule>
 <!-- nft add rule ip6 filter test log prefix test_chain group 1 -->

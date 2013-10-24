@@ -1,1 +1,1 @@
-{"rule":{"family":"ip","table":"filter","chain":"output","handle":23,"flags":0,"expr":[{"type":"counter","pkts":135,"bytes":21655}]}}
+{"rule":{"family":"ip","table":"filter","chain":"output","handle":23,"expr":[{"type":"counter","pkts":135,"bytes":21655}]}}

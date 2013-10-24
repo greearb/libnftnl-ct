@@ -1,1 +1,1 @@
-{"rule":{"family":"ip","table":"filter","chain":"input","handle":10,"flags":0,"expr":[{"type":"nat","nat_type":"dnat","family":"ip","sreg_addr_min":1,"sreg_addr_max":2,"sreg_proto_min":3,"sreg_proto_max":4}]}}
+{"rule":{"family":"ip","table":"filter","chain":"input","handle":10,"expr":[{"type":"nat","nat_type":"dnat","family":"ip","sreg_addr_min":1,"sreg_addr_max":2,"sreg_proto_min":3,"sreg_proto_max":4}]}}

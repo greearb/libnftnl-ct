@@ -1,2 +1,2 @@
-<rule><family>ip6</family><table>filter</table><chain>test</chain><handle>36</handle><flags>0</flags><expr type="cmp"><sreg>1</sreg><op>eq</op><cmpdata><data_reg type="value"><len>16</len><data0>0x00000000</data0><data1>0x6e6f6200</data1><data2>0x2e303164</data2><data3>0x00393331</data3></data_reg></cmpdata></expr></rule>
+<rule><family>ip6</family><table>filter</table><chain>test</chain><handle>36</handle><expr type="cmp"><sreg>1</sreg><op>eq</op><cmpdata><data_reg type="value"><len>16</len><data0>0x00000000</data0><data1>0x6e6f6200</data1><data2>0x2e303164</data2><data3>0x00393331</data3></data_reg></cmpdata></expr></rule>
 <!-- nft add rule ip6 filter test meta iifname bond10.139 accept -->
