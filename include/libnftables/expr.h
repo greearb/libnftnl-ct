@@ -137,6 +137,11 @@ enum {
 	NFT_EXPR_LIMIT_UNIT,
 };
 
+enum {
+	NFT_EXPR_REJECT_TYPE	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_REJECT_CODE,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
