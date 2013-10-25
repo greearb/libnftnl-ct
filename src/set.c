@@ -183,8 +183,8 @@ EXPORT_SYMBOL(nft_set_attr_get_str);
 
 uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr)
 {
-	uint32_t val = *((uint32_t *)nft_set_attr_get(s, attr));
-	return val;
+	const uint32_t *val = nft_set_attr_get(s, attr);
+	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_set_attr_get_u32);
 

@@ -201,22 +201,22 @@ EXPORT_SYMBOL(nft_rule_attr_get_str);
 
 uint32_t nft_rule_attr_get_u32(const struct nft_rule *r, uint16_t attr)
 {
-	uint32_t val = *((uint32_t *)nft_rule_attr_get(r, attr));
-	return val;
+	const uint32_t *val = nft_rule_attr_get(r, attr);
+	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u32);
 
 uint64_t nft_rule_attr_get_u64(const struct nft_rule *r, uint16_t attr)
 {
-	uint64_t val = *((uint64_t *)nft_rule_attr_get(r, attr));
-	return val;
+	const uint64_t *val = nft_rule_attr_get(r, attr);
+	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u64);
 
 uint8_t nft_rule_attr_get_u8(const struct nft_rule *r, uint16_t attr)
 {
-	uint8_t val = *((uint8_t *)nft_rule_attr_get(r, attr));
-	return val;
+	const uint8_t *val = nft_rule_attr_get(r, attr);
+	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u8);
 
