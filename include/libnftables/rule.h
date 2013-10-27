@@ -39,6 +39,8 @@ uint64_t nft_rule_attr_get_u64(const struct nft_rule *r, uint16_t attr);
 
 void nft_rule_add_expr(struct nft_rule *r, struct nft_rule_expr *expr);
 
+struct nlmsghdr;
+
 void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *t);
 
 enum {

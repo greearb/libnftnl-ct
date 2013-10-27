@@ -30,6 +30,8 @@ const void *nft_set_attr_get(struct nft_set *s, uint16_t attr);
 const char *nft_set_attr_get_str(struct nft_set *s, uint16_t attr);
 uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr);
 
+struct nlmsghdr;
+
 struct nlmsghdr *nft_set_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);
 void nft_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s);
 int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s);

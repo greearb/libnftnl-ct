@@ -41,6 +41,8 @@ uint32_t nft_chain_attr_get_u32(struct nft_chain *c, uint16_t attr);
 int32_t nft_chain_attr_get_s32(struct nft_chain *c, uint16_t attr);
 uint64_t nft_chain_attr_get_u64(struct nft_chain *c, uint16_t attr);
 
+struct nlmsghdr;
+
 void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain *t);
 
 enum {
