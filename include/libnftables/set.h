@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <sys/types.h>
 
 enum {
 	NFT_SET_ATTR_TABLE,
