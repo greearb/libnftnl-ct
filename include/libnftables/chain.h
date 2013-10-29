@@ -1,6 +1,7 @@
 #ifndef _CHAIN_H_
 #define _CHAIN_H_
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -60,6 +61,7 @@ enum nft_chain_parse_type {
 
 int nft_chain_parse(struct nft_chain *c, enum nft_chain_parse_type type, const char *data);
 int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *t, uint32_t type, uint32_t flags);
+int nft_chain_fprintf(FILE *fp, struct nft_chain *c, uint32_t type, uint32_t flags);
 
 struct nlmsghdr *nft_chain_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);
 int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *t);

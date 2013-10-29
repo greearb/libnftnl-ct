@@ -851,6 +851,19 @@ int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
 }
 EXPORT_SYMBOL(nft_chain_snprintf);
 
+static inline int nft_chain_do_snprintf(char *buf, size_t size, void *c,
+					uint32_t type, uint32_t flags)
+{
+	return nft_chain_snprintf(buf, size, c, type, flags);
+}
+
+int nft_chain_fprintf(FILE *fp, struct nft_chain *c, uint32_t type,
+		      uint32_t flags)
+{
+	return nft_fprintf(fp, c, type, flags, nft_chain_do_snprintf);
+}
+EXPORT_SYMBOL(nft_chain_fprintf);
+
 struct nft_chain_list {
 	struct list_head list;
 };

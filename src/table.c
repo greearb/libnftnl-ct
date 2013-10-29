@@ -388,6 +388,19 @@ int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
 }
 EXPORT_SYMBOL(nft_table_snprintf);
 
+static inline int nft_table_do_snprintf(char *buf, size_t size, void *t,
+					uint32_t type, uint32_t flags)
+{
+	return nft_table_snprintf(buf, size, t, type, flags);
+}
+
+int nft_table_fprintf(FILE *fp, struct nft_table *t, uint32_t type,
+		      uint32_t flags)
+{
+	return nft_fprintf(fp, t, type, flags, nft_table_do_snprintf);
+}
+EXPORT_SYMBOL(nft_table_fprintf);
+
 struct nft_table_list {
 	struct list_head list;
 };

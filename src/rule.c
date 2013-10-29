@@ -819,6 +819,19 @@ int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
 }
 EXPORT_SYMBOL(nft_rule_snprintf);
 
+static inline int nft_rule_do_snprintf(char *buf, size_t size, void *r,
+				       uint32_t type, uint32_t flags)
+{
+	return nft_rule_snprintf(buf, size, r, type, flags);
+}
+
+int nft_rule_fprintf(FILE *fp, struct nft_rule *r, uint32_t type,
+		     uint32_t flags)
+{
+	return nft_fprintf(fp, r, type, flags, nft_rule_do_snprintf);
+}
+EXPORT_SYMBOL(nft_rule_fprintf);
+
 int nft_rule_expr_foreach(struct nft_rule *r,
                           int (*cb)(struct nft_rule_expr *e, void *data),
                           void *data)

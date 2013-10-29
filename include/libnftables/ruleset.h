@@ -1,6 +1,8 @@
 #ifndef _RULESET_H_
 #define _RULESET_H_
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,6 +39,7 @@ enum nft_ruleset_parse_type {
 
 int nft_ruleset_parse(struct nft_ruleset *rs, enum nft_ruleset_parse_type type, const char *data);
 int nft_ruleset_snprintf(char *buf, size_t size, const struct nft_ruleset *rs, uint32_t type, uint32_t flags);
+int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type, uint32_t flags);
 
 #ifdef __cplusplus
 } /* extern "C" */

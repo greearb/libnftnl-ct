@@ -174,3 +174,30 @@ void xfree(const void *ptr)
 {
 	free((void *)ptr);
 }
+
+int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags,
+		int (*snprintf_cb)(char *buf, size_t bufsiz, void *obj,
+				   uint32_t type, uint32_t flags))
+{
+	char _buf[NFT_SNPRINTF_BUFSIZ];
+	char *buf = _buf;
+	size_t bufsiz = sizeof(_buf);
+	int ret;
+
+	ret = snprintf_cb(buf, bufsiz, obj, type, flags);
+	if (ret > NFT_SNPRINTF_BUFSIZ) {
+		buf = calloc(1, ret);
+		if (buf == NULL)
+			return -1;
+
+		bufsiz = ret;
+		ret = snprintf_cb(buf, bufsiz, obj, type, flags);
+	}
+
+	ret = fprintf(fp, "%s", buf);
+
+	if (buf != _buf)
+		xfree(buf);
+
+	return ret;
+}

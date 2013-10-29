@@ -577,6 +577,19 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 }
 EXPORT_SYMBOL(nft_set_elem_snprintf);
 
+static inline int nft_set_elem_do_snprintf(char *buf, size_t size, void *e,
+					   uint32_t type, uint32_t flags)
+{
+	return nft_set_elem_snprintf(buf, size, e, type, flags);
+}
+
+int nft_set_elem_fprintf(FILE *fp, struct nft_set_elem *se, uint32_t type,
+			 uint32_t flags)
+{
+	return nft_fprintf(fp, se, type, flags, nft_set_elem_do_snprintf);
+}
+EXPORT_SYMBOL(nft_set_elem_fprintf);
+
 int nft_set_elem_foreach(struct nft_set *s,
 			 int (*cb)(struct nft_set_elem *e, void *data),
 			 void *data)

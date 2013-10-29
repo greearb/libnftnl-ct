@@ -813,3 +813,206 @@ int nft_ruleset_snprintf(char *buf, size_t size, const struct nft_ruleset *r,
 	}
 }
 EXPORT_SYMBOL(nft_ruleset_snprintf);
+
+static int nft_ruleset_fprintf_tables(FILE *fp, const struct nft_ruleset *rs,
+				      uint32_t type, uint32_t flags)
+{
+	int len = 0, ret = 0;
+	struct nft_table *t;
+	struct nft_table_list_iter *ti;
+
+	ti = nft_table_list_iter_create(rs->table_list);
+	if (ti == NULL)
+		return -1;
+
+	t = nft_table_list_iter_next(ti);
+	while (t != NULL) {
+		ret = nft_table_fprintf(fp, t, type, flags);
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+
+		t = nft_table_list_iter_next(ti);
+
+		ret = fprintf(fp, "%s", nft_ruleset_o_separator(t, type));
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+	}
+	nft_table_list_iter_destroy(ti);
+
+	return len;
+err:
+	nft_table_list_iter_destroy(ti);
+	return -1;
+}
+
+static int nft_ruleset_fprintf_chains(FILE *fp, const struct nft_ruleset *rs,
+				      uint32_t type, uint32_t flags)
+{
+	int len = 0, ret = 0;
+	struct nft_chain *o;
+	struct nft_chain_list_iter *i;
+
+	i = nft_chain_list_iter_create(rs->chain_list);
+	if (i == NULL)
+		return -1;
+
+	o = nft_chain_list_iter_next(i);
+	while (o != NULL) {
+		ret = nft_chain_fprintf(fp, o, type, flags);
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+
+		o = nft_chain_list_iter_next(i);
+
+		ret = fprintf(fp, "%s", nft_ruleset_o_separator(o, type));
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+	}
+	nft_chain_list_iter_destroy(i);
+
+	return len;
+err:
+	nft_chain_list_iter_destroy(i);
+	return -1;
+}
+
+static int nft_ruleset_fprintf_sets(FILE *fp, const struct nft_ruleset *rs,
+				    uint32_t type, uint32_t flags)
+{
+	int len = 0, ret = 0;
+	struct nft_set *o;
+	struct nft_set_list_iter *i;
+
+	i = nft_set_list_iter_create(rs->set_list);
+	if (i == NULL)
+		return -1;
+
+	o = nft_set_list_iter_next(i);
+	while (o != NULL) {
+		ret = nft_set_fprintf(fp, o, type, flags);
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+
+		o = nft_set_list_iter_next(i);
+
+		ret = fprintf(fp, "%s", nft_ruleset_o_separator(o, type));
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+	}
+	nft_set_list_iter_destroy(i);
+
+	return len;
+err:
+	nft_set_list_iter_destroy(i);
+	return -1;
+}
+
+static int nft_ruleset_fprintf_rules(FILE *fp, const struct nft_ruleset *rs,
+				    uint32_t type, uint32_t flags)
+{
+	int len = 0, ret = 0;
+	struct nft_rule *o;
+	struct nft_rule_list_iter *i;
+
+	i = nft_rule_list_iter_create(rs->rule_list);
+	if (i == NULL)
+		return -1;
+
+	o = nft_rule_list_iter_next(i);
+	while (o != NULL) {
+		ret = nft_rule_fprintf(fp, o, type, flags);
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+
+		o = nft_rule_list_iter_next(i);
+
+		ret = fprintf(fp, "%s", nft_ruleset_o_separator(o, type));
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+	}
+	nft_rule_list_iter_destroy(i);
+
+	return len;
+err:
+	nft_rule_list_iter_destroy(i);
+	return -1;
+}
+
+#define NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len)	\
+	if (ret < 0)				\
+		return -1;			\
+	len += ret;
+
+int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
+			uint32_t flags)
+{
+	int len = 0, ret = 0;
+	void *prev = NULL;
+
+	ret = fprintf(fp, "%s", nft_ruleset_o_opentag(type));
+	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+	if ((nft_ruleset_attr_is_set(rs, NFT_RULESET_ATTR_TABLELIST)) &&
+	    (!nft_table_list_is_empty(rs->table_list))) {
+		ret = nft_ruleset_fprintf_tables(fp, rs, type, flags);
+		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+		if (ret > 0)
+			prev = rs->table_list;
+	}
+
+	if ((nft_ruleset_attr_is_set(rs, NFT_RULESET_ATTR_CHAINLIST)) &&
+	    (!nft_chain_list_is_empty(rs->chain_list))) {
+		ret = fprintf(fp, "%s", nft_ruleset_o_separator(prev, type));
+		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+		ret = nft_ruleset_fprintf_chains(fp, rs, type, flags);
+		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+		if (ret > 0)
+			prev = rs->chain_list;
+	}
+
+	if ((nft_ruleset_attr_is_set(rs, NFT_RULESET_ATTR_SETLIST)) &&
+	    (!nft_set_list_is_empty(rs->set_list))) {
+		ret = fprintf(fp, "%s", nft_ruleset_o_separator(prev, type));
+		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+		ret = nft_ruleset_fprintf_sets(fp, rs, type, flags);
+		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+		if (ret > 0)
+			prev = rs->set_list;
+	}
+
+	if ((nft_ruleset_attr_is_set(rs, NFT_RULESET_ATTR_RULELIST)) &&
+	    (!nft_rule_list_is_empty(rs->rule_list))) {
+		ret = fprintf(fp, "%s", nft_ruleset_o_separator(prev, type));
+		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+		ret = nft_ruleset_fprintf_rules(fp, rs, type, flags);
+		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+	}
+
+	ret = fprintf(fp, "%s", nft_ruleset_o_closetag(type));
+	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+	return len;
+}
+EXPORT_SYMBOL(nft_ruleset_fprintf);

@@ -17,6 +17,8 @@
 #define BASE_DEC 10
 #define BASE_HEX 16
 
+#define NFT_SNPRINTF_BUFSIZ 4096
+
 enum nft_type {
 	NFT_TYPE_U8,
 	NFT_TYPE_U16,
@@ -87,6 +89,8 @@ int nft_strtoi(const char *string, int base, void *number, enum nft_type type);
 const char *nft_verdict2str(uint32_t verdict);
 int nft_str2verdict(const char *verdict);
 int nft_get_value(enum nft_type type, void *val, void *out);
+
+int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags, int (*snprintf_cb)(char *buf, size_t bufsiz, void *obj, uint32_t type, uint32_t flags));
 
 void xfree(const void *ptr);
 

@@ -1,6 +1,7 @@
 #ifndef _NFT_SET_H_
 #define _NFT_SET_H_
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -38,6 +39,7 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s);
 int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s);
 
 int nft_set_snprintf(char *buf, size_t size, struct nft_set *s, uint32_t type, uint32_t flags);
+int nft_set_fprintf(FILE *fp, struct nft_set *s, uint32_t type, uint32_t flags);
 
 struct nft_set_list;
 
@@ -108,6 +110,7 @@ int nft_set_elem_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set_elem *s)
 
 int nft_set_elem_parse(struct nft_set_elem *e, enum nft_set_parse_type type, const char *data);
 int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *s, uint32_t type, uint32_t flags);
+int nft_set_elem_fprintf(FILE *fp, struct nft_set_elem *se, uint32_t type, uint32_t flags);
 
 int nft_set_elem_foreach(struct nft_set *s, int (*cb)(struct nft_set_elem *e, void *data), void *data);
 
