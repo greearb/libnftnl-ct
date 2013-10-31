@@ -234,7 +234,7 @@ static int test_json(const char *filename)
 			if (nft_ruleset_parse(rs, NFT_RULESET_PARSE_JSON, json) == 0)
 				ret = compare_test(TEST_JSON_RULESET, rs, filename);
 			else
-				ret = -1;
+				goto failparsing;
 
 			nft_ruleset_free(rs);
 			}
@@ -329,7 +329,7 @@ static int test_xml(const char *filename)
 				ret = compare_test(TEST_XML_RULESET, rs,
 						   filename);
 			else
-				ret = -1;
+				goto failparsing;
 
 			nft_ruleset_free(rs);
 		}
@@ -352,6 +352,7 @@ int main(int argc, char *argv[])
 	DIR *d;
 	struct dirent *dent;
 	char path[PATH_MAX];
+	int ret = 0, exit_code = 0;
 
 	if (argc != 2) {
 		fprintf(stderr, "Usage: %s <directory>\n", argv[0]);
@@ -374,19 +375,25 @@ int main(int argc, char *argv[])
 		snprintf(path, sizeof(path), "%s/%s", argv[1], dent->d_name);
 
 		if (strcmp(&dent->d_name[len-4], ".xml") == 0) {
-			if (test_xml(path) == 0) {
+			if ((ret = test_xml(path)) == 0) {
 				printf("parsing and validating %s: ", path);
 				printf("\033[32mOK\e[0m\n");
 			}
+			exit_code += ret;
 		}
 		if (strcmp(&dent->d_name[len-5], ".json") == 0) {
-			if (test_json(path) == 0) {
+			if ((ret = test_json(path)) == 0) {
 				printf("parsing and validating %s: ", path);
 				printf("\033[32mOK\e[0m\n");
 			}
+			exit_code += ret;
 		}
 	}
 
 	closedir(d);
+
+	if (exit_code != 0)
+		exit(EXIT_FAILURE);
+
 	return 0;
 }
