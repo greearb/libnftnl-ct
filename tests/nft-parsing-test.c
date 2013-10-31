@@ -251,7 +251,7 @@ failparsing:
 	json_decref(root);
 	return -1;
 #else
-	errno = EOPNOTSUPP;
+	printf("Compiled without support for JSON.\n");
 	return -1;
 #endif
 }
@@ -350,7 +350,7 @@ failparsing:
 	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
 	return -1;
 #else
-	errno = EOPNOTSUPP;
+	printf("Compiled without support for XML.\n");
 	return -1;
 #endif
 }
