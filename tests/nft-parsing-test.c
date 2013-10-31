@@ -335,9 +335,11 @@ static int test_xml(const char *filename)
 		}
 	}
 
+	mxmlDelete(tree);
 	return ret;
 
 failparsing:
+	mxmlDelete(tree);
 	printf("parsing %s: ", filename);
 	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
 	return -1;
