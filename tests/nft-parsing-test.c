@@ -273,12 +273,18 @@ static int test_xml(const char *filename)
 	tree = mxmlLoadFile(NULL, fp, MXML_NO_CALLBACK);
 	fclose(fp);
 
-	if (tree == NULL)
+	if (tree == NULL) {
+		printf("unable to build XML tree from file %s %s\n", filename,
+		       FAILED_STR);
 		return -1;
+	}
 
 	xml = mxmlSaveAllocString(tree, MXML_NO_CALLBACK);
-	if (xml == NULL)
+	if (xml == NULL) {
+		printf("unable to alloc string from XML tree from %s %s\n",
+		       filename, FAILED_STR);
 		return -1;
+	}
 
 	/* Check what parsing should be done */
 	if (strcmp(tree->value.opaque, "table") == 0) {
