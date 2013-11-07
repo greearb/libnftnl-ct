@@ -274,15 +274,15 @@ static int test_xml(const char *filename)
 	fclose(fp);
 
 	if (tree == NULL) {
-		printf("unable to build XML tree from file %s %s\n", filename,
-		       FAILED_STR);
+		printf("unable to build XML tree from file "
+		       "%s \033[31mFAILED\e[0m\n", filename);
 		return -1;
 	}
 
 	xml = mxmlSaveAllocString(tree, MXML_NO_CALLBACK);
 	if (xml == NULL) {
-		printf("unable to alloc string from XML tree from %s %s\n",
-		       filename, FAILED_STR);
+		printf("unable to alloc string from XML tree from %s "
+		       "\033[31mFAILED\e[0m\n", filename);
 		return -1;
 	}
 
