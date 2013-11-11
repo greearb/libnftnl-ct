@@ -257,11 +257,11 @@ nft_rule_expr_lookup_snprintf(char *buf, size_t size, uint32_t type,
 	struct nft_expr_lookup *lookup = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_lookup_snprintf_default(buf, size, lookup);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_rule_expr_lookup_snprintf_xml(buf, size, lookup);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_rule_expr_lookup_snprintf_json(buf, size, lookup);
 	default:
 		break;

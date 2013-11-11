@@ -293,14 +293,14 @@ nft_rule_expr_bitwise_snprintf_json(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->mask,
-				    NFT_RULE_O_JSON, 0, DATA_VALUE);
+				    NFT_OUTPUT_JSON, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "},\"xor\":{");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->xor,
-				    NFT_RULE_O_JSON, 0, DATA_VALUE);
+				    NFT_OUTPUT_JSON, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "}");
@@ -325,14 +325,14 @@ nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->mask,
-				    NFT_RULE_O_XML, 0, DATA_VALUE);
+				    NFT_OUTPUT_XML, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "</mask><xor>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->xor,
-				    NFT_RULE_O_XML, 0, DATA_VALUE);
+				    NFT_OUTPUT_XML, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "</xor>");
@@ -352,14 +352,14 @@ nft_rule_expr_bitwise_snprintf_default(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->mask,
-				    NFT_RULE_O_DEFAULT, 0, DATA_VALUE);
+				    NFT_OUTPUT_DEFAULT, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, ") ^ ");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &bitwise->xor,
-				    NFT_RULE_O_DEFAULT, 0, DATA_VALUE);
+				    NFT_OUTPUT_DEFAULT, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -372,12 +372,12 @@ nft_rule_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
 	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_bitwise_snprintf_default(buf, size,
 							      bitwise);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_rule_expr_bitwise_snprintf_xml(buf, size, bitwise);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_rule_expr_bitwise_snprintf_json(buf, size, bitwise);
 	default:
 		break;

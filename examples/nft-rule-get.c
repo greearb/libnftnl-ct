@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t portid, seq, type = NFT_RULE_O_DEFAULT;
+	uint32_t portid, seq, type = NFT_OUTPUT_DEFAULT;
 	struct nft_rule *t = NULL;
 	int ret, family;
 
@@ -78,9 +78,9 @@ int main(int argc, char *argv[])
 
 	if (argc == 3) {
 		if (strcmp(argv[2], "xml") == 0)
-			type = NFT_RULE_O_XML;
+			type = NFT_OUTPUT_XML;
 		else if (strcmp(argv[2], "json") == 0)
-			type = NFT_RULE_O_JSON;
+			type = NFT_OUTPUT_JSON;
 	}
 
 	/* XXX requires table, chain and handle attributes for selective get */

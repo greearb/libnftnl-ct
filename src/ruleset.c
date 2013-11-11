@@ -557,16 +557,16 @@ err:
 #endif
 }
 
-int nft_ruleset_parse(struct nft_ruleset *r, enum nft_ruleset_parse_type type,
+int nft_ruleset_parse(struct nft_ruleset *r, enum nft_parse_type type,
 		      const char *data)
 {
 	int ret;
 
 	switch (type) {
-	case NFT_RULESET_PARSE_XML:
+	case NFT_PARSE_XML:
 		ret = nft_ruleset_xml_parse(r, data);
 		break;
-	case NFT_RULESET_PARSE_JSON:
+	case NFT_PARSE_JSON:
 		ret = nft_ruleset_json_parse(r, data);
 		break;
 	default:
@@ -582,9 +582,9 @@ EXPORT_SYMBOL(nft_ruleset_parse);
 static const char *nft_ruleset_o_opentag(uint32_t type)
 {
 	switch (type) {
-	case NFT_RULESET_O_XML:
+	case NFT_OUTPUT_XML:
 		return "<nftables>";
-	case NFT_RULESET_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return "{\"nftables\":[";
 	default:
 		return "";
@@ -597,9 +597,9 @@ static const char *nft_ruleset_o_separator(void *obj, uint32_t type)
 		return "";
 
 	switch (type) {
-	case NFT_RULESET_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return ",";
-	case NFT_RULESET_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return "\n";
 	default:
 		return "";
@@ -609,9 +609,9 @@ static const char *nft_ruleset_o_separator(void *obj, uint32_t type)
 static const char *nft_ruleset_o_closetag(uint32_t type)
 {
 	switch (type) {
-	case NFT_RULESET_O_XML:
+	case NFT_OUTPUT_XML:
 		return "</nftables>";
-	case NFT_RULESET_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return "]}";
 	default:
 		return "";
@@ -803,9 +803,9 @@ int nft_ruleset_snprintf(char *buf, size_t size, const struct nft_ruleset *r,
 			 uint32_t type, uint32_t flags)
 {
 	switch (type) {
-	case NFT_RULESET_O_DEFAULT:
-	case NFT_RULESET_O_XML:
-	case NFT_RULESET_O_JSON:
+	case NFT_OUTPUT_DEFAULT:
+	case NFT_OUTPUT_XML:
+	case NFT_OUTPUT_JSON:
 		return nft_ruleset_do_snprintf(buf, size, r, type, flags);
 	default:
 		errno = EOPNOTSUPP;

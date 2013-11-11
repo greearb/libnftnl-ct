@@ -112,36 +112,36 @@ static int compare_test(uint32_t type, void *input, const char *filename)
 
 	switch (type) {
 	case TEST_XML_TABLE:
-		nft_table_snprintf(out, sizeof(out), t, NFT_TABLE_O_XML, 0);
+		nft_table_snprintf(out, sizeof(out), t, NFT_OUTPUT_XML, 0);
 		break;
 	case TEST_JSON_TABLE:
-		nft_table_snprintf(out, sizeof(out), t, NFT_TABLE_O_JSON, 0);
+		nft_table_snprintf(out, sizeof(out), t, NFT_OUTPUT_JSON, 0);
 		break;
 	case TEST_XML_CHAIN:
-		nft_chain_snprintf(out, sizeof(out), c, NFT_CHAIN_O_XML, 0);
+		nft_chain_snprintf(out, sizeof(out), c, NFT_OUTPUT_XML, 0);
 		break;
 	case TEST_JSON_CHAIN:
-		nft_chain_snprintf(out, sizeof(out), c, NFT_CHAIN_O_JSON, 0);
+		nft_chain_snprintf(out, sizeof(out), c, NFT_OUTPUT_JSON, 0);
 		break;
 	case TEST_XML_RULE:
-		nft_rule_snprintf(out, sizeof(out), r, NFT_RULE_O_XML, 0);
+		nft_rule_snprintf(out, sizeof(out), r, NFT_OUTPUT_XML, 0);
 		break;
 	case TEST_JSON_RULE:
-		nft_rule_snprintf(out, sizeof(out), r, NFT_RULE_O_JSON, 0);
+		nft_rule_snprintf(out, sizeof(out), r, NFT_OUTPUT_JSON, 0);
 		break;
 	case TEST_XML_SET:
-		nft_set_snprintf(out, sizeof(out), s, NFT_SET_O_XML, 0);
+		nft_set_snprintf(out, sizeof(out), s, NFT_OUTPUT_XML, 0);
 		break;
 	case TEST_JSON_SET:
-		nft_set_snprintf(out, sizeof(out), s, NFT_SET_O_JSON, 0);
+		nft_set_snprintf(out, sizeof(out), s, NFT_OUTPUT_JSON, 0);
 		break;
 	case TEST_XML_RULESET:
 		nft_ruleset_snprintf(out, sizeof(out), rs,
-				     NFT_RULESET_O_XML, 0);
+				     NFT_OUTPUT_XML, 0);
 		break;
 	case TEST_JSON_RULESET:
 		nft_ruleset_snprintf(out, sizeof(out), rs,
-				     NFT_RULESET_O_JSON, 0);
+				     NFT_OUTPUT_JSON, 0);
 		break;
 	default:
 		errno = EINVAL;
@@ -191,7 +191,7 @@ static int test_json(const char *filename)
 	if (json_object_get(root, "table") != NULL) {
 		t = nft_table_alloc();
 		if (t != NULL) {
-			if (nft_table_parse(t, NFT_TABLE_PARSE_JSON, json) == 0)
+			if (nft_table_parse(t, NFT_PARSE_JSON, json) == 0)
 				ret = compare_test(TEST_JSON_TABLE, t, filename);
 			else
 				goto failparsing;
@@ -201,7 +201,7 @@ static int test_json(const char *filename)
 	} else if (json_object_get(root, "chain") != NULL) {
 		c = nft_chain_alloc();
 		if (c != NULL) {
-			if (nft_chain_parse(c, NFT_CHAIN_PARSE_JSON, json) == 0)
+			if (nft_chain_parse(c, NFT_PARSE_JSON, json) == 0)
 				ret = compare_test(TEST_JSON_CHAIN, c, filename);
 			else
 				goto failparsing;
@@ -211,7 +211,7 @@ static int test_json(const char *filename)
 	} else if (json_object_get(root, "rule") != NULL) {
 		r = nft_rule_alloc();
 		if (r != NULL) {
-			if (nft_rule_parse(r, NFT_RULE_PARSE_JSON, json) == 0)
+			if (nft_rule_parse(r, NFT_PARSE_JSON, json) == 0)
 				ret = compare_test(TEST_JSON_RULE, r, filename);
 			else
 				goto failparsing;
@@ -221,7 +221,7 @@ static int test_json(const char *filename)
 	} else if (json_object_get(root, "set") != NULL) {
 		s = nft_set_alloc();
 		if (s != NULL) {
-			if (nft_set_parse(s, NFT_SET_PARSE_JSON, json) == 0)
+			if (nft_set_parse(s, NFT_PARSE_JSON, json) == 0)
 				ret = compare_test(TEST_JSON_SET, s, filename);
 			else
 				goto failparsing;
@@ -231,7 +231,7 @@ static int test_json(const char *filename)
 	} else if (json_object_get(root, "nftables") != NULL) {
 		rs = nft_ruleset_alloc();
 		if (rs != NULL) {
-			if (nft_ruleset_parse(rs, NFT_RULESET_PARSE_JSON, json) == 0)
+			if (nft_ruleset_parse(rs, NFT_PARSE_JSON, json) == 0)
 				ret = compare_test(TEST_JSON_RULESET, rs, filename);
 			else
 				goto failparsing;
@@ -290,7 +290,7 @@ static int test_xml(const char *filename)
 	if (strcmp(tree->value.opaque, "table") == 0) {
 		t = nft_table_alloc();
 		if (t != NULL) {
-			if (nft_table_parse(t, NFT_TABLE_PARSE_XML, xml) == 0)
+			if (nft_table_parse(t, NFT_PARSE_XML, xml) == 0)
 				ret = compare_test(TEST_XML_TABLE, t, filename);
 			else
 				goto failparsing;
@@ -300,7 +300,7 @@ static int test_xml(const char *filename)
 	} else if (strcmp(tree->value.opaque, "chain") == 0) {
 		c = nft_chain_alloc();
 		if (c != NULL) {
-			if (nft_chain_parse(c, NFT_CHAIN_PARSE_XML, xml) == 0)
+			if (nft_chain_parse(c, NFT_PARSE_XML, xml) == 0)
 				ret = compare_test(TEST_XML_CHAIN, c, filename);
 			else
 				goto failparsing;
@@ -310,7 +310,7 @@ static int test_xml(const char *filename)
 	} else if (strcmp(tree->value.opaque, "rule") == 0) {
 		r = nft_rule_alloc();
 		if (r != NULL) {
-			if (nft_rule_parse(r, NFT_RULE_PARSE_XML, xml) == 0)
+			if (nft_rule_parse(r, NFT_PARSE_XML, xml) == 0)
 				ret = compare_test(TEST_XML_RULE, r, filename);
 			else
 				goto failparsing;
@@ -320,7 +320,7 @@ static int test_xml(const char *filename)
 	} else if (strcmp(tree->value.opaque, "set") == 0) {
 		s = nft_set_alloc();
 		if (s != NULL) {
-			if (nft_set_parse(s, NFT_SET_PARSE_XML, xml) == 0)
+			if (nft_set_parse(s, NFT_PARSE_XML, xml) == 0)
 				ret = compare_test(TEST_XML_SET, s, filename);
 			else
 				goto failparsing;
@@ -330,7 +330,7 @@ static int test_xml(const char *filename)
 	} else if (strcmp(tree->value.opaque, "nftables") == 0) {
 		rs = nft_ruleset_alloc();
 		if (rs != NULL) {
-			if (nft_ruleset_parse(rs, NFT_RULESET_PARSE_XML,
+			if (nft_ruleset_parse(rs, NFT_PARSE_XML,
 					      xml) == 0)
 				ret = compare_test(TEST_XML_RULESET, rs,
 						   filename);

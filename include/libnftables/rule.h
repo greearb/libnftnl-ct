@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
+#include <libnftables/common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,20 +47,7 @@ struct nlmsghdr;
 
 void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *t);
 
-enum {
-	NFT_RULE_O_DEFAULT	= 0,
-	NFT_RULE_O_XML,
-	NFT_RULE_O_JSON,
-};
-
-enum nft_rule_parse_type {
-	NFT_RULE_PARSE_NONE	= 0,
-	NFT_RULE_PARSE_XML,
-	NFT_RULE_PARSE_JSON,
-	NFT_RULE_PARSE_MAX,
-};
-
-int nft_rule_parse(struct nft_rule *r, enum nft_rule_parse_type type, const char *data);
+int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type, const char *data);
 int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *t, uint32_t type, uint32_t flags);
 int nft_rule_fprintf(FILE *fp, struct nft_rule *r, uint32_t type, uint32_t flags);
 

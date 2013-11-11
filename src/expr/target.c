@@ -247,12 +247,12 @@ nft_rule_expr_target_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_target *target = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "name %s rev %u ",
 				target->name, target->rev);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_rule_exp_target_snprintf_xml(buf, len, target);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_rule_exp_target_snprintf_json(buf, len, target);
 	default:
 		break;

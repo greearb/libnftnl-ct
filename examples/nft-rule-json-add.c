@@ -63,12 +63,12 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (nft_rule_parse(r, NFT_RULE_PARSE_JSON, json) < 0) {
+	if (nft_rule_parse(r, NFT_PARSE_JSON, json) < 0) {
 		printf("E: Unable to parse JSON file: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	nft_rule_snprintf(reprint, sizeof(reprint), r, NFT_RULE_O_JSON, 0);
+	nft_rule_snprintf(reprint, sizeof(reprint), r, NFT_OUTPUT_JSON, 0);
 	printf("Parsed:\n%s\n", reprint);
 
 	nft_rule_attr_unset(r, NFT_RULE_ATTR_HANDLE);

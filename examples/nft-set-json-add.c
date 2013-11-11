@@ -64,12 +64,12 @@ int main(int argc, char *argv[])
 
 	close(fd);
 
-	if (nft_set_parse(s, NFT_SET_PARSE_JSON, json) < 0) {
+	if (nft_set_parse(s, NFT_PARSE_JSON, json) < 0) {
 		printf("E: Unable to parse JSON file: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	nft_set_snprintf(reprint, sizeof(reprint), s, NFT_SET_O_JSON, 0);
+	nft_set_snprintf(reprint, sizeof(reprint), s, NFT_OUTPUT_JSON, 0);
 	printf("Parsed:\n%s\n", reprint);
 
 	family = nft_set_attr_get_u32(s, NFT_SET_ATTR_FAMILY);

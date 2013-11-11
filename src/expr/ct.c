@@ -304,15 +304,15 @@ nft_rule_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_ct *ct = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "load %s => reg %u dir %u ",
 				ctkey2str(ct->key), ct->dreg, ct->dir);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
 					  "<key>%s</key>"
 					  "<dir>%u</dir>",
 				ct->dreg, ctkey2str(ct->key), ct->dir);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_expr_ct_snprintf_json(buf, len, e);
 	default:
 		break;

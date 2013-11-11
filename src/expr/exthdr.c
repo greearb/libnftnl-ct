@@ -289,11 +289,11 @@ nft_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "load %ub @ %u + %u => reg %u ",
 				exthdr->len, exthdr->type,
 				exthdr->offset, exthdr->dreg);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
 					  "<exthdr_type>%s</exthdr_type>"
 					  "<offset>%u</offset>"
@@ -301,7 +301,7 @@ nft_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 					exthdr->dreg,
 					exthdr_type2str(exthdr->type),
 					exthdr->offset, exthdr->len);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return snprintf(buf, len, "\"dreg\":%u,"
 					  "\"exthdr_type\":\"%s\",\"offset\":%u,"
 					  "\"len\":%u",

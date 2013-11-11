@@ -245,12 +245,12 @@ nft_rule_expr_match_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_match *match = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "name %s rev %u ",
 				match->name, match->rev);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_rule_expr_match_snprintf_xml(buf, len, match);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_rule_expr_match_snprintf_json(buf, len, match);
 	default:
 		break;

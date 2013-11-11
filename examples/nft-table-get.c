@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	uint32_t portid, seq, family;
 	struct nft_table *t = NULL;
 	int ret;
-	uint32_t type = NFT_TABLE_O_DEFAULT;
+	uint32_t type = NFT_OUTPUT_DEFAULT;
 
 	if (argc < 2 || argc > 4) {
 		fprintf(stderr, "%s <family> [<table>] [<default|xml|json>]\n",
@@ -78,11 +78,11 @@ int main(int argc, char *argv[])
 	}
 
 	if (strcmp(argv[argc-1], "xml") == 0) {
-		type = NFT_TABLE_O_XML;
+		type = NFT_OUTPUT_XML;
 		argv[argc-1] = NULL;
 		argc--;
 	}else if (strcmp(argv[argc-1], "json") == 0) {
-		type = NFT_TABLE_O_JSON;
+		type = NFT_OUTPUT_JSON;
 		argv[argc-1] = NULL;
 		argc--;
 	} else if (strcmp(argv[argc - 1], "default") == 0) {

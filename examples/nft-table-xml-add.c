@@ -60,12 +60,12 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (nft_table_parse(t, NFT_TABLE_PARSE_XML, xml) < 0) {
+	if (nft_table_parse(t, NFT_PARSE_XML, xml) < 0) {
 		printf("E: Unable to parse XML file: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	nft_table_snprintf(reprint, sizeof(reprint), t, NFT_TABLE_O_XML, 0);
+	nft_table_snprintf(reprint, sizeof(reprint), t, NFT_OUTPUT_XML, 0);
 	printf("Parsed:\n%s\n", reprint);
 
 	family = nft_table_attr_get_u32(t, NFT_TABLE_ATTR_FAMILY);

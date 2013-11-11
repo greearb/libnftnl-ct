@@ -268,17 +268,17 @@ nft_rule_expr_immediate_snprintf_json(char *buf, size_t len,
 
 	if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-					    NFT_RULE_O_JSON, flags, DATA_VALUE);
+					    NFT_OUTPUT_JSON, flags, DATA_VALUE);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	} else if (e->flags & (1 << NFT_EXPR_IMM_VERDICT)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-					  NFT_RULE_O_JSON, flags, DATA_VERDICT);
+					  NFT_OUTPUT_JSON, flags, DATA_VERDICT);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	} else if (e->flags & (1 << NFT_EXPR_IMM_CHAIN)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-					    NFT_RULE_O_JSON, flags, DATA_CHAIN);
+					    NFT_OUTPUT_JSON, flags, DATA_CHAIN);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -302,17 +302,17 @@ nft_rule_expr_immediate_snprintf_xml(char *buf, size_t len,
 
 	if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-					    NFT_RULE_O_XML, flags, DATA_VALUE);
+					    NFT_OUTPUT_XML, flags, DATA_VALUE);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	} else if (e->flags & (1 << NFT_EXPR_IMM_VERDICT)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-					  NFT_RULE_O_XML, flags, DATA_VERDICT);
+					  NFT_OUTPUT_XML, flags, DATA_VERDICT);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	} else if (e->flags & (1 << NFT_EXPR_IMM_CHAIN)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-					    NFT_RULE_O_XML, flags, DATA_CHAIN);
+					    NFT_OUTPUT_XML, flags, DATA_CHAIN);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -334,17 +334,17 @@ nft_rule_expr_immediate_snprintf_default(char *buf, size_t len,
 
 	if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-					NFT_RULE_O_DEFAULT, flags, DATA_VALUE);
+					NFT_OUTPUT_DEFAULT, flags, DATA_VALUE);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	} else if (e->flags & (1 << NFT_EXPR_IMM_VERDICT)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-				NFT_RULE_O_DEFAULT, flags, DATA_VERDICT);
+				NFT_OUTPUT_DEFAULT, flags, DATA_VERDICT);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	} else if (e->flags & (1 << NFT_EXPR_IMM_CHAIN)) {
 		ret = nft_data_reg_snprintf(buf+offset, len, &imm->data,
-					NFT_RULE_O_DEFAULT, flags, DATA_CHAIN);
+					NFT_OUTPUT_DEFAULT, flags, DATA_CHAIN);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -356,11 +356,11 @@ nft_rule_expr_immediate_snprintf(char *buf, size_t len, uint32_t type,
 				 uint32_t flags, struct nft_rule_expr *e)
 {
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_immediate_snprintf_default(buf, len, e, flags);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_rule_expr_immediate_snprintf_xml(buf, len, e, flags);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_rule_expr_immediate_snprintf_json(buf, len, e, flags);
 	default:
 		break;

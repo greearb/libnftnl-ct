@@ -515,16 +515,16 @@ static int nft_set_xml_parse(struct nft_set *s, const char *xml)
 #endif
 }
 
-int nft_set_parse(struct nft_set *s, enum nft_set_parse_type type,
+int nft_set_parse(struct nft_set *s, enum nft_parse_type type,
 		  const char *data)
 {
 	int ret;
 
 	switch (type) {
-	case NFT_SET_PARSE_XML:
+	case NFT_PARSE_XML:
 		ret = nft_set_xml_parse(s, data);
 		break;
-	case NFT_SET_PARSE_JSON:
+	case NFT_PARSE_JSON:
 		ret = nft_set_json_parse(s, data);
 		break;
 	default:
@@ -640,7 +640,7 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 	if (!list_empty(&s->element_list)) {
 		list_for_each_entry(elem, &s->element_list, head) {
 			ret = nft_set_elem_snprintf(buf+offset, len, elem,
-						    NFT_SET_O_XML, flags);
+						    NFT_OUTPUT_XML, flags);
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 	}
@@ -655,11 +655,11 @@ int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 		     uint32_t type, uint32_t flags)
 {
 	switch(type) {
-	case NFT_SET_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_set_snprintf_default(buf, size, s, type, flags);
-	case NFT_SET_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_set_snprintf_xml(buf, size, s, flags);
-	case NFT_SET_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_set_snprintf_json(buf, size, s, type, flags);
 	default:
 		break;

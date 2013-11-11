@@ -243,19 +243,19 @@ nft_rule_expr_log_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_log *log = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "prefix '%s' group %u "
 					  "snaplen %u qthreshold %u ",
 				log->prefix, log->group,
 				log->snaplen, log->qthreshold);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return snprintf(buf, len, "<prefix>%s</prefix>"
 					  "<group>%u</group>"
 					  "<snaplen>%u</snaplen>"
 					  "<qthreshold>%u</qthreshold>",
 				log->prefix, log->group,
 				log->snaplen, log->qthreshold);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return snprintf(buf, len, "\"prefix\":\"%s\","
 					  "\"group\":%u,"
 					  "\"snaplen\":%u,"

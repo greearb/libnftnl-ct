@@ -658,16 +658,16 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml)
 #endif
 }
 
-int nft_rule_parse(struct nft_rule *r, enum nft_rule_parse_type type,
+int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type,
 		   const char *data)
 {
 	int ret;
 
 	switch (type) {
-	case NFT_RULE_PARSE_XML:
+	case NFT_PARSE_XML:
 		ret = nft_rule_xml_parse(r, data);
 		break;
-	case NFT_RULE_PARSE_JSON:
+	case NFT_PARSE_JSON:
 		ret = nft_rule_json_parse(r, data);
 		break;
 	default:
@@ -806,11 +806,11 @@ int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *r,
 		       uint32_t type, uint32_t flags)
 {
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_snprintf_default(buf, size, r, type, flags);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_rule_snprintf_xml(buf, size, r, type, flags);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_rule_snprintf_json(buf, size, r, type, flags);
 	default:
 		break;

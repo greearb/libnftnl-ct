@@ -173,13 +173,13 @@ nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_counter *ctr = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "pkts %"PRIu64" bytes %"PRIu64" ",
 				ctr->pkts, ctr->bytes);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return snprintf(buf, len, "<pkts>%"PRIu64"</pkts><bytes>%"PRIu64"</bytes>",
 				ctr->pkts, ctr->bytes);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return snprintf(buf, len, "\"pkts\":%"PRIu64",\"bytes\":%"PRIu64"",
 				ctr->pkts, ctr->bytes);
 	default:

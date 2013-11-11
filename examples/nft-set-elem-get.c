@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, family;
-	uint32_t type = NFT_SET_O_DEFAULT;
+	uint32_t type = NFT_OUTPUT_DEFAULT;
 	struct nft_set *t = NULL;
 	int ret;
 
@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
 	}
 
 	if (argc == 5 && strcmp(argv[4], "json") == 0 )
-		type = NFT_SET_O_JSON;
+		type = NFT_OUTPUT_JSON;
 	else if (argc == 5 && strcmp(argv[4], "xml") == 0)
-		type = NFT_SET_O_XML;
+		type = NFT_OUTPUT_XML;
 
 	nlh = nft_set_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
 					NLM_F_DUMP|NLM_F_ACK, seq);

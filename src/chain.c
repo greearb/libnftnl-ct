@@ -727,16 +727,16 @@ static int nft_chain_xml_parse(struct nft_chain *c, const char *xml)
 #endif
 }
 
-int nft_chain_parse(struct nft_chain *c, enum nft_chain_parse_type type,
+int nft_chain_parse(struct nft_chain *c, enum nft_parse_type type,
 		    const char *data)
 {
 	int ret;
 
 	switch (type) {
-	case NFT_CHAIN_PARSE_XML:
+	case NFT_PARSE_XML:
 		ret = nft_chain_xml_parse(c, data);
 		break;
-	case NFT_CHAIN_PARSE_JSON:
+	case NFT_PARSE_JSON:
 		ret = nft_chain_json_parse(c, data);
 		break;
 	default:
@@ -838,11 +838,11 @@ int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
 		       uint32_t type, uint32_t flags)
 {
 	switch(type) {
-	case NFT_CHAIN_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_chain_snprintf_default(buf, size, c);
-	case NFT_CHAIN_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_chain_snprintf_xml(buf, size, c);
-	case NFT_CHAIN_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_chain_snprintf_json(buf, size, c);
 	default:
 		break;

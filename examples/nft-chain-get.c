@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t portid, seq, type = NFT_CHAIN_O_DEFAULT;
+	uint32_t portid, seq, type = NFT_OUTPUT_DEFAULT;
 	struct nft_chain *t = NULL;
 	int ret, family;
 
@@ -96,9 +96,9 @@ int main(int argc, char *argv[])
 	}
 
 	if (strcmp(argv[argc-1], "xml") == 0){
-		type = NFT_CHAIN_O_XML;
+		type = NFT_OUTPUT_XML;
 	}else if (strcmp(argv[argc-1], "json") == 0){
-		type = NFT_CHAIN_O_JSON;
+		type = NFT_OUTPUT_JSON;
 	}
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);

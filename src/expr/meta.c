@@ -231,14 +231,14 @@ nft_rule_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_meta *meta = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "load %s => reg %u ",
 				meta_key2str(meta->key), meta->dreg);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return snprintf(buf, len, "<dreg>%u</dreg>"
 					  "<key>%s</key>",
 				meta->dreg, meta_key2str(meta->key));
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return snprintf(buf, len, "\"dreg\":%u,"
 					  "\"key\":\"%s\"",
 				meta->dreg, meta_key2str(meta->key));

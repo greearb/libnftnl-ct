@@ -324,16 +324,16 @@ static int nft_table_json_parse(struct nft_table *t, const char *json)
 #endif
 }
 
-int nft_table_parse(struct nft_table *t, enum nft_table_parse_type type,
+int nft_table_parse(struct nft_table *t, enum nft_parse_type type,
 		    const char *data)
 {
 	int ret;
 
 	switch (type) {
-	case NFT_TABLE_PARSE_XML:
+	case NFT_PARSE_XML:
 		ret = nft_table_xml_parse(t, data);
 		break;
-	case NFT_TABLE_PARSE_JSON:
+	case NFT_PARSE_JSON:
 		ret = nft_table_json_parse(t, data);
 		break;
 	default:
@@ -375,11 +375,11 @@ int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
 		       uint32_t type, uint32_t flags)
 {
 	switch(type) {
-	case NFT_TABLE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_table_snprintf_default(buf, size, t);
-	case NFT_TABLE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_table_snprintf_xml(buf, size, t);
-	case NFT_TABLE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_table_snprintf_json(buf, size, t);
 	default:
 		break;

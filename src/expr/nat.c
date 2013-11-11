@@ -438,11 +438,11 @@ nft_rule_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
 			   uint32_t flags, struct nft_rule_expr *e)
 {
 	switch (type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_nat_snprintf_default(buf, size, e);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_rule_expr_nat_snprintf_xml(buf, size, e);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_rule_expr_nat_snprintf_json(buf, size, e);
 	default:
 		break;

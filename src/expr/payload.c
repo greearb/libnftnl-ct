@@ -302,14 +302,14 @@ nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_payload *payload = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "load %ub @ %s header + %u => reg %u ",
 				payload->len, base2str(payload->base),
 				payload->offset, payload->dreg);
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_rule_expr_payload_snprintf_xml(buf, len, flags,
 							  payload);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_rule_expr_payload_snprintf_json(buf, len, flags,
 							  payload);
 	default:

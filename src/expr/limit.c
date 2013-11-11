@@ -183,14 +183,14 @@ nft_rule_expr_limit_snprintf(char *buf, size_t len, uint32_t type,
 	struct nft_expr_limit *limit = nft_expr_data(e);
 
 	switch(type) {
-	case NFT_RULE_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "rate %"PRIu64"/%s ",
 				limit->rate, get_unit(limit->unit));
-	case NFT_RULE_O_XML:
+	case NFT_OUTPUT_XML:
 		return snprintf(buf, len, "<rate>%"PRIu64"</rate>"
 					  "<unit>%"PRIu64"</unit>",
 				limit->rate, limit->unit);
-	case NFT_RULE_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return snprintf(buf, len, "\"rate\":%"PRIu64","
 					  "\"unit\":%"PRIu64"",
 				limit->rate, limit->unit);

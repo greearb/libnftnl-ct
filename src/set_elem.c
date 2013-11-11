@@ -434,11 +434,11 @@ static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml)
 }
 
 int nft_set_elem_parse(struct nft_set_elem *e,
-		       enum nft_set_parse_type type, const char *data) {
+		       enum nft_parse_type type, const char *data) {
 	int ret;
 
 	switch (type) {
-	case NFT_SET_PARSE_XML:
+	case NFT_PARSE_XML:
 		ret = nft_set_elem_xml_parse(e, data);
 		break;
 	default:
@@ -463,7 +463,7 @@ static int nft_set_elem_snprintf_json(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &e->key,
-				    NFT_RULE_O_JSON, flags, DATA_VALUE);
+				    NFT_OUTPUT_JSON, flags, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "}");
@@ -481,7 +481,7 @@ static int nft_set_elem_snprintf_json(char *buf, size_t size,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = nft_data_reg_snprintf(buf+offset, len, &e->data,
-				    NFT_RULE_O_JSON, flags, type);
+				    NFT_OUTPUT_JSON, flags, type);
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = snprintf(buf+offset, len, "}");
@@ -529,7 +529,7 @@ static int nft_set_elem_snprintf_xml(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_data_reg_snprintf(buf+offset, len, &e->key,
-				    NFT_RULE_O_XML, flags, DATA_VALUE);
+				    NFT_OUTPUT_XML, flags, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "</key>");
@@ -547,7 +547,7 @@ static int nft_set_elem_snprintf_xml(char *buf, size_t size,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = nft_data_reg_snprintf(buf+offset, len, &e->data,
-					    NFT_RULE_O_XML, flags, type);
+					    NFT_OUTPUT_XML, flags, type);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = snprintf(buf+offset, len, "</data>");
@@ -564,11 +564,11 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 			   uint32_t type, uint32_t flags)
 {
 	switch(type) {
-	case NFT_SET_O_DEFAULT:
+	case NFT_OUTPUT_DEFAULT:
 		return nft_set_elem_snprintf_default(buf, size, e);
-	case NFT_SET_O_XML:
+	case NFT_OUTPUT_XML:
 		return nft_set_elem_snprintf_xml(buf, size, e, flags);
-	case NFT_SET_O_JSON:
+	case NFT_OUTPUT_JSON:
 		return nft_set_elem_snprintf_json(buf, size, e, flags);
 	default:
 		break;
