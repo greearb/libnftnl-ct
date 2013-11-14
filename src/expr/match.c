@@ -258,10 +258,18 @@ nft_rule_expr_match_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static void nft_rule_expr_match_free(struct nft_rule_expr *e)
+{
+	struct nft_expr_match *match = nft_expr_data(e);
+
+	xfree(match->data);
+}
+
 struct expr_ops expr_ops_match = {
 	.name		= "match",
 	.alloc_len	= sizeof(struct nft_expr_match),
 	.max_attr	= NFTA_MATCH_MAX,
+	.free		= nft_rule_expr_match_free,
 	.set		= nft_rule_expr_match_set,
 	.get		= nft_rule_expr_match_get,
 	.parse		= nft_rule_expr_match_parse,

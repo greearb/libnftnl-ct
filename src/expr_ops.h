@@ -23,6 +23,7 @@ struct expr_ops {
 	const char *name;
 	uint32_t alloc_len;
 	int	max_attr;
+	void	(*free)(struct nft_rule_expr *e);
 	int	(*set)(struct nft_rule_expr *e, uint16_t type, const void *data, uint32_t data_len);
 	const void *(*get)(const struct nft_rule_expr *e, uint16_t type, uint32_t *data_len);
 	int 	(*parse)(struct nft_rule_expr *e, struct nlattr *attr);

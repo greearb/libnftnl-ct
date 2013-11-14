@@ -260,10 +260,18 @@ nft_rule_expr_target_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static void nft_rule_expr_target_free(struct nft_rule_expr *e)
+{
+	struct nft_expr_target *target = nft_expr_data(e);
+
+	xfree(target->data);
+}
+
 struct expr_ops expr_ops_target = {
 	.name		= "target",
 	.alloc_len	= sizeof(struct nft_expr_target),
 	.max_attr	= NFTA_TARGET_MAX,
+	.free		= nft_rule_expr_target_free,
 	.set		= nft_rule_expr_target_set,
 	.get		= nft_rule_expr_target_get,
 	.parse		= nft_rule_expr_target_parse,
