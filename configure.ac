@@ -30,6 +30,7 @@ AS_IF([test "x$with_json_parsing" = "xyes"], [
 ])
 AC_PROG_CC
 AM_PROG_CC_C_O
+AC_EXEEXT
 AC_DISABLE_STATIC
 LT_INIT
 CHECK_GCC_FVISIBILITY

@@ -32,5 +32,7 @@ libnftables_la_SOURCES = utils.c		\
 			 expr/payload.c		\
 			 expr/reject.c		\
 			 expr/target.c		\
+			 expr/data_reg.h	\
 			 libnftables.map	\
+			 expr_ops.h		\
 			 internal.h
