@@ -140,12 +140,12 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 			 mnl_attr_get_str(tb[NFTA_MATCH_NAME]));
 
 		match->name[XT_EXTENSION_MAXNAMELEN-1] = '\0';
-		e->flags |= (1 << NFTA_MATCH_NAME);
+		e->flags |= (1 << NFT_EXPR_MT_NAME);
 	}
 
 	if (tb[NFTA_MATCH_REV]) {
 		match->rev = ntohl(mnl_attr_get_u32(tb[NFTA_MATCH_REV]));
-		e->flags |= (1 << NFTA_MATCH_REV);
+		e->flags |= (1 << NFT_EXPR_MT_REV);
 	}
 
 	if (tb[NFTA_MATCH_INFO]) {
@@ -164,7 +164,7 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 		match->data = match_data;
 		match->data_len = len;
 
-		e->flags |= (1 << NFTA_MATCH_INFO);
+		e->flags |= (1 << NFT_EXPR_MT_INFO);
 	}
 
 	return 0;
