@@ -268,10 +268,18 @@ nft_rule_expr_log_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static void nft_rule_expr_log_free(struct nft_rule_expr *e)
+{
+	struct nft_expr_log *log = nft_expr_data(e);
+
+	xfree(log->prefix);
+}
+
 struct expr_ops expr_ops_log = {
 	.name		= "log",
 	.alloc_len	= sizeof(struct nft_expr_log),
 	.max_attr	= NFTA_LOG_MAX,
+	.free		= nft_rule_expr_log_free,
 	.set		= nft_rule_expr_log_set,
 	.get		= nft_rule_expr_log_get,
 	.parse		= nft_rule_expr_log_parse,
