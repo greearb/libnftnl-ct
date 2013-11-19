@@ -149,7 +149,7 @@ static int nft_rule_expr_target_parse(struct nft_rule_expr *e, struct nlattr *at
 	}
 
 	if (tb[NFTA_TARGET_INFO]) {
-		uint32_t len = mnl_attr_get_len(tb[NFTA_TARGET_INFO]);
+		uint32_t len = mnl_attr_get_payload_len(tb[NFTA_TARGET_INFO]);
 		void *target_data;
 
 		if (target->data)
