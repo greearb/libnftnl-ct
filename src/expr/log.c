@@ -119,7 +119,7 @@ nft_rule_expr_log_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 	struct nft_expr_log *log = nft_expr_data(e);
 
 	if (e->flags & (1 << NFT_EXPR_LOG_PREFIX))
-		mnl_attr_put_str(nlh, NFTA_LOG_PREFIX, log->prefix);
+		mnl_attr_put_strz(nlh, NFTA_LOG_PREFIX, log->prefix);
 	if (e->flags & (1 << NFT_EXPR_LOG_GROUP))
 		mnl_attr_put_u16(nlh, NFTA_LOG_GROUP, htons(log->group));
 	if (e->flags & (1 << NFT_EXPR_LOG_SNAPLEN))
