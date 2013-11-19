@@ -28,8 +28,10 @@ void nft_table_attr_unset(struct nft_table *t, uint16_t attr);
 void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data);
 const void *nft_table_attr_get(struct nft_table *t, uint16_t attr);
 
+void nft_table_attr_set_u8(struct nft_table *t, uint16_t attr, uint8_t data);
 void nft_table_attr_set_u32(struct nft_table *t, uint16_t attr, uint32_t data);
 void nft_table_attr_set_str(struct nft_table *t, uint16_t attr, const char *str);
+uint8_t nft_table_attr_get_u8(struct nft_table *t, uint16_t attr);
 uint32_t nft_table_attr_get_u32(struct nft_table *t, uint16_t attr);
 const char *nft_table_attr_get_str(struct nft_table *t, uint16_t attr);
 

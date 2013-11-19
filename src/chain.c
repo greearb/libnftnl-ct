@@ -206,6 +206,12 @@ void nft_chain_attr_set_u64(struct nft_chain *c, uint16_t attr, uint64_t data)
 }
 EXPORT_SYMBOL(nft_chain_attr_set_u64);
 
+void nft_chain_attr_set_u8(struct nft_chain *c, uint16_t attr, uint8_t data)
+{
+	nft_chain_attr_set(c, attr, &data);
+}
+EXPORT_SYMBOL(nft_chain_attr_set_u8);
+
 void nft_chain_attr_set_str(struct nft_chain *c, uint16_t attr, const char *str)
 {
 	nft_chain_attr_set(c, attr, str);
@@ -271,6 +277,13 @@ uint64_t nft_chain_attr_get_u64(struct nft_chain *c, uint16_t attr)
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_chain_attr_get_u64);
+
+uint8_t nft_chain_attr_get_u8(struct nft_chain *c, uint16_t attr)
+{
+	const uint8_t *val = nft_chain_attr_get(c, attr);
+	return val ? *val : 0;
+}
+EXPORT_SYMBOL(nft_chain_attr_get_u8);
 
 struct nlmsghdr *
 nft_chain_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,

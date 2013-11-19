@@ -6,8 +6,10 @@ global:
   nft_table_attr_unset;
   nft_table_attr_set;
   nft_table_attr_get;
+  nft_table_attr_set_u8;
   nft_table_attr_set_u32;
   nft_table_attr_set_str;
+  nft_table_attr_get_u8;
   nft_table_attr_get_u32;
   nft_table_attr_get_str;
   nft_table_parse;
@@ -32,11 +34,13 @@ global:
   nft_chain_attr_is_set;
   nft_chain_attr_unset;
   nft_chain_attr_set;
+  nft_chain_attr_set_u8;
   nft_chain_attr_set_u32;
   nft_chain_attr_set_s32;
   nft_chain_attr_set_u64;
   nft_chain_attr_set_str;
   nft_chain_attr_get;
+  nft_chain_attr_get_u8;
   nft_chain_attr_get_u32;
   nft_chain_attr_get_s32;
   nft_chain_attr_get_u64;

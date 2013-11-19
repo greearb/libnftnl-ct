@@ -34,6 +34,7 @@ enum {
 bool nft_chain_attr_is_set(const struct nft_chain *c, uint16_t attr);
 void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr);
 void nft_chain_attr_set(struct nft_chain *t, uint16_t attr, const void *data);
+void nft_chain_attr_set_u8(struct nft_chain *t, uint16_t attr, uint8_t data);
 void nft_chain_attr_set_u32(struct nft_chain *t, uint16_t attr, uint32_t data);
 void nft_chain_attr_set_s32(struct nft_chain *t, uint16_t attr, int32_t data);
 void nft_chain_attr_set_u64(struct nft_chain *t, uint16_t attr, uint64_t data);
@@ -41,6 +42,7 @@ void nft_chain_attr_set_str(struct nft_chain *t, uint16_t attr, const char *str)
 
 const void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr);
 const char *nft_chain_attr_get_str(struct nft_chain *c, uint16_t attr);
+uint8_t nft_chain_attr_get_u8(struct nft_chain *c, uint16_t attr);
 uint32_t nft_chain_attr_get_u32(struct nft_chain *c, uint16_t attr);
 int32_t nft_chain_attr_get_s32(struct nft_chain *c, uint16_t attr);
 uint64_t nft_chain_attr_get_u64(struct nft_chain *c, uint16_t attr);

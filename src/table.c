@@ -103,6 +103,12 @@ void nft_table_attr_set_u32(struct nft_table *t, uint16_t attr, uint32_t val)
 }
 EXPORT_SYMBOL(nft_table_attr_set_u32);
 
+void nft_table_attr_set_u8(struct nft_table *t, uint16_t attr, uint8_t val)
+{
+	nft_table_attr_set(t, attr, &val);
+}
+EXPORT_SYMBOL(nft_table_attr_set_u8);
+
 void nft_table_attr_set_str(struct nft_table *t, uint16_t attr, const char *str)
 {
 	nft_table_attr_set(t, attr, str);
@@ -132,6 +138,13 @@ uint32_t nft_table_attr_get_u32(struct nft_table *t, uint16_t attr)
 	return ret == NULL ? 0 : *((uint32_t *)ret);
 }
 EXPORT_SYMBOL(nft_table_attr_get_u32);
+
+uint8_t nft_table_attr_get_u8(struct nft_table *t, uint16_t attr)
+{
+	const void *ret = nft_table_attr_get(t, attr);
+	return ret == NULL ? 0 : *((uint8_t *)ret);
+}
+EXPORT_SYMBOL(nft_table_attr_get_u8);
 
 const char *nft_table_attr_get_str(struct nft_table *t, uint16_t attr)
 {
