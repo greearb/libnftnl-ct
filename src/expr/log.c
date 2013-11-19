@@ -142,7 +142,7 @@ nft_rule_expr_log_parse(struct nft_rule_expr *e, struct nlattr *attr)
 			xfree(log->prefix);
 
 		log->prefix = strdup(mnl_attr_get_str(tb[NFTA_LOG_PREFIX]));
-		e->flags |= (1 << NFT_EXPR_LOG_GROUP);
+		e->flags |= (1 << NFT_EXPR_LOG_PREFIX);
 	}
 	if (tb[NFTA_LOG_GROUP]) {
 		log->group = ntohs(mnl_attr_get_u16(tb[NFTA_LOG_GROUP]));
