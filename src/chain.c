@@ -285,27 +285,6 @@ uint8_t nft_chain_attr_get_u8(struct nft_chain *c, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_chain_attr_get_u8);
 
-struct nlmsghdr *
-nft_chain_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
-			  uint16_t type, uint32_t seq)
-{
-	struct nlmsghdr *nlh;
-	struct nfgenmsg *nfh;
-
-	nlh = mnl_nlmsg_put_header(buf);
-	nlh->nlmsg_type = (NFNL_SUBSYS_NFTABLES << 8) | cmd;
-	nlh->nlmsg_flags = NLM_F_REQUEST | type;
-	nlh->nlmsg_seq = seq;
-
-	nfh = mnl_nlmsg_put_extra_header(nlh, sizeof(struct nfgenmsg));
-	nfh->nfgen_family = family;
-	nfh->version = NFNETLINK_V0;
-	nfh->res_id = 0;
-
-	return nlh;
-}
-EXPORT_SYMBOL(nft_chain_nlmsg_build_hdr);
-
 void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain *c)
 {
 	if (c->flags & (1 << NFT_CHAIN_ATTR_TABLE))

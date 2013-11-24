@@ -43,7 +43,7 @@ int nft_table_parse(struct nft_table *t, enum nft_parse_type type, const char *d
 int nft_table_snprintf(char *buf, size_t size, struct nft_table *t, uint32_t type, uint32_t flags);
 int nft_table_fprintf(FILE *fp, struct nft_table *t, uint32_t type, uint32_t flags);
 
-struct nlmsghdr *nft_table_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);
+#define nft_table_nlmsg_build_hdr	nft_nlmsg_build_hdr
 int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t);
 
 struct nft_table_list;

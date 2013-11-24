@@ -220,27 +220,6 @@ uint8_t nft_rule_attr_get_u8(const struct nft_rule *r, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u8);
 
-struct nlmsghdr *
-nft_rule_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
-			  uint16_t type, uint32_t seq)
-{
-	struct nlmsghdr *nlh;
-	struct nfgenmsg *nfh;
-
-	nlh = mnl_nlmsg_put_header(buf);
-	nlh->nlmsg_type = (NFNL_SUBSYS_NFTABLES << 8) | cmd;
-	nlh->nlmsg_flags = NLM_F_REQUEST | type;
-	nlh->nlmsg_seq = seq;
-
-	nfh = mnl_nlmsg_put_extra_header(nlh, sizeof(struct nfgenmsg));
-	nfh->nfgen_family = family;
-	nfh->version = NFNETLINK_V0;
-	nfh->res_id = 0;
-
-	return nlh;
-}
-EXPORT_SYMBOL(nft_rule_nlmsg_build_hdr);
-
 void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *r)
 {
 	struct nft_rule_expr *expr;

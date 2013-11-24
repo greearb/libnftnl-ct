@@ -15,7 +15,6 @@ global:
   nft_table_parse;
   nft_table_snprintf;
   nft_table_fprintf;
-  nft_table_nlmsg_build_hdr;
   nft_table_nlmsg_build_payload;
   nft_table_nlmsg_parse;
   nft_table_list_alloc;
@@ -48,7 +47,6 @@ global:
   nft_chain_parse;
   nft_chain_snprintf;
   nft_chain_fprintf;
-  nft_chain_nlmsg_build_hdr;
   nft_chain_nlmsg_build_payload;
   nft_chain_nlmsg_parse;
   nft_chain_list_alloc;
@@ -78,7 +76,6 @@ global:
   nft_rule_parse;
   nft_rule_snprintf;
   nft_rule_fprintf;
-  nft_rule_nlmsg_build_hdr;
   nft_rule_nlmsg_build_payload;
   nft_rule_nlmsg_parse;
   nft_rule_add_expr;
@@ -128,7 +125,6 @@ global:
   nft_set_attr_get;
   nft_set_attr_get_str;
   nft_set_attr_get_u32;
-  nft_set_nlmsg_build_hdr;
   nft_set_nlmsg_build_payload;
   nft_set_nlmsg_parse;
   nft_set_parse;
@@ -160,7 +156,6 @@ global:
   nft_set_elem_attr_get;
   nft_set_elem_attr_get_str;
   nft_set_elem_attr_get_u32;
-  nft_set_elem_nlmsg_build_hdr;
   nft_set_elem_nlmsg_build_payload;
   nft_set_elem_nlmsg_parse;
   nft_set_elem_parse;
@@ -186,6 +181,8 @@ global:
   nft_ruleset_parse;
   nft_ruleset_snprintf;
   nft_ruleset_fprintf;
+
+  nft_nlmsg_build_hdr;
 
 local: *;
 };

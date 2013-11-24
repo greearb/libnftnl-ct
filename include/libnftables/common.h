@@ -13,4 +13,8 @@ enum nft_parse_type {
 	NFT_PARSE_JSON,
 	NFT_PARSE_MAX,
 };
+
+struct nlmsghdr *nft_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
+				     uint16_t type, uint32_t seq);
+
 #endif

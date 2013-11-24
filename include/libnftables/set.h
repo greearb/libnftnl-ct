@@ -36,7 +36,7 @@ uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr);
 
 struct nlmsghdr;
 
-struct nlmsghdr *nft_set_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);
+#define nft_set_nlmsg_build_hdr	nft_nlmsg_build_hdr
 void nft_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s);
 int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s);
 int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s);
@@ -92,7 +92,7 @@ uint32_t nft_set_elem_attr_get_u32(struct nft_set_elem *s, uint16_t attr);
 
 bool nft_set_elem_attr_is_set(const struct nft_set_elem *s, uint16_t attr);
 
-struct nlmsghdr *nft_set_elem_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family, uint16_t type, uint32_t seq);
+#define nft_set_elem_nlmsg_build_hdr	nft_nlmsg_build_hdr
 void nft_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s);
 void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set_elem *e);
 
