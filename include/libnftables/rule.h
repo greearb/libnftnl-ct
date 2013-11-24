@@ -1,5 +1,5 @@
-#ifndef _RULE_H_
-#define _RULE_H_
+#ifndef _LIBNFTABLES_RULE_H_
+#define _LIBNFTABLES_RULE_H_
 
 #include <stdio.h>
 #include <stdint.h>
@@ -85,4 +85,4 @@ void nft_rule_list_iter_destroy(struct nft_rule_list_iter *iter);
 } /* extern "C" */
 #endif
 
-#endif /* _RULE_H_ */
+#endif /* _LIBNFTABLES_RULE_H_ */

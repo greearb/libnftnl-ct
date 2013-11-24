@@ -1,5 +1,5 @@
-#ifndef _COMMON_H_
-#define _COMMON_H_
+#ifndef _LIBNFTABLES_COMMON_H_
+#define _LIBNFTABLES_COMMON_H_
 
 enum nft_output_type {
 	NFT_OUTPUT_DEFAULT	= 0,

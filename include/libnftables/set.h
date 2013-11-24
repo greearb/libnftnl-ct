@@ -1,5 +1,5 @@
-#ifndef _NFT_SET_H_
-#define _NFT_SET_H_
+#ifndef _LIBNFTABLES_SET_H_
+#define _LIBNFTABLES_SET_H_
 
 #include <stdio.h>
 #include <stdint.h>
@@ -110,4 +110,4 @@ struct nft_set_elem *nft_set_elems_iter_cur(struct nft_set_elems_iter *iter);
 struct nft_set_elem *nft_set_elems_iter_next(struct nft_set_elems_iter *iter);
 void nft_set_elems_iter_destroy(struct nft_set_elems_iter *iter);
 
-#endif
+#endif /* _LIBNFTABLES_SET_H_ */

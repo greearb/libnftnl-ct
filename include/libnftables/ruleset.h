@@ -1,5 +1,5 @@
-#ifndef _RULESET_H_
-#define _RULESET_H_
+#ifndef _LIBNFTABLES_RULESET_H_
+#define _LIBNFTABLES_RULESET_H_
 
 #include <stdio.h>
 
@@ -38,4 +38,4 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type, u
 } /* extern "C" */
 #endif
 
-#endif /* _RULESET_H_ */
+#endif /* _LIBNFTABLES_RULESET_H_ */

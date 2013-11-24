@@ -1,5 +1,5 @@
-#ifndef _TABLE_H_
-#define _TABLE_H_
+#ifndef _LIBNFTABLES_TABLE_H_
+#define _LIBNFTABLES_TABLE_H_
 
 #include <stdio.h>
 #include <stdint.h>
@@ -67,4 +67,4 @@ void nft_table_list_iter_destroy(struct nft_table_list_iter *iter);
 } /* extern "C" */
 #endif
 
-#endif /* _TABLE_H_ */
+#endif /* _LIBNFTABLES_TABLE_H_ */
