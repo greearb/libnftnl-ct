@@ -16,7 +16,7 @@
 #include <netinet/ip.h>
 #include <linux/netfilter/nf_tables.h>
 #include <linux/netfilter/xt_iprange.h>
-#include <linux/netfilter_ipv4/ipt_LOG.h>
+#include <linux/netfilter/xt_LOG.h>
 #include <libmnl/libmnl.h>
 #include <libnftables/rule.h>
 #include <libnftables/expr.h>
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	struct nft_rule *a, *b;
 	struct nft_rule_expr *ex;
 	struct nlmsghdr *nlh;
-	struct ipt_log_info *info;
+	struct xt_log_info *info;
 	char buf[4096];
 	struct nft_rule_expr_iter *iter_a, *iter_b;
 	struct nft_rule_expr *rule_a, *rule_b;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	nft_rule_expr_set(ex, NFT_EXPR_TG_NAME, "test", strlen("test"));
 	nft_rule_expr_set_u32(ex, NFT_EXPR_TG_REV, 0x12345678);
 
-	info = calloc(1, sizeof(struct ipt_log_info));
+	info = calloc(1, sizeof(struct xt_log_info));
 	if (info == NULL)
 		print_err("OOM");
 	sprintf(info->prefix, "test: ");
