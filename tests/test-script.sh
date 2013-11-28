@@ -18,3 +18,5 @@
 ./nft-rule-test
 ./nft-set-test
 ./nft-table-test
+./nft-parsing-test xmlfiles
+./nft-parsing-test jsonfiles
