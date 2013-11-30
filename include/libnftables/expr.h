@@ -143,6 +143,11 @@ enum {
 	NFT_EXPR_REJECT_CODE,
 };
 
+enum {
+	NFT_EXPR_QUEUE_NUM	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_QUEUE_TOTAL,
+	NFT_EXPR_QUEUE_FLAGS,
+};
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

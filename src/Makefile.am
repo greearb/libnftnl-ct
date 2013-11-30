@@ -31,6 +31,7 @@ libnftables_la_SOURCES = utils.c		\
 			 expr/meta.c		\
 			 expr/nat.c		\
 			 expr/payload.c		\
+			 expr/queue.c		\
 			 expr/reject.c		\
 			 expr/target.c		\
 			 expr/data_reg.h	\
