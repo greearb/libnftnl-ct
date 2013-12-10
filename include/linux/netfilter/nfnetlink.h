@@ -97,4 +97,9 @@ extern void nfnl_unlock(void);
 	MODULE_ALIAS("nfnetlink-subsys-" __stringify(subsys))
 
 #endif	/* __KERNEL__ */
+
+/* Reserved control nfnetlink messages */
+#define NFNL_MSG_BATCH_BEGIN            NLMSG_MIN_TYPE
+#define NFNL_MSG_BATCH_END              NLMSG_MIN_TYPE+1
+
 #endif	/* _NFNETLINK_H */
