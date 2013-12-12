@@ -21,6 +21,7 @@ enum {
 	NFT_TABLE_ATTR_NAME	= 0,
 	NFT_TABLE_ATTR_FAMILY,
 	NFT_TABLE_ATTR_FLAGS,
+	NFT_TABLE_ATTR_USE,
 };
 
 bool nft_table_attr_is_set(const struct nft_table *t, uint16_t attr);
