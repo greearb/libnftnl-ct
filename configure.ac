@@ -16,11 +16,9 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 dnl Dependencies
 PKG_CHECK_MODULES([LIBMNL], [libmnl >= 1.0.0])
 AC_ARG_WITH([xml-parsing],
-	AS_HELP_STRING([--with-xml-parsing], [XML parsing support]),
-	[with_xml_parsing="yes"], [with_xml_parsing="no"])
+	AS_HELP_STRING([--with-xml-parsing], [XML parsing support]))
 AC_ARG_WITH([json-parsing],
-	AS_HELP_STRING([--with-json-parsing], [JSON parsing support]),
-	[with_json_parsing="yes"], [with_json_parsing="no"])
+	AS_HELP_STRING([--with-json-parsing], [JSON parsing support]))
 
 AS_IF([test "x$with_xml_parsing" = "xyes"], [
 	PKG_CHECK_MODULES([LIBXML], [mxml >= 2.6])
