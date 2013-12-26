@@ -50,6 +50,7 @@ enum {
 enum {
 	NFT_EXPR_META_KEY	= NFT_RULE_EXPR_ATTR_BASE,
 	NFT_EXPR_META_DREG,
+	NFT_EXPR_META_SREG,
 };
 
 enum {
