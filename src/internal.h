@@ -57,19 +57,21 @@ int nft_mxml_set_parse(mxml_node_t *tree, struct nft_set *s);
 
 #ifdef JSON_PARSING
 #include <jansson.h>
-int nft_jansson_parse_val(json_t *root, const char *tag, int type, void *out);
-const char *nft_jansson_parse_str(json_t *root, const char *tag);
-bool nft_jansson_node_exist(json_t *root, const char *tag);
+int nft_jansson_parse_val(json_t *root, const char *node_name, int type,
+			  void *out);
+const char *nft_jansson_parse_str(json_t *root, const char *node_name);
+bool nft_jansson_node_exist(json_t *root, const char *node_name);
 json_t *nft_jansson_create_root(const char *json, json_error_t *err);
-json_t *nft_jansson_get_node(json_t *root, const char *tag);
+json_t *nft_jansson_get_node(json_t *root, const char *node_name);
 void nft_jansson_free_root(json_t *root);
 int nft_jansson_parse_family(json_t *root, void *out);
-int nft_jansson_str2num(json_t *root, const char *tag, int base, void *out,
-			enum nft_type type);
-int nft_jansson_parse_reg(json_t *root, const char *tag, int type, void *out);
+int nft_jansson_str2num(json_t *root, const char *node_name, int base,
+			void *out, enum nft_type type);
+int nft_jansson_parse_reg(json_t *root, const char *node_name, int type,
+			  void *out);
 struct nft_rule_expr *nft_jansson_expr_parse(json_t *root);
 union nft_data_reg;
-int nft_jansson_data_reg_parse(json_t *root, const char *tag,
+int nft_jansson_data_reg_parse(json_t *root, const char *node_name,
 			       union nft_data_reg *data_reg);
 struct nft_set_elem;
 int nft_set_elem_json_parse(struct nft_set_elem *e, json_t *root);

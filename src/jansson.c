@@ -23,12 +23,12 @@
 
 #ifdef JSON_PARSING
 
-static int nft_jansson_load_int_node(json_t *root, const char *tag,
+static int nft_jansson_load_int_node(json_t *root, const char *node_name,
 				      json_int_t *val)
 {
 	json_t *node;
 
-	node = json_object_get(root, tag);
+	node = json_object_get(root, node_name);
 	if (node == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -43,12 +43,12 @@ static int nft_jansson_load_int_node(json_t *root, const char *tag,
 	return 0;
 }
 
-const char *nft_jansson_parse_str(json_t *root, const char *tag)
+const char *nft_jansson_parse_str(json_t *root, const char *node_name)
 {
 	json_t *node;
 	const char *val;
 
-	node = json_object_get(root, tag);
+	node = json_object_get(root, node_name);
 	if (node == NULL) {
 		errno = EINVAL;
 		return NULL;
@@ -58,11 +58,12 @@ const char *nft_jansson_parse_str(json_t *root, const char *tag)
 	return val;
 }
 
-int nft_jansson_parse_val(json_t *root, const char *tag, int type, void *out)
+int nft_jansson_parse_val(json_t *root, const char *node_name, int type,
+			  void *out)
 {
 	json_int_t val;
 
-	if (nft_jansson_load_int_node(root, tag, &val) == -1)
+	if (nft_jansson_load_int_node(root, node_name, &val) == -1)
 		return -1;
 
 	if (nft_get_value(type, &val, out) == -1)
@@ -71,9 +72,9 @@ int nft_jansson_parse_val(json_t *root, const char *tag, int type, void *out)
 	return 0;
 }
 
-bool nft_jansson_node_exist(json_t *root, const char *tag)
+bool nft_jansson_node_exist(json_t *root, const char *node_name)
 {
-	return json_object_get(root, tag) != NULL;
+	return json_object_get(root, node_name) != NULL;
 }
 
 json_t *nft_jansson_create_root(const char *json, json_error_t *err)
@@ -89,11 +90,11 @@ json_t *nft_jansson_create_root(const char *json, json_error_t *err)
 	return root;
 }
 
-json_t *nft_jansson_get_node(json_t *root, const char *tag)
+json_t *nft_jansson_get_node(json_t *root, const char *node_name)
 {
 	json_t *node;
 
-	node = json_object_get(root, tag);
+	node = json_object_get(root, node_name);
 	if (node == NULL) {
 		errno = EINVAL;
 		return NULL;
@@ -126,9 +127,10 @@ int nft_jansson_parse_family(json_t *root, void *out)
 	return 0;
 }
 
-int nft_jansson_parse_reg(json_t *root, const char *tag, int type, void *out)
+int nft_jansson_parse_reg(json_t *root, const char *node_name, int type,
+			  void *out)
 {
-	if (nft_jansson_parse_val(root, tag, type, out) < 0)
+	if (nft_jansson_parse_val(root, node_name, type, out) < 0)
 		return -1;
 
 	if (*((uint32_t *)out) > NFT_REG_MAX){
@@ -139,12 +141,12 @@ int nft_jansson_parse_reg(json_t *root, const char *tag, int type, void *out)
 	return 0;
 }
 
-int nft_jansson_str2num(json_t *root, const char *tag, int base,
+int nft_jansson_str2num(json_t *root, const char *node_name, int base,
 			void *out, enum nft_type type)
 {
 	const char *str;
 
-	str = nft_jansson_parse_str(root, tag);
+	str = nft_jansson_parse_str(root, node_name);
 	if (str == NULL)
 		return -1;
 
@@ -170,14 +172,14 @@ struct nft_rule_expr *nft_jansson_expr_parse(json_t *root)
 	return ret < 0 ? NULL : e;
 }
 
-int nft_jansson_data_reg_parse(json_t *root, const char *tag,
+int nft_jansson_data_reg_parse(json_t *root, const char *node_name,
 			       union nft_data_reg *data_reg)
 {
 	json_t *data;
 	const char *type;
 	int ret;
 
-	data = json_object_get(root, tag);
+	data = json_object_get(root, node_name);
 	if (data == NULL) {
 		errno = EINVAL;
 		return -1;
