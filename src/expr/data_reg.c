@@ -27,12 +27,13 @@
 #include "internal.h"
 
 #ifdef JSON_PARSING
-static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data)
+static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data,
+					   struct nft_parse_err *err)
 {
 	int verdict;
 	const char *verdict_str;
 
-	verdict_str = nft_jansson_parse_str(data, "verdict");
+	verdict_str = nft_jansson_parse_str(data, "verdict", err);
 	if (verdict_str == NULL)
 		return -1;
 
@@ -45,9 +46,10 @@ static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data
 	return 0;
 }
 
-static int nft_data_reg_chain_json_parse(union nft_data_reg *reg, json_t *data)
+static int nft_data_reg_chain_json_parse(union nft_data_reg *reg, json_t *data,
+					 struct nft_parse_err *err)
 {
-	reg->chain = strdup(nft_jansson_parse_str(data, "chain"));
+	reg->chain = strdup(nft_jansson_parse_str(data, "chain", err));
 	if (reg->chain == NULL) {
 		return -1;
 	}
@@ -55,19 +57,20 @@ static int nft_data_reg_chain_json_parse(union nft_data_reg *reg, json_t *data)
 	return 0;
 }
 
-static int nft_data_reg_value_json_parse(union nft_data_reg *reg, json_t *data)
+static int nft_data_reg_value_json_parse(union nft_data_reg *reg, json_t *data,
+					 struct nft_parse_err *err)
 {
 	int i;
 	char node_name[6];
 
-	if (nft_jansson_parse_val(data, "len", NFT_TYPE_U8, &reg->len) < 0)
+	if (nft_jansson_parse_val(data, "len", NFT_TYPE_U8, &reg->len, err) < 0)
 			return -1;
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
 		sprintf(node_name, "data%d", i);
 
 		if (nft_jansson_str2num(data, node_name, BASE_HEX,
-				        &reg->val[i], NFT_TYPE_U32) != 0)
+					&reg->val[i], NFT_TYPE_U32, err) != 0)
 			return -1;
 	}
 
@@ -75,23 +78,24 @@ static int nft_data_reg_value_json_parse(union nft_data_reg *reg, json_t *data)
 }
 #endif
 
-int nft_data_reg_json_parse(union nft_data_reg *reg, json_t *data)
+int nft_data_reg_json_parse(union nft_data_reg *reg, json_t *data,
+			    struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 
 	const char *type;
 
-	type = nft_jansson_parse_str(data, "type");
+	type = nft_jansson_parse_str(data, "type", err);
 	if (type == NULL)
 		return -1;
 
 	/* Select what type of parsing is needed */
 	if (strcmp(type, "value") == 0) {
-		return nft_data_reg_value_json_parse(reg, data);
+		return nft_data_reg_value_json_parse(reg, data, err);
 	} else if (strcmp(type, "verdict") == 0) {
-		return nft_data_reg_verdict_json_parse(reg, data);
+		return nft_data_reg_verdict_json_parse(reg, data, err);
 	} else if (strcmp(type, "chain") == 0) {
-		return nft_data_reg_chain_json_parse(reg, data);
+		return nft_data_reg_chain_json_parse(reg, data, err);
 	}
 
 	return 0;
@@ -103,13 +107,14 @@ int nft_data_reg_json_parse(union nft_data_reg *reg, json_t *data)
 
 #ifdef XML_PARSING
 static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg,
-					  mxml_node_t *tree)
+					  mxml_node_t *tree,
+					  struct nft_parse_err *err)
 {
 	int verdict;
 	const char *verdict_str;
 
 	verdict_str = nft_mxml_str_parse(tree, "verdict", MXML_DESCEND_FIRST,
-					 NFT_XML_MAND);
+					 NFT_XML_MAND, err);
 	if (verdict_str == NULL)
 		return DATA_NONE;
 
@@ -123,12 +128,13 @@ static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg,
 }
 
 static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg,
-					mxml_node_t *tree)
+					mxml_node_t *tree,
+					struct nft_parse_err *err)
 {
 	const char *chain;
 
 	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST,
-				   NFT_XML_MAND);
+				   NFT_XML_MAND, err);
 	if (chain == NULL)
 		return DATA_NONE;
 
@@ -140,7 +146,8 @@ static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg,
 }
 
 static int nft_data_reg_value_xml_parse(union nft_data_reg *reg,
-					mxml_node_t *tree)
+					mxml_node_t *tree,
+					struct nft_parse_err *err)
 {
 	int i;
 	char node_name[6];
@@ -156,7 +163,7 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg,
 	*/
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &reg->len, NFT_TYPE_U8, NFT_XML_MAND) != 0)
+			       &reg->len, NFT_TYPE_U8, NFT_XML_MAND, err) != 0)
 		return DATA_NONE;
 
 	/* Get and set <dataN> */
@@ -165,7 +172,7 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg,
 
 		if (nft_mxml_num_parse(tree, node_name, MXML_DESCEND_FIRST,
 				       BASE_HEX, &reg->val[i], NFT_TYPE_U32,
-				       NFT_XML_MAND) != 0)
+				       NFT_XML_MAND, err) != 0)
 			return DATA_NONE;
 	}
 
@@ -173,7 +180,8 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg,
 }
 #endif
 
-int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree)
+int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree,
+			   struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	const char *type;
@@ -194,11 +202,11 @@ int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree)
 	}
 
 	if (strcmp(type, "value") == 0)
-		return nft_data_reg_value_xml_parse(reg, node);
+		return nft_data_reg_value_xml_parse(reg, node, err);
 	else if (strcmp(type, "verdict") == 0)
-		return nft_data_reg_verdict_xml_parse(reg, node);
+		return nft_data_reg_verdict_xml_parse(reg, node, err);
 	else if (strcmp(type, "chain") == 0)
-		return nft_data_reg_chain_xml_parse(reg, node);
+		return nft_data_reg_chain_xml_parse(reg, node, err);
 
 	return DATA_NONE;
 #else

@@ -51,7 +51,8 @@ struct nlmsghdr;
 
 void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain *t);
 
-int nft_chain_parse(struct nft_chain *c, enum nft_parse_type type, const char *data);
+int nft_chain_parse(struct nft_chain *c, enum nft_parse_type type,
+		    const char *data, struct nft_parse_err *err);
 int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *t, uint32_t type, uint32_t flags);
 int nft_chain_fprintf(FILE *fp, struct nft_chain *c, uint32_t type, uint32_t flags);
 

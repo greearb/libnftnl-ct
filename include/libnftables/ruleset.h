@@ -30,7 +30,8 @@ void nft_ruleset_attr_unset(struct nft_ruleset *r, uint16_t attr);
 void nft_ruleset_attr_set(struct nft_ruleset *r, uint16_t attr, void *data);
 const void *nft_ruleset_attr_get(const struct nft_ruleset *r, uint16_t attr);
 
-int nft_ruleset_parse(struct nft_ruleset *rs, enum nft_parse_type type, const char *data);
+int nft_ruleset_parse(struct nft_ruleset *rs, enum nft_parse_type type,
+		      const char *data, struct nft_parse_err *err);
 int nft_ruleset_snprintf(char *buf, size_t size, const struct nft_ruleset *rs, uint32_t type, uint32_t flags);
 int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type, uint32_t flags);
 

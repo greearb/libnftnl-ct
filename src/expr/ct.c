@@ -178,7 +178,8 @@ static inline int str2ctkey(const char *ctkey)
 	return -1;
 }
 
-static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
+static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root,
+				       struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *key_str;
@@ -186,13 +187,13 @@ static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
 	uint8_t dir;
 	int key;
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) < 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_CT_DREG, reg);
 
 	if (nft_jansson_node_exist(root, "key")) {
-		key_str = nft_jansson_parse_str(root, "key");
+		key_str = nft_jansson_parse_str(root, "key", err);
 		if (key_str == NULL)
 			return -1;
 
@@ -205,7 +206,8 @@ static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
 	}
 
 	if (nft_jansson_node_exist(root, "dir")) {
-		if (nft_jansson_parse_val(root, "dir", NFT_TYPE_U8, &dir) < 0)
+		if (nft_jansson_parse_val(root, "dir", NFT_TYPE_U8, &dir,
+					  err) < 0)
 			return -1;
 
 		if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)
@@ -225,7 +227,8 @@ err:
 }
 
 
-static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				      struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_ct *ct = nft_expr_data(e);
@@ -234,7 +237,7 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	int key;
 	uint8_t dir;
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST, err);
 	if (reg < 0)
 		return -1;
 
@@ -242,7 +245,7 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	e->flags |= (1 << NFT_EXPR_CT_DREG);
 
 	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST,
-				     NFT_XML_MAND);
+				     NFT_XML_MAND, err);
 	if (key_str == NULL)
 		return -1;
 
@@ -254,7 +257,7 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	e->flags |= (1 << NFT_EXPR_CT_KEY);
 
 	if (nft_mxml_num_parse(tree, "dir", MXML_DESCEND_FIRST, BASE_DEC,
-			       &dir, NFT_TYPE_U8, NFT_XML_MAND) != 0)
+			       &dir, NFT_TYPE_U8, NFT_XML_MAND, err) != 0)
 		return -1;
 
 	if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)

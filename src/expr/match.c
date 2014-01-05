@@ -170,12 +170,13 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 	return 0;
 }
 
-static int nft_rule_expr_match_json_parse(struct nft_rule_expr *e, json_t *root)
+static int nft_rule_expr_match_json_parse(struct nft_rule_expr *e, json_t *root,
+					  struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *name;
 
-	name = nft_jansson_parse_str(root, "name");
+	name = nft_jansson_parse_str(root, "name", err);
 	if (name == NULL)
 		return -1;
 
@@ -189,14 +190,15 @@ static int nft_rule_expr_match_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 
-static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+					 struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_match *mt = nft_expr_data(e);
 	const char *name;
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
-				  NFT_XML_MAND);
+				  NFT_XML_MAND, err);
 	if (name == NULL)
 		return -1;
 

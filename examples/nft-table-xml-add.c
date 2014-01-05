@@ -23,6 +23,7 @@
 
 #include <libmnl/libmnl.h>
 #include <libnftables/table.h>
+#include <libnftables/common.h>
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
 	uint16_t family;
 	char xml[4096];
 	char reprint[4096];
+	struct nft_parse_err *err;
 
 	if (argc < 2) {
 		printf("Usage: %s <xml-file>\n", argv[0]);
@@ -60,8 +62,14 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (nft_table_parse(t, NFT_PARSE_XML, xml) < 0) {
-		printf("E: Unable to parse XML file: %s\n", strerror(errno));
+	err = nft_parse_err_alloc();
+	if (err == NULL) {
+		perror("error");
+		exit(EXIT_FAILURE);
+	}
+
+	if (nft_table_parse(t, NFT_PARSE_XML, xml, err) < 0) {
+		nft_parse_perror("Unable to parse XML file", err);
 		exit(EXIT_FAILURE);
 	}
 
@@ -76,6 +84,7 @@ int main(int argc, char *argv[])
 					NLM_F_CREATE|NLM_F_ACK, seq);
 	nft_table_nlmsg_build_payload(nlh, t);
 	nft_table_free(t);
+	nft_parse_err_free(err);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

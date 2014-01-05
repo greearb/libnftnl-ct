@@ -178,20 +178,21 @@ nft_rule_expr_immediate_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_immediate_json_parse(struct nft_rule_expr *e, json_t *root)
+nft_rule_expr_immediate_json_parse(struct nft_rule_expr *e, json_t *root,
+				   struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	struct nft_expr_immediate *imm = nft_expr_data(e);
 	int datareg_type;
 	uint32_t reg;
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) < 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_IMM_DREG, reg);
 
 	datareg_type = nft_jansson_data_reg_parse(root, "immediatedata",
-						  &imm->data);
+						  &imm->data, err);
 	if (datareg_type < 0)
 		return -1;
 
@@ -217,14 +218,15 @@ nft_rule_expr_immediate_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 static int
-nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				  struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_immediate *imm = nft_expr_data(e);
 	int datareg_type;
 	int32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST, err);
 	if (reg < 0)
 		return -1;
 
@@ -232,7 +234,7 @@ nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	e->flags |= (1 << NFT_EXPR_IMM_DREG);
 
 	datareg_type = nft_mxml_data_reg_parse(tree, "immediatedata",
-					       &imm->data, NFT_XML_MAND);
+					       &imm->data, NFT_XML_MAND, err);
 	switch (datareg_type) {
 	case DATA_VALUE:
 		e->flags |= (1 << NFT_EXPR_IMM_DATA);

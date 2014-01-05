@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 	uint16_t family;
 	char xml[4096];
 	char reprint[4096];
+	struct nft_parse_err *err;
 
 	if (argc < 2) {
 		printf("Usage: %s <xml-file>\n", argv[0]);
@@ -46,6 +47,12 @@ int main(int argc, char *argv[])
 	c = nft_chain_alloc();
 	if (c == NULL) {
 		perror("OOM");
+		exit(EXIT_FAILURE);
+	}
+
+	err = nft_parse_err_alloc();
+	if (err == NULL) {
+		perror("error");
 		exit(EXIT_FAILURE);
 	}
 
@@ -63,8 +70,8 @@ int main(int argc, char *argv[])
 
 	close(fd);
 
-	if (nft_chain_parse(c, NFT_PARSE_XML, xml) < 0) {
-		printf("E: Unable to parse XML file: %s\n", strerror(errno));
+	if (nft_chain_parse(c, NFT_PARSE_XML, xml, err) < 0) {
+		nft_parse_perror("Unable to parse XML file", err);
 		exit(EXIT_FAILURE);
 	}
 
@@ -80,6 +87,7 @@ int main(int argc, char *argv[])
 	nft_chain_nlmsg_build_payload(nlh, c);
 
 	nft_chain_free(c);
+	nft_parse_err_free(err);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

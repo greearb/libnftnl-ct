@@ -194,19 +194,20 @@ static inline int nft_str2base(const char *base)
 }
 
 static int
-nft_rule_expr_payload_json_parse(struct nft_rule_expr *e, json_t *root)
+nft_rule_expr_payload_json_parse(struct nft_rule_expr *e, json_t *root,
+				 struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *base_str;
 	uint32_t reg, uval32;
 	int base;
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) < 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_DREG, reg);
 
-	base_str = nft_jansson_parse_str(root, "base");
+	base_str = nft_jansson_parse_str(root, "base", err);
 	if (base_str == NULL)
 		return -1;
 
@@ -216,12 +217,13 @@ nft_rule_expr_payload_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_BASE, base);
 
-	if (nft_jansson_parse_val(root, "offset", NFT_TYPE_U32, &uval32) < 0)
+	if (nft_jansson_parse_val(root, "offset", NFT_TYPE_U32, &uval32,
+				  err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_OFFSET, uval32);
 
-	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &uval32) < 0)
+	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &uval32, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_LEN, uval32);
@@ -234,14 +236,15 @@ nft_rule_expr_payload_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 static int
-nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_payload *payload = nft_expr_data(e);
 	const char *base_str;
 	int32_t reg, base;
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST, err);
 	if (reg < 0)
 		return -1;
 
@@ -249,7 +252,7 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	e->flags |= (1 << NFT_EXPR_PAYLOAD_DREG);
 
 	base_str = nft_mxml_str_parse(tree, "base", MXML_DESCEND_FIRST,
-				      NFT_XML_MAND);
+				      NFT_XML_MAND, err);
 	if (base_str == NULL)
 		return -1;
 
@@ -262,13 +265,14 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 
 	if (nft_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
 			       &payload->offset, NFT_TYPE_U8,
-			       NFT_XML_MAND) != 0)
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_PAYLOAD_OFFSET);
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &payload->len, NFT_TYPE_U8, NFT_XML_MAND) != 0)
+			       &payload->len, NFT_TYPE_U8,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_PAYLOAD_LEN);

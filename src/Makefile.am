@@ -4,6 +4,7 @@ lib_LTLIBRARIES = libnftables.la
 libnftables_la_LIBADD = ${LIBMNL_LIBS} ${LIBXML_LIBS} ${LIBJSON_LIBS}
 libnftables_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libnftables.map \
 			 -version-info $(LIBVERSION)
+
 libnftables_la_SOURCES = utils.c		\
 			 common.c		\
 			 table.c		\

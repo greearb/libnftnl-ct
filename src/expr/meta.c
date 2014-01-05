@@ -160,19 +160,20 @@ static inline int str2meta_key(const char *str)
 	return -1;
 }
 
-static int nft_rule_expr_meta_json_parse(struct nft_rule_expr *e, json_t *root)
+static int nft_rule_expr_meta_json_parse(struct nft_rule_expr *e, json_t *root,
+					 struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *key_str;
 	uint32_t reg;
 	int key;
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) < 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
                 return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_META_DREG, reg);
 
-	key_str = nft_jansson_parse_str(root, "key");
+	key_str = nft_jansson_parse_str(root, "key", err);
 	if (key_str == NULL)
 		return -1;
 
@@ -190,7 +191,8 @@ static int nft_rule_expr_meta_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 
-static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+					struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_meta *meta = nft_expr_data(e);
@@ -198,7 +200,7 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tr
 	int32_t reg;
 	int key;
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST, err);
 	if (reg < 0)
                 return -1;
 
@@ -206,7 +208,7 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tr
 	e->flags |= (1 << NFT_EXPR_META_DREG);
 
 	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST,
-				     NFT_XML_MAND);
+				     NFT_XML_MAND, err);
 	if (key_str == NULL)
 		return -1;
 

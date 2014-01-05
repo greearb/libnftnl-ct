@@ -184,5 +184,9 @@ global:
 
   nft_nlmsg_build_hdr;
 
+  nft_parse_err_alloc;
+  nft_parse_err_free;
+  nft_parse_perror;
+
 local: *;
 };

@@ -143,24 +143,25 @@ nft_rule_expr_lookup_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_lookup_json_parse(struct nft_rule_expr *e, json_t *root)
+nft_rule_expr_lookup_json_parse(struct nft_rule_expr *e, json_t *root,
+				struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *set_name;
 	int32_t reg;
 
-	set_name = nft_jansson_parse_str(root, "set");
+	set_name = nft_jansson_parse_str(root, "set", err);
 	if (set_name == NULL)
 		return -1;
 
 	nft_rule_expr_set_str(e, NFT_EXPR_LOOKUP_SET, set_name);
 
-	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg) < 0)
+	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SREG, reg);
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) < 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_DREG, reg);
@@ -173,7 +174,8 @@ nft_rule_expr_lookup_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 static int
-nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+			       struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_lookup *lookup = nft_expr_data(e);
@@ -181,7 +183,7 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	int32_t reg;
 
 	set_name = nft_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST,
-				      NFT_XML_MAND);
+				      NFT_XML_MAND, err);
 	if (set_name == NULL)
 		return -1;
 
@@ -189,14 +191,14 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 	lookup->set_name[IFNAMSIZ-1] = '\0';
 	e->flags |= (1 << NFT_EXPR_LOOKUP_SET);
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND);
+	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND, err);
 	if (reg < 0)
 		return -1;
 
 	lookup->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_LOOKUP_SREG);
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND);
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND, err);
 	if (reg < 0)
 		return -1;
 

@@ -181,35 +181,36 @@ nft_rule_expr_bitwise_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_bitwise_json_parse(struct nft_rule_expr *e, json_t *root)
+nft_rule_expr_bitwise_json_parse(struct nft_rule_expr *e, json_t *root,
+				 struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
 	uint32_t reg, len;
 
-	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg) < 0)
+	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BITWISE_SREG, reg);
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) < 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BITWISE_DREG, reg);
 
-	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &len) < 0)
+	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &len, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BITWISE_LEN, len);
 
 	if (nft_jansson_data_reg_parse(root, "mask",
-				       &bitwise->mask) != DATA_VALUE)
+				       &bitwise->mask, err) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BITWISE_MASK);
 
 	if (nft_jansson_data_reg_parse(root, "xor",
-				       &bitwise->xor) != DATA_VALUE)
+				       &bitwise->xor, err) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BITWISE_XOR);
@@ -225,20 +226,21 @@ nft_rule_expr_bitwise_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 static int
-nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
 	int32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
+	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST, err);
 	if (reg < 0)
 		return -1;
 
 	bitwise->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_BITWISE_SREG);
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND);
+	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND, err);
 	if (reg < 0)
 		return -1;
 
@@ -247,19 +249,19 @@ nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST,
 			       BASE_DEC, &bitwise->len, NFT_TYPE_U8,
-			       NFT_XML_MAND) != 0)
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BITWISE_LEN);
 
 	if (nft_mxml_data_reg_parse(tree, "mask", &bitwise->mask,
-				    NFT_XML_MAND) != DATA_VALUE)
+				    NFT_XML_MAND, err) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BITWISE_MASK);
 
 	if (nft_mxml_data_reg_parse(tree, "xor", &bitwise->xor,
-				    NFT_XML_MAND) != DATA_VALUE)
+				    NFT_XML_MAND, err) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BITWISE_XOR);

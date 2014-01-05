@@ -357,26 +357,27 @@ int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 EXPORT_SYMBOL(nft_set_elems_nlmsg_parse);
 
 #ifdef XML_PARSING
-int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e)
+int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e,
+			    struct nft_parse_err *err)
 {
 	int set_elem_data;
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
 			       BASE_DEC, &e->set_elem_flags,
-			       NFT_TYPE_U32, NFT_XML_MAND) != 0)
+			       NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_SET_ELEM_ATTR_FLAGS);
 
 	if (nft_mxml_data_reg_parse(tree, "key", &e->key,
-				    NFT_XML_MAND) != DATA_VALUE)
+				    NFT_XML_MAND, err) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_SET_ELEM_ATTR_KEY);
 
 	/* <set_elem_data> is not mandatory */
 	set_elem_data = nft_mxml_data_reg_parse(tree, "data",
-						&e->data, NFT_XML_OPT);
+						&e->data, NFT_XML_OPT, err);
 	switch (set_elem_data) {
 	case DATA_VALUE:
 		e->flags |= (1 << NFT_SET_ELEM_ATTR_DATA);
@@ -393,17 +394,18 @@ int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e)
 }
 #endif
 
-static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml)
+static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml,
+				  struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree;
 	int ret;
 
-	tree = nft_mxml_build_tree(xml, "set_elem");
+	tree = nft_mxml_build_tree(xml, "set_elem", err);
 	if (tree == NULL)
 		return -1;
 
-	ret = nft_mxml_set_elem_parse(tree, e);
+	ret = nft_mxml_set_elem_parse(tree, e, err);
 	mxmlDelete(tree);
 	return ret;
 #else
@@ -413,12 +415,13 @@ static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml)
 }
 
 int nft_set_elem_parse(struct nft_set_elem *e,
-		       enum nft_parse_type type, const char *data) {
+		       enum nft_parse_type type, const char *data,
+		       struct nft_parse_err *err) {
 	int ret;
 
 	switch (type) {
 	case NFT_PARSE_XML:
-		ret = nft_set_elem_xml_parse(e, data);
+		ret = nft_set_elem_xml_parse(e, data, err);
 		break;
 	default:
 		errno = EOPNOTSUPP;

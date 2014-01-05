@@ -118,17 +118,18 @@ nft_rule_expr_limit_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nft_rule_expr_limit_json_parse(struct nft_rule_expr *e, json_t *root)
+static int nft_rule_expr_limit_json_parse(struct nft_rule_expr *e, json_t *root,
+					  struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	uint64_t uval64;
 
-	if (nft_jansson_parse_val(root, "rate", NFT_TYPE_U64, &uval64) < 0)
+	if (nft_jansson_parse_val(root, "rate", NFT_TYPE_U64, &uval64, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_RATE, uval64);
 
-	if (nft_jansson_parse_val(root, "unit", NFT_TYPE_U64, &uval64) < 0)
+	if (nft_jansson_parse_val(root, "unit", NFT_TYPE_U64, &uval64, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_UNIT, uval64);
@@ -140,19 +141,23 @@ static int nft_rule_expr_limit_json_parse(struct nft_rule_expr *e, json_t *root)
 #endif
 }
 
-static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e,
+					 mxml_node_t *tree,
+					 struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_limit *limit = nft_expr_data(e);
 
 	if (nft_mxml_num_parse(tree, "rate", MXML_DESCEND_FIRST, BASE_DEC,
-			       &limit->rate, NFT_TYPE_U64, NFT_XML_MAND) != 0)
+			       &limit->rate, NFT_TYPE_U64, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LIMIT_RATE);
 
 	if (nft_mxml_num_parse(tree, "unit", MXML_DESCEND_FIRST, BASE_DEC,
-			       &limit->unit, NFT_TYPE_U64, NFT_XML_MAND) != 0)
+			       &limit->unit, NFT_TYPE_U64, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LIMIT_UNIT);
