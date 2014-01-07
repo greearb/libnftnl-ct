@@ -30,16 +30,19 @@ mxml_node_t *nft_mxml_build_tree(const char *xml, const char *treename,
 	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
 	if (tree == NULL) {
 		err->error = NFT_PARSE_EBADINPUT;
-		err->line = 0;
-		err->column = 0;
 		goto err;
 	}
 
 	if (strcmp(tree->value.opaque, treename) == 0)
 		return tree;
 
+	err->error = NFT_PARSE_EMISSINGNODE;
+	err->node_name = treename;
+
 	mxmlDelete(tree);
 err:
+	err->line = 0;
+	err->column = 0;
 	errno = EINVAL;
 	return NULL;
 }
