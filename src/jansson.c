@@ -244,8 +244,8 @@ int nft_jansson_data_reg_parse(json_t *root, const char *node_name,
 	}
 }
 
-int nft_set_elem_json_parse(struct nft_set_elem *e, json_t *root,
-			    struct nft_parse_err *err)
+int nft_jansson_set_elem_parse(struct nft_set_elem *e, json_t *root,
+			       struct nft_parse_err *err)
 {
 	uint32_t uval32;
 	int set_elem_data;

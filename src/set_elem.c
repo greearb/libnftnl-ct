@@ -414,6 +414,24 @@ static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml,
 #endif
 }
 
+static int nft_set_elem_json_parse(struct nft_set_elem *e, const void *json,
+				   struct nft_parse_err *err)
+{
+#ifdef JSON_PARSING
+	json_t *tree;
+	json_error_t error;
+
+	tree = nft_jansson_create_root(json, &error, err);
+	if (tree == NULL)
+		return -1;
+
+	return nft_jansson_set_elem_parse(e, tree, err);
+#else
+	errno = EOPNOTSUPP;
+	return -1;
+#endif
+}
+
 int nft_set_elem_parse(struct nft_set_elem *e,
 		       enum nft_parse_type type, const char *data,
 		       struct nft_parse_err *err) {
@@ -422,6 +440,9 @@ int nft_set_elem_parse(struct nft_set_elem *e,
 	switch (type) {
 	case NFT_PARSE_XML:
 		ret = nft_set_elem_xml_parse(e, data, err);
+		break;
+	case NFT_PARSE_JSON:
+		ret = nft_set_elem_json_parse(e, data, err);
 		break;
 	default:
 		errno = EOPNOTSUPP;

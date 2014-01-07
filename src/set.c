@@ -357,7 +357,8 @@ int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
 			if (json_elem == NULL)
 				goto err;
 
-			if (nft_set_elem_json_parse(elem, json_elem, err) < 0)
+			if (nft_jansson_set_elem_parse(elem,
+						       json_elem, err) < 0)
 				goto err;
 
 			list_add_tail(&elem->head, &s->element_list);
