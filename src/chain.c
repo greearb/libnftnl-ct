@@ -50,6 +50,7 @@ static const char *nft_hooknum2str(int family, int hooknum)
 	switch (family) {
 	case NFPROTO_IPV4:
 	case NFPROTO_IPV6:
+	case NFPROTO_INET:
 	case NFPROTO_BRIDGE:
 		switch (hooknum) {
 		case NF_INET_PRE_ROUTING:

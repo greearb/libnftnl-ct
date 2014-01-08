@@ -23,7 +23,7 @@
 #include "expr_ops.h"
 
 #ifndef NFT_META_MAX
-#define NFT_META_MAX (NFT_META_SECMARK + 1)
+#define NFT_META_MAX (NFT_META_L4PROTO + 1)
 #endif
 
 struct nft_expr_meta {
@@ -139,6 +139,8 @@ nft_rule_expr_meta_parse(struct nft_rule_expr *e, struct nlattr *attr)
 const char *meta_key2str_array[NFT_META_MAX] = {
 	[NFT_META_LEN]		= "len",
 	[NFT_META_PROTOCOL]	= "protocol",
+	[NFT_META_NFPROTO]	= "nfproto",
+	[NFT_META_L4PROTO]	= "l4proto",
 	[NFT_META_PRIORITY]	= "priority",
 	[NFT_META_MARK]		= "mark",
 	[NFT_META_IIF]		= "iif",

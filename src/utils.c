@@ -27,6 +27,8 @@ const char *nft_family2str(uint32_t family)
 		return "ip";
 	case AF_INET6:
 		return "ip6";
+	case 1:
+		return "inet";
 	case AF_BRIDGE:
 		return "bridge";
 	case 3: /* NFPROTO_ARP */
@@ -42,6 +44,8 @@ int nft_str2family(const char *family)
 		return AF_INET;
 	else if (strcmp(family, "ip6") == 0)
 		return AF_INET6;
+	else if (strcmp(family, "inet") == 0)
+		return 1;
 	else if (strcmp(family, "bridge") == 0)
 		return AF_BRIDGE;
 	else if (strcmp(family, "arp") == 0)
