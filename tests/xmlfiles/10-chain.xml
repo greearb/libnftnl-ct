@@ -1,1 +1,1 @@
-<chain><name>test</name><handle>0</handle><bytes>0</bytes><packets>0</packets><table>filter</table><type>filter</type><hooknum>input</hooknum><prio>0</prio><policy>accept</policy><family>ip</family></chain>
+<nftables><chain><name>test</name><handle>0</handle><bytes>0</bytes><packets>0</packets><table>filter</table><type>filter</type><hooknum>input</hooknum><prio>0</prio><policy>accept</policy><family>ip</family></chain></nftables>

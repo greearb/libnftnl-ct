@@ -1,1 +1,1 @@
-<table><name>filter</name><family>ip</family><flags>0</flags></table>
+<nftables><table><name>filter</name><family>ip</family><flags>0</flags></table></nftables>
