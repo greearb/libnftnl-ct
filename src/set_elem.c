@@ -394,14 +394,15 @@ int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e,
 }
 #endif
 
-static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml,
-				  struct nft_parse_err *err)
+static int nft_set_elem_xml_parse(struct nft_set_elem *e, const void *xml,
+				  struct nft_parse_err *err,
+				  enum nft_parse_input input)
 {
 #ifdef XML_PARSING
 	mxml_node_t *tree;
 	int ret;
 
-	tree = nft_mxml_build_tree(xml, "set_elem", err);
+	tree = nft_mxml_build_tree(xml, "set_elem", err, input);
 	if (tree == NULL)
 		return -1;
 
@@ -415,13 +416,14 @@ static int nft_set_elem_xml_parse(struct nft_set_elem *e, const char *xml,
 }
 
 static int nft_set_elem_json_parse(struct nft_set_elem *e, const void *json,
-				   struct nft_parse_err *err)
+				   struct nft_parse_err *err,
+				   enum nft_parse_input input)
 {
 #ifdef JSON_PARSING
 	json_t *tree;
 	json_error_t error;
 
-	tree = nft_jansson_create_root(json, &error, err);
+	tree = nft_jansson_create_root(json, &error, err, input);
 	if (tree == NULL)
 		return -1;
 
@@ -432,17 +434,19 @@ static int nft_set_elem_json_parse(struct nft_set_elem *e, const void *json,
 #endif
 }
 
-int nft_set_elem_parse(struct nft_set_elem *e,
-		       enum nft_parse_type type, const char *data,
-		       struct nft_parse_err *err) {
+static int
+nft_set_elem_do_parse(struct nft_set_elem *e, enum nft_parse_type type,
+		      const void *data, struct nft_parse_err *err,
+		      enum nft_parse_input input)
+{
 	int ret;
 
 	switch (type) {
 	case NFT_PARSE_XML:
-		ret = nft_set_elem_xml_parse(e, data, err);
+		ret = nft_set_elem_xml_parse(e, data, err, input);
 		break;
 	case NFT_PARSE_JSON:
-		ret = nft_set_elem_json_parse(e, data, err);
+		ret = nft_set_elem_json_parse(e, data, err, input);
 		break;
 	default:
 		errno = EOPNOTSUPP;
@@ -451,6 +455,11 @@ int nft_set_elem_parse(struct nft_set_elem *e,
 	}
 
 	return ret;
+}
+int nft_set_elem_parse(struct nft_set_elem *e, enum nft_parse_type type,
+		       const char *data, struct nft_parse_err *err)
+{
+	return nft_set_elem_do_parse(e, type, data, err, NFT_PARSE_BUFFER);
 }
 EXPORT_SYMBOL(nft_set_elem_parse);
 

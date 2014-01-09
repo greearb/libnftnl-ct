@@ -38,12 +38,16 @@ struct nft_parse_err {
 	const char *node_name;
 };
 
+enum nft_parse_input {
+	NFT_PARSE_BUFFER,
+};
+
 #ifdef XML_PARSING
 #include <mxml.h>
 #define NFT_XML_MAND 0
 #define NFT_XML_OPT (1 << 0)
-mxml_node_t *nft_mxml_build_tree(const char *xml, const char *treename,
-				 struct nft_parse_err *err);
+mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,
+				 struct nft_parse_err *err, enum nft_parse_input input);
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node,
 					  struct nft_parse_err *err);
 int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags,
@@ -88,8 +92,8 @@ int nft_jansson_parse_val(json_t *root, const char *node_name, int type,
 const char *nft_jansson_parse_str(json_t *root, const char *node_name,
 				  struct nft_parse_err *err);
 bool nft_jansson_node_exist(json_t *root, const char *node_name);
-json_t *nft_jansson_create_root(const char *json, json_error_t *error,
-				struct nft_parse_err *err);
+json_t *nft_jansson_create_root(const void *json, json_error_t *error,
+				struct nft_parse_err *err, enum nft_parse_input input);
 json_t *nft_jansson_get_node(json_t *root, const char *node_name,
 			     struct nft_parse_err *err);
 void nft_jansson_free_root(json_t *root);

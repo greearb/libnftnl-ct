@@ -526,14 +526,15 @@ err:
 }
 #endif
 
-static int nft_rule_json_parse(struct nft_rule *r, const char *json,
-			       struct nft_parse_err *err)
+static int nft_rule_json_parse(struct nft_rule *r, const void *json,
+			       struct nft_parse_err *err,
+			       enum nft_parse_input input)
 {
 #ifdef JSON_PARSING
 	json_t *tree;
 	json_error_t error;
 
-	tree = nft_jansson_create_root(json, &error, err);
+	tree = nft_jansson_create_root(json, &error, err, input);
 	if (tree == NULL)
 		return -1;
 
@@ -627,12 +628,13 @@ int nft_mxml_rule_parse(mxml_node_t *tree, struct nft_rule *r,
 }
 #endif
 
-static int nft_rule_xml_parse(struct nft_rule *r, const char *xml,
-			      struct nft_parse_err *err)
+static int nft_rule_xml_parse(struct nft_rule *r, const void *xml,
+			      struct nft_parse_err *err,
+			      enum nft_parse_input input)
 {
 #ifdef XML_PARSING
 	int ret;
-	mxml_node_t *tree = nft_mxml_build_tree(xml, "rule", err);
+	mxml_node_t *tree = nft_mxml_build_tree(xml, "rule", err, input);
 	if (tree == NULL)
 		return -1;
 
@@ -645,18 +647,19 @@ static int nft_rule_xml_parse(struct nft_rule *r, const char *xml,
 #endif
 }
 
-int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type,
-		   const char *data, struct nft_parse_err *err)
+static int nft_rule_do_parse(struct nft_rule *r, enum nft_parse_type type,
+			     const void *data, struct nft_parse_err *err,
+			     enum nft_parse_input input)
 {
 	int ret;
 	struct nft_parse_err perr;
 
 	switch (type) {
 	case NFT_PARSE_XML:
-		ret = nft_rule_xml_parse(r, data, &perr);
+		ret = nft_rule_xml_parse(r, data, &perr, input);
 		break;
 	case NFT_PARSE_JSON:
-		ret = nft_rule_json_parse(r, data, &perr);
+		ret = nft_rule_json_parse(r, data, &perr, input);
 		break;
 	default:
 		ret = -1;
@@ -667,6 +670,11 @@ int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type,
 		*err = perr;
 
 	return ret;
+}
+int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type,
+		   const char *data, struct nft_parse_err *err)
+{
+	return nft_rule_do_parse(r, type, data, err, NFT_PARSE_BUFFER);
 }
 EXPORT_SYMBOL(nft_rule_parse);
 

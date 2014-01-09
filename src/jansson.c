@@ -89,22 +89,31 @@ bool nft_jansson_node_exist(json_t *root, const char *node_name)
 	return json_object_get(root, node_name) != NULL;
 }
 
-json_t *nft_jansson_create_root(const char *json, json_error_t *error,
-				struct nft_parse_err *err)
+json_t *nft_jansson_create_root(const void *json, json_error_t *error,
+				struct nft_parse_err *err, enum nft_parse_input input)
 {
 	json_t *root;
 
-	root = json_loadb(json, strlen(json), 0, error);
+	switch (input) {
+	case NFT_PARSE_BUFFER:
+		root = json_loadb(json, strlen(json), 0, error);
+		break;
+	default:
+		goto err;
+	}
+
 	if (root == NULL) {
 		err->error = NFT_PARSE_EBADINPUT;
 		err->line = error->line;
 		err->column = error->column;
 		err->node_name = error->source;
-		errno = EINVAL;
-		return NULL;
+		goto err;
 	}
 
 	return root;
+err:
+	errno = EINVAL;
+	return NULL;
 }
 
 json_t *nft_jansson_get_node(json_t *root, const char *node_name,

@@ -22,12 +22,19 @@
 #include <libnftables/set.h>
 
 #ifdef XML_PARSING
-mxml_node_t *nft_mxml_build_tree(const char *xml, const char *treename,
-				 struct nft_parse_err *err)
+mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,
+				 struct nft_parse_err *err, enum nft_parse_input input)
 {
 	mxml_node_t *tree;
 
-	tree = mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);
+	switch (input) {
+	case NFT_PARSE_BUFFER:
+		tree = mxmlLoadString(NULL, data, MXML_OPAQUE_CALLBACK);
+		break;
+	default:
+		goto err;
+	}
+
 	if (tree == NULL) {
 		err->error = NFT_PARSE_EBADINPUT;
 		goto err;

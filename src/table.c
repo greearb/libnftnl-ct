@@ -247,12 +247,13 @@ int nft_mxml_table_parse(mxml_node_t *tree, struct nft_table *t,
 }
 #endif
 
-static int nft_table_xml_parse(struct nft_table *t, const char *xml,
-			       struct nft_parse_err *err)
+static int nft_table_xml_parse(struct nft_table *t, const void *data,
+			       struct nft_parse_err *err,
+			       enum nft_parse_input input)
 {
 #ifdef XML_PARSING
 	int ret;
-	mxml_node_t *tree = nft_mxml_build_tree(xml, "table", err);
+	mxml_node_t *tree = nft_mxml_build_tree(data, "table", err, input);
 	if (tree == NULL)
 		return -1;
 
@@ -302,14 +303,15 @@ err:
 }
 #endif
 
-static int nft_table_json_parse(struct nft_table *t, const char *json,
-				struct nft_parse_err *err)
+static int nft_table_json_parse(struct nft_table *t, const void *json,
+				struct nft_parse_err *err,
+				enum nft_parse_input input)
 {
 #ifdef JSON_PARSING
 	json_t *tree;
 	json_error_t error;
 
-	tree = nft_jansson_create_root(json, &error, err);
+	tree = nft_jansson_create_root(json, &error, err, input);
 	if (tree == NULL)
 		return -1;
 
@@ -320,18 +322,19 @@ static int nft_table_json_parse(struct nft_table *t, const char *json,
 #endif
 }
 
-int nft_table_parse(struct nft_table *t, enum nft_parse_type type,
-		    const char *data, struct nft_parse_err *err)
+static int nft_table_do_parse(struct nft_table *t, enum nft_parse_type type,
+			      const void *data, struct nft_parse_err *err,
+			      enum nft_parse_input input)
 {
 	int ret;
 	struct nft_parse_err perr;
 
 	switch (type) {
 	case NFT_PARSE_XML:
-		ret = nft_table_xml_parse(t, data, &perr);
+		ret = nft_table_xml_parse(t, data, &perr, input);
 		break;
 	case NFT_PARSE_JSON:
-		ret = nft_table_json_parse(t, data, &perr);
+		ret = nft_table_json_parse(t, data, &perr, input);
 		break;
 	default:
 		ret = -1;
@@ -343,6 +346,12 @@ int nft_table_parse(struct nft_table *t, enum nft_parse_type type,
 		*err = perr;
 
 	return ret;
+}
+
+int nft_table_parse(struct nft_table *t, enum nft_parse_type type,
+		    const char *data, struct nft_parse_err *err)
+{
+	return nft_table_do_parse(t, type, data, err, NFT_PARSE_BUFFER);
 }
 EXPORT_SYMBOL(nft_table_parse);
 
