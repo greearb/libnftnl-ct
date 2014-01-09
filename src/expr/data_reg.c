@@ -18,13 +18,12 @@
 #include <netinet/in.h>
 
 #include <libmnl/libmnl.h>
-#include <linux/netfilter.h>
-#include <linux/netfilter/nf_tables.h>
 #include <libnftables/expr.h>
 #include <libnftables/rule.h>
-#include "expr_ops.h"
-#include "data_reg.h"
 #include "internal.h"
+
+#include <linux/netfilter.h>
+#include <linux/netfilter/nf_tables.h>
 
 #ifdef JSON_PARSING
 static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data)
