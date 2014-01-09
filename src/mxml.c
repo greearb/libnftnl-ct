@@ -31,6 +31,9 @@ mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,
 	case NFT_PARSE_BUFFER:
 		tree = mxmlLoadString(NULL, data, MXML_OPAQUE_CALLBACK);
 		break;
+	case NFT_PARSE_FILE:
+		tree = mxmlLoadFile(NULL, (FILE *)data, MXML_OPAQUE_CALLBACK);
+		break;
 	default:
 		goto err;
 	}

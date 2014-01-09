@@ -463,6 +463,13 @@ int nft_set_elem_parse(struct nft_set_elem *e, enum nft_parse_type type,
 }
 EXPORT_SYMBOL(nft_set_elem_parse);
 
+int nft_set_elem_parse_file(struct nft_set_elem *e, enum nft_parse_type type,
+			    FILE *fp, struct nft_parse_err *err)
+{
+	return nft_set_elem_do_parse(e, type, fp, err, NFT_PARSE_FILE);
+}
+EXPORT_SYMBOL(nft_set_elem_parse_file);
+
 static int nft_set_elem_snprintf_json(char *buf, size_t size,
 				      struct nft_set_elem *e, uint32_t flags)
 {

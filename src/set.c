@@ -376,7 +376,8 @@ err:
 #endif
 
 static int nft_set_json_parse(struct nft_set *s, const void *json,
-			      struct nft_parse_err *err, enum nft_parse_input input)
+			      struct nft_parse_err *err,
+			      enum nft_parse_input input)
 {
 #ifdef JSON_PARSING
 	json_t *tree;
@@ -484,7 +485,8 @@ int nft_mxml_set_parse(mxml_node_t *tree, struct nft_set *s,
 #endif
 
 static int nft_set_xml_parse(struct nft_set *s, const void *xml,
-			     struct nft_parse_err *err, enum nft_parse_input input)
+			     struct nft_parse_err *err,
+			     enum nft_parse_input input)
 {
 #ifdef XML_PARSING
 	int ret;
@@ -532,6 +534,13 @@ int nft_set_parse(struct nft_set *s, enum nft_parse_type type,
 	return nft_set_do_parse(s, type, data, err, NFT_PARSE_BUFFER);
 }
 EXPORT_SYMBOL(nft_set_parse);
+
+int nft_set_parse_file(struct nft_set *s, enum nft_parse_type type,
+		       FILE *fp, struct nft_parse_err *err)
+{
+	return nft_set_do_parse(s, type, fp, err, NFT_PARSE_FILE);
+}
+EXPORT_SYMBOL(nft_set_parse_file);
 
 static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
 				  uint32_t type, uint32_t flags)

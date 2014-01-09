@@ -597,6 +597,13 @@ int nft_ruleset_parse(struct nft_ruleset *r, enum nft_parse_type type,
 }
 EXPORT_SYMBOL(nft_ruleset_parse);
 
+int nft_ruleset_parse_file(struct nft_ruleset *rs, enum nft_parse_type type,
+			   FILE *fp, struct nft_parse_err *err)
+{
+	return nft_ruleset_do_parse(rs, type, fp, err, NFT_PARSE_FILE);
+}
+EXPORT_SYMBOL(nft_ruleset_parse_file);
+
 static const char *nft_ruleset_o_opentag(uint32_t type)
 {
 	switch (type) {

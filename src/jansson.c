@@ -98,6 +98,9 @@ json_t *nft_jansson_create_root(const void *json, json_error_t *error,
 	case NFT_PARSE_BUFFER:
 		root = json_loadb(json, strlen(json), 0, error);
 		break;
+	case NFT_PARSE_FILE:
+		root = json_loadf((FILE *)json, 0, error);
+		break;
 	default:
 		goto err;
 	}

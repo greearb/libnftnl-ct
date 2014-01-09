@@ -13,6 +13,7 @@ global:
   nft_table_attr_get_u32;
   nft_table_attr_get_str;
   nft_table_parse;
+  nft_table_parse_file;
   nft_table_snprintf;
   nft_table_fprintf;
   nft_table_nlmsg_build_payload;
@@ -45,6 +46,7 @@ global:
   nft_chain_attr_get_u64;
   nft_chain_attr_get_str;
   nft_chain_parse;
+  nft_chain_parse_file;
   nft_chain_snprintf;
   nft_chain_fprintf;
   nft_chain_nlmsg_build_payload;
@@ -74,6 +76,7 @@ global:
   nft_rule_attr_get_u64;
   nft_rule_attr_get_str;
   nft_rule_parse;
+  nft_rule_parse_file;
   nft_rule_snprintf;
   nft_rule_fprintf;
   nft_rule_nlmsg_build_payload;
@@ -128,6 +131,7 @@ global:
   nft_set_nlmsg_build_payload;
   nft_set_nlmsg_parse;
   nft_set_parse;
+  nft_set_parse_file;
   nft_set_snprintf;
   nft_set_fprintf;
 
@@ -159,6 +163,7 @@ global:
   nft_set_elem_nlmsg_build_payload;
   nft_set_elem_nlmsg_parse;
   nft_set_elem_parse;
+  nft_set_elem_parse_file;
   nft_set_elem_snprintf;
   nft_set_elem_fprinf;
 
@@ -179,6 +184,7 @@ global:
   nft_ruleset_attr_set;
   nft_ruleset_attr_get;
   nft_ruleset_parse;
+  nft_ruleset_parse_file;
   nft_ruleset_snprintf;
   nft_ruleset_fprintf;
 

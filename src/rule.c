@@ -678,6 +678,13 @@ int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type,
 }
 EXPORT_SYMBOL(nft_rule_parse);
 
+int nft_rule_parse_file(struct nft_rule *r, enum nft_parse_type type,
+			FILE *fp, struct nft_parse_err *err)
+{
+	return nft_rule_do_parse(r, type, fp, err, NFT_PARSE_FILE);
+}
+EXPORT_SYMBOL(nft_rule_parse_file);
+
 static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 					 uint32_t type, uint32_t flags)
 {

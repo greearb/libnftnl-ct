@@ -40,6 +40,7 @@ struct nft_parse_err {
 
 enum nft_parse_input {
 	NFT_PARSE_BUFFER,
+	NFT_PARSE_FILE,
 };
 
 #ifdef XML_PARSING

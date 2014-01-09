@@ -355,6 +355,13 @@ int nft_table_parse(struct nft_table *t, enum nft_parse_type type,
 }
 EXPORT_SYMBOL(nft_table_parse);
 
+int nft_table_parse_file(struct nft_table *t, enum nft_parse_type type,
+			 FILE *fp, struct nft_parse_err *err)
+{
+	return nft_table_do_parse(t, type, fp, err, NFT_PARSE_FILE);
+}
+EXPORT_SYMBOL(nft_table_parse_file);
+
 static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 {
 	return snprintf(buf, size,

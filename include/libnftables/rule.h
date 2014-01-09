@@ -49,6 +49,8 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *t);
 
 int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type,
 		   const char *data, struct nft_parse_err *err);
+int nft_rule_parse_file(struct nft_rule *r, enum nft_parse_type type,
+			FILE *fp, struct nft_parse_err *err);
 int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *t, uint32_t type, uint32_t flags);
 int nft_rule_fprintf(FILE *fp, struct nft_rule *r, uint32_t type, uint32_t flags);
 

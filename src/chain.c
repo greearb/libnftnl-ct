@@ -761,6 +761,13 @@ int nft_chain_parse(struct nft_chain *c, enum nft_parse_type type,
 }
 EXPORT_SYMBOL(nft_chain_parse);
 
+int nft_chain_parse_file(struct nft_chain *c, enum nft_parse_type type,
+			 FILE *fp, struct nft_parse_err *err)
+{
+	return nft_chain_do_parse(c, type, fp, err, NFT_PARSE_FILE);
+}
+EXPORT_SYMBOL(nft_chain_parse_file);
+
 static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
 {
 	int ret, len = size, offset = 0;
