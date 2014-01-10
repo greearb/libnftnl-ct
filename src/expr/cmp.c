@@ -26,8 +26,8 @@
 
 struct nft_expr_cmp {
 	union nft_data_reg	data;
-	uint8_t			sreg;	/* enum nft_registers */
-	uint8_t			op;	/* enum nft_cmp_ops */
+	enum nft_registers	sreg;
+	enum nft_cmp_ops	op;
 };
 
 static int

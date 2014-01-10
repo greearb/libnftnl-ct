@@ -27,8 +27,8 @@
 #endif
 
 struct nft_expr_meta {
-	uint8_t			key;	/* enum nft_meta_keys */
-	uint8_t			dreg;	/* enum nft_registers */
+	enum nft_meta_keys	key;
+	enum nft_registers	dreg;
 };
 
 static int

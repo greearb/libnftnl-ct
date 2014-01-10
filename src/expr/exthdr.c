@@ -32,9 +32,9 @@
 
 struct nft_expr_exthdr {
 	enum nft_registers	dreg;
+	uint32_t		offset;
+	uint32_t		len;
 	uint8_t			type;
-	unsigned int		offset;
-	unsigned int		len;
 };
 
 static int
@@ -51,10 +51,10 @@ nft_rule_expr_exthdr_set(struct nft_rule_expr *e, uint16_t type,
 		exthdr->type = *((uint8_t *)data);
 		break;
 	case NFT_EXPR_EXTHDR_OFFSET:
-		exthdr->offset = *((unsigned int *)data);
+		exthdr->offset = *((uint32_t *)data);
 		break;
 	case NFT_EXPR_EXTHDR_LEN:
-		exthdr->len = *((unsigned int *)data);
+		exthdr->len = *((uint32_t *)data);
 		break;
 	default:
 		return -1;

@@ -24,7 +24,7 @@
 
 struct nft_expr_ct {
 	enum nft_ct_keys        key;
-	uint32_t		dreg;	/* enum nft_registers */
+	enum nft_registers	dreg;
 	uint8_t			dir;
 };
 

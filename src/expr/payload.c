@@ -29,8 +29,8 @@
 struct nft_expr_payload {
 	enum nft_registers	dreg;
 	enum nft_payload_bases	base;
-	unsigned int		offset;
-	unsigned int		len;
+	uint32_t		offset;
+	uint32_t		len;
 };
 
 static int
