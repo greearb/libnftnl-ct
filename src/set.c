@@ -453,16 +453,17 @@ int nft_mxml_set_parse(mxml_node_t *tree, struct nft_set *s,
 	s->flags |= (1 << NFT_SET_ATTR_KEY_LEN);
 
 	if (nft_mxml_num_parse(tree, "data_type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &s->data_type, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
-		return -1;
+			       &s->data_type, NFT_TYPE_U32,
+			       NFT_XML_OPT, err) == 0) {
+		s->flags |= (1 << NFT_SET_ATTR_DATA_TYPE);
 
-	s->flags |= (1 << NFT_SET_ATTR_DATA_TYPE);
+		if (nft_mxml_num_parse(tree, "data_len", MXML_DESCEND_FIRST,
+				       BASE_DEC, &s->data_len, NFT_TYPE_U32,
+				       NFT_XML_MAND, err) != 0)
+			return -1;
 
-	if (nft_mxml_num_parse(tree, "data_len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &s->data_len, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
-		return -1;
-
-	s->flags |= (1 << NFT_SET_ATTR_DATA_LEN);
+		s->flags |= (1 << NFT_SET_ATTR_DATA_LEN);
+	}
 
 	for (node = mxmlFindElement(tree, tree, "set_elem", NULL,
 				    NULL, MXML_DESCEND);
@@ -634,13 +635,19 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 				  "<name>%s</name>"
 				  "<flags>%u</flags>"
 				  "<key_type>%u</key_type>"
-				  "<key_len>%u</key_len>"
-				  "<data_type>%u</data_type>"
-				  "<data_len>%u</data_len>",
+				  "<key_len>%u</key_len>",
 			nft_family2str(s->family), s->table, s->name,
-			s->set_flags, s->key_type,
-			s->key_len, s->data_type, s->data_len);
+			s->set_flags, s->key_type, s->key_len);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (s->flags & (1 << NFT_SET_ATTR_DATA_TYPE) &&
+	    s->flags & (1 << NFT_SET_ATTR_DATA_LEN)) {
+		ret = snprintf(buf+offset, len, "<data_type>%u</data_type>"
+			       "<data_len>%u</data_len>",
+			       s->data_type, s->data_len);
+
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	if (!list_empty(&s->element_list)) {
 		list_for_each_entry(elem, &s->element_list, head) {
