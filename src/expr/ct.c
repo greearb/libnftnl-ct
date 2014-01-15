@@ -151,6 +151,7 @@ const char *ctkey2str_array[NFT_CT_MAX] = {
 	[NFT_CT_SECMARK]	= "secmark",
 	[NFT_CT_EXPIRATION]	= "expiration",
 	[NFT_CT_HELPER]		= "helper",
+	[NFT_CT_L3PROTOCOL]	= "l3protocol",
 	[NFT_CT_PROTOCOL]	= "protocol",
 	[NFT_CT_SRC]		= "src",
 	[NFT_CT_DST]		= "dst",
