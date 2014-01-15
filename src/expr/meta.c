@@ -27,10 +27,10 @@
 #endif
 
 struct nft_expr_meta {
-	uint8_t			key;	/* enum nft_meta_keys */
+	uint32_t		key;	/* enum nft_meta_keys */
 	union {
-		uint8_t		dreg;	/* enum nft_registers */
-		uint8_t		sreg;   /* enum nft_registers */
+		uint32_t	dreg;	/* enum nft_registers */
+		uint32_t	sreg;   /* enum nft_registers */
 	};
 };
 
