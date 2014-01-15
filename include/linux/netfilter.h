@@ -1,8 +1,8 @@
-#ifndef _UAPI__LINUX_NETFILTER_H
-#define _UAPI__LINUX_NETFILTER_H
+#ifndef __LINUX_NETFILTER_H
+#define __LINUX_NETFILTER_H
 
 #include <linux/types.h>
-#include <linux/compiler.h>
+
 #include <linux/sysctl.h>
 
 
@@ -32,7 +32,6 @@
 #define NF_DROP_ERR(x) (((-x) << 16) | NF_DROP)
 
 /* only for userspace compatibility */
-#ifndef __KERNEL__
 /* Generic cache responses from hook functions.
    <= 0x2000 is used for protocol-flags. */
 #define NFC_UNKNOWN 0x4000
@@ -40,7 +39,6 @@
 
 /* NF_VERDICT_BITS should be 8 now, but userspace might break if this changes */
 #define NF_VERDICT_BITS 16
-#endif
 
 enum nf_inet_hooks {
 	NF_INET_PRE_ROUTING,
@@ -70,4 +68,4 @@ union nf_inet_addr {
 	struct in6_addr	in6;
 };
 
-#endif /* _UAPI__LINUX_NETFILTER_H */
+#endif /* __LINUX_NETFILTER_H */
