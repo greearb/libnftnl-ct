@@ -99,30 +99,34 @@ err:
 	return NULL;
 }
 
-int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags,
+int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t *reg,
+		       uint32_t mxmlflags, uint32_t flags,
 		       struct nft_parse_err *err)
 {
 	mxml_node_t *node;
-	uint64_t val;
 
-	node = mxmlFindElement(tree, tree, reg_name, NULL, NULL, flags);
+	node = mxmlFindElement(tree, tree, reg_name, NULL, NULL, mxmlflags);
 	if (node == NULL) {
-		err->error = NFT_PARSE_EMISSINGNODE;
-		errno = EINVAL;
-		goto err;
+		if (!(flags & NFT_XML_OPT)) {
+			err->error = NFT_PARSE_EMISSINGNODE;
+			errno = EINVAL;
+			goto err;
+		}
+		return -1;
 	}
 
-	if (nft_strtoi(node->child->value.opaque, BASE_DEC, &val,
-		       NFT_TYPE_U64) != 0) {
+	if (nft_strtoi(node->child->value.opaque, BASE_DEC, reg,
+		       NFT_TYPE_U32) != 0) {
 		err->error = NFT_PARSE_EBADTYPE;
 		goto err;
 	}
 
-	if (val > NFT_REG_MAX) {
+	if (*reg > NFT_REG_MAX) {
 		errno = ERANGE;
 		goto err;
 	}
-	return val;
+
+	return 0;
 err:
 	err->node_name = reg_name;
 	return -1;

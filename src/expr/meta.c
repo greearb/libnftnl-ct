@@ -197,11 +197,11 @@ static int nft_rule_expr_meta_xml_parse(struct nft_rule_expr *e, mxml_node_t *tr
 #ifdef XML_PARSING
 	struct nft_expr_meta *meta = nft_expr_data(e);
 	const char *key_str;
-	int32_t reg;
 	int key;
+	uint32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST, err);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "dreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_MAND, err) < 0)
                 return -1;
 
 	meta->dreg = reg;

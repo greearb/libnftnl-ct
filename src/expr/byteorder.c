@@ -246,17 +246,18 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #ifdef XML_PARSING
 	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 	const char *op;
-	int32_t reg, ntoh;
+	int32_t ntoh;
+	uint32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST, err);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	byteorder->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_SREG);
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND, err);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "dreg", &reg, MXML_DESCEND, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	byteorder->dreg = reg;

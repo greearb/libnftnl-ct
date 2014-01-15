@@ -231,17 +231,17 @@ nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 {
 #ifdef XML_PARSING
 	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
-	int32_t reg;
+	uint32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST, err);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	bitwise->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_BITWISE_SREG);
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND, err);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "dreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	bitwise->dreg = reg;

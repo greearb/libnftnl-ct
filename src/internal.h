@@ -51,7 +51,8 @@ mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,
 				 struct nft_parse_err *err, enum nft_parse_input input);
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node,
 					  struct nft_parse_err *err);
-int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t flags,
+int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t *reg,
+		       uint32_t mxmlflags, uint32_t flags,
 		       struct nft_parse_err *err);
 union nft_data_reg;
 int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,

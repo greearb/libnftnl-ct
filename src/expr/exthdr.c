@@ -240,11 +240,11 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #ifdef XML_PARSING
 	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
 	const char *exthdr_type;
-	int32_t reg;
 	int type;
+	uint32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST, err);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "dreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	exthdr->dreg = reg;

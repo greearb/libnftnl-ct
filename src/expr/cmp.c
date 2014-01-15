@@ -217,10 +217,11 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 #ifdef XML_PARSING
 	struct nft_expr_cmp *cmp = nft_expr_data(e);
 	const char *op;
-	int32_t reg, op_value;
+	int32_t op_value;
+	uint32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST, err);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	cmp->sreg = reg;

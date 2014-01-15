@@ -180,7 +180,7 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #ifdef XML_PARSING
 	struct nft_expr_lookup *lookup = nft_expr_data(e);
 	const char *set_name;
-	int32_t reg;
+	uint32_t reg;
 
 	set_name = nft_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST,
 				      NFT_XML_MAND, err);
@@ -191,19 +191,18 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 	lookup->set_name[IFNAMSIZ-1] = '\0';
 	e->flags |= (1 << NFT_EXPR_LOOKUP_SET);
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND, err);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg", &reg, MXML_DESCEND,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	lookup->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_LOOKUP_SREG);
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND, err);
-	if (reg < 0)
-		return -1;
-
-	lookup->dreg = reg;
-	e->flags |= (1 << NFT_EXPR_LOOKUP_DREG);
+	if (nft_mxml_reg_parse(tree, "dreg", &reg, MXML_DESCEND,
+			       NFT_XML_OPT, err) == 0) {
+		lookup->dreg = reg;
+		e->flags |= (1 << NFT_EXPR_LOOKUP_DREG);
+	}
 
 	return 0;
 #else
