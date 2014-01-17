@@ -121,7 +121,7 @@ nft_rule_expr_meta_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-const char *meta_key2str_array[NFT_META_MAX] = {
+static const char *meta_key2str_array[NFT_META_MAX] = {
 	[NFT_META_LEN]		= "len",
 	[NFT_META_PROTOCOL]	= "protocol",
 	[NFT_META_PRIORITY]	= "priority",
