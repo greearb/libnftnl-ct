@@ -154,18 +154,24 @@ const char *nft_verdict2str(uint32_t verdict)
 	}
 }
 
-int nft_str2verdict(const char *verdict)
+int nft_str2verdict(const char *verdict, int *verdict_num)
 {
-	if (strcmp(verdict, "accept") == 0)
-		return NF_ACCEPT;
-	else if (strcmp(verdict, "drop") == 0)
-		return NF_DROP;
-	else if (strcmp(verdict, "return") == 0)
-		return NFT_RETURN;
-	else if (strcmp(verdict, "jump") == 0)
-		return NFT_JUMP;
-	else if (strcmp(verdict, "goto") == 0)
-		return NFT_GOTO;
+	if (strcmp(verdict, "accept") == 0) {
+		*verdict_num = NF_ACCEPT;
+		return 0;
+	} else if (strcmp(verdict, "drop") == 0) {
+		*verdict_num = NF_DROP;
+		return 0;
+	} else if (strcmp(verdict, "return") == 0) {
+		*verdict_num = NFT_RETURN;
+		return 0;
+	} else if (strcmp(verdict, "jump") == 0) {
+		*verdict_num = NFT_JUMP;
+		return 0;
+	} else if (strcmp(verdict, "goto") == 0) {
+		*verdict_num = NFT_GOTO;
+		return 0;
+	}
 
 	return -1;
 }

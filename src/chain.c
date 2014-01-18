@@ -503,7 +503,7 @@ int nft_jansson_parse_chain(struct nft_chain *c, json_t *tree,
 {
 	json_t *root;
 	uint64_t uval64;
-	uint32_t policy;
+	int policy;
 	int32_t val32;
 	const char *valstr;
 
@@ -575,9 +575,12 @@ int nft_jansson_parse_chain(struct nft_chain *c, json_t *tree,
 		if (valstr == NULL)
 			goto err;
 
-		policy = nft_str2verdict(valstr);
-		if (policy == -1)
+		if (nft_str2verdict(valstr, &policy) != 0) {
+			errno = EINVAL;
+			err->node_name = "policy";
+			err->error = NFT_PARSE_EBADTYPE;
 			goto err;
+		}
 
 		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_POLICY, policy);
 	}
@@ -697,9 +700,12 @@ int nft_mxml_chain_parse(mxml_node_t *tree, struct nft_chain *c,
 		if (policy_str == NULL)
 			return -1;
 
-		policy = nft_str2verdict(policy_str);
-		if (policy == -1)
+		if (nft_str2verdict(policy_str, &policy) != 0) {
+			errno = EINVAL;
+			err->node_name = "policy";
+			err->error = NFT_PARSE_EBADTYPE;
 			return -1;
+		}
 
 		c->policy = policy;
 		c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);

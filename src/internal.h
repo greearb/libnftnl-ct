@@ -131,7 +131,7 @@ const char *nft_family2str(uint32_t family);
 int nft_str2family(const char *family);
 int nft_strtoi(const char *string, int base, void *number, enum nft_type type);
 const char *nft_verdict2str(uint32_t verdict);
-int nft_str2verdict(const char *verdict);
+int nft_str2verdict(const char *verdict, int *verdict_num);
 int nft_get_value(enum nft_type type, void *val, void *out);
 
 #include <stdio.h>

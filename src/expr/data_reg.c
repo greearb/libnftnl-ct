@@ -37,9 +37,12 @@ static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data
 	if (verdict_str == NULL)
 		return -1;
 
-	verdict = nft_str2verdict(verdict_str);
-	if (verdict < 0)
+	if (nft_str2verdict(verdict_str, &verdict) != 0) {
+		err->node_name = "verdict";
+		err->error = NFT_PARSE_EBADTYPE;
+		errno = EINVAL;
 		return -1;
+	}
 
 	reg->verdict = (uint32_t)verdict;
 
@@ -118,9 +121,12 @@ static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg,
 	if (verdict_str == NULL)
 		return DATA_NONE;
 
-	verdict = nft_str2verdict(verdict_str);
-	if (verdict < 0)
+	if (nft_str2verdict(verdict_str, &verdict) != 0) {
+		err->node_name = "verdict";
+		err->error = NFT_PARSE_EBADTYPE;
+		errno = EINVAL;
 		return DATA_NONE;
+	}
 
 	reg->verdict = (uint32_t)verdict;
 
