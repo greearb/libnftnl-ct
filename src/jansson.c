@@ -213,7 +213,6 @@ int nft_jansson_data_reg_parse(json_t *root, const char *node_name,
 			       struct nft_parse_err *err)
 {
 	json_t *data;
-	const char *type;
 	int ret;
 
 	data = json_object_get(root, node_name);
@@ -233,27 +232,12 @@ int nft_jansson_data_reg_parse(json_t *root, const char *node_name,
 	}
 
 	ret = nft_data_reg_json_parse(data_reg, data, err);
-	if (ret < 0) {
+	if (ret == DATA_NONE) {
 		errno = EINVAL;
 		return -1;
 	}
 
-	type = nft_jansson_parse_str(data, "type", err);
-	if (type == NULL)
-		return -1;
-
-	if (strcmp(type, "value") == 0)
-		return DATA_VALUE;
-	else if (strcmp(type, "verdict") == 0)
-		return DATA_VERDICT;
-	else if (strcmp(type, "chain") == 0)
-		return DATA_CHAIN;
-	else {
-		err->error = NFT_PARSE_EBADTYPE;
-		err->node_name = "type";
-		errno = EINVAL;
-		return -1;
-	}
+	return ret;
 }
 
 int nft_jansson_set_elem_parse(struct nft_set_elem *e, json_t *root,
@@ -281,10 +265,11 @@ int nft_jansson_set_elem_parse(struct nft_set_elem *e, json_t *root,
 			break;
 		case DATA_VERDICT:
 			e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
+			if (e->data.chain != NULL)
+				e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
+
 			break;
-		case DATA_CHAIN:
-			e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
-			break;
+		case DATA_NONE:
 		default:
 			return -1;
 		}

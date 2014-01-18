@@ -384,9 +384,9 @@ int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e,
 		break;
 	case DATA_VERDICT:
 		e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
-		break;
-	case DATA_CHAIN:
-		e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
+		if (e->data.chain != NULL)
+			e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
+
 		break;
 	}
 

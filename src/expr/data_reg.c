@@ -32,10 +32,11 @@ static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data
 {
 	int verdict;
 	const char *verdict_str;
+	const char *chain;
 
 	verdict_str = nft_jansson_parse_str(data, "verdict", err);
 	if (verdict_str == NULL)
-		return -1;
+		return DATA_NONE;
 
 	if (nft_str2verdict(verdict_str, &verdict) != 0) {
 		err->node_name = "verdict";
@@ -46,18 +47,15 @@ static int nft_data_reg_verdict_json_parse(union nft_data_reg *reg, json_t *data
 
 	reg->verdict = (uint32_t)verdict;
 
-	return 0;
-}
+	if (nft_jansson_node_exist(data, "chain")) {
+		chain = nft_jansson_parse_str(data, "chain", err);
+		if (chain == NULL)
+			return DATA_NONE;
 
-static int nft_data_reg_chain_json_parse(union nft_data_reg *reg, json_t *data,
-					 struct nft_parse_err *err)
-{
-	reg->chain = strdup(nft_jansson_parse_str(data, "chain", err));
-	if (reg->chain == NULL) {
-		return -1;
+		reg->chain = strdup(chain);
 	}
 
-	return 0;
+	return DATA_VERDICT;
 }
 
 static int nft_data_reg_value_json_parse(union nft_data_reg *reg, json_t *data,
@@ -67,17 +65,17 @@ static int nft_data_reg_value_json_parse(union nft_data_reg *reg, json_t *data,
 	char node_name[6];
 
 	if (nft_jansson_parse_val(data, "len", NFT_TYPE_U8, &reg->len, err) < 0)
-			return -1;
+			return DATA_NONE;
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
 		sprintf(node_name, "data%d", i);
 
 		if (nft_jansson_str2num(data, node_name, BASE_HEX,
 					&reg->val[i], NFT_TYPE_U32, err) != 0)
-			return -1;
+			return DATA_NONE;
 	}
 
-	return 0;
+	return DATA_VALUE;
 }
 #endif
 
@@ -93,15 +91,12 @@ int nft_data_reg_json_parse(union nft_data_reg *reg, json_t *data,
 		return -1;
 
 	/* Select what type of parsing is needed */
-	if (strcmp(type, "value") == 0) {
+	if (strcmp(type, "value") == 0)
 		return nft_data_reg_value_json_parse(reg, data, err);
-	} else if (strcmp(type, "verdict") == 0) {
+	else if (strcmp(type, "verdict") == 0)
 		return nft_data_reg_verdict_json_parse(reg, data, err);
-	} else if (strcmp(type, "chain") == 0) {
-		return nft_data_reg_chain_json_parse(reg, data, err);
-	}
 
-	return 0;
+	return DATA_NONE;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
@@ -115,6 +110,7 @@ static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg,
 {
 	int verdict;
 	const char *verdict_str;
+	const char *chain;
 
 	verdict_str = nft_mxml_str_parse(tree, "verdict", MXML_DESCEND_FIRST,
 					 NFT_XML_MAND, err);
@@ -130,25 +126,16 @@ static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg,
 
 	reg->verdict = (uint32_t)verdict;
 
-	return DATA_VERDICT;
-}
-
-static int nft_data_reg_chain_xml_parse(union nft_data_reg *reg,
-					mxml_node_t *tree,
-					struct nft_parse_err *err)
-{
-	const char *chain;
-
 	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST,
-				   NFT_XML_MAND, err);
-	if (chain == NULL)
-		return DATA_NONE;
+				   NFT_XML_OPT, err);
+	if (chain != NULL) {
+		if (reg->chain)
+			xfree(reg->chain);
 
-	if (reg->chain)
-		xfree(reg->chain);
+		reg->chain = strdup(chain);
+	}
 
-	reg->chain = strdup(chain);
-	return DATA_CHAIN;
+	return DATA_VERDICT;
 }
 
 static int nft_data_reg_value_xml_parse(union nft_data_reg *reg,
@@ -195,25 +182,24 @@ int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree,
 
 	node = mxmlFindElement(tree, tree, "data_reg", "type", NULL,
 			       MXML_DESCEND_FIRST);
-	if (node == NULL) {
-		errno = EINVAL;
-		return DATA_NONE;
-	}
+	if (node == NULL)
+		goto err;
 
 	type = mxmlElementGetAttr(node, "type");
 
-	if (type == NULL) {
-		errno = EINVAL;
-		return DATA_NONE;
-	}
+	if (type == NULL)
+		goto err;
 
 	if (strcmp(type, "value") == 0)
 		return nft_data_reg_value_xml_parse(reg, node, err);
 	else if (strcmp(type, "verdict") == 0)
 		return nft_data_reg_verdict_xml_parse(reg, node, err);
-	else if (strcmp(type, "chain") == 0)
-		return nft_data_reg_chain_xml_parse(reg, node, err);
 
+	return DATA_NONE;
+err:
+	errno = EINVAL;
+	err->node_name = "data_reg";
+	err->error = NFT_PARSE_EMISSINGNODE;
 	return DATA_NONE;
 #else
 	errno = EOPNOTSUPP;
@@ -308,6 +294,67 @@ nft_data_reg_value_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
+static int
+nft_data_reg_verdict_snprintf_def(char *buf, size_t size,
+				  union nft_data_reg *reg, uint32_t flags)
+{
+	int len = size, offset = 0, ret = 0;
+
+	ret = snprintf(buf, size, "%s ", nft_verdict2str(reg->verdict));
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (reg->chain != NULL) {
+		ret = snprintf(buf+offset, size, "-> %s ", reg->chain);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+}
+
+static int
+nft_data_reg_verdict_snprintf_xml(char *buf, size_t size,
+				  union nft_data_reg *reg, uint32_t flags)
+{
+	int len = size, offset = 0, ret = 0;
+
+	ret = snprintf(buf, size, "<data_reg type=\"verdict\">"
+		       "<verdict>%s</verdict>", nft_verdict2str(reg->verdict));
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (reg->chain != NULL) {
+		ret = snprintf(buf+offset, size, "<chain>%s</chain>",
+			       reg->chain);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, size, "</data_reg>");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
+static int
+nft_data_reg_verdict_snprintf_json(char *buf, size_t size,
+				   union nft_data_reg *reg, uint32_t flags)
+{
+	int len = size, offset = 0, ret = 0;
+
+	ret = snprintf(buf, size, "\"data_reg\":{\"type\":\"verdict\","
+		       "\"verdict\":\"%s\"", nft_verdict2str(reg->verdict));
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (reg->chain != NULL) {
+		ret = snprintf(buf+offset, size, ",\"chain\":\"%s\"",
+			       reg->chain);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, size, "}");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
+}
+
 int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 			  uint32_t output_format, uint32_t flags, int reg_type)
 {
@@ -327,44 +374,24 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 			break;
 		}
 	case DATA_VERDICT:
-		switch(output_format) {
-		case NFT_OUTPUT_DEFAULT:
-			return snprintf(buf, size, "%d ", reg->verdict);
-		case NFT_OUTPUT_XML:
-			return snprintf(buf, size,
-					"<data_reg type=\"verdict\">"
-						"<verdict>%s</verdict>"
-					"</data_reg>",
-					nft_verdict2str(reg->verdict));
-		case NFT_OUTPUT_JSON:
-			return snprintf(buf, size,
-					"\"data_reg\":{"
-					"\"type\":\"verdict\","
-					"\"verdict\":\"%s\""
-					"}", nft_verdict2str(reg->verdict));
-		default:
-			break;
-		}
 	case DATA_CHAIN:
 		switch(output_format) {
 		case NFT_OUTPUT_DEFAULT:
-			return snprintf(buf, size, "%s ", reg->chain);
+			return nft_data_reg_verdict_snprintf_def(buf, size,
+								 reg, flags);
 		case NFT_OUTPUT_XML:
-			return snprintf(buf, size,
-					"<data_reg type=\"chain\">"
-						"<chain>%s</chain>"
-					"</data_reg>", reg->chain);
+			return nft_data_reg_verdict_snprintf_xml(buf, size,
+								 reg, flags);
 		case NFT_OUTPUT_JSON:
-			return snprintf(buf, size,
-					"\"data_reg\":{\"type\":\"chain\","
-					"\"chain\":\"%s\""
-					"}", reg->chain);
+			return nft_data_reg_verdict_snprintf_json(buf, size,
+								  reg, flags);
 		default:
 			break;
 		}
 	default:
 		break;
 	}
+
 	return -1;
 }
 
