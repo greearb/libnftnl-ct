@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#include <stdlib.h>
+#include <sys/socket.h>
 #include <linux/netlink.h>
 #include <linux/netfilter/nfnetlink.h>
 
@@ -14,7 +16,6 @@
 #include <libnftnl/common.h>
 
 #include "internal.h"
-#include<stdlib.h>
 
 struct nlmsghdr *nft_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
 				     uint16_t type, uint32_t seq)
