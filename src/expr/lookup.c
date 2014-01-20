@@ -18,8 +18,8 @@
 #include <errno.h>
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
-#include <libnftables/rule.h>
-#include <libnftables/expr.h>
+#include <libnftnl/rule.h>
+#include <libnftnl/expr.h>
 #include "data_reg.h"
 #include "expr_ops.h"
 

@@ -11,7 +11,7 @@
 #include <linux/netfilter/nfnetlink.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #include "internal.h"
 #include<stdlib.h>

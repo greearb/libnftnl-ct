@@ -1,4 +1,4 @@
-LIBNFTABLES_1.0 {
+LIBNFTNL_1.0 {
 global:
   nft_table_alloc;
   nft_table_free;

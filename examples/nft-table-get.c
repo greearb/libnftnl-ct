@@ -18,7 +18,7 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/table.h>
+#include <libnftnl/table.h>
 
 static int table_cb(const struct nlmsghdr *nlh, void *data)
 {

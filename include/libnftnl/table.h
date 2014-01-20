@@ -1,12 +1,12 @@
-#ifndef _LIBNFTABLES_TABLE_H_
-#define _LIBNFTABLES_TABLE_H_
+#ifndef _LIBNFTNL_TABLE_H_
+#define _LIBNFTNL_TABLE_H_
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,4 @@ void nft_table_list_iter_destroy(struct nft_table_list_iter *iter);
 } /* extern "C" */
 #endif
 
-#endif /* _LIBNFTABLES_TABLE_H_ */
+#endif /* _LIBNFTNL_TABLE_H_ */

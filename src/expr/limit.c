@@ -19,8 +19,8 @@
 
 #include "internal.h"
 #include <libmnl/libmnl.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_limit {

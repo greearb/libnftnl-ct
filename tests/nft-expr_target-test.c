@@ -18,8 +18,8 @@
 #include <linux/netfilter/xt_iprange.h>
 #include <linux/netfilter/xt_LOG.h>
 #include <libmnl/libmnl.h>
-#include <libnftables/rule.h>
-#include <libnftables/expr.h>
+#include <libnftnl/rule.h>
+#include <libnftnl/expr.h>
 
 static int test_ok = 1;
 

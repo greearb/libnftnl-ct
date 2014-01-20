@@ -23,7 +23,7 @@
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nf_tables.h>
 
-#include <libnftables/table.h>
+#include <libnftnl/table.h>
 
 struct nft_table {
 	struct list_head head;

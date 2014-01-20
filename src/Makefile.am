@@ -1,40 +1,40 @@
 include $(top_srcdir)/Make_global.am
-lib_LTLIBRARIES = libnftables.la
+lib_LTLIBRARIES = libnftnl.la
 
-libnftables_la_LIBADD = ${LIBMNL_LIBS} ${LIBXML_LIBS} ${LIBJSON_LIBS}
-libnftables_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libnftables.map \
-			 -version-info $(LIBVERSION)
+libnftnl_la_LIBADD = ${LIBMNL_LIBS} ${LIBXML_LIBS} ${LIBJSON_LIBS}
+libnftnl_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libnftnl.map	\
+		      -version-info $(LIBVERSION)
 
-libnftables_la_SOURCES = utils.c		\
-			 common.c		\
-			 table.c		\
-			 chain.c		\
-			 rule.c			\
-			 set.c			\
-			 set_elem.c		\
-			 ruleset.c		\
-			 mxml.c			\
-			 jansson.c		\
-			 expr.c			\
-			 expr_ops.c		\
-			 expr/bitwise.c		\
-			 expr/byteorder.c	\
-			 expr/cmp.c		\
-			 expr/counter.c		\
-			 expr/ct.c		\
-			 expr/data_reg.c	\
-			 expr/exthdr.c		\
-			 expr/limit.c		\
-			 expr/log.c		\
-			 expr/lookup.c		\
-			 expr/immediate.c	\
-			 expr/match.c		\
-			 expr/meta.c		\
-			 expr/nat.c		\
-			 expr/payload.c		\
-			 expr/reject.c		\
-			 expr/target.c		\
-			 expr/data_reg.h	\
-			 libnftables.map	\
-			 expr_ops.h		\
-			 internal.h
+libnftnl_la_SOURCES = utils.c		\
+		      common.c		\
+		      table.c		\
+		      chain.c		\
+		      rule.c		\
+		      set.c		\
+		      set_elem.c	\
+		      ruleset.c		\
+		      mxml.c		\
+		      jansson.c		\
+		      expr.c		\
+		      expr_ops.c	\
+		      expr/bitwise.c	\
+		      expr/byteorder.c	\
+		      expr/cmp.c	\
+		      expr/counter.c	\
+		      expr/ct.c		\
+		      expr/data_reg.c	\
+		      expr/exthdr.c	\
+		      expr/limit.c	\
+		      expr/log.c	\
+		      expr/lookup.c	\
+		      expr/immediate.c	\
+		      expr/match.c	\
+		      expr/meta.c	\
+		      expr/nat.c	\
+		      expr/payload.c	\
+		      expr/reject.c	\
+		      expr/target.c	\
+		      expr/data_reg.h	\
+		      libnftnl.map	\
+		      expr_ops.h	\
+		      internal.h

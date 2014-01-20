@@ -17,11 +17,11 @@
 #include <stdlib.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/ruleset.h>
-#include <libnftables/table.h>
-#include <libnftables/chain.h>
-#include <libnftables/set.h>
-#include <libnftables/rule.h>
+#include <libnftnl/ruleset.h>
+#include <libnftnl/table.h>
+#include <libnftnl/chain.h>
+#include <libnftnl/set.h>
+#include <libnftnl/rule.h>
 
 struct nft_ruleset {
 	struct nft_table_list	*table_list;

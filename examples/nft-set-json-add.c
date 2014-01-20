@@ -25,7 +25,7 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/set.h>
+#include <libnftnl/set.h>
 
 int main(int argc, char *argv[])
 {

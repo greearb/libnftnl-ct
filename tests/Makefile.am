@@ -23,64 +23,64 @@ check_PROGRAMS = 	nft-parsing-test		\
 			nft-expr_target-test
 
 nft_parsing_test_SOURCES = nft-parsing-test.c
-nft_parsing_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS} ${LIBXML_LIBS} ${LIBJSON_LIBS}
+nft_parsing_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS} ${LIBXML_LIBS} ${LIBJSON_LIBS}
 
 nft_table_test_SOURCES = nft-table-test.c
-nft_table_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_table_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_chain_test_SOURCES = nft-chain-test.c
-nft_chain_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_chain_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_rule_test_SOURCES = nft-rule-test.c
-nft_rule_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_rule_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_set_test_SOURCES = nft-set-test.c
-nft_set_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_set_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_bitwise_test_SOURCES = nft-expr_bitwise-test.c
-nft_expr_bitwise_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_bitwise_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_byteorder_test_SOURCES = nft-expr_byteorder-test.c
-nft_expr_byteorder_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_byteorder_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_cmp_test_SOURCES = nft-expr_cmp-test.c
-nft_expr_cmp_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_cmp_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_counter_test_SOURCES = nft-expr_counter-test.c
-nft_expr_counter_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_counter_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_exthdr_test_SOURCES = nft-expr_exthdr-test.c
-nft_expr_exthdr_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_exthdr_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_ct_test_SOURCES = nft-expr_ct-test.c
-nft_expr_ct_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_ct_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_immediate_test_SOURCES = nft-expr_counter-test.c
-nft_expr_immediate_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_immediate_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_limit_test_SOURCES = nft-expr_limit-test.c
-nft_expr_limit_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_limit_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_lookup_test_SOURCES = nft-expr_limit-test.c
-nft_expr_lookup_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_lookup_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_log_test_SOURCES = nft-expr_log-test.c
-nft_expr_log_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_log_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_match_test_SOURCES = nft-expr_match-test.c
-nft_expr_match_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_match_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_meta_test_SOURCES = nft-expr_meta-test.c
-nft_expr_meta_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_meta_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_nat_test_SOURCES = nft-expr_nat-test.c
-nft_expr_nat_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_nat_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_payload_test_SOURCES = nft-expr_payload-test.c
-nft_expr_payload_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_payload_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_reject_test_SOURCES = nft-expr_reject-test.c
-nft_expr_reject_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_reject_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_target_test_SOURCES = nft-expr_target-test.c
-nft_expr_target_test_LDADD = ../src/libnftables.la ${LIBMNL_LIBS}
+nft_expr_target_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}

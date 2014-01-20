@@ -1,5 +1,5 @@
-#ifndef _LIBNFTABLES_RULE_EXPR_H_
-#define _LIBNFTABLES_RULE_EXPR_H_
+#ifndef _LIBNFTNL_RULE_EXPR_H_
+#define _LIBNFTNL_RULE_EXPR_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -147,4 +147,4 @@ enum {
 } /* extern "C" */
 #endif
 
-#endif /* _LIBNFTABLES_RULE_EXPR_H_ */
+#endif /* _LIBNFTNL_RULE_EXPR_H_ */

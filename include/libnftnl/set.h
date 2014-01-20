@@ -1,12 +1,12 @@
-#ifndef _LIBNFTABLES_SET_H_
-#define _LIBNFTABLES_SET_H_
+#ifndef _LIBNFTNL_SET_H_
+#define _LIBNFTNL_SET_H_
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 enum {
 	NFT_SET_ATTR_TABLE,
@@ -116,4 +116,4 @@ struct nft_set_elem *nft_set_elems_iter_cur(struct nft_set_elems_iter *iter);
 struct nft_set_elem *nft_set_elems_iter_next(struct nft_set_elems_iter *iter);
 void nft_set_elems_iter_destroy(struct nft_set_elems_iter *iter);
 
-#endif /* _LIBNFTABLES_SET_H_ */
+#endif /* _LIBNFTNL_SET_H_ */

@@ -1,5 +1,5 @@
-#ifndef _LIBNFTABLES_RULESET_H_
-#define _LIBNFTABLES_RULESET_H_
+#ifndef _LIBNFTNL_RULESET_H_
+#define _LIBNFTNL_RULESET_H_
 
 #include <stdio.h>
 
@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,4 +41,4 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type, u
 } /* extern "C" */
 #endif
 
-#endif /* _LIBNFTABLES_RULESET_H_ */
+#endif /* _LIBNFTNL_RULESET_H_ */

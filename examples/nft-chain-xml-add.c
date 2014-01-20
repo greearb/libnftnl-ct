@@ -23,8 +23,8 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/chain.h>
-#include <libnftables/rule.h>
+#include <libnftnl/chain.h>
+#include <libnftnl/rule.h>
 
 int main(int argc, char *argv[])
 {

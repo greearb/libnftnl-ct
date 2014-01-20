@@ -6,11 +6,11 @@
 #include <errno.h>
 
 #include <libmnl/libmnl.h> /*nlmsghdr*/
-#include <libnftables/ruleset.h>
-#include <libnftables/table.h>
-#include <libnftables/chain.h>
-#include <libnftables/rule.h>
-#include <libnftables/set.h>
+#include <libnftnl/ruleset.h>
+#include <libnftnl/table.h>
+#include <libnftnl/chain.h>
+#include <libnftnl/rule.h>
+#include <libnftnl/set.h>
 
 enum {
 	TEST_XML_RULESET,

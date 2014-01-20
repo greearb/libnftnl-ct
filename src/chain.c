@@ -26,7 +26,7 @@
 #include <linux/netfilter.h>
 #include <linux/netfilter_arp.h>
 
-#include <libnftables/chain.h>
+#include <libnftnl/chain.h>
 
 struct nft_chain {
 	struct list_head head;

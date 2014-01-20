@@ -15,11 +15,11 @@
 #include <limits.h>
 
 #include <linux/netfilter/nf_tables.h>
-#include <libnftables/table.h>
-#include <libnftables/chain.h>
-#include <libnftables/rule.h>
-#include <libnftables/expr.h>
-#include <libnftables/set.h>
+#include <libnftnl/table.h>
+#include <libnftnl/chain.h>
+#include <libnftnl/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/set.h>
 
 #ifdef XML_PARSING
 mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,

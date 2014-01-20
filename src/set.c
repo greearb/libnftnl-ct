@@ -23,7 +23,7 @@
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nf_tables.h>
 
-#include <libnftables/set.h>
+#include <libnftnl/set.h>
 
 #include "linux_list.h"
 #include "expr/data_reg.h"

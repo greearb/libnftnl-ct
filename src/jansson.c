@@ -16,9 +16,9 @@
 #include <errno.h>
 #include <string.h>
 #include "expr_ops.h"
-#include <libnftables/set.h>
+#include <libnftnl/set.h>
 
-#include <libnftables/expr.h>
+#include <libnftnl/expr.h>
 #include <linux/netfilter/nf_tables.h>
 
 #ifdef JSON_PARSING

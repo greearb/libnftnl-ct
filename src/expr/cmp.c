@@ -19,8 +19,8 @@
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "expr_ops.h"
 #include "data_reg.h"
 

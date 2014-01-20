@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #define BASE_DEC 10
 #define BASE_HEX 16
