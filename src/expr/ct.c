@@ -191,7 +191,7 @@ static const char *ctdir2str(uint8_t ctdir)
 	}
 }
 
-static int str2ctdir(const char *str, uint8_t *ctdir)
+static inline int str2ctdir(const char *str, uint8_t *ctdir)
 {
 	if (strcmp(str, "original") == 0) {
 		*ctdir = IP_CT_DIR_ORIGINAL;
