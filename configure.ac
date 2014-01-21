@@ -20,12 +20,14 @@ AC_ARG_WITH([xml-parsing],
 AC_ARG_WITH([json-parsing],
 	AS_HELP_STRING([--with-json-parsing], [JSON parsing support]))
 
-AS_IF([test "x$with_xml_parsing" = "xyes"], [
-	PKG_CHECK_MODULES([LIBXML], [mxml >= 2.6])
-])
-AS_IF([test "x$with_json_parsing" = "xyes"], [
-	PKG_CHECK_MODULES([LIBJSON], [jansson >= 2.3])
-])
+AS_IF([test "x$with_xml_parsing" = "xyes"],
+	[PKG_CHECK_MODULES([LIBXML], [mxml >= 2.6])],
+	[with_xml_parsing="no"]
+)
+AS_IF([test "x$with_json_parsing" = "xyes"],
+	[PKG_CHECK_MODULES([LIBJSON], [jansson >= 2.3])],
+	[with_json_parsing="no"]
+)
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_EXEEXT
