@@ -1,6 +1,8 @@
 #ifndef _LIBNFTNL_COMMON_H_
 #define _LIBNFTNL_COMMON_H_
 
+#include <stdint.h>
+
 enum {
 	NFT_PARSE_EBADINPUT	= 0,
 	NFT_PARSE_EMISSINGNODE,
