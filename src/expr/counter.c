@@ -19,8 +19,8 @@
 
 #include "internal.h"
 #include <libmnl/libmnl.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_counter {
@@ -119,17 +119,18 @@ nft_rule_expr_counter_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_counter_json_parse(struct nft_rule_expr *e, json_t *root)
+nft_rule_expr_counter_json_parse(struct nft_rule_expr *e, json_t *root,
+				 struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	uint64_t uval64;
 
-	if (nft_jansson_parse_val(root, "pkts", NFT_TYPE_U64, &uval64) < 0)
+	if (nft_jansson_parse_val(root, "pkts", NFT_TYPE_U64, &uval64, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_CTR_PACKETS, uval64);
 
-	if (nft_jansson_parse_val(root, "bytes", NFT_TYPE_U64, &uval64) < 0)
+	if (nft_jansson_parse_val(root, "bytes", NFT_TYPE_U64, &uval64, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u64(e, NFT_EXPR_CTR_BYTES, uval64);
@@ -142,19 +143,22 @@ nft_rule_expr_counter_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 static int
-nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_counter *ctr = nft_expr_data(e);
 
 	if (nft_mxml_num_parse(tree, "pkts", MXML_DESCEND_FIRST, BASE_DEC,
-			       &ctr->pkts, NFT_TYPE_U64, NFT_XML_MAND) != 0)
+			       &ctr->pkts, NFT_TYPE_U64, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_CTR_PACKETS);
 
 	if (nft_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
-			       &ctr->bytes, NFT_TYPE_U64, NFT_XML_MAND) != 0)
+			       &ctr->bytes, NFT_TYPE_U64, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_CTR_BYTES);

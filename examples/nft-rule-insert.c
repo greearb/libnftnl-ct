@@ -20,8 +20,8 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/rule.h>
-#include <libnftables/expr.h>
+#include <libnftnl/rule.h>
+#include <libnftnl/expr.h>
 
 #include <linux/netfilter_ipv4/ipt_LOG.h>
 #include <linux/netfilter/xt_iprange.h>

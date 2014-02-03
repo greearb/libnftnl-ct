@@ -1,12 +1,12 @@
-#ifndef _LIBNFTABLES_RULE_H_
-#define _LIBNFTABLES_RULE_H_
+#ifndef _LIBNFTNL_RULE_H_
+#define _LIBNFTNL_RULE_H_
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,7 +47,10 @@ struct nlmsghdr;
 
 void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *t);
 
-int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type, const char *data);
+int nft_rule_parse(struct nft_rule *r, enum nft_parse_type type,
+		   const char *data, struct nft_parse_err *err);
+int nft_rule_parse_file(struct nft_rule *r, enum nft_parse_type type,
+			FILE *fp, struct nft_parse_err *err);
 int nft_rule_snprintf(char *buf, size_t size, struct nft_rule *t, uint32_t type, uint32_t flags);
 int nft_rule_fprintf(FILE *fp, struct nft_rule *r, uint32_t type, uint32_t flags);
 
@@ -85,4 +88,4 @@ void nft_rule_list_iter_destroy(struct nft_rule_list_iter *iter);
 } /* extern "C" */
 #endif
 
-#endif /* _LIBNFTABLES_RULE_H_ */
+#endif /* _LIBNFTNL_RULE_H_ */

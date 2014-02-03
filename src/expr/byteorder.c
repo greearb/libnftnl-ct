@@ -18,8 +18,8 @@
 #include <errno.h>
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "data_reg.h"
 #include "expr_ops.h"
 
@@ -194,24 +194,25 @@ static inline int nft_str2ntoh(const char *op)
 }
 
 static int
-nft_rule_expr_byteorder_json_parse(struct nft_rule_expr *e, json_t *root)
+nft_rule_expr_byteorder_json_parse(struct nft_rule_expr *e, json_t *root,
+				   struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *op;
 	uint32_t uval32;
 	int ntoh;
 
-	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &uval32) < 0)
+	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &uval32, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SREG, uval32);
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &uval32) < 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &uval32, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_DREG, uval32);
 
-	op = nft_jansson_parse_str(root, "op");
+	op = nft_jansson_parse_str(root, "op", err);
 	if (op == NULL)
 		return -1;
 
@@ -221,12 +222,12 @@ nft_rule_expr_byteorder_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_OP, ntoh);
 
-	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &uval32) < 0)
+	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &uval32, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_LEN, uval32);
 
-	if (nft_jansson_parse_val(root, "size", NFT_TYPE_U32, &uval32) < 0)
+	if (nft_jansson_parse_val(root, "size", NFT_TYPE_U32, &uval32, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SIZE, uval32);
@@ -239,28 +240,31 @@ nft_rule_expr_byteorder_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 static int
-nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				  struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 	const char *op;
-	int32_t reg, ntoh;
+	int32_t ntoh;
+	uint32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	byteorder->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_SREG);
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "dreg", &reg, MXML_DESCEND, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	byteorder->dreg = reg;
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_DREG);
 
-	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFT_XML_MAND);
+	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFT_XML_MAND,
+				err);
 	if (op == NULL)
 		return -1;
 
@@ -273,14 +277,14 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
 			       &byteorder->len, NFT_TYPE_U8,
-			       NFT_XML_MAND) != 0)
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_LEN);
 
 	if (nft_mxml_num_parse(tree, "size", MXML_DESCEND_FIRST, BASE_DEC,
 			       &byteorder->size, NFT_TYPE_U8,
-			       NFT_XML_MAND) != 0)
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_BYTEORDER_SIZE);

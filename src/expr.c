@@ -22,7 +22,7 @@
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nf_tables.h>
 
-#include <libnftables/expr.h>
+#include <libnftnl/expr.h>
 
 #include "linux_list.h"
 

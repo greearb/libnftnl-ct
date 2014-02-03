@@ -7,11 +7,13 @@
  * (at your option) any later version.
  */
 
+#include <stdlib.h>
+#include <sys/socket.h>
 #include <linux/netlink.h>
 #include <linux/netfilter/nfnetlink.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #include "internal.h"
 
@@ -34,3 +36,33 @@ struct nlmsghdr *nft_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
 	return nlh;
 }
 EXPORT_SYMBOL(nft_nlmsg_build_hdr);
+
+struct nft_parse_err *nft_parse_err_alloc(void)
+{
+	return calloc(1, sizeof(struct nft_parse_err));
+}
+EXPORT_SYMBOL(nft_parse_err_alloc);
+
+void nft_parse_err_free(struct nft_parse_err *err)
+{
+	xfree(err);
+}
+EXPORT_SYMBOL(nft_parse_err_free);
+
+int nft_parse_perror(const char *str, struct nft_parse_err *err)
+{
+	switch (err->error) {
+	case NFT_PARSE_EBADINPUT:
+		return fprintf(stderr, "%s : Bad input format in line %d column %d\n",
+		       str, err->line, err->column);
+	case NFT_PARSE_EMISSINGNODE:
+		return fprintf(stderr, "%s : Node \"%s\" not found\n",
+				str, err->node_name);
+	case NFT_PARSE_EBADTYPE:
+		return fprintf(stderr, "%s: Invalid type in node \"%s\"\n",
+				str, err->node_name);
+	default:
+		return fprintf(stderr, "Undefined error\n");
+	}
+}
+EXPORT_SYMBOL(nft_parse_perror);

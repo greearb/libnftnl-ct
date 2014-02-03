@@ -18,8 +18,8 @@
 
 #include "internal.h"
 #include <libmnl/libmnl.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_ct {
@@ -141,10 +141,6 @@ nft_rule_expr_ct_parse(struct nft_rule_expr *e, struct nlattr *attr)
 		ct->key = ntohl(mnl_attr_get_u32(tb[NFTA_CT_KEY]));
 		e->flags |= (1 << NFT_EXPR_CT_KEY);
 	}
-	if (tb[NFTA_CT_DIRECTION]) {
-		ct->dir = mnl_attr_get_u8(tb[NFTA_CT_DIRECTION]);
-		e->flags |= (1 << NFT_EXPR_CT_DIR);
-	}
 	if (tb[NFTA_CT_DREG]) {
 		ct->dreg = ntohl(mnl_attr_get_u32(tb[NFTA_CT_DREG]));
 		e->flags |= (1 << NFT_EXPR_CT_DREG);
@@ -152,6 +148,10 @@ nft_rule_expr_ct_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	if (tb[NFTA_CT_SREG]) {
 		ct->sreg = ntohl(mnl_attr_get_u32(tb[NFTA_CT_SREG]));
 		e->flags |= (1 << NFT_EXPR_CT_SREG);
+	}
+	if (tb[NFTA_CT_DIRECTION]) {
+		ct->dir = mnl_attr_get_u8(tb[NFTA_CT_DIRECTION]);
+		e->flags |= (1 << NFT_EXPR_CT_DIR);
 	}
 
 	return 0;
@@ -165,6 +165,7 @@ const char *ctkey2str_array[NFT_CT_MAX] = {
 	[NFT_CT_SECMARK]	= "secmark",
 	[NFT_CT_EXPIRATION]	= "expiration",
 	[NFT_CT_HELPER]		= "helper",
+	[NFT_CT_L3PROTOCOL]	= "l3protocol",
 	[NFT_CT_PROTOCOL]	= "protocol",
 	[NFT_CT_SRC]		= "src",
 	[NFT_CT_DST]		= "dst",
@@ -192,30 +193,58 @@ static inline int str2ctkey(const char *ctkey)
 	return -1;
 }
 
-static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
+static const char *ctdir2str(uint8_t ctdir)
+{
+	switch (ctdir) {
+	case IP_CT_DIR_ORIGINAL:
+		return "original";
+	case IP_CT_DIR_REPLY:
+		return "reply";
+	default:
+		return "unknow";
+	}
+}
+
+static inline int str2ctdir(const char *str, uint8_t *ctdir)
+{
+	if (strcmp(str, "original") == 0) {
+		*ctdir = IP_CT_DIR_ORIGINAL;
+		return 0;
+	}
+
+	if (strcmp(str, "reply") == 0) {
+		*ctdir = IP_CT_DIR_REPLY;
+		return 0;
+	}
+
+	return -1;
+}
+
+static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root,
+				       struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
-	const char *key_str;
+	const char *key_str, *dir_str;
 	uint32_t reg;
 	uint8_t dir;
 	int key;
 
 	if (nft_jansson_node_exist(root, "dreg")) {
-		if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg) < 0)
+		if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
 			return -1;
 
 		nft_rule_expr_set_u32(e, NFT_EXPR_CT_DREG, reg);
 	}
 
 	if (nft_jansson_node_exist(root, "sreg")) {
-		if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg) < 0)
+		if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg, err) < 0)
 			return -1;
 
 		nft_rule_expr_set_u32(e, NFT_EXPR_CT_SREG, reg);
 	}
 
 	if (nft_jansson_node_exist(root, "key")) {
-		key_str = nft_jansson_parse_str(root, "key");
+		key_str = nft_jansson_parse_str(root, "key", err);
 		if (key_str == NULL)
 			return -1;
 
@@ -228,11 +257,15 @@ static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root)
 	}
 
 	if (nft_jansson_node_exist(root, "dir")) {
-		if (nft_jansson_parse_val(root, "dir", NFT_TYPE_U8, &dir) < 0)
+		dir_str = nft_jansson_parse_str(root, "dir", err);
+		if (dir_str == NULL)
 			return -1;
 
-		if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)
+		if (str2ctdir(dir_str, &dir) != 0) {
+			err->node_name = "dir";
+			err->error = NFT_PARSE_EBADTYPE;
 			goto err;
+		}
 
 		nft_rule_expr_set_u8(e, NFT_EXPR_CT_DIR, dir);
 	}
@@ -248,29 +281,30 @@ err:
 }
 
 
-static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				      struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_ct *ct = nft_expr_data(e);
-	const char *key_str;
-	int32_t reg;
+	const char *key_str, *dir_str;
 	int key;
 	uint8_t dir;
+	uint32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "dreg", MXML_DESCEND_FIRST);
-	if (reg >= 0) {
+	if (nft_mxml_reg_parse(tree, "dreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_OPT, err) >= 0) {
 		ct->dreg = reg;
 		e->flags |= (1 << NFT_EXPR_CT_DREG);
 	}
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
-	if (reg >= 0) {
+	if (nft_mxml_reg_parse(tree, "sreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_OPT, err) >= 0) {
 		ct->sreg = reg;
 		e->flags |= (1 << NFT_EXPR_CT_SREG);
 	}
 
 	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST,
-				     NFT_XML_MAND);
+				     NFT_XML_MAND, err);
 	if (key_str == NULL)
 		return -1;
 
@@ -281,15 +315,17 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	ct->key = key;
 	e->flags |= (1 << NFT_EXPR_CT_KEY);
 
-	if (nft_mxml_num_parse(tree, "dir", MXML_DESCEND_FIRST, BASE_DEC,
-			       &dir, NFT_TYPE_U8, NFT_XML_MAND) != 0)
-		return -1;
+	dir_str = nft_mxml_str_parse(tree, "dir", MXML_DESCEND_FIRST,
+				     NFT_XML_OPT, err);
+	if (dir_str != NULL) {
+		if (str2ctdir(dir_str, &dir) != 0) {
+			err->node_name = "dir";
+			err->error = NFT_PARSE_EBADTYPE;
+			goto err;
+		}
 
-	if (dir != IP_CT_DIR_ORIGINAL && dir != IP_CT_DIR_REPLY)
-		goto err;
-
-	ct->dir = dir;
-	e->flags |= (1 << NFT_EXPR_CT_DIR);
+		nft_rule_expr_set_u8(e, NFT_EXPR_CT_DIR, dir);
+	}
 
 	return 0;
 err:
@@ -302,51 +338,7 @@ err:
 }
 
 static int
-nft_rule_expr_ct_snprintf_default(char *buf, size_t size,
-				  struct nft_rule_expr *e)
-{
-	struct nft_expr_ct *ct = nft_expr_data(e);
-
-	if (e->flags & (1 << NFT_EXPR_CT_SREG))
-		return snprintf(buf, size, "set %s with reg %u ",
-				ctkey2str(ct->key), ct->sreg);
-
-	return snprintf(buf, size, "load %s => reg %u dir %u ",
-			ctkey2str(ct->key), ct->dreg, ct->dir);
-}
-
-static int
-nft_rule_expr_ct_snprintf_xml(char *buf, size_t size, struct nft_rule_expr *e)
-{
-	int ret, len = size, offset = 0;
-	struct nft_expr_ct *ct = nft_expr_data(e);
-
-	if (e->flags & (1 << NFT_EXPR_CT_DREG)) {
-		ret = snprintf(buf+offset, len, "<dreg>%u</dreg>", ct->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (e->flags & (1 << NFT_EXPR_CT_SREG)) {
-		ret = snprintf(buf+offset, len, "<sreg>%u</sreg>", ct->sreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (e->flags & (1 << NFT_EXPR_CT_KEY)) {
-		ret = snprintf(buf+offset, len, "<key>%s</key>",
-			       ctkey2str(ct->key));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (e->flags & (1 << NFT_EXPR_CT_DIR)) {
-		ret = snprintf(buf+offset, len, "<dir>%u</dir>", ct->dir);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
-}
-
-static int
-nft_rule_expr_ct_snprintf_json(char *buf, size_t size, struct nft_rule_expr *e)
+nft_expr_ct_snprintf_json(char *buf, size_t size, struct nft_rule_expr *e)
 {
 	int ret, len = size, offset = 0;
 	struct nft_expr_ct *ct = nft_expr_data(e);
@@ -367,8 +359,9 @@ nft_rule_expr_ct_snprintf_json(char *buf, size_t size, struct nft_rule_expr *e)
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	if (e->flags & (1 << NFT_EXPR_CT_DIR)) {
-		ret = snprintf(buf+offset, len, "\"dir\":%u,", ct->dir);
+	if (nft_rule_expr_is_set(e, NFT_EXPR_CT_DIR)) {
+		ret = snprintf(buf+offset, len, "\"dir\":\"%s\",",
+			       ctdir2str(ct->dir));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -379,16 +372,74 @@ nft_rule_expr_ct_snprintf_json(char *buf, size_t size, struct nft_rule_expr *e)
 }
 
 static int
+nft_expr_ct_snprintf_xml(char *buf, size_t size, struct nft_rule_expr *e)
+{
+	int ret, len = size, offset = 0;
+	struct nft_expr_ct *ct = nft_expr_data(e);
+
+	if (e->flags & (1 << NFT_EXPR_CT_DREG)) {
+		ret = snprintf(buf+offset, len, "<dreg>%u</dreg>", ct->dreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFT_EXPR_CT_SREG)) {
+		ret = snprintf(buf+offset, len, "<sreg>%u</sreg>", ct->sreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFT_EXPR_CT_KEY)) {
+		ret = snprintf(buf+offset, len, "<key>%s</key>",
+			       ctkey2str(ct->key));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (nft_rule_expr_is_set(e, NFT_EXPR_CT_DIR)) {
+		ret = snprintf(buf+offset, len, "<dir>%s</dir>",
+			       ctdir2str(ct->dir));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+}
+
+static int
+nft_expr_ct_snprintf_default(char *buf, size_t size, struct nft_rule_expr *e)
+{
+	int ret, len = size, offset = 0;
+	struct nft_expr_ct *ct = nft_expr_data(e);
+
+	if (e->flags & (1 << NFT_EXPR_CT_SREG)) {
+		ret = snprintf(buf, size, "set %s with reg %u ",
+				ctkey2str(ct->key), ct->sreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFT_EXPR_CT_DREG)) {
+		ret = snprintf(buf, len, "load %s => reg %u ",
+			       ctkey2str(ct->key), ct->dreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (nft_rule_expr_is_set(e, NFT_EXPR_CT_DIR)) {
+		ret = snprintf(buf+offset, len, ", dir %s ",
+			       ctdir2str(ct->dir));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
+}
+
+static int
 nft_rule_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
 			    uint32_t flags, struct nft_rule_expr *e)
 {
 	switch(type) {
 	case NFT_OUTPUT_DEFAULT:
-		return nft_rule_expr_ct_snprintf_default(buf, len, e);
+		return nft_expr_ct_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_ct_snprintf_xml(buf, len, e);
+		return nft_expr_ct_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_ct_snprintf_json(buf, len, e);
+		return nft_expr_ct_snprintf_json(buf, len, e);
 	default:
 		break;
 	}

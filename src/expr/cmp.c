@@ -19,15 +19,15 @@
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "expr_ops.h"
 #include "data_reg.h"
 
 struct nft_expr_cmp {
 	union nft_data_reg	data;
-	uint32_t		sreg;	/* enum nft_registers */
-	uint32_t		op;	/* enum nft_cmp_ops */
+	enum nft_registers	sreg;
+	enum nft_cmp_ops	op;
 };
 
 static int
@@ -174,7 +174,8 @@ static inline int nft_str2cmp(const char *op)
 	}
 }
 
-static int nft_rule_expr_cmp_json_parse(struct nft_rule_expr *e, json_t *root)
+static int nft_rule_expr_cmp_json_parse(struct nft_rule_expr *e, json_t *root,
+					struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	struct nft_expr_cmp *cmp = nft_expr_data(e);
@@ -182,12 +183,12 @@ static int nft_rule_expr_cmp_json_parse(struct nft_rule_expr *e, json_t *root)
 	uint32_t uval32;
 	int base;
 
-	if (nft_jansson_parse_val(root, "sreg", NFT_TYPE_U32, &uval32) < 0)
+	if (nft_jansson_parse_val(root, "sreg", NFT_TYPE_U32, &uval32, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_CMP_SREG, uval32);
 
-	op = nft_jansson_parse_str(root, "op");
+	op = nft_jansson_parse_str(root, "op", err);
 	if (op == NULL)
 		return -1;
 
@@ -198,7 +199,7 @@ static int nft_rule_expr_cmp_json_parse(struct nft_rule_expr *e, json_t *root)
 	nft_rule_expr_set_u32(e, NFT_EXPR_CMP_OP, base);
 
 	if (nft_jansson_data_reg_parse(root, "cmpdata",
-				       &cmp->data) != DATA_VALUE)
+				       &cmp->data, err) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_CMP_DATA);
@@ -210,21 +211,24 @@ static int nft_rule_expr_cmp_json_parse(struct nft_rule_expr *e, json_t *root)
 #endif
 }
 
-static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				       struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_cmp *cmp = nft_expr_data(e);
 	const char *op;
-	int32_t reg, op_value;
+	int32_t op_value;
+	uint32_t reg;
 
-	reg = nft_mxml_reg_parse(tree, "sreg", MXML_DESCEND_FIRST);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg", &reg, MXML_DESCEND_FIRST,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	cmp->sreg = reg;
 	e->flags |= (1 << NFT_EXPR_CMP_SREG);
 
-	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFT_XML_MAND);
+	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFT_XML_MAND,
+				err);
 	if (op == NULL)
 		return -1;
 
@@ -236,7 +240,8 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	e->flags |= (1 << NFT_EXPR_CMP_OP);
 
 	if (nft_mxml_data_reg_parse(tree, "cmpdata",
-				    &cmp->data, NFT_XML_MAND) != DATA_VALUE)
+				    &cmp->data, NFT_XML_MAND,
+				    err) != DATA_VALUE)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_CMP_DATA);

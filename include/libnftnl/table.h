@@ -1,12 +1,12 @@
-#ifndef _LIBNFTABLES_TABLE_H_
-#define _LIBNFTABLES_TABLE_H_
+#ifndef _LIBNFTNL_TABLE_H_
+#define _LIBNFTNL_TABLE_H_
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +40,10 @@ struct nlmsghdr;
 
 void nft_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_table *t);
 
-int nft_table_parse(struct nft_table *t, enum nft_parse_type type, const char *data);
+int nft_table_parse(struct nft_table *t, enum nft_parse_type type,
+		    const char *data, struct nft_parse_err *err);
+int nft_table_parse_file(struct nft_table *t, enum nft_parse_type type,
+			 FILE *fp, struct nft_parse_err *err);
 int nft_table_snprintf(char *buf, size_t size, struct nft_table *t, uint32_t type, uint32_t flags);
 int nft_table_fprintf(FILE *fp, struct nft_table *t, uint32_t type, uint32_t flags);
 
@@ -68,4 +71,4 @@ void nft_table_list_iter_destroy(struct nft_table_list_iter *iter);
 } /* extern "C" */
 #endif
 
-#endif /* _LIBNFTABLES_TABLE_H_ */
+#endif /* _LIBNFTNL_TABLE_H_ */

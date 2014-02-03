@@ -13,7 +13,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <linux/netfilter/nf_tables.h>
-#include <libnftables/chain.h>
+#include <libnftnl/chain.h>
 
 static int test_ok = 1;
 

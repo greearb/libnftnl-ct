@@ -6,4 +6,4 @@ SUBDIRS = src include examples tests
 DIST_SUBDIRS = src include examples tests
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libnftables.pc
+pkgconfig_DATA = libnftnl.pc

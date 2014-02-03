@@ -1,1 +1,1 @@
-<rule><family>ip</family><table>filter</table><chain>INPUT</chain><handle>100</handle><expr type="limit"><rate>123123</rate><unit>321321</unit></expr></rule>
+<nftables><rule><family>ip</family><table>filter</table><chain>INPUT</chain><handle>100</handle><expr type="limit"><rate>123123</rate><unit>321321</unit></expr></rule></nftables>

@@ -20,8 +20,8 @@
 #include <arpa/inet.h>
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nf_tables.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_nat {
@@ -196,14 +196,15 @@ static inline int nft_str2nat(const char *nat)
 	}
 }
 
-static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root)
+static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root,
+					struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *nat_type, *family_str;
 	uint32_t reg;
 	int val32;
 
-	nat_type = nft_jansson_parse_str(root, "nat_type");
+	nat_type = nft_jansson_parse_str(root, "nat_type", err);
 	if (nat_type == NULL)
 		return -1;
 
@@ -213,7 +214,7 @@ static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root)
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_TYPE, val32);
 
-	family_str = nft_jansson_parse_str(root, "family");
+	family_str = nft_jansson_parse_str(root, "family", err);
 	if (family_str == NULL)
 		return -1;
 
@@ -224,25 +225,25 @@ static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root)
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_FAMILY, val32);
 
 	if (nft_jansson_parse_reg(root, "sreg_addr_min", NFT_TYPE_U32,
-				  &reg) < 0)
+				  &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MIN, reg);
 
 	if (nft_jansson_parse_reg(root, "sreg_addr_max", NFT_TYPE_U32,
-				  &reg) < 0)
+				  &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MAX, reg);
 
 	if (nft_jansson_parse_reg(root, "sreg_proto_min", NFT_TYPE_U32,
-				  &reg) < 0)
+				  &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MIN, reg);
 
 	if (nft_jansson_parse_reg(root, "sreg_proto_max", NFT_TYPE_U32,
-				  &reg) < 0)
+				  &reg, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MAX, reg);
@@ -254,16 +255,17 @@ static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root)
 #endif
 }
 
-static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+				       struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_nat *nat = nft_expr_data(e);
 	const char *nat_type;
-	int32_t reg;
 	int family, nat_type_value;
+	uint32_t reg;
 
 	nat_type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST,
-				      NFT_XML_MAND);
+				      NFT_XML_MAND, err);
 	if (nat_type == NULL)
 		return -1;
 
@@ -275,7 +277,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	e->flags |= (1 << NFT_EXPR_NAT_TYPE);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
-				       NFT_XML_MAND);
+				       NFT_XML_MAND, err);
 	if (family < 0) {
 		mxmlDelete(tree);
 		return -1;
@@ -284,29 +286,29 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	nat->family = family;
 	e->flags |= (1 << NFT_EXPR_NAT_FAMILY);
 
-	reg = nft_mxml_reg_parse(tree, "sreg_addr_min", MXML_DESCEND);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg_addr_min", &reg,
+			       MXML_DESCEND, NFT_XML_MAND, err) != 0)
 		return -1;
 
 	nat->sreg_addr_min = reg;
 	e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MIN);
 
-	reg = nft_mxml_reg_parse(tree, "sreg_addr_max", MXML_DESCEND);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg_addr_max", &reg,
+			       MXML_DESCEND, NFT_XML_MAND, err) != 0)
 		return -1;
 
 	nat->sreg_addr_max = reg;
 	e->flags |= (1 << NFT_EXPR_NAT_REG_ADDR_MAX);
 
-	reg = nft_mxml_reg_parse(tree, "sreg_proto_min", MXML_DESCEND);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg_proto_min", &reg,
+			       MXML_DESCEND, NFT_XML_MAND, err) != 0)
 		return -1;
 
 	nat->sreg_proto_min = reg;
 	e->flags |= (1 << NFT_EXPR_NAT_REG_PROTO_MIN);
 
-	reg = nft_mxml_reg_parse(tree, "sreg_proto_max", MXML_DESCEND);
-	if (reg < 0)
+	if (nft_mxml_reg_parse(tree, "sreg_proto_max", &reg,
+			       MXML_DESCEND, NFT_XML_MAND, err) != 0)
 		return -1;
 
 	nat->sreg_proto_max = reg;

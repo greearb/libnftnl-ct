@@ -1,12 +1,12 @@
-#ifndef _LIBNFTABLES_SET_H_
-#define _LIBNFTABLES_SET_H_
+#ifndef _LIBNFTNL_SET_H_
+#define _LIBNFTNL_SET_H_
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 enum {
 	NFT_SET_ATTR_TABLE,
@@ -60,7 +60,10 @@ struct nft_set *nft_set_list_iter_cur(struct nft_set_list_iter *iter);
 struct nft_set *nft_set_list_iter_next(struct nft_set_list_iter *iter);
 void nft_set_list_iter_destroy(struct nft_set_list_iter *iter);
 
-int nft_set_parse(struct nft_set *s, enum nft_parse_type type, const char *data);
+int nft_set_parse(struct nft_set *s, enum nft_parse_type type,
+		  const char *data, struct nft_parse_err *err);
+int nft_set_parse_file(struct nft_set *s, enum nft_parse_type type,
+		       FILE *fp, struct nft_parse_err *err);
 
 /*
  * Set elements
@@ -98,7 +101,10 @@ void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set_elem 
 
 int nft_set_elem_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set_elem *s);
 
-int nft_set_elem_parse(struct nft_set_elem *e, enum nft_parse_type type, const char *data);
+int nft_set_elem_parse(struct nft_set_elem *e, enum nft_parse_type type,
+		       const char *data, struct nft_parse_err *err);
+int nft_set_elem_parse_file(struct nft_set_elem *e, enum nft_parse_type type,
+			    FILE *fp, struct nft_parse_err *err);
 int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *s, uint32_t type, uint32_t flags);
 int nft_set_elem_fprintf(FILE *fp, struct nft_set_elem *se, uint32_t type, uint32_t flags);
 
@@ -110,4 +116,4 @@ struct nft_set_elem *nft_set_elems_iter_cur(struct nft_set_elems_iter *iter);
 struct nft_set_elem *nft_set_elems_iter_next(struct nft_set_elems_iter *iter);
 void nft_set_elems_iter_destroy(struct nft_set_elems_iter *iter);
 
-#endif /* _LIBNFTABLES_SET_H_ */
+#endif /* _LIBNFTNL_SET_H_ */

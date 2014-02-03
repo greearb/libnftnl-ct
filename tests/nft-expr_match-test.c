@@ -18,8 +18,8 @@
 #include <linux/netfilter/nf_tables.h>
 #include <linux/netfilter/xt_iprange.h>
 #include <libmnl/libmnl.h>
-#include <libnftables/rule.h>
-#include <libnftables/expr.h>
+#include <libnftnl/rule.h>
+#include <libnftnl/expr.h>
 
 static int test_ok = 1;
 

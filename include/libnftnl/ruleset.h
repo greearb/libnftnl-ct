@@ -1,5 +1,5 @@
-#ifndef _LIBNFTABLES_RULESET_H_
-#define _LIBNFTABLES_RULESET_H_
+#ifndef _LIBNFTNL_RULESET_H_
+#define _LIBNFTNL_RULESET_H_
 
 #include <stdio.h>
 
@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +30,10 @@ void nft_ruleset_attr_unset(struct nft_ruleset *r, uint16_t attr);
 void nft_ruleset_attr_set(struct nft_ruleset *r, uint16_t attr, void *data);
 const void *nft_ruleset_attr_get(const struct nft_ruleset *r, uint16_t attr);
 
-int nft_ruleset_parse(struct nft_ruleset *rs, enum nft_parse_type type, const char *data);
+int nft_ruleset_parse(struct nft_ruleset *rs, enum nft_parse_type type,
+		      const char *data, struct nft_parse_err *err);
+int nft_ruleset_parse_file(struct nft_ruleset *rs, enum nft_parse_type type,
+			   FILE *fp, struct nft_parse_err *err);
 int nft_ruleset_snprintf(char *buf, size_t size, const struct nft_ruleset *rs, uint32_t type, uint32_t flags);
 int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type, uint32_t flags);
 
@@ -38,4 +41,4 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type, u
 } /* extern "C" */
 #endif
 
-#endif /* _LIBNFTABLES_RULESET_H_ */
+#endif /* _LIBNFTNL_RULESET_H_ */

@@ -1,12 +1,12 @@
-#ifndef _LIBNFTABLES_CHAIN_H_
-#define _LIBNFTABLES_CHAIN_H_
+#ifndef _LIBNFTNL_CHAIN_H_
+#define _LIBNFTNL_CHAIN_H_
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include <libnftables/common.h>
+#include <libnftnl/common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,7 +51,10 @@ struct nlmsghdr;
 
 void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain *t);
 
-int nft_chain_parse(struct nft_chain *c, enum nft_parse_type type, const char *data);
+int nft_chain_parse(struct nft_chain *c, enum nft_parse_type type,
+		    const char *data, struct nft_parse_err *err);
+int nft_chain_parse_file(struct nft_chain *c, enum nft_parse_type type,
+			 FILE *fp, struct nft_parse_err *err);
 int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *t, uint32_t type, uint32_t flags);
 int nft_chain_fprintf(FILE *fp, struct nft_chain *c, uint32_t type, uint32_t flags);
 
@@ -79,4 +82,4 @@ void nft_chain_list_iter_destroy(struct nft_chain_list_iter *iter);
 } /* extern "C" */
 #endif
 
-#endif /* _LIBNFTABLES_CHAIN_H_ */
+#endif /* _LIBNFTNL_CHAIN_H_ */

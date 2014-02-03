@@ -18,8 +18,8 @@
 
 #include "internal.h"
 #include <libmnl/libmnl.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_reject {
@@ -122,18 +122,19 @@ nft_rule_expr_reject_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_reject_json_parse(struct nft_rule_expr *e, json_t *root)
+nft_rule_expr_reject_json_parse(struct nft_rule_expr *e, json_t *root,
+				struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	uint32_t type;
 	uint16_t code;
 
-	if (nft_jansson_parse_val(root, "type", NFT_TYPE_U32, &type) < 0)
+	if (nft_jansson_parse_val(root, "type", NFT_TYPE_U32, &type, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_REJECT_TYPE, type);
 
-	if (nft_jansson_parse_val(root, "code", NFT_TYPE_U8, &code) < 0)
+	if (nft_jansson_parse_val(root, "code", NFT_TYPE_U8, &code, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u8(e, NFT_EXPR_REJECT_CODE, code);
@@ -146,19 +147,22 @@ nft_rule_expr_reject_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 static int
-nft_rule_expr_reject_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+nft_rule_expr_reject_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+			       struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_reject *reject = nft_expr_data(e);
 
 	if (nft_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &reject->type, NFT_TYPE_U32, NFT_XML_MAND) != 0)
+			       &reject->type, NFT_TYPE_U32, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_REJECT_TYPE);
 
 	if (nft_mxml_num_parse(tree, "code", MXML_DESCEND_FIRST, BASE_DEC,
-			       &reject->icmp_code, NFT_TYPE_U8, NFT_XML_MAND) != 0)
+			       &reject->icmp_code, NFT_TYPE_U8, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_REJECT_CODE);

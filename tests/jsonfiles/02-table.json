@@ -1,1 +1,1 @@
-{"table":{"name":"filter2","family":"ip6","flags":0,"use":0}}
+{"nftables":[{"table":{"name":"filter2","family":"ip6","flags":0,"use":0}}]}

@@ -14,7 +14,7 @@
 
 #include <netinet/in.h>
 #include <linux/netfilter/nf_tables.h>
-#include <libnftables/rule.h>
+#include <libnftnl/rule.h>
 
 static int test_ok = 1;
 

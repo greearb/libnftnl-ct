@@ -18,8 +18,8 @@
 
 #include "internal.h"
 #include <libmnl/libmnl.h>
-#include <libnftables/expr.h>
-#include <libnftables/rule.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
 #include "expr_ops.h"
 
 struct nft_expr_log {
@@ -160,31 +160,34 @@ nft_rule_expr_log_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nft_rule_expr_log_json_parse(struct nft_rule_expr *e, json_t *root)
+static int nft_rule_expr_log_json_parse(struct nft_rule_expr *e, json_t *root,
+					struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *prefix;
 	uint32_t snaplen;
 	uint16_t uval16;
 
-	prefix = nft_jansson_parse_str(root, "prefix");
+	prefix = nft_jansson_parse_str(root, "prefix", err);
 	if (prefix == NULL)
 		return -1;
 
 	nft_rule_expr_set_str(e, NFT_EXPR_LOG_PREFIX, prefix);
 
-	if (nft_jansson_parse_val(root, "group", NFT_TYPE_U16, &uval16) < 0)
+	if (nft_jansson_parse_val(root, "group", NFT_TYPE_U16, &uval16,
+				  err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u16(e, NFT_EXPR_LOG_GROUP, uval16);
 
-	if (nft_jansson_parse_val(root, "snaplen", NFT_TYPE_U32, &snaplen) < 0)
+	if (nft_jansson_parse_val(root, "snaplen", NFT_TYPE_U32, &snaplen,
+				  err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_LOG_SNAPLEN, snaplen);
 
 	if (nft_jansson_parse_val(root, "qthreshold", NFT_TYPE_U16,
-				  &uval16) < 0)
+				  &uval16, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u16(e, NFT_EXPR_LOG_QTHRESHOLD, uval16);
@@ -196,14 +199,16 @@ static int nft_rule_expr_log_json_parse(struct nft_rule_expr *e, json_t *root)
 #endif
 }
 
-static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e,
+				       mxml_node_t *tree,
+				       struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_log *log = nft_expr_data(e);
 	const char *prefix;
 
 	prefix = nft_mxml_str_parse(tree, "prefix", MXML_DESCEND_FIRST,
-				    NFT_XML_MAND);
+				    NFT_XML_MAND, err);
 	if (prefix == NULL)
 		return -1;
 
@@ -211,20 +216,22 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	e->flags |= (1 << NFT_EXPR_LOG_PREFIX);
 
 	if (nft_mxml_num_parse(tree, "group", MXML_DESCEND_FIRST, BASE_DEC,
-			       &log->group, NFT_TYPE_U16, NFT_XML_MAND) != 0)
+			       &log->group, NFT_TYPE_U16, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LOG_GROUP);
 
 	if (nft_mxml_num_parse(tree, "snaplen", MXML_DESCEND_FIRST, BASE_DEC,
-			       &log->snaplen, NFT_TYPE_U32, NFT_XML_MAND) != 0)
+			       &log->snaplen, NFT_TYPE_U32, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LOG_SNAPLEN);
 
 	if (nft_mxml_num_parse(tree, "qthreshold", MXML_DESCEND_FIRST,
 			       BASE_DEC, &log->qthreshold,
-			       NFT_TYPE_U16, NFT_XML_MAND) != 0)
+			       NFT_TYPE_U16, NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_LOG_QTHRESHOLD);

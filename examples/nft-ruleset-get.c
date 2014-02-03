@@ -21,12 +21,12 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/common.h>
-#include <libnftables/ruleset.h>
-#include <libnftables/table.h>
-#include <libnftables/chain.h>
-#include <libnftables/set.h>
-#include <libnftables/rule.h>
+#include <libnftnl/common.h>
+#include <libnftnl/ruleset.h>
+#include <libnftnl/table.h>
+#include <libnftnl/chain.h>
+#include <libnftnl/set.h>
+#include <libnftnl/rule.h>
 
 static int seq;
 
