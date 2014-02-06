@@ -843,16 +843,16 @@ static int nft_chain_snprintf_default(char *buf, size_t size,
 {
 	int ret, len = size, offset = 0;
 
-	ret = snprintf(buf, len, "%s %s %s",
-		       nft_family2str(c->family), c->table, c->name);
+	ret = snprintf(buf, len, "%s %s %s use %u",
+		       nft_family2str(c->family), c->table, c->name, c->use);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
 		ret = snprintf(buf+offset, len,
-			       " type %s hook %s prio %d policy %s use %d "
+			       " type %s hook %s prio %d policy %s "
 			       "packets %"PRIu64" bytes %"PRIu64"",
 			       c->type, nft_hooknum2str(c->family, c->hooknum),
-			       c->prio, nft_verdict2str(c->policy), c->use,
+			       c->prio, nft_verdict2str(c->policy),
 			       c->packets, c->bytes);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
