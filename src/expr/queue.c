@@ -130,23 +130,24 @@ nft_rule_expr_queue_parse(struct nft_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nft_rule_expr_queue_json_parse(struct nft_rule_expr *e, json_t *root)
+nft_rule_expr_queue_json_parse(struct nft_rule_expr *e, json_t *root,
+			       struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
 	uint32_t type;
 	uint16_t code;
 
-	if (nft_jansson_parse_val(root, "num", NFT_TYPE_U16, &type) < 0)
+	if (nft_jansson_parse_val(root, "num", NFT_TYPE_U16, &type, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_QUEUE_NUM, type);
 
-	if (nft_jansson_parse_val(root, "total", NFT_TYPE_U16, &code) < 0)
+	if (nft_jansson_parse_val(root, "total", NFT_TYPE_U16, &code, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_TOTAL, code);
 
-	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U16, &code) < 0)
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U16, &code, err) < 0)
 		return -1;
 
 	nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_FLAGS, code);
@@ -159,25 +160,29 @@ nft_rule_expr_queue_json_parse(struct nft_rule_expr *e, json_t *root)
 }
 
 static int
-nft_rule_expr_queue_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree)
+nft_rule_expr_queue_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
+			      struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
 	struct nft_expr_queue *queue = nft_expr_data(e);
 
 	if (nft_mxml_num_parse(tree, "num", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue->queuenum, NFT_TYPE_U16, NFT_XML_MAND) != 0)
+			       &queue->queuenum, NFT_TYPE_U16, NFT_XML_MAND,
+			       err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_QUEUE_NUM);
 
 	if (nft_mxml_num_parse(tree, "total", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue->queues_total, NFT_TYPE_U8, NFT_XML_MAND) != 0)
+			       &queue->queues_total, NFT_TYPE_U8,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_QUEUE_TOTAL);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue->flags, NFT_TYPE_U8, NFT_XML_MAND) != 0)
+			       &queue->flags, NFT_TYPE_U8,
+			       NFT_XML_MAND, err) != 0)
 		return -1;
 
 	e->flags |= (1 << NFT_EXPR_QUEUE_FLAGS);
