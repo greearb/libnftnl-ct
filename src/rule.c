@@ -115,6 +115,9 @@ EXPORT_SYMBOL(nft_rule_attr_unset);
 
 void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
 {
+	if (attr > NFT_RULE_ATTR_MAX)
+		return;
+
 	switch(attr) {
 	case NFT_RULE_ATTR_TABLE:
 		if (r->table)
@@ -143,8 +146,6 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
 	case NFT_RULE_ATTR_POSITION:
 		r->position = *((uint64_t *)data);
 		break;
-	default:
-		return;
 	}
 	r->flags |= (1 << attr);
 }

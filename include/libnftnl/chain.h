@@ -29,7 +29,9 @@ enum {
 	NFT_CHAIN_ATTR_PACKETS	= 8,
 	NFT_CHAIN_ATTR_HANDLE,
 	NFT_CHAIN_ATTR_TYPE,
+	__NFT_CHAIN_ATTR_MAX
 };
+#define NFT_CHAIN_ATTR_MAX (__NFT_CHAIN_ATTR_MAX - 1)
 
 bool nft_chain_attr_is_set(const struct nft_chain *c, uint16_t attr);
 void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr);

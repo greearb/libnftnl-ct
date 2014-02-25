@@ -22,7 +22,9 @@ enum {
 	NFT_TABLE_ATTR_FAMILY,
 	NFT_TABLE_ATTR_FLAGS,
 	NFT_TABLE_ATTR_USE,
+	__NFT_TABLE_ATTR_MAX
 };
+#define NFT_TABLE_ATTR_MAX (__NFT_TABLE_ATTR_MAX - 1)
 
 bool nft_table_attr_is_set(const struct nft_table *t, uint16_t attr);
 void nft_table_attr_unset(struct nft_table *t, uint16_t attr);

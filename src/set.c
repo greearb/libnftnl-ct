@@ -98,6 +98,9 @@ EXPORT_SYMBOL(nft_set_attr_unset);
 
 void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data)
 {
+	if (attr > NFT_SET_ATTR_MAX)
+		return;
+
 	switch(attr) {
 	case NFT_SET_ATTR_TABLE:
 		if (s->table)
@@ -129,8 +132,6 @@ void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data)
 	case NFT_SET_ATTR_FAMILY:
 		s->family = *((uint32_t *)data);
 		break;
-	default:
-		return;
 	}
 	s->flags |= (1 << attr);
 }

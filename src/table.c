@@ -81,26 +81,27 @@ EXPORT_SYMBOL(nft_table_attr_unset);
 
 void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data)
 {
+	if (attr > NFT_TABLE_ATTR_MAX)
+		return;
+
 	switch (attr) {
 	case NFT_TABLE_ATTR_NAME:
 		if (t->name)
 			xfree(t->name);
 
 		t->name = strdup(data);
-		t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 		break;
 	case NFT_TABLE_ATTR_FLAGS:
 		t->table_flags = *((uint32_t *)data);
-		t->flags |= (1 << NFT_TABLE_ATTR_FLAGS);
 		break;
 	case NFT_TABLE_ATTR_FAMILY:
 		t->family = *((uint8_t *)data);
-		t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
 		break;
 	case NFT_TABLE_ATTR_USE:
-		/* Cannot be unset, ignoring it */
-		break;
+		/* Cannot be set, ignoring it */
+		return;
 	}
+	t->flags |= (1 << attr);
 }
 EXPORT_SYMBOL(nft_table_attr_set);
 

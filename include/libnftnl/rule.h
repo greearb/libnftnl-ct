@@ -26,7 +26,9 @@ enum {
 	NFT_RULE_ATTR_COMPAT_PROTO,
 	NFT_RULE_ATTR_COMPAT_FLAGS,
 	NFT_RULE_ATTR_POSITION,
+	__NFT_RULE_ATTR_MAX
 };
+#define NFT_RULE_ATTR_MAX (__NFT_RULE_ATTR_MAX - 1)
 
 void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr);
 bool nft_rule_attr_is_set(const struct nft_rule *r, uint16_t attr);

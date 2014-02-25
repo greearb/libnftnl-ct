@@ -142,6 +142,9 @@ EXPORT_SYMBOL(nft_chain_attr_unset);
 
 void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
 {
+	if (attr > NFT_CHAIN_ATTR_MAX)
+		return;
+
 	switch(attr) {
 	case NFT_CHAIN_ATTR_NAME:
 		strncpy(c->name, data, NFT_CHAIN_MAXNAMELEN);
@@ -182,8 +185,6 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
 
 		c->type = strdup(data);
 		break;
-	default:
-		return;
 	}
 	c->flags |= (1 << attr);
 }

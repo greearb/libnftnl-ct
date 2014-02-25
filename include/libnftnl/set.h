@@ -17,7 +17,9 @@ enum {
 	NFT_SET_ATTR_DATA_TYPE,
 	NFT_SET_ATTR_DATA_LEN,
 	NFT_SET_ATTR_FAMILY,
+	__NFT_SET_ATTR_MAX
 };
+#define NFT_SET_ATTR_MAX (__NFT_SET_ATTR_MAX - 1)
 
 struct nft_set;
 
