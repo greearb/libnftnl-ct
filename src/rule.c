@@ -19,6 +19,7 @@
 #include <netinet/in.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <ctype.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -39,6 +40,10 @@ struct nft_rule {
 	const char	*chain;
 	uint64_t	handle;
 	uint64_t	position;
+	struct {
+			void		*data;
+			uint32_t	len;
+	} user;
 	struct {
 			uint32_t	flags;
 			uint32_t	proto;
@@ -106,6 +111,7 @@ void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr)
 	case NFT_RULE_ATTR_COMPAT_FLAGS:
 	case NFT_RULE_ATTR_POSITION:
 	case NFT_RULE_ATTR_FAMILY:
+	case NFT_RULE_ATTR_USERDATA:
 		break;
 	}
 
@@ -156,6 +162,10 @@ void nft_rule_attr_set_data(struct nft_rule *r, uint16_t attr,
 		break;
 	case NFT_RULE_ATTR_POSITION:
 		r->position = *((uint64_t *)data);
+		break;
+	case NFT_RULE_ATTR_USERDATA:
+		r->user.data = (void *)data;
+		r->user.len = data_len;
 		break;
 	}
 	r->flags |= (1 << attr);
@@ -212,6 +222,9 @@ const void *nft_rule_attr_get_data(const struct nft_rule *r, uint16_t attr,
 	case NFT_RULE_ATTR_POSITION:
 		*data_len = sizeof(uint64_t);
 		return &r->position;
+	case NFT_RULE_ATTR_USERDATA:
+		*data_len = r->user.len;
+		return r->user.data;
 	}
 	return NULL;
 }
@@ -276,6 +289,10 @@ void nft_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_rule *r)
 		mnl_attr_put_u64(nlh, NFTA_RULE_HANDLE, htobe64(r->handle));
 	if (r->flags & (1 << NFT_RULE_ATTR_POSITION))
 		mnl_attr_put_u64(nlh, NFTA_RULE_POSITION, htobe64(r->position));
+	if (r->flags & (1 << NFT_RULE_ATTR_USERDATA)) {
+		mnl_attr_put(nlh, NFTA_RULE_USERDATA, r->user.len,
+			     r->user.data);
+	}
 
 	if (!list_empty(&r->expr_list)) {
 		nest = mnl_attr_nest_start(nlh, NFTA_RULE_EXPRESSIONS);
@@ -334,6 +351,12 @@ static int nft_rule_parse_attr_cb(const struct nlattr *attr, void *data)
 		break;
 	case NFTA_RULE_POSITION:
 		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
+			perror("mnl_attr_validate");
+			return MNL_CB_ERROR;
+		}
+		break;
+	case NFTA_RULE_USERDATA:
+		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
 		}
@@ -477,6 +500,22 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 	if (tb[NFTA_RULE_POSITION]) {
 		r->position = be64toh(mnl_attr_get_u64(tb[NFTA_RULE_POSITION]));
 		r->flags |= (1 << NFT_RULE_ATTR_POSITION);
+	}
+	if (tb[NFTA_RULE_USERDATA]) {
+		const void *udata =
+			mnl_attr_get_payload(tb[NFTA_RULE_USERDATA]);
+
+		if (r->user.data)
+			xfree(r->user.data);
+
+		r->user.len = mnl_attr_get_payload_len(tb[NFTA_RULE_USERDATA]);
+
+		r->user.data = malloc(r->user.len);
+		if (r->user.data == NULL)
+			return -1;
+
+		memcpy(r->user.data, udata, r->user.len);
+		r->flags |= (1 << NFT_RULE_ATTR_USERDATA);
 	}
 
 	r->family = nfg->nfgen_family;
@@ -830,7 +869,7 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 				     uint32_t type, uint32_t flags)
 {
 	struct nft_rule_expr *expr;
-	int ret, len = size, offset = 0;
+	int ret, len = size, offset = 0, i;
 
 	ret = snprintf(buf, len, "%s %s %s %"PRIu64" %"PRIu64"\n",
 			nft_family2str(r->family), r->table, r->chain,
@@ -847,6 +886,23 @@ static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 
 		ret = snprintf(buf+offset, len, "]\n");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->user.len) {
+		ret = snprintf(buf+offset, len, "  userdata = { ");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		for (i = 0; i < r->user.len; i++) {
+			char *c = r->user.data;
+
+			ret = snprintf(buf+offset, len, "%c",
+				       isalnum(c[i]) ? c[i] : 0);
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		}
+
+		ret = snprintf(buf+offset, len, " }\n");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
 	}
 
 	return offset;
