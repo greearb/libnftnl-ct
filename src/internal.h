@@ -187,4 +187,17 @@ struct nft_set_elem {
 
 #define __init __attribute__((constructor))
 
+void __nft_assert_fail(uint16_t attr, const char *filename, int line);
+
+#define nft_assert(attr, expr)				\
+  ((expr)						\
+   ? (void)0						\
+   : __nft_assert_fail(attr, __FILE__, __LINE__))
+
+#define nft_assert_validate(_validate_array, _attr, _data_len)		\
+({									\
+	if (_validate_array[_attr])					\
+		nft_assert(attr, _validate_array[_attr] == _data_len);	\
+})
+
 #endif

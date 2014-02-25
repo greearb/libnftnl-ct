@@ -211,3 +211,10 @@ int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags,
 
 	return ret;
 }
+
+void __nft_assert_fail(uint16_t attr, const char *filename, int line)
+{
+	fprintf(stderr, "libnftnl: attribute %d assertion failed in %s:%d\n",
+		attr, filename, line);
+	exit(EXIT_FAILURE);
+}
