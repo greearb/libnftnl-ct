@@ -32,8 +32,8 @@ static void cmp_nft_chain(struct nft_chain *a, struct nft_chain *b)
 	if (strcmp(nft_chain_attr_get_str(a, NFT_CHAIN_ATTR_TABLE),
 		   nft_chain_attr_get_str(b, NFT_CHAIN_ATTR_TABLE)) != 0)
 		print_err("Chain table mismatches");
-	if (nft_chain_attr_get_u8(a, NFT_CHAIN_ATTR_FAMILY) !=
-	    nft_chain_attr_get_u8(b, NFT_CHAIN_ATTR_FAMILY))
+	if (nft_chain_attr_get_u32(a, NFT_CHAIN_ATTR_FAMILY) !=
+	    nft_chain_attr_get_u32(b, NFT_CHAIN_ATTR_FAMILY))
 		print_err("Chain family mismatches");
 	if (nft_chain_attr_get_u32(a, NFT_CHAIN_ATTR_POLICY) !=
 	    nft_chain_attr_get_u32(b, NFT_CHAIN_ATTR_POLICY))
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nft_chain_attr_set_str(a, NFT_CHAIN_ATTR_NAME, "test");
-	nft_chain_attr_set_u8(a, NFT_CHAIN_ATTR_FAMILY, AF_INET);
+	nft_chain_attr_set_u32(a, NFT_CHAIN_ATTR_FAMILY, AF_INET);
 	nft_chain_attr_set_str(a, NFT_CHAIN_ATTR_TABLE, "Table");
 	nft_chain_attr_set_u32(a, NFT_CHAIN_ATTR_POLICY,0x12345678);
 	nft_chain_attr_set_u32(a, NFT_CHAIN_ATTR_HOOKNUM, 0x12345678);

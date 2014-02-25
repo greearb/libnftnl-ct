@@ -32,8 +32,8 @@ static void cmp_nft_table(struct nft_table *a, struct nft_table *b)
 	if (nft_table_attr_get_u32(a, NFT_TABLE_ATTR_FLAGS) !=
 	    nft_table_attr_get_u32(b, NFT_TABLE_ATTR_FLAGS))
 		print_err("table flags mismatches");
-	if (nft_table_attr_get_u8(a, NFT_TABLE_ATTR_FAMILY) !=
-	    nft_table_attr_get_u8(b, NFT_TABLE_ATTR_FAMILY))
+	if (nft_table_attr_get_u32(a, NFT_TABLE_ATTR_FAMILY) !=
+	    nft_table_attr_get_u32(b, NFT_TABLE_ATTR_FAMILY))
 		print_err("tabke family mismatches");
 }
 
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nft_table_attr_set_str(a, NFT_TABLE_ATTR_NAME, "test");
-	nft_table_attr_set_u8(a, NFT_TABLE_ATTR_FAMILY, AF_INET);
+	nft_table_attr_set_u32(a, NFT_TABLE_ATTR_FAMILY, AF_INET);
 	nft_table_attr_set_u32(a, NFT_TABLE_ATTR_FLAGS, 0);
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */

@@ -34,7 +34,7 @@ struct nft_chain {
 	char		name[NFT_CHAIN_MAXNAMELEN];
 	const char	*type;
 	const char	*table;
-	uint8_t		family;
+	uint32_t	family;
 	uint32_t	policy;
 	uint32_t	hooknum;
 	int32_t		prio;
@@ -147,7 +147,7 @@ static uint32_t nft_chain_attr_validate[NFT_CHAIN_ATTR_MAX + 1] = {
 	[NFT_CHAIN_ATTR_BYTES]		= sizeof(uint64_t),
 	[NFT_CHAIN_ATTR_PACKETS]	= sizeof(uint64_t),
 	[NFT_CHAIN_ATTR_HANDLE]		= sizeof(uint64_t),
-	[NFT_CHAIN_ATTR_FAMILY]		= sizeof(uint8_t),
+	[NFT_CHAIN_ATTR_FAMILY]		= sizeof(uint32_t),
 };
 
 void nft_chain_attr_set_data(struct nft_chain *c, uint16_t attr,
@@ -190,7 +190,7 @@ void nft_chain_attr_set_data(struct nft_chain *c, uint16_t attr,
 		c->handle = *((uint64_t *)data);
 		break;
 	case NFT_CHAIN_ATTR_FAMILY:
-		c->family = *((uint8_t *)data);
+		c->family = *((uint32_t *)data);
 		break;
 	case NFT_CHAIN_ATTR_TYPE:
 		if (c->type)
@@ -272,7 +272,7 @@ const void *nft_chain_attr_get_data(struct nft_chain *c, uint16_t attr,
 		*data_len = sizeof(uint64_t);
 		return &c->handle;
 	case NFT_CHAIN_ATTR_FAMILY:
-		*data_len = sizeof(uint8_t);
+		*data_len = sizeof(uint32_t);
 		return &c->family;
 	case NFT_CHAIN_ATTR_TYPE:
 		*data_len = sizeof(uint32_t);

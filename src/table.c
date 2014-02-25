@@ -29,7 +29,7 @@ struct nft_table {
 	struct list_head head;
 
 	const char	*name;
-	uint8_t		family;
+	uint32_t	family;
 	uint32_t	table_flags;
 	uint32_t	use;
 	uint32_t	flags;
@@ -81,7 +81,7 @@ EXPORT_SYMBOL(nft_table_attr_unset);
 
 static uint32_t nft_table_attr_validate[NFT_TABLE_ATTR_MAX + 1] = {
 	[NFT_TABLE_ATTR_FLAGS]	= sizeof(uint32_t),
-	[NFT_TABLE_ATTR_FAMILY]	= sizeof(uint8_t),
+	[NFT_TABLE_ATTR_FAMILY]	= sizeof(uint32_t),
 };
 
 void nft_table_attr_set_data(struct nft_table *t, uint16_t attr,
@@ -103,7 +103,7 @@ void nft_table_attr_set_data(struct nft_table *t, uint16_t attr,
 		t->table_flags = *((uint32_t *)data);
 		break;
 	case NFT_TABLE_ATTR_FAMILY:
-		t->family = *((uint8_t *)data);
+		t->family = *((uint32_t *)data);
 		break;
 	case NFT_TABLE_ATTR_USE:
 		/* Cannot be set, ignoring it */
@@ -150,7 +150,7 @@ const void *nft_table_attr_get_data(struct nft_table *t, uint16_t attr,
 		*data_len = sizeof(uint32_t);
 		return &t->table_flags;
 	case NFT_TABLE_ATTR_FAMILY:
-		*data_len = sizeof(uint8_t);
+		*data_len = sizeof(uint32_t);
 		return &t->family;
 	case NFT_TABLE_ATTR_USE:
 		*data_len = sizeof(uint32_t);

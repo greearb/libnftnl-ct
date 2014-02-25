@@ -33,8 +33,8 @@ static void cmp_nft_rule_expr(struct nft_rule_expr *rule_a,
 	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_META_KEY) !=
 	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_META_KEY))
 		print_err("Expr NFT_EXPR_META_KEY mismatches");
-	if (nft_rule_expr_get_u8(rule_a, NFT_EXPR_META_DREG) !=
-	    nft_rule_expr_get_u8(rule_b, NFT_EXPR_META_DREG))
+	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_META_DREG) !=
+	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_META_DREG))
 		print_err("Expr NFT_EXPR_META_DREG mismatches");
 }
 

@@ -34,9 +34,9 @@ struct nft_rule {
 	struct list_head head;
 
 	uint32_t	flags;
+	uint32_t	family;
 	const char	*table;
 	const char	*chain;
-	uint8_t		family;
 	uint64_t	handle;
 	uint64_t	position;
 	struct {
@@ -117,7 +117,7 @@ static uint32_t nft_rule_attr_validate[NFT_RULE_ATTR_MAX + 1] = {
 	[NFT_RULE_ATTR_HANDLE]		= sizeof(uint64_t),
 	[NFT_RULE_ATTR_COMPAT_PROTO]	= sizeof(uint32_t),
 	[NFT_RULE_ATTR_COMPAT_FLAGS]	= sizeof(uint32_t),
-	[NFT_RULE_ATTR_FAMILY]		= sizeof(uint8_t),
+	[NFT_RULE_ATTR_FAMILY]		= sizeof(uint32_t),
 	[NFT_RULE_ATTR_POSITION]	= sizeof(uint64_t),
 };
 
@@ -152,7 +152,7 @@ void nft_rule_attr_set_data(struct nft_rule *r, uint16_t attr,
 		r->compat.flags = *((uint32_t *)data);
 		break;
 	case NFT_RULE_ATTR_FAMILY:
-		r->family = *((uint8_t *)data);
+		r->family = *((uint32_t *)data);
 		break;
 	case NFT_RULE_ATTR_POSITION:
 		r->position = *((uint64_t *)data);
@@ -194,7 +194,7 @@ const void *nft_rule_attr_get_data(const struct nft_rule *r, uint16_t attr,
 
 	switch(attr) {
 	case NFT_RULE_ATTR_FAMILY:
-		*data_len = sizeof(uint8_t);
+		*data_len = sizeof(uint32_t);
 		return &r->family;
 	case NFT_RULE_ATTR_TABLE:
 		return r->table;

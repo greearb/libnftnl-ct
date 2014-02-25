@@ -32,8 +32,8 @@ static void cmp_nft_rule_expr(struct nft_rule_expr *rule_a,
 	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_CT_KEY) !=
 	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_CT_KEY))
 		print_err("Expr CT_KEY mismatches");
-	if (nft_rule_expr_get_u8(rule_a, NFT_EXPR_CT_DIR) !=
-	    nft_rule_expr_get_u8(rule_b, NFT_EXPR_CT_DIR))
+	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_CT_DIR) !=
+	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_CT_DIR))
 		print_err("Expr CT_DIR mismatches");
 	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_CT_DREG) !=
 	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_CT_DREG))
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nft_rule_expr_set_u32(ex, NFT_EXPR_CT_KEY, 0x1234568);
-	nft_rule_expr_set_u8(ex, NFT_EXPR_CT_DIR, 0x12);
+	nft_rule_expr_set_u32(ex, NFT_EXPR_CT_DIR, 0x12);
 	nft_rule_expr_set_u32(ex, NFT_EXPR_CT_DREG, 0x12345678);
 
 	nft_rule_add_expr(a, ex);

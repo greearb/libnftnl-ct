@@ -33,8 +33,8 @@ static void cmp_nft_rule_expr(struct nft_rule_expr *rule_a,
 	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_EXTHDR_DREG) !=
 	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_EXTHDR_DREG))
 		print_err("Expr NFT_EXPR_EXTHDR_DREG mismatches");
-	if (nft_rule_expr_get_u8(rule_a, NFT_EXPR_EXTHDR_TYPE) !=
-	    nft_rule_expr_get_u8(rule_b, NFT_EXPR_EXTHDR_TYPE))
+	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_EXTHDR_TYPE) !=
+	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_EXTHDR_TYPE))
 		print_err("Expr NFT_EXPR_EXTHDR_TYPE mismatches");
 	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_EXTHDR_OFFSET) !=
 	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_EXTHDR_OFFSET))
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nft_rule_expr_set_u32(ex, NFT_EXPR_EXTHDR_DREG, 0x12345678);
-	nft_rule_expr_set_u8(ex, NFT_EXPR_EXTHDR_TYPE, 0x12);
+	nft_rule_expr_set_u32(ex, NFT_EXPR_EXTHDR_TYPE, 0x12);
 	nft_rule_expr_set_u32(ex, NFT_EXPR_EXTHDR_OFFSET, 0x12345678);
 	nft_rule_expr_set_u32(ex, NFT_EXPR_EXTHDR_LEN, 0x12345678);
 
