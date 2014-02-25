@@ -29,7 +29,11 @@ enum {
 bool nft_table_attr_is_set(const struct nft_table *t, uint16_t attr);
 void nft_table_attr_unset(struct nft_table *t, uint16_t attr);
 void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data);
+void nft_table_attr_set_data(struct nft_table *t, uint16_t attr,
+			     const void *data, uint32_t data_len);
 const void *nft_table_attr_get(struct nft_table *t, uint16_t attr);
+const void *nft_table_attr_get_data(struct nft_table *t, uint16_t attr,
+				    uint32_t *data_len);
 
 void nft_table_attr_set_u8(struct nft_table *t, uint16_t attr, uint8_t data);
 void nft_table_attr_set_u32(struct nft_table *t, uint16_t attr, uint32_t data);

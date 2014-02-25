@@ -140,10 +140,23 @@ void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_chain_attr_unset);
 
-void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
+static uint32_t nft_chain_attr_validate[NFT_CHAIN_ATTR_MAX + 1] = {
+	[NFT_CHAIN_ATTR_HOOKNUM]	= sizeof(uint32_t),
+	[NFT_CHAIN_ATTR_PRIO]		= sizeof(int32_t),
+	[NFT_CHAIN_ATTR_POLICY]		= sizeof(uint32_t),
+	[NFT_CHAIN_ATTR_BYTES]		= sizeof(uint64_t),
+	[NFT_CHAIN_ATTR_PACKETS]	= sizeof(uint64_t),
+	[NFT_CHAIN_ATTR_HANDLE]		= sizeof(uint64_t),
+	[NFT_CHAIN_ATTR_FAMILY]		= sizeof(uint8_t),
+};
+
+void nft_chain_attr_set_data(struct nft_chain *c, uint16_t attr,
+			     const void *data, uint32_t data_len)
 {
 	if (attr > NFT_CHAIN_ATTR_MAX)
 		return;
+
+	nft_assert_validate(nft_chain_attr_validate, attr, data_len);
 
 	switch(attr) {
 	case NFT_CHAIN_ATTR_NAME:
@@ -188,39 +201,46 @@ void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
 	}
 	c->flags |= (1 << attr);
 }
+EXPORT_SYMBOL(nft_chain_attr_set_data);
+
+void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
+{
+	nft_chain_attr_set_data(c, attr, data, nft_chain_attr_validate[attr]);
+}
 EXPORT_SYMBOL(nft_chain_attr_set);
 
 void nft_chain_attr_set_u32(struct nft_chain *c, uint16_t attr, uint32_t data)
 {
-	nft_chain_attr_set(c, attr, &data);
+	nft_chain_attr_set_data(c, attr, &data, sizeof(uint32_t));
 }
 EXPORT_SYMBOL(nft_chain_attr_set_u32);
 
 void nft_chain_attr_set_s32(struct nft_chain *c, uint16_t attr, int32_t data)
 {
-	nft_chain_attr_set(c, attr, &data);
+	nft_chain_attr_set_data(c, attr, &data, sizeof(int32_t));
 }
 EXPORT_SYMBOL(nft_chain_attr_set_s32);
 
 void nft_chain_attr_set_u64(struct nft_chain *c, uint16_t attr, uint64_t data)
 {
-	nft_chain_attr_set(c, attr, &data);
+	nft_chain_attr_set_data(c, attr, &data, sizeof(uint64_t));
 }
 EXPORT_SYMBOL(nft_chain_attr_set_u64);
 
 void nft_chain_attr_set_u8(struct nft_chain *c, uint16_t attr, uint8_t data)
 {
-	nft_chain_attr_set(c, attr, &data);
+	nft_chain_attr_set_data(c, attr, &data, sizeof(uint8_t));
 }
 EXPORT_SYMBOL(nft_chain_attr_set_u8);
 
 void nft_chain_attr_set_str(struct nft_chain *c, uint16_t attr, const char *str)
 {
-	nft_chain_attr_set(c, attr, str);
+	nft_chain_attr_set_data(c, attr, str, strlen(str));
 }
 EXPORT_SYMBOL(nft_chain_attr_set_str);
 
-const void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
+const void *nft_chain_attr_get_data(struct nft_chain *c, uint16_t attr,
+				    uint32_t *data_len)
 {
 	if (!(c->flags & (1 << attr)))
 		return NULL;
@@ -231,25 +251,41 @@ const void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
 	case NFT_CHAIN_ATTR_TABLE:
 		return c->table;
 	case NFT_CHAIN_ATTR_HOOKNUM:
+		*data_len = sizeof(uint32_t);
 		return &c->hooknum;
 	case NFT_CHAIN_ATTR_PRIO:
+		*data_len = sizeof(int32_t);
 		return &c->prio;
 	case NFT_CHAIN_ATTR_POLICY:
+		*data_len = sizeof(uint32_t);
 		return &c->policy;
 	case NFT_CHAIN_ATTR_USE:
+		*data_len = sizeof(uint32_t);
 		return &c->use;
 	case NFT_CHAIN_ATTR_BYTES:
+		*data_len = sizeof(uint64_t);
 		return &c->bytes;
 	case NFT_CHAIN_ATTR_PACKETS:
+		*data_len = sizeof(uint64_t);
 		return &c->packets;
 	case NFT_CHAIN_ATTR_HANDLE:
+		*data_len = sizeof(uint64_t);
 		return &c->handle;
 	case NFT_CHAIN_ATTR_FAMILY:
+		*data_len = sizeof(uint8_t);
 		return &c->family;
 	case NFT_CHAIN_ATTR_TYPE:
+		*data_len = sizeof(uint32_t);
 		return c->type;
 	}
 	return NULL;
+}
+EXPORT_SYMBOL(nft_chain_attr_get_data);
+
+const void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
+{
+	uint32_t data_len;
+	return nft_chain_attr_get_data(c, attr, &data_len);
 }
 EXPORT_SYMBOL(nft_chain_attr_get);
 
@@ -261,28 +297,44 @@ EXPORT_SYMBOL(nft_chain_attr_get_str);
 
 uint32_t nft_chain_attr_get_u32(struct nft_chain *c, uint16_t attr)
 {
-	const uint32_t *val = nft_chain_attr_get(c, attr);
+	uint32_t data_len;
+	const uint32_t *val = nft_chain_attr_get_data(c, attr, &data_len);
+
+	nft_assert(attr, data_len == sizeof(uint32_t));
+
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_chain_attr_get_u32);
 
 int32_t nft_chain_attr_get_s32(struct nft_chain *c, uint16_t attr)
 {
-	const int32_t *val = nft_chain_attr_get(c, attr);
+	uint32_t data_len;
+	const int32_t *val = nft_chain_attr_get_data(c, attr, &data_len);
+
+	nft_assert(attr, data_len == sizeof(int32_t));
+
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_chain_attr_get_s32);
 
 uint64_t nft_chain_attr_get_u64(struct nft_chain *c, uint16_t attr)
 {
-	const uint64_t *val = nft_chain_attr_get(c, attr);
+	uint32_t data_len;
+	const uint64_t *val = nft_chain_attr_get_data(c, attr, &data_len);
+
+	nft_assert(attr, data_len == sizeof(int64_t));
+
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_chain_attr_get_u64);
 
 uint8_t nft_chain_attr_get_u8(struct nft_chain *c, uint16_t attr)
 {
-	const uint8_t *val = nft_chain_attr_get(c, attr);
+	uint32_t data_len;
+	const uint8_t *val = nft_chain_attr_get_data(c, attr, &data_len);
+
+	nft_assert(attr, data_len == sizeof(int8_t));
+
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_chain_attr_get_u8);

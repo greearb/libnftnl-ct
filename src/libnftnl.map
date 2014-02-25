@@ -196,3 +196,14 @@ global:
 
 local: *;
 };
+
+LIBNFTNL_1.1 {
+  nft_table_attr_set_data;
+  nft_table_attr_get_data;
+  nft_chain_attr_set_data;
+  nft_chain_attr_get_data;
+  nft_rule_attr_set_data;
+  nft_rule_attr_get_data;
+  nft_set_attr_set_data;
+  nft_set_attr_get_data;
+} LIBNFTNL_1.0;

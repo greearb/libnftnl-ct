@@ -113,10 +113,21 @@ void nft_rule_attr_unset(struct nft_rule *r, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_rule_attr_unset);
 
-void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
+static uint32_t nft_rule_attr_validate[NFT_RULE_ATTR_MAX + 1] = {
+	[NFT_RULE_ATTR_HANDLE]		= sizeof(uint64_t),
+	[NFT_RULE_ATTR_COMPAT_PROTO]	= sizeof(uint32_t),
+	[NFT_RULE_ATTR_COMPAT_FLAGS]	= sizeof(uint32_t),
+	[NFT_RULE_ATTR_FAMILY]		= sizeof(uint8_t),
+	[NFT_RULE_ATTR_POSITION]	= sizeof(uint64_t),
+};
+
+void nft_rule_attr_set_data(struct nft_rule *r, uint16_t attr,
+			    const void *data, uint32_t data_len)
 {
 	if (attr > NFT_RULE_ATTR_MAX)
 		return;
+
+	nft_assert_validate(nft_rule_attr_validate, attr, data_len);
 
 	switch(attr) {
 	case NFT_RULE_ATTR_TABLE:
@@ -149,48 +160,67 @@ void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
 	}
 	r->flags |= (1 << attr);
 }
+EXPORT_SYMBOL(nft_rule_attr_set_data);
+
+void nft_rule_attr_set(struct nft_rule *r, uint16_t attr, const void *data)
+{
+	nft_rule_attr_set_data(r, attr, data, nft_rule_attr_validate[attr]);
+}
 EXPORT_SYMBOL(nft_rule_attr_set);
 
 void nft_rule_attr_set_u32(struct nft_rule *r, uint16_t attr, uint32_t val)
 {
-	nft_rule_attr_set(r, attr, &val);
+	nft_rule_attr_set_data(r, attr, &val, sizeof(uint32_t));
 }
 EXPORT_SYMBOL(nft_rule_attr_set_u32);
 
 void nft_rule_attr_set_u64(struct nft_rule *r, uint16_t attr, uint64_t val)
 {
-	nft_rule_attr_set(r, attr, &val);
+	nft_rule_attr_set_data(r, attr, &val, sizeof(uint64_t));
 }
 EXPORT_SYMBOL(nft_rule_attr_set_u64);
 
 void nft_rule_attr_set_str(struct nft_rule *r, uint16_t attr, const char *str)
 {
-	nft_rule_attr_set(r, attr, str);
+	nft_rule_attr_set_data(r, attr, str, strlen(str));
 }
 EXPORT_SYMBOL(nft_rule_attr_set_str);
 
-const void *nft_rule_attr_get(const struct nft_rule *r, uint16_t attr)
+const void *nft_rule_attr_get_data(const struct nft_rule *r, uint16_t attr,
+				   uint32_t *data_len)
 {
 	if (!(r->flags & (1 << attr)))
 		return NULL;
 
 	switch(attr) {
 	case NFT_RULE_ATTR_FAMILY:
+		*data_len = sizeof(uint8_t);
 		return &r->family;
 	case NFT_RULE_ATTR_TABLE:
 		return r->table;
 	case NFT_RULE_ATTR_CHAIN:
 		return r->chain;
 	case NFT_RULE_ATTR_HANDLE:
+		*data_len = sizeof(uint64_t);
 		return &r->handle;
 	case NFT_RULE_ATTR_COMPAT_PROTO:
+		*data_len = sizeof(uint32_t);
 		return &r->compat.proto;
 	case NFT_RULE_ATTR_COMPAT_FLAGS:
+		*data_len = sizeof(uint32_t);
 		return &r->compat.flags;
 	case NFT_RULE_ATTR_POSITION:
+		*data_len = sizeof(uint64_t);
 		return &r->position;
 	}
 	return NULL;
+}
+EXPORT_SYMBOL(nft_rule_attr_get_data);
+
+const void *nft_rule_attr_get(const struct nft_rule *r, uint16_t attr)
+{
+	uint32_t data_len;
+	return nft_rule_attr_get_data(r, attr, &data_len);
 }
 EXPORT_SYMBOL(nft_rule_attr_get);
 
@@ -202,21 +232,33 @@ EXPORT_SYMBOL(nft_rule_attr_get_str);
 
 uint32_t nft_rule_attr_get_u32(const struct nft_rule *r, uint16_t attr)
 {
-	const uint32_t *val = nft_rule_attr_get(r, attr);
+	uint32_t data_len;
+	const uint32_t *val = nft_rule_attr_get_data(r, attr, &data_len);
+
+	nft_assert(attr, data_len == sizeof(uint32_t));
+
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u32);
 
 uint64_t nft_rule_attr_get_u64(const struct nft_rule *r, uint16_t attr)
 {
-	const uint64_t *val = nft_rule_attr_get(r, attr);
+	uint32_t data_len;
+	const uint64_t *val = nft_rule_attr_get_data(r, attr, &data_len);
+
+	nft_assert(attr, data_len == sizeof(uint64_t));
+
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u64);
 
 uint8_t nft_rule_attr_get_u8(const struct nft_rule *r, uint16_t attr)
 {
-	const uint8_t *val = nft_rule_attr_get(r, attr);
+	uint32_t data_len;
+	const uint8_t *val = nft_rule_attr_get_data(r, attr, &data_len);
+
+	nft_assert(attr, data_len == sizeof(uint8_t));
+
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_rule_attr_get_u8);

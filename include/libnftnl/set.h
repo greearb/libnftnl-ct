@@ -29,10 +29,14 @@ void nft_set_free(struct nft_set *s);
 bool nft_set_attr_is_set(const struct nft_set *s, uint16_t attr);
 void nft_set_attr_unset(struct nft_set *s, uint16_t attr);
 void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data);
+void nft_set_attr_set_data(struct nft_set *s, uint16_t attr, const void *data,
+			   uint32_t data_len);
 void nft_set_attr_set_u32(struct nft_set *s, uint16_t attr, uint32_t val);
 void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, const char *str);
 
 const void *nft_set_attr_get(struct nft_set *s, uint16_t attr);
+const void *nft_set_attr_get_data(struct nft_set *s, uint16_t attr,
+				  uint32_t *data_len);
 const char *nft_set_attr_get_str(struct nft_set *s, uint16_t attr);
 uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr);
 

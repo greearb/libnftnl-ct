@@ -79,10 +79,18 @@ void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_table_attr_unset);
 
-void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data)
+static uint32_t nft_table_attr_validate[NFT_TABLE_ATTR_MAX + 1] = {
+	[NFT_TABLE_ATTR_FLAGS]	= sizeof(uint32_t),
+	[NFT_TABLE_ATTR_FAMILY]	= sizeof(uint8_t),
+};
+
+void nft_table_attr_set_data(struct nft_table *t, uint16_t attr,
+			     const void *data, uint32_t data_len)
 {
 	if (attr > NFT_TABLE_ATTR_MAX)
 		return;
+
+	nft_assert_validate(nft_table_attr_validate, attr, data_len);
 
 	switch (attr) {
 	case NFT_TABLE_ATTR_NAME:
@@ -103,27 +111,34 @@ void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data)
 	}
 	t->flags |= (1 << attr);
 }
+EXPORT_SYMBOL(nft_table_attr_set_data);
+
+void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data)
+{
+	nft_table_attr_set_data(t, attr, data, nft_table_attr_validate[attr]);
+}
 EXPORT_SYMBOL(nft_table_attr_set);
 
 void nft_table_attr_set_u32(struct nft_table *t, uint16_t attr, uint32_t val)
 {
-	nft_table_attr_set(t, attr, &val);
+	nft_table_attr_set_data(t, attr, &val, sizeof(uint32_t));
 }
 EXPORT_SYMBOL(nft_table_attr_set_u32);
 
 void nft_table_attr_set_u8(struct nft_table *t, uint16_t attr, uint8_t val)
 {
-	nft_table_attr_set(t, attr, &val);
+	nft_table_attr_set_data(t, attr, &val, sizeof(uint8_t));
 }
 EXPORT_SYMBOL(nft_table_attr_set_u8);
 
 void nft_table_attr_set_str(struct nft_table *t, uint16_t attr, const char *str)
 {
-	nft_table_attr_set(t, attr, str);
+	nft_table_attr_set_data(t, attr, str, 0);
 }
 EXPORT_SYMBOL(nft_table_attr_set_str);
 
-const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
+const void *nft_table_attr_get_data(struct nft_table *t, uint16_t attr,
+				    uint32_t *data_len)
 {
 	if (!(t->flags & (1 << attr)))
 		return NULL;
@@ -132,13 +147,23 @@ const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
 	case NFT_TABLE_ATTR_NAME:
 		return t->name;
 	case NFT_TABLE_ATTR_FLAGS:
+		*data_len = sizeof(uint32_t);
 		return &t->table_flags;
 	case NFT_TABLE_ATTR_FAMILY:
+		*data_len = sizeof(uint8_t);
 		return &t->family;
 	case NFT_TABLE_ATTR_USE:
+		*data_len = sizeof(uint32_t);
 		return &t->use;
 	}
 	return NULL;
+}
+EXPORT_SYMBOL(nft_table_attr_get_data);
+
+const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
+{
+	uint32_t data_len;
+	return nft_table_attr_get_data(t, attr, &data_len);
 }
 EXPORT_SYMBOL(nft_table_attr_get);
 
