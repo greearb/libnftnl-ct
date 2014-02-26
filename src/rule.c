@@ -455,7 +455,9 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
 	int ret = 0;
 
-	mnl_attr_parse(nlh, sizeof(*nfg), nft_rule_parse_attr_cb, tb);
+	if (mnl_attr_parse(nlh, sizeof(*nfg), nft_rule_parse_attr_cb, tb) < 0)
+		return -1;
+
 	if (tb[NFTA_RULE_TABLE]) {
 		r->table = strdup(mnl_attr_get_str(tb[NFTA_RULE_TABLE]));
 		r->flags |= (1 << NFT_RULE_ATTR_TABLE);

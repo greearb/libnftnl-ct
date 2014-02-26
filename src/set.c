@@ -281,9 +281,10 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 {
 	struct nlattr *tb[NFTA_SET_MAX+1] = {};
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
-	int ret = 0;
 
-	mnl_attr_parse(nlh, sizeof(*nfg), nft_set_parse_attr_cb, tb);
+	if (mnl_attr_parse(nlh, sizeof(*nfg), nft_set_parse_attr_cb, tb) < 0)
+		return -1;
+
 	if (tb[NFTA_SET_TABLE]) {
 		s->table = strdup(mnl_attr_get_str(tb[NFTA_SET_TABLE]));
 		s->flags |= (1 << NFT_SET_ATTR_TABLE);
@@ -315,7 +316,7 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 	s->family = nfg->nfgen_family;
 	s->flags |= (1 << NFT_SET_ATTR_FAMILY);
 
-	return ret;
+	return 0;
 }
 EXPORT_SYMBOL(nft_set_nlmsg_parse);
 

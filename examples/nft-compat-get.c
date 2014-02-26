@@ -51,7 +51,8 @@ static int cb(const struct nlmsghdr *nlh, void *data)
 	struct nlattr *tb[NFTA_COMPAT_MAX+1] = {};
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
 
-	mnl_attr_parse(nlh, sizeof(*nfg), data_attr_cb, tb);
+	if (mnl_attr_parse(nlh, sizeof(*nfg), data_attr_cb, tb) < 0)
+		return MNL_CB_ERROR;
 
 	if (tb[NFTA_COMPAT_NAME])
 		printf("name=%s ", mnl_attr_get_str(tb[NFTA_COMPAT_NAME]));

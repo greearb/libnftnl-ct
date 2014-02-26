@@ -502,7 +502,9 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
 	int ret = 0;
 
-	mnl_attr_parse(nlh, sizeof(*nfg), nft_chain_parse_attr_cb, tb);
+	if (mnl_attr_parse(nlh, sizeof(*nfg), nft_chain_parse_attr_cb, tb) < 0)
+		return -1;
+
 	if (tb[NFTA_CHAIN_NAME]) {
 		strncpy(c->name, mnl_attr_get_str(tb[NFTA_CHAIN_NAME]),
 			NFT_CHAIN_MAXNAMELEN);
@@ -512,8 +514,11 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 		c->table = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_TABLE]));
 		c->flags |= (1 << NFT_CHAIN_ATTR_TABLE);
 	}
-	if (tb[NFTA_CHAIN_HOOK])
+	if (tb[NFTA_CHAIN_HOOK]) {
 		ret = nft_chain_parse_hook(tb[NFTA_CHAIN_HOOK], c);
+		if (ret < 0)
+			return ret;
+	}
 	if (tb[NFTA_CHAIN_POLICY]) {
 		c->policy = ntohl(mnl_attr_get_u32(tb[NFTA_CHAIN_POLICY]));
 		c->flags |= (1 << NFT_CHAIN_ATTR_POLICY);
@@ -522,8 +527,11 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 		c->use = ntohl(mnl_attr_get_u32(tb[NFTA_CHAIN_USE]));
 		c->flags |= (1 << NFT_CHAIN_ATTR_USE);
 	}
-	if (tb[NFTA_CHAIN_COUNTERS])
+	if (tb[NFTA_CHAIN_COUNTERS]) {
 		ret = nft_chain_parse_counters(tb[NFTA_CHAIN_COUNTERS], c);
+		if (ret < 0)
+			return ret;
+	}
 	if (tb[NFTA_CHAIN_HANDLE]) {
 		c->handle = be64toh(mnl_attr_get_u64(tb[NFTA_CHAIN_HANDLE]));
 		c->flags |= (1 << NFT_CHAIN_ATTR_HANDLE);
