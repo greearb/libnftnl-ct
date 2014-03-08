@@ -12,7 +12,6 @@ check_PROGRAMS = nft-table-add		\
 		 nft-chain-del		\
 		 nft-chain-get		\
 		 nft-rule-add		\
-		 nft-rule-insert	\
 		 nft-rule-xml-add	\
 		 nft-rule-json-add	\
 		 nft-rule-del		\

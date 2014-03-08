@@ -80,11 +80,12 @@ static void add_counter(struct nft_rule *r)
 }
 
 static struct nft_rule *setup_rule(uint8_t family, const char *table,
-				   const char *chain)
+				   const char *chain, const char *handle)
 {
 	struct nft_rule *r = NULL;
 	uint8_t proto;
 	uint16_t dport;
+	uint64_t handle_num;
 
 	r = nft_rule_alloc();
 	if (r == NULL) {
@@ -95,6 +96,11 @@ static struct nft_rule *setup_rule(uint8_t family, const char *table,
 	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, table);
 	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, chain);
 	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, family);
+
+	if (handle != NULL) {
+		handle_num = atoll(handle);
+		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_POSITION, handle_num);
+	}
 
 	proto = IPPROTO_TCP;
 	add_payload(r, NFT_PAYLOAD_NETWORK_HEADER, NFT_REG_1,
@@ -138,7 +144,7 @@ int main(int argc, char *argv[])
 	uint32_t seq = time(NULL);
 	int ret;
 
-	if (argc != 4) {
+	if (argc < 4 || argc > 5) {
 		fprintf(stderr, "Usage: %s <family> <table> <chain>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -152,7 +158,10 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	r = setup_rule(family, argv[2], argv[3]);
+	if (argc != 5)
+		r = setup_rule(family, argv[2], argv[3], NULL);
+	else
+		r = setup_rule(family, argv[2], argv[3], argv[4]);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
