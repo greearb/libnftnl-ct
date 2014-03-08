@@ -81,10 +81,6 @@ int main(int argc, char *argv[])
 	if (argc == 5)
 		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_HANDLE, atoi(argv[4]));
 
-	char tmp[1024];
-	nft_rule_snprintf(tmp, sizeof(tmp), r, 0, 0);
-	printf("%s\n", tmp);
-
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
 	nft_mnl_batch_put(mnl_nlmsg_batch_current(batch),
