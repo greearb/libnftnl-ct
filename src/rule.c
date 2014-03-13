@@ -775,11 +775,31 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 	int ret, len = size, offset = 0;
 	struct nft_rule_expr *expr;
 
-	ret = snprintf(buf, len, "{\"rule\":{\"family\":\"%s\",\"table\":\"%s\","
-				 "\"chain\":\"%s\",\"handle\":%llu,",
-		       nft_family2str(r->family), r->table, r->chain,
-		       (unsigned long long)r->handle);
+	ret = snprintf(buf, len, "{\"rule\":{");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (r->flags & (1 << NFT_RULE_ATTR_FAMILY)) {
+		ret = snprintf(buf+offset, len, "\"family\":\"%s\",",
+			       nft_family2str(r->family));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->flags & (1 << NFT_RULE_ATTR_TABLE)) {
+		ret = snprintf(buf+offset, len, "\"table\":\"%s\",",
+			       r->table);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->flags & (1 << NFT_RULE_ATTR_CHAIN)) {
+		ret = snprintf(buf+offset, len, "\"chain\":\"%s\",",
+			       r->chain);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (r->flags & (1 << NFT_RULE_ATTR_HANDLE)) {
+		ret = snprintf(buf+offset, len, "\"handle\":%llu,",
+			       (unsigned long long)r->handle);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	if (r->flags & (1 << NFT_RULE_ATTR_COMPAT_PROTO) ||
 	    r->flags & (1 << NFT_RULE_ATTR_COMPAT_FLAGS)) {
@@ -824,12 +844,31 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 	int ret, len = size, offset = 0;
 	struct nft_rule_expr *expr;
 
-	ret = snprintf(buf, len, "<rule><family>%s</family>"
-		       "<table>%s</table><chain>%s</chain>"
-		       "<handle>%llu</handle>",
-		       nft_family2str(r->family), r->table, r->chain,
-		       (unsigned long long)r->handle);
+	ret = snprintf(buf, len, "<rule>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (r->flags & (1 << NFT_RULE_ATTR_FAMILY)) {
+		ret = snprintf(buf+offset, len, "<family>%s</family>",
+			       nft_family2str(r->family));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->flags & (1 << NFT_RULE_ATTR_TABLE)) {
+		ret = snprintf(buf+offset, len, "<table>%s</table>",
+			       r->table);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->flags & (1 << NFT_RULE_ATTR_CHAIN)) {
+		ret = snprintf(buf+offset, len, "<chain>%s</chain>",
+			       r->chain);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (r->flags & (1 << NFT_RULE_ATTR_HANDLE)) {
+		ret = snprintf(buf+offset, len, "<handle>%llu</handle>",
+			       (unsigned long long)r->handle);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	if (r->compat.flags != 0 || r->compat.proto != 0) {
 		ret = snprintf(buf+offset, len,
@@ -865,15 +904,42 @@ static int nft_rule_snprintf_xml(char *buf, size_t size, struct nft_rule *r,
 	return offset;
 }
 
-static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r, 
+static int nft_rule_snprintf_default(char *buf, size_t size, struct nft_rule *r,
 				     uint32_t type, uint32_t flags)
 {
 	struct nft_rule_expr *expr;
 	int ret, len = size, offset = 0, i;
 
-	ret = snprintf(buf, len, "%s %s %s %"PRIu64" %"PRIu64"\n",
-			nft_family2str(r->family), r->table, r->chain,
-			r->handle, r->position);
+	if (r->flags & (1 << NFT_RULE_ATTR_FAMILY)) {
+		ret = snprintf(buf+offset, len, "%s ",
+			       nft_family2str(r->family));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->flags & (1 << NFT_RULE_ATTR_TABLE)) {
+		ret = snprintf(buf+offset, len, "%s ",
+			       r->table);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->flags & (1 << NFT_RULE_ATTR_CHAIN)) {
+		ret = snprintf(buf+offset, len, "%s ",
+			       r->chain);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (r->flags & (1 << NFT_RULE_ATTR_HANDLE)) {
+		ret = snprintf(buf+offset, len, "%llu ",
+			       (unsigned long long)r->handle);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (r->flags & (1 << NFT_RULE_ATTR_POSITION)) {
+		ret = snprintf(buf+offset, len, "%llu ",
+			       (unsigned long long)r->position);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf+offset, len, "\n");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(expr, &r->expr_list, head) {
