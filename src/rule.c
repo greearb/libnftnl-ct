@@ -540,28 +540,36 @@ int nft_jansson_parse_rule(struct nft_rule *r, json_t *tree,
 	if (root == NULL)
 		return -1;
 
-	if (nft_jansson_parse_family(root, &family, err) != 0)
-		goto err;
+	if (nft_jansson_node_exist(root, "family")) {
+		if (nft_jansson_parse_family(root, &family, err) != 0)
+			goto err;
 
-	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, family);
+		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, family);
+	}
 
-	str = nft_jansson_parse_str(root, "table", err);
-	if (str == NULL)
-		goto err;
+	if (nft_jansson_node_exist(root, "table")) {
+		str = nft_jansson_parse_str(root, "table", err);
+		if (str == NULL)
+			goto err;
 
-	nft_rule_attr_set_str(r, NFT_RULE_ATTR_TABLE, str);
+		nft_rule_attr_set_str(r, NFT_RULE_ATTR_TABLE, str);
+	}
 
-	str = nft_jansson_parse_str(root, "chain", err);
-	if (str == NULL)
-		goto err;
+	if (nft_jansson_node_exist(root, "chain")) {
+		str = nft_jansson_parse_str(root, "chain", err);
+		if (str == NULL)
+			goto err;
 
-	nft_rule_attr_set_str(r, NFT_RULE_ATTR_CHAIN, str);
+		nft_rule_attr_set_str(r, NFT_RULE_ATTR_CHAIN, str);
+	}
 
-	if (nft_jansson_parse_val(root, "handle", NFT_TYPE_U64, &uval64,
-				  err) < 0)
-		goto err;
+	if (nft_jansson_node_exist(root, "handle")) {
+		if (nft_jansson_parse_val(root, "handle", NFT_TYPE_U64, &uval64,
+					  err) < 0)
+			goto err;
 
-	nft_rule_attr_set_u64(r, NFT_RULE_ATTR_HANDLE, uval64);
+		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_HANDLE, uval64);
+	}
 
 	if (nft_jansson_node_exist(root, "compat_proto") ||
 	    nft_jansson_node_exist(root, "compat_flags")) {
@@ -640,39 +648,22 @@ int nft_mxml_rule_parse(mxml_node_t *tree, struct nft_rule *r,
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFT_XML_MAND, err);
-	if (family < 0)
-		return -1;
-
-	r->family = family;
-	r->flags |= (1 << NFT_RULE_ATTR_FAMILY);
+	if (family >= 0)
+		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, family);
 
 	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
 				   NFT_XML_MAND, err);
-	if (table == NULL)
-		return -1;
-
-	if (r->table)
-		xfree(r->table);
-
-	r->table = strdup(table);
-	r->flags |= (1 << NFT_RULE_ATTR_TABLE);
+	if (table != NULL)
+		nft_rule_attr_set_str(r, NFT_RULE_ATTR_TABLE, table);
 
 	chain = nft_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST,
 				   NFT_XML_MAND, err);
-	if (chain == NULL)
-		return -1;
-
-	if (r->chain)
-		xfree(r->chain);
-
-	r->chain = strdup(chain);
-	r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
+	if (chain != NULL)
+		nft_rule_attr_set_str(r, NFT_RULE_ATTR_CHAIN, chain);
 
 	if (nft_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
-			       &r->handle, NFT_TYPE_U64, NFT_XML_MAND, err) != 0)
-		return -1;
-
-	r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
+			      &r->handle, NFT_TYPE_U64, NFT_XML_MAND, err) >= 0)
+		r->flags |= (1 << NFT_RULE_ATTR_HANDLE);
 
 	if (nft_mxml_num_parse(tree, "compat_proto", MXML_DESCEND_FIRST,
 			       BASE_DEC, &r->compat.proto, NFT_TYPE_U32,
@@ -687,7 +678,6 @@ int nft_mxml_rule_parse(mxml_node_t *tree, struct nft_rule *r,
 	if (nft_rule_attr_is_set(r, NFT_RULE_ATTR_COMPAT_PROTO) !=
 			nft_rule_attr_is_set(r, NFT_RULE_ATTR_COMPAT_FLAGS)) {
 		errno = EINVAL;
-		return -1;
 	}
 
 	if (nft_mxml_num_parse(tree, "position", MXML_DESCEND_FIRST,
