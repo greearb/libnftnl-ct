@@ -105,8 +105,6 @@ bool nft_set_elem_attr_is_set(const struct nft_set_elem *s, uint16_t attr);
 void nft_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s);
 void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set_elem *e);
 
-int nft_set_elem_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set_elem *s);
-
 int nft_set_elem_parse(struct nft_set_elem *e, enum nft_parse_type type,
 		       const char *data, struct nft_parse_err *err);
 int nft_set_elem_parse_file(struct nft_set_elem *e, enum nft_parse_type type,

@@ -161,7 +161,6 @@ global:
   nft_set_elem_attr_get_str;
   nft_set_elem_attr_get_u32;
   nft_set_elem_nlmsg_build_payload;
-  nft_set_elem_nlmsg_parse;
   nft_set_elem_parse;
   nft_set_elem_parse_file;
   nft_set_elem_snprintf;

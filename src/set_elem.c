@@ -291,7 +291,6 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 
 	return ret;
 }
-EXPORT_SYMBOL(nft_set_elem_nlmsg_parse);
 
 static int
 nft_set_elem_list_parse_attr_cb(const struct nlattr *attr, void *data)
