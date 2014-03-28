@@ -63,9 +63,6 @@ nft_chain_get_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 nft_rule_add_SOURCES = nft-rule-add.c
 nft_rule_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
-nft_rule_insert_SOURCES = nft-rule-insert.c
-nft_rule_insert_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS} ${LIBXML_LIBS}
-
 nft_rule_xml_add_SOURCES = nft-rule-xml-add.c
 nft_rule_xml_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
