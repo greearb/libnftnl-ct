@@ -21,6 +21,7 @@
 #include <libnftnl/table.h>
 #include <libnftnl/chain.h>
 #include <libnftnl/rule.h>
+#include <libnftnl/set.h>
 
 static int table_cb(const struct nlmsghdr *nlh, int type)
 {
@@ -97,6 +98,57 @@ err:
 	return MNL_CB_OK;
 }
 
+static int set_cb(const struct nlmsghdr *nlh, int type)
+{
+	struct nft_set *t;
+	char buf[4096];
+
+	t = nft_set_alloc();
+	if (t == NULL) {
+		perror("OOM");
+		goto err;
+	}
+
+	if (nft_set_nlmsg_parse(nlh, t) < 0) {
+		perror("nft_set_nlmsg_parse");
+		goto err_free;
+	}
+
+	nft_set_snprintf(buf, sizeof(buf), t, NFT_OUTPUT_DEFAULT, 0);
+	printf("[%s]\t%s\n", type == NFT_MSG_NEWSET ? "NEW" : "DEL", buf);
+
+err_free:
+	nft_set_free(t);
+err:
+	return MNL_CB_OK;
+}
+
+static int setelem_cb(const struct nlmsghdr *nlh, int type)
+{
+
+	struct nft_set *s;
+	char buf[4096];
+
+	s = nft_set_alloc();
+	if (s == NULL) {
+		perror("OOM");
+		goto err;
+	}
+
+	if (nft_set_elems_nlmsg_parse(nlh, s) < 0) {
+		perror("nft_set_nlmsg_parse");
+		goto err_free;
+	}
+
+	nft_set_snprintf(buf, sizeof(buf), s, NFT_OUTPUT_DEFAULT, 0);
+	printf("[%s]\t%s\n", type == NFT_MSG_NEWSETELEM ? "NEW" : "DEL", buf);
+
+err_free:
+	nft_set_free(s);
+err:
+	return MNL_CB_OK;
+}
+
 static int events_cb(const struct nlmsghdr *nlh, void *data)
 {
 	int ret = MNL_CB_OK;
@@ -114,6 +166,14 @@ static int events_cb(const struct nlmsghdr *nlh, void *data)
 	case NFT_MSG_NEWRULE:
 	case NFT_MSG_DELRULE:
 		ret = rule_cb(nlh, type);
+		break;
+	case NFT_MSG_NEWSET:
+	case NFT_MSG_DELSET:
+		ret = set_cb(nlh, type);
+		break;
+	case NFT_MSG_NEWSETELEM:
+	case NFT_MSG_DELSETELEM:
+		ret = setelem_cb(nlh, type);
 		break;
 	}
 
