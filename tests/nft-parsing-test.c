@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <limits.h>
 #include <errno.h>
+#include <getopt.h>
 
 #include <libmnl/libmnl.h> /*nlmsghdr*/
 #include <libnftnl/ruleset.h>
@@ -161,7 +162,7 @@ failparsing:
 	return -1;
 }
 
-int main(int argc, char *argv[])
+static int execute_test(const char *dir_name)
 {
 	DIR *d;
 	struct dirent *dent;
@@ -169,12 +170,7 @@ int main(int argc, char *argv[])
 	int ret = 0, exit_code = 0;
 	struct nft_parse_err *err;
 
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <directory>\n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
-
-	d = opendir(argv[1]);
+	d = opendir(dir_name);
 	if (d == NULL) {
 		perror("opendir");
 		exit(EXIT_FAILURE);
@@ -193,7 +189,7 @@ int main(int argc, char *argv[])
 		    strcmp(dent->d_name, "..") == 0)
 			continue;
 
-		snprintf(path, sizeof(path), "%s/%s", argv[1], dent->d_name);
+		snprintf(path, sizeof(path), "%s/%s", dir_name, dent->d_name);
 
 		if (strcmp(&dent->d_name[len-4], ".xml") == 0) {
 			if ((ret = test_xml(path, err)) == 0) {
@@ -218,4 +214,49 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 
 	return 0;
+}
+
+static void show_help(const char *name)
+{
+	printf(
+"Usage: %s [option]\n"
+"\n"
+"Options:\n"
+"  -d/--dir <directory>		Check test files from <directory>.\n"
+"\n",
+	       name);
+}
+
+int main(int argc, char *argv[])
+{
+	int val;
+	int ret = 0;
+	int option_index = 0;
+	static struct option long_options[] = {
+		{ "dir", required_argument, 0, 'd' },
+		{ 0 }
+	};
+
+	if (argc != 3) {
+		show_help(argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	while (1) {
+		val = getopt_long(argc, argv, "d:", long_options,
+				  &option_index);
+
+		if (val == -1)
+			break;
+
+		switch (val) {
+		case 'd':
+			ret = execute_test(optarg);
+			break;
+		default:
+			show_help(argv[0]);
+			break;
+		}
+	}
+	return ret;
 }
