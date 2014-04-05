@@ -358,6 +358,9 @@ int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
         if (tb[NFTA_SET_ELEM_LIST_ELEMENTS])
 	 	ret = nft_set_elems_parse(s, tb[NFTA_SET_ELEM_LIST_ELEMENTS]);
 
+	s->family = nfg->nfgen_family;
+	s->flags |= (1 << NFT_SET_ATTR_FAMILY);
+
 	return ret;
 }
 EXPORT_SYMBOL(nft_set_elems_nlmsg_parse);
