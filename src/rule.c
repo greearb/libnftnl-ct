@@ -133,7 +133,7 @@ void nft_rule_attr_set_data(struct nft_rule *r, uint16_t attr,
 	if (attr > NFT_RULE_ATTR_MAX)
 		return;
 
-	nft_assert_validate(nft_rule_attr_validate, attr, data_len);
+	nft_assert_validate(data, nft_rule_attr_validate, attr, data_len);
 
 	switch(attr) {
 	case NFT_RULE_ATTR_TABLE:
@@ -248,7 +248,7 @@ uint32_t nft_rule_attr_get_u32(const struct nft_rule *r, uint16_t attr)
 	uint32_t data_len;
 	const uint32_t *val = nft_rule_attr_get_data(r, attr, &data_len);
 
-	nft_assert(attr, data_len == sizeof(uint32_t));
+	nft_assert(val, attr, data_len == sizeof(uint32_t));
 
 	return val ? *val : 0;
 }
@@ -259,7 +259,7 @@ uint64_t nft_rule_attr_get_u64(const struct nft_rule *r, uint16_t attr)
 	uint32_t data_len;
 	const uint64_t *val = nft_rule_attr_get_data(r, attr, &data_len);
 
-	nft_assert(attr, data_len == sizeof(uint64_t));
+	nft_assert(val, attr, data_len == sizeof(uint64_t));
 
 	return val ? *val : 0;
 }
@@ -270,7 +270,7 @@ uint8_t nft_rule_attr_get_u8(const struct nft_rule *r, uint16_t attr)
 	uint32_t data_len;
 	const uint8_t *val = nft_rule_attr_get_data(r, attr, &data_len);
 
-	nft_assert(attr, data_len == sizeof(uint8_t));
+	nft_assert(val, attr, data_len == sizeof(uint8_t));
 
 	return val ? *val : 0;
 }

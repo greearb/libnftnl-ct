@@ -90,7 +90,7 @@ void nft_table_attr_set_data(struct nft_table *t, uint16_t attr,
 	if (attr > NFT_TABLE_ATTR_MAX)
 		return;
 
-	nft_assert_validate(nft_table_attr_validate, attr, data_len);
+	nft_assert_validate(data, nft_table_attr_validate, attr, data_len);
 
 	switch (attr) {
 	case NFT_TABLE_ATTR_NAME:

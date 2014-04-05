@@ -156,7 +156,7 @@ void nft_chain_attr_set_data(struct nft_chain *c, uint16_t attr,
 	if (attr > NFT_CHAIN_ATTR_MAX)
 		return;
 
-	nft_assert_validate(nft_chain_attr_validate, attr, data_len);
+	nft_assert_validate(data, nft_chain_attr_validate, attr, data_len);
 
 	switch(attr) {
 	case NFT_CHAIN_ATTR_NAME:
@@ -300,7 +300,7 @@ uint32_t nft_chain_attr_get_u32(struct nft_chain *c, uint16_t attr)
 	uint32_t data_len;
 	const uint32_t *val = nft_chain_attr_get_data(c, attr, &data_len);
 
-	nft_assert(attr, data_len == sizeof(uint32_t));
+	nft_assert(val, attr, data_len == sizeof(uint32_t));
 
 	return val ? *val : 0;
 }
@@ -311,7 +311,7 @@ int32_t nft_chain_attr_get_s32(struct nft_chain *c, uint16_t attr)
 	uint32_t data_len;
 	const int32_t *val = nft_chain_attr_get_data(c, attr, &data_len);
 
-	nft_assert(attr, data_len == sizeof(int32_t));
+	nft_assert(val, attr, data_len == sizeof(int32_t));
 
 	return val ? *val : 0;
 }
@@ -322,7 +322,7 @@ uint64_t nft_chain_attr_get_u64(struct nft_chain *c, uint16_t attr)
 	uint32_t data_len;
 	const uint64_t *val = nft_chain_attr_get_data(c, attr, &data_len);
 
-	nft_assert(attr, data_len == sizeof(int64_t));
+	nft_assert(val, attr, data_len == sizeof(int64_t));
 
 	return val ? *val : 0;
 }
@@ -333,7 +333,7 @@ uint8_t nft_chain_attr_get_u8(struct nft_chain *c, uint16_t attr)
 	uint32_t data_len;
 	const uint8_t *val = nft_chain_attr_get_data(c, attr, &data_len);
 
-	nft_assert(attr, data_len == sizeof(int8_t));
+	nft_assert(val, attr, data_len == sizeof(int8_t));
 
 	return val ? *val : 0;
 }

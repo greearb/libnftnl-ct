@@ -111,7 +111,7 @@ void nft_set_attr_set_data(struct nft_set *s, uint16_t attr, const void *data,
 	if (attr > NFT_SET_ATTR_MAX)
 		return;
 
-	nft_assert_validate(nft_set_attr_validate, attr, data_len);
+	nft_assert_validate(data, nft_set_attr_validate, attr, data_len);
 
 	switch(attr) {
 	case NFT_SET_ATTR_TABLE:
@@ -219,7 +219,7 @@ uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr)
 	uint32_t data_len;
 	const uint32_t *val = nft_set_attr_get_data(s, attr, &data_len);
 
-	nft_assert(attr, data_len == sizeof(uint32_t));
+	nft_assert(val, attr, data_len == sizeof(uint32_t));
 
 	return val ? *val : 0;
 }
