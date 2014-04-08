@@ -31,6 +31,7 @@ struct nft_expr_lookup {
 	enum nft_registers	sreg;
 	enum nft_registers	dreg;
 	char			set_name[IFNAMSIZ];
+	uint32_t		set_id;
 };
 
 static int
@@ -49,6 +50,9 @@ nft_rule_expr_lookup_set(struct nft_rule_expr *e, uint16_t type,
 	case NFT_EXPR_LOOKUP_SET:
 		snprintf(lookup->set_name, sizeof(lookup->set_name), "%s",
 			 (const char *)data);
+		break;
+	case NFT_EXPR_LOOKUP_SET_ID:
+		lookup->set_id = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -71,6 +75,8 @@ nft_rule_expr_lookup_get(const struct nft_rule_expr *e, uint16_t type,
 		return &lookup->dreg;
 	case NFT_EXPR_LOOKUP_SET:
 		return lookup->set_name;
+	case NFT_EXPR_LOOKUP_SET_ID:
+		return &lookup->set_id;
 	}
 	return NULL;
 }
@@ -86,6 +92,7 @@ static int nft_rule_expr_lookup_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_LOOKUP_SREG:
 	case NFTA_LOOKUP_DREG:
+	case NFTA_LOOKUP_SET_ID:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
@@ -114,6 +121,10 @@ nft_rule_expr_lookup_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_LOOKUP_DREG, htonl(lookup->dreg));
 	if (e->flags & (1 << NFT_EXPR_LOOKUP_SET))
 		mnl_attr_put_strz(nlh, NFTA_LOOKUP_SET, lookup->set_name);
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_SET_ID)) {
+		mnl_attr_put_u32(nlh, NFTA_LOOKUP_SET_ID,
+				 htonl(lookup->set_id));
+	}
 }
 
 static int
@@ -137,6 +148,11 @@ nft_rule_expr_lookup_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	if (tb[NFTA_LOOKUP_SET]) {
 		strcpy(lookup->set_name, mnl_attr_get_str(tb[NFTA_LOOKUP_SET]));
 		e->flags |= (1 << NFT_EXPR_LOOKUP_SET);
+	}
+	if (tb[NFTA_LOOKUP_SET_ID]) {
+		lookup->set_id =
+			ntohl(mnl_attr_get_u32(tb[NFTA_LOOKUP_SET_ID]));
+		e->flags |= (1 << NFT_EXPR_LOOKUP_SET_ID);
 	}
 
 	return ret;

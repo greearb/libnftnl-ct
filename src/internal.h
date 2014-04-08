@@ -167,6 +167,7 @@ struct nft_set {
 	uint32_t		key_len;
 	uint32_t		data_type;
 	uint32_t		data_len;
+	uint32_t		id;
 	struct list_head	element_list;
 
 	uint32_t		flags;

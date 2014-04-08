@@ -87,6 +87,7 @@ void nft_set_attr_unset(struct nft_set *s, uint16_t attr)
 	case NFT_SET_ATTR_DATA_TYPE:
 	case NFT_SET_ATTR_DATA_LEN:
 	case NFT_SET_ATTR_FAMILY:
+	case NFT_SET_ATTR_ID:
 		break;
 	default:
 		return;
@@ -144,6 +145,9 @@ void nft_set_attr_set_data(struct nft_set *s, uint16_t attr, const void *data,
 	case NFT_SET_ATTR_FAMILY:
 		s->family = *((uint32_t *)data);
 		break;
+	case NFT_SET_ATTR_ID:
+		s->id = *((uint32_t *)data);
+		break;
 	}
 	s->flags |= (1 << attr);
 }
@@ -196,6 +200,9 @@ const void *nft_set_attr_get_data(struct nft_set *s, uint16_t attr,
 	case NFT_SET_ATTR_FAMILY:
 		*data_len = sizeof(uint32_t);
 		return &s->family;
+	case NFT_SET_ATTR_ID:
+		*data_len = sizeof(uint32_t);
+		return &s->id;
 	}
 	return NULL;
 }
@@ -242,6 +249,8 @@ void nft_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s)
 		mnl_attr_put_u32(nlh, NFTA_SET_DATA_TYPE, htonl(s->data_type));
 	if (s->flags & (1 << NFT_SET_ATTR_DATA_LEN))
 		mnl_attr_put_u32(nlh, NFTA_SET_DATA_LEN, htonl(s->data_len));
+	if (s->flags & (1 << NFT_SET_ATTR_ID))
+		mnl_attr_put_u32(nlh, NFTA_SET_ID, htonl(s->id));
 }
 EXPORT_SYMBOL(nft_set_nlmsg_build_payload);
 
@@ -266,6 +275,7 @@ static int nft_set_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_SET_KEY_LEN:
 	case NFTA_SET_DATA_TYPE:
 	case NFTA_SET_DATA_LEN:
+	case NFTA_SET_ID:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
 			perror("mnl_attr_validate");
 			return MNL_CB_ERROR;
@@ -312,6 +322,10 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 	if (tb[NFTA_SET_DATA_LEN]) {
 		s->data_len = ntohl(mnl_attr_get_u32(tb[NFTA_SET_DATA_LEN]));
 		s->flags |= (1 << NFT_SET_ATTR_DATA_LEN);
+	}
+	if (tb[NFTA_SET_ID]) {
+		s->id = ntohl(mnl_attr_get_u32(tb[NFTA_SET_ID]));
+		s->flags |= (1 << NFT_SET_ATTR_ID);
 	}
 	s->family = nfg->nfgen_family;
 	s->flags |= (1 << NFT_SET_ATTR_FAMILY);

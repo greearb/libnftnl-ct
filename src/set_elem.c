@@ -205,6 +205,8 @@ void nft_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s)
 
 	if (s->flags & (1 << NFT_SET_ATTR_NAME))
 		mnl_attr_put_strz(nlh, NFTA_SET_ELEM_LIST_SET, s->name);
+	if (s->flags & (1 << NFT_SET_ATTR_ID))
+		mnl_attr_put_u32(nlh, NFTA_SET_ELEM_LIST_SET_ID, htonl(s->id));
 	if (s->flags & (1 << NFT_SET_ATTR_TABLE))
 		mnl_attr_put_strz(nlh, NFTA_SET_ELEM_LIST_TABLE, s->table);
 
@@ -360,6 +362,10 @@ int nft_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 		s->name =
 			strdup(mnl_attr_get_str(tb[NFTA_SET_ELEM_LIST_SET]));
 		s->flags |= (1 << NFT_SET_ATTR_NAME);
+	}
+	if (tb[NFTA_SET_ELEM_LIST_SET_ID]) {
+		s->id = ntohl(mnl_attr_get_u32(tb[NFTA_SET_ELEM_LIST_SET_ID]));
+		s->flags |= (1 << NFT_SET_ATTR_ID);
 	}
         if (tb[NFTA_SET_ELEM_LIST_ELEMENTS])
 	 	ret = nft_set_elems_parse(s, tb[NFTA_SET_ELEM_LIST_ELEMENTS]);
