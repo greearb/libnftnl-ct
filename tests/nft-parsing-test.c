@@ -240,6 +240,47 @@ static int execute_test(const char *dir_name)
 	return 0;
 }
 
+static int execute_test_file(const char *filename)
+{
+	char path[PATH_MAX];
+	int ret = 0;
+	struct nft_parse_err *err;
+
+	err = nft_parse_err_alloc();
+	if (err == NULL) {
+		perror("error");
+		exit(EXIT_FAILURE);
+	}
+
+	snprintf(path, sizeof(path), "%s", filename);
+
+	int len = strlen(filename);
+	if (strcmp(&filename[len-4], ".xml") == 0) {
+		if ((ret = test_xml(path, err)) == 0) {
+			if (!update) {
+				printf("parsing and validating %s: ",
+				       path);
+				printf("\033[32mOK\e[0m\n");
+			}
+		}
+		exit(EXIT_FAILURE);
+	}
+	if (strcmp(&filename[len-5], ".json") == 0) {
+		if ((ret = test_json(path, err)) == 0) {
+			if (!update) {
+				printf("parsing and validating %s: ",
+				       path);
+				printf("\033[32mOK\e[0m\n");
+			}
+		}
+		exit(EXIT_FAILURE);
+	}
+
+	nft_parse_err_free(err);
+
+	return 0;
+}
+
 static void show_help(const char *name)
 {
 	printf(
@@ -248,6 +289,7 @@ static void show_help(const char *name)
 "Options:\n"
 "  -d/--dir <directory>		Check test files from <directory>.\n"
 "  -u/--update <directory>	Update test files from <directory>.\n"
+"  -f/--file <file>		Check test file <file>\n"
 "\n",
 	       name);
 }
@@ -260,6 +302,7 @@ int main(int argc, char *argv[])
 	static struct option long_options[] = {
 		{ "dir", required_argument, 0, 'd' },
 		{ "update", required_argument, 0, 'u' },
+		{ "file", required_argument, 0, 'f' },
 		{ 0 }
 	};
 
@@ -269,7 +312,7 @@ int main(int argc, char *argv[])
 	}
 
 	while (1) {
-		val = getopt_long(argc, argv, "d:u:", long_options,
+		val = getopt_long(argc, argv, "d:u:f:", long_options,
 				  &option_index);
 
 		if (val == -1)
@@ -282,6 +325,9 @@ int main(int argc, char *argv[])
 		case 'u':
 			update = true;
 			ret = execute_test(optarg);
+			break;
+		case 'f':
+			ret = execute_test_file(optarg);
 			break;
 		default:
 			show_help(argv[0]);
