@@ -18,6 +18,8 @@ enum {
 	TEST_JSON_RULESET,
 };
 
+static bool update = false;
+
 static void print_detail_error(char *a, char *b)
 {
 	int i;
@@ -80,8 +82,24 @@ static int compare_test(uint32_t type, struct nft_ruleset *rs,
 	rewind(fp);
 	fgets(orig, sizeof(orig), fp);
 
-	if (strncmp(orig, out, strlen(out)) == 0)
+	if (strncmp(orig, out, strlen(out)) == 0) {
+		if (update)
+			printf("%s: No changes to update\n", filename);
 		return 0;
+	}
+	if (update) {
+		FILE *fout;
+		printf("%s: Updating test file\n", filename);
+		fout = fopen(filename, "w");
+		if (fout == NULL) {
+			printf("unable to open file %s: %s\n", filename,
+			strerror(errno));
+			return -1;
+		}
+		fprintf(fout, "%s\n", out);
+		fclose(fout);
+		return 0;
+	}
 
 	printf("validating %s: ", filename);
 	printf("\033[31mFAILED\e[0m\n");
@@ -193,15 +211,21 @@ static int execute_test(const char *dir_name)
 
 		if (strcmp(&dent->d_name[len-4], ".xml") == 0) {
 			if ((ret = test_xml(path, err)) == 0) {
-				printf("parsing and validating %s: ", path);
-				printf("\033[32mOK\e[0m\n");
+				if (!update) {
+					printf("parsing and validating %s: ",
+					       path);
+					printf("\033[32mOK\e[0m\n");
+				}
 			}
 			exit_code += ret;
 		}
 		if (strcmp(&dent->d_name[len-5], ".json") == 0) {
 			if ((ret = test_json(path, err)) == 0) {
-				printf("parsing and validating %s: ", path);
-				printf("\033[32mOK\e[0m\n");
+				if (!update) {
+					printf("parsing and validating %s: ",
+					       path);
+					printf("\033[32mOK\e[0m\n");
+				}
 			}
 			exit_code += ret;
 		}
@@ -223,6 +247,7 @@ static void show_help(const char *name)
 "\n"
 "Options:\n"
 "  -d/--dir <directory>		Check test files from <directory>.\n"
+"  -u/--update <directory>	Update test files from <directory>.\n"
 "\n",
 	       name);
 }
@@ -234,6 +259,7 @@ int main(int argc, char *argv[])
 	int option_index = 0;
 	static struct option long_options[] = {
 		{ "dir", required_argument, 0, 'd' },
+		{ "update", required_argument, 0, 'u' },
 		{ 0 }
 	};
 
@@ -243,7 +269,7 @@ int main(int argc, char *argv[])
 	}
 
 	while (1) {
-		val = getopt_long(argc, argv, "d:", long_options,
+		val = getopt_long(argc, argv, "d:u:", long_options,
 				  &option_index);
 
 		if (val == -1)
@@ -251,6 +277,10 @@ int main(int argc, char *argv[])
 
 		switch (val) {
 		case 'd':
+			ret = execute_test(optarg);
+			break;
+		case 'u':
+			update = true;
 			ret = execute_test(optarg);
 			break;
 		default:
