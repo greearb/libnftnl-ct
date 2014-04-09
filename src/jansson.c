@@ -215,13 +215,10 @@ int nft_jansson_data_reg_parse(json_t *root, const char *node_name,
 	json_t *data;
 	int ret;
 
+	 /* It is necessary for the compatibility with cmpdata label. */
 	data = json_object_get(root, node_name);
-	if (data == NULL) {
-		err->error = NFT_PARSE_EMISSINGNODE;
-		err->node_name = node_name;
-		errno = EINVAL;
-		return -1;
-	}
+	if (data == NULL)
+		data = root;
 
 	data = json_object_get(data, "data_reg");
 	if (data == NULL) {

@@ -140,15 +140,10 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 
 	node = mxmlFindElement(tree, tree, node_name, NULL, NULL,
 			       MXML_DESCEND_FIRST);
-	if (node == NULL || node->child == NULL) {
-		if (!(flags & NFT_XML_OPT)) {
-			err->error = NFT_PARSE_EMISSINGNODE;
-			err->node_name = node_name;
-			errno = EINVAL;
-		}
 
-		return DATA_NONE;
-	}
+	/* It is necessary for the compatibility with cmpdata label. */
+	if (node == NULL || node->child == NULL)
+		node = tree;
 
 	return nft_data_reg_xml_parse(data_reg, node, err);
 }
