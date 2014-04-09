@@ -263,8 +263,7 @@ nft_rule_expr_immediate_snprintf_json(char *buf, size_t len,
 	int size = len, offset = 0, ret;
 	struct nft_expr_immediate *imm = nft_expr_data(e);
 
-	ret = snprintf(buf, len, "\"dreg\":%u,"
-				 "\"immediatedata\":{", imm->dreg);
+	ret = snprintf(buf, len, "\"dreg\":%u,", imm->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 
@@ -284,9 +283,6 @@ nft_rule_expr_immediate_snprintf_json(char *buf, size_t len,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, len, "}");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
 	return offset;
 }
 
@@ -297,8 +293,7 @@ nft_rule_expr_immediate_snprintf_xml(char *buf, size_t len,
 	int size = len, offset = 0, ret;
 	struct nft_expr_immediate *imm = nft_expr_data(e);
 
-	ret = snprintf(buf, len, "<dreg>%u</dreg>"
-				"<immediatedata>", imm->dreg);
+	ret = snprintf(buf, len, "<dreg>%u</dreg>", imm->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 
@@ -317,9 +312,6 @@ nft_rule_expr_immediate_snprintf_xml(char *buf, size_t len,
 					    NFT_OUTPUT_XML, flags, DATA_CHAIN);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
-	ret = snprintf(buf+offset, len, "</immediatedata>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }
