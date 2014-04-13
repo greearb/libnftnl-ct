@@ -263,6 +263,7 @@ static int execute_test_file(const char *filename)
 				printf("\033[32mOK\e[0m\n");
 			}
 		}
+		nft_parse_err_free(err);
 		exit(EXIT_FAILURE);
 	}
 	if (strcmp(&filename[len-5], ".json") == 0) {
@@ -273,6 +274,7 @@ static int execute_test_file(const char *filename)
 				printf("\033[32mOK\e[0m\n");
 			}
 		}
+		nft_parse_err_free(err);
 		exit(EXIT_FAILURE);
 	}
 
