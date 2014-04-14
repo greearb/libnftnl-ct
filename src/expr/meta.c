@@ -23,7 +23,7 @@
 #include "expr_ops.h"
 
 #ifndef NFT_META_MAX
-#define NFT_META_MAX (NFT_META_L4PROTO + 1)
+#define NFT_META_MAX (NFT_META_BRI_OIFNAME + 1)
 #endif
 
 struct nft_expr_meta {
@@ -153,6 +153,8 @@ static const char *meta_key2str_array[NFT_META_MAX] = {
 	[NFT_META_NFTRACE]	= "nftrace",
 	[NFT_META_RTCLASSID]	= "rtclassid",
 	[NFT_META_SECMARK]	= "secmark",
+	[NFT_META_BRI_IIFNAME]	= "bri_iifname",
+	[NFT_META_BRI_OIFNAME]	= "bri_oifname",
 };
 
 static const char *meta_key2str(uint8_t key)
