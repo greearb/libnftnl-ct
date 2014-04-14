@@ -42,8 +42,8 @@ nft_rule_expr_match_set(struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_MT_NAME:
-		memcpy(mt->name, data, XT_EXTENSION_MAXNAMELEN);
-		mt->name[XT_EXTENSION_MAXNAMELEN-1] = '\0';
+		snprintf(mt->name, sizeof(mt->name), "%.*s", data_len,
+			 (const char *)data);
 		break;
 	case NFT_EXPR_MT_REV:
 		mt->rev = *((uint32_t *)data);

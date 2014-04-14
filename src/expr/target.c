@@ -42,8 +42,8 @@ nft_rule_expr_target_set(struct nft_rule_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFT_EXPR_TG_NAME:
-		memcpy(tg->name, data, XT_EXTENSION_MAXNAMELEN);
-		tg->name[XT_EXTENSION_MAXNAMELEN-1] = '\0';
+		snprintf(tg->name, sizeof(tg->name), "%.*s", data_len,
+			 (const char *) data);
 		break;
 	case NFT_EXPR_TG_REV:
 		tg->rev = *((uint32_t *)data);
