@@ -47,8 +47,8 @@ nft_rule_expr_lookup_set(struct nft_rule_expr *e, uint16_t type,
 		lookup->dreg = *((uint32_t *)data);
 		break;
 	case NFT_EXPR_LOOKUP_SET:
-		memcpy(lookup->set_name, data, IFNAMSIZ);
-		lookup->set_name[IFNAMSIZ-1] = '\0';
+		snprintf(lookup->set_name, sizeof(lookup->set_name), "%s",
+			 (const char *)data);
 		break;
 	default:
 		return -1;
