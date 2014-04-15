@@ -42,6 +42,12 @@ EXPORT_SYMBOL(nft_set_elem_alloc);
 
 void nft_set_elem_free(struct nft_set_elem *s)
 {
+	if (s->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN)) {
+		if (s->data.chain) {
+			xfree(s->data.chain);
+			s->data.chain = NULL;
+		}
+	}
 	xfree(s);
 }
 EXPORT_SYMBOL(nft_set_elem_free);
