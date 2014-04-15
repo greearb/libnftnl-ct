@@ -66,3 +66,80 @@ int nft_parse_perror(const char *str, struct nft_parse_err *err)
 	}
 }
 EXPORT_SYMBOL(nft_parse_perror);
+
+int nft_event_header_snprintf(char *buf, size_t size, uint32_t type,
+			      uint32_t flags)
+{
+	int ret = 0;
+
+	switch (type) {
+	case NFT_OUTPUT_XML:
+		if (flags & NFT_OF_EVENT_NEW) {
+			ret = snprintf(buf, size, "<event><type>new</type>");
+		} else if (flags & NFT_OF_EVENT_DEL) {
+			ret = snprintf(buf, size,
+				       "<event><type>delete</type>");
+		} else {
+			ret = snprintf(buf, size,
+				       "<event><type>unknown</type>");
+		}
+		break;
+	case NFT_OUTPUT_JSON:
+		if (flags & NFT_OF_EVENT_NEW) {
+			ret = snprintf(buf, size, "{event:{type:\"new\",{\"");
+		} else if (flags & NFT_OF_EVENT_DEL) {
+			ret = snprintf(buf, size,
+				       "{event:{type:\"delete\",{\"");
+		} else {
+			ret = snprintf(buf, size,
+				       "{event:{type:\"unknown\",{\"");
+		}
+		break;
+	default:
+		if (flags & NFT_OF_EVENT_NEW) {
+			ret = snprintf(buf, size, "%9s", "[NEW] ");
+		} else if (flags & NFT_OF_EVENT_DEL) {
+			ret = snprintf(buf, size, "%9s", "[DELETE] ");
+		} else {
+			ret = snprintf(buf, size, "%9s", "[unknown] ");
+		}
+		break;
+	}
+	return ret;
+}
+
+int nft_event_header_fprintf(FILE *fp, uint32_t type, uint32_t flags)
+{
+	char buf[64]; /* enough for the maximum string length above */
+
+	nft_event_header_snprintf(buf, sizeof(buf), type, flags);
+	buf[sizeof(buf) - 1] = '\0';
+
+	return fprintf(fp, "%s", buf);
+}
+
+int nft_event_footer_snprintf(char *buf, size_t size, uint32_t type,
+			      uint32_t flags)
+{
+	if (!(flags & NFT_OF_EVENT_ANY))
+		return 0;
+
+	switch (type) {
+	case NFT_OUTPUT_XML:
+		return snprintf(buf, size, "</event>");
+	case NFT_OUTPUT_JSON:
+		return snprintf(buf, size, "}}}");
+	default:
+		return 0;
+	}
+}
+
+int nft_event_footer_fprintf(FILE *fp, uint32_t type, uint32_t flags)
+{
+	char buf[32]; /* enough for the maximum string length above */
+
+	nft_event_footer_snprintf(buf, sizeof(buf), type, flags);
+	buf[sizeof(buf) - 1] = '\0';
+
+	return fprintf(fp, "%s", buf);
+}

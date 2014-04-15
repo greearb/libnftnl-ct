@@ -704,17 +704,37 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 		     uint32_t type, uint32_t flags)
 {
+	int ret, len = size, offset = 0;
+	uint32_t inner_flags = flags;
+
+	/* prevent set_elems to print as events */
+	inner_flags &= ~NFT_OF_EVENT_ANY;
+
+	ret = nft_event_header_snprintf(buf+offset, len, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
 	switch(type) {
 	case NFT_OUTPUT_DEFAULT:
-		return nft_set_snprintf_default(buf, size, s, type, flags);
-	case NFT_OUTPUT_XML:
-		return nft_set_snprintf_xml(buf, size, s, flags);
-	case NFT_OUTPUT_JSON:
-		return nft_set_snprintf_json(buf, size, s, type, flags);
-	default:
+		ret = nft_set_snprintf_default(buf+offset, len, s, type,
+					       inner_flags);
 		break;
+	case NFT_OUTPUT_XML:
+		ret = nft_set_snprintf_xml(buf+offset, len, s, inner_flags);
+		break;
+	case NFT_OUTPUT_JSON:
+		ret = nft_set_snprintf_json(buf+offset, len, s, type,
+					    inner_flags);
+		break;
+	default:
+		return -1;
 	}
-	return -1;
+
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = nft_event_footer_snprintf(buf+offset, len, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
 }
 EXPORT_SYMBOL(nft_set_snprintf);
 

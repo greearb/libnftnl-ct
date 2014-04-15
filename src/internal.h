@@ -136,6 +136,12 @@ int nft_get_value(enum nft_type type, void *val, void *out);
 
 #include <stdio.h>
 int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags, int (*snprintf_cb)(char *buf, size_t bufsiz, void *obj, uint32_t type, uint32_t flags));
+int nft_event_header_snprintf(char *buf, size_t bufsize,
+			      uint32_t format, uint32_t flags);
+int nft_event_header_fprintf(FILE *fp, uint32_t format, uint32_t flags);
+int nft_event_footer_snprintf(char *buf, size_t bufsize,
+			      uint32_t format, uint32_t flags);
+int nft_event_footer_fprintf(FILE *fp, uint32_t format, uint32_t flags);
 
 void xfree(const void *ptr);
 

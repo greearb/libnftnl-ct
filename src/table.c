@@ -441,17 +441,30 @@ static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *
 int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
 		       uint32_t type, uint32_t flags)
 {
+	int ret, len = size, offset = 0;
+
+	ret = nft_event_header_snprintf(buf+offset, len, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
 	switch(type) {
 	case NFT_OUTPUT_DEFAULT:
-		return nft_table_snprintf_default(buf, size, t);
-	case NFT_OUTPUT_XML:
-		return nft_table_snprintf_xml(buf, size, t);
-	case NFT_OUTPUT_JSON:
-		return nft_table_snprintf_json(buf, size, t);
-	default:
+		ret = nft_table_snprintf_default(buf+offset, len, t);
 		break;
+	case NFT_OUTPUT_XML:
+		ret = nft_table_snprintf_xml(buf+offset, len, t);
+		break;
+	case NFT_OUTPUT_JSON:
+		ret = nft_table_snprintf_json(buf+offset, len, t);
+		break;
+	default:
+		return -1;
 	}
-	return -1;
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = nft_event_footer_snprintf(buf+offset, len, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
 }
 EXPORT_SYMBOL(nft_table_snprintf);
 

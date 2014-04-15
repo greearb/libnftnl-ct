@@ -15,6 +15,12 @@ enum nft_output_type {
 	NFT_OUTPUT_JSON,
 };
 
+enum nft_output_flags {
+	NFT_OF_EVENT_NEW	= (1 << 0),
+	NFT_OF_EVENT_DEL	= (1 << 1),
+	NFT_OF_EVENT_ANY	= (NFT_OF_EVENT_NEW | NFT_OF_EVENT_DEL),
+};
+
 enum nft_parse_type {
 	NFT_PARSE_NONE		= 0,
 	NFT_PARSE_XML,

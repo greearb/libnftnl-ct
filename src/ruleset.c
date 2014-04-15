@@ -765,14 +765,21 @@ nft_ruleset_do_snprintf(char *buf, size_t size, const struct nft_ruleset *rs,
 {
 	int ret, len = size, offset = 0;
 	void *prev = NULL;
+	uint32_t inner_flags = flags;
 
-	ret = snprintf(buf+offset, size, "%s", nft_ruleset_o_opentag(type));
+	/* dont pass events flags to child calls of _snprintf() */
+	inner_flags &= ~NFT_OF_EVENT_ANY;
+
+	ret = nft_event_header_snprintf(buf+offset, len, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = snprintf(buf+offset, len, "%s", nft_ruleset_o_opentag(type));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (nft_ruleset_attr_is_set(rs, NFT_RULESET_ATTR_TABLELIST) &&
 	    (!nft_table_list_is_empty(rs->table_list))) {
 		ret = nft_ruleset_snprintf_table(buf+offset, len, rs,
-						 type, flags);
+						 type, inner_flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		if (ret > 0)
@@ -786,7 +793,7 @@ nft_ruleset_do_snprintf(char *buf, size_t size, const struct nft_ruleset *rs,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = nft_ruleset_snprintf_chain(buf+offset, len, rs,
-						 type, flags);
+						 type, inner_flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		if (ret > 0)
@@ -800,7 +807,7 @@ nft_ruleset_do_snprintf(char *buf, size_t size, const struct nft_ruleset *rs,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = nft_ruleset_snprintf_set(buf+offset, len, rs,
-					       type, flags);
+					       type, inner_flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		if (ret > 0)
@@ -814,11 +821,14 @@ nft_ruleset_do_snprintf(char *buf, size_t size, const struct nft_ruleset *rs,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		ret = nft_ruleset_snprintf_rule(buf+offset, len, rs,
-						type, flags);
+						type, inner_flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	ret = snprintf(buf+offset, size, "%s", nft_ruleset_o_closetag(type));
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	ret = nft_event_footer_snprintf(buf+offset, len, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -989,13 +999,20 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
 {
 	int len = 0, ret = 0;
 	void *prev = NULL;
+	uint32_t inner_flags = flags;
+
+	/* dont pass events flags to child calls of _snprintf() */
+	inner_flags &= ~NFT_OF_EVENT_ANY;
+
+	ret = nft_event_header_fprintf(fp, type, flags);
+	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 	ret = fprintf(fp, "%s", nft_ruleset_o_opentag(type));
 	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 	if ((nft_ruleset_attr_is_set(rs, NFT_RULESET_ATTR_TABLELIST)) &&
 	    (!nft_table_list_is_empty(rs->table_list))) {
-		ret = nft_ruleset_fprintf_tables(fp, rs, type, flags);
+		ret = nft_ruleset_fprintf_tables(fp, rs, type, inner_flags);
 		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		if (ret > 0)
@@ -1007,7 +1024,7 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
 		ret = fprintf(fp, "%s", nft_ruleset_o_separator(prev, type));
 		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
-		ret = nft_ruleset_fprintf_chains(fp, rs, type, flags);
+		ret = nft_ruleset_fprintf_chains(fp, rs, type, inner_flags);
 		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		if (ret > 0)
@@ -1019,7 +1036,7 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
 		ret = fprintf(fp, "%s", nft_ruleset_o_separator(prev, type));
 		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
-		ret = nft_ruleset_fprintf_sets(fp, rs, type, flags);
+		ret = nft_ruleset_fprintf_sets(fp, rs, type, inner_flags);
 		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		if (ret > 0)
@@ -1031,11 +1048,14 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
 		ret = fprintf(fp, "%s", nft_ruleset_o_separator(prev, type));
 		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
-		ret = nft_ruleset_fprintf_rules(fp, rs, type, flags);
+		ret = nft_ruleset_fprintf_rules(fp, rs, type, inner_flags);
 		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 	}
 
 	ret = fprintf(fp, "%s", nft_ruleset_o_closetag(type));
+	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
+	ret = nft_event_footer_fprintf(fp, type, flags);
 	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 	return len;
