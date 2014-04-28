@@ -72,6 +72,9 @@ int nft_event_header_snprintf(char *buf, size_t size, uint32_t type,
 {
 	int ret = 0;
 
+	if (!(flags & NFT_OF_EVENT_ANY))
+		return 0;
+
 	switch (type) {
 	case NFT_OUTPUT_XML:
 		if (flags & NFT_OF_EVENT_NEW) {
