@@ -825,7 +825,7 @@ nft_ruleset_do_snprintf(char *buf, size_t size, const struct nft_ruleset *rs,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, size, "%s", nft_ruleset_o_closetag(type));
+	ret = snprintf(buf+offset, len, "%s", nft_ruleset_o_closetag(type));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = nft_event_footer_snprintf(buf+offset, len, type, flags);
