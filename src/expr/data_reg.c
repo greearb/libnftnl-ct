@@ -304,7 +304,7 @@ nft_data_reg_verdict_snprintf_def(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (reg->chain != NULL) {
-		ret = snprintf(buf+offset, size, "-> %s ", reg->chain);
+		ret = snprintf(buf+offset, len, "-> %s ", reg->chain);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
@@ -322,12 +322,12 @@ nft_data_reg_verdict_snprintf_xml(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (reg->chain != NULL) {
-		ret = snprintf(buf+offset, size, "<chain>%s</chain>",
+		ret = snprintf(buf+offset, len, "<chain>%s</chain>",
 			       reg->chain);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, size, "</data_reg>");
+	ret = snprintf(buf+offset, len, "</data_reg>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -344,12 +344,12 @@ nft_data_reg_verdict_snprintf_json(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (reg->chain != NULL) {
-		ret = snprintf(buf+offset, size, ",\"chain\":\"%s\"",
+		ret = snprintf(buf+offset, len, ",\"chain\":\"%s\"",
 			       reg->chain);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, size, "}");
+	ret = snprintf(buf+offset, len, "}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
