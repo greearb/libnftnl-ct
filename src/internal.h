@@ -183,10 +183,12 @@ struct nft_set_elem {
 };
 
 #define SNPRINTF_BUFFER_SIZE(ret, size, len, offset)	\
-	size += ret;					\
+	if (ret < 0)					\
+		return ret;				\
+	offset += ret;					\
 	if (ret > len)					\
 		ret = len;				\
-	offset += ret;					\
+	size += ret;					\
 	len -= ret;
 
 #define div_round_up(n, d)	(((n) + (d) - 1) / (d))
