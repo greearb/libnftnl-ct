@@ -195,17 +195,24 @@ int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags,
 	int ret;
 
 	ret = snprintf_cb(buf, bufsiz, obj, type, flags);
-	if (ret > NFT_SNPRINTF_BUFSIZ) {
-		buf = calloc(1, ret);
+	if (ret < 0)
+		goto out;
+
+	if (ret >= NFT_SNPRINTF_BUFSIZ) {
+		bufsiz = ret + 1;
+
+		buf = malloc(bufsiz);
 		if (buf == NULL)
 			return -1;
 
-		bufsiz = ret;
 		ret = snprintf_cb(buf, bufsiz, obj, type, flags);
+		if (ret < 0)
+			goto out;
 	}
 
 	ret = fprintf(fp, "%s", buf);
 
+out:
 	if (buf != _buf)
 		xfree(buf);
 
