@@ -151,21 +151,18 @@ nft_rule_expr_reject_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 			       struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
-	struct nft_expr_reject *reject = nft_expr_data(e);
+	uint32_t type;
+	uint8_t code;
 
 	if (nft_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &reject->type, NFT_TYPE_U32, NFT_XML_MAND,
-			       err) != 0)
+			       &type, NFT_TYPE_U32, NFT_XML_MAND, err) < 0)
 		return -1;
-
-	e->flags |= (1 << NFT_EXPR_REJECT_TYPE);
+	nft_rule_expr_set_u32(e, NFT_EXPR_REJECT_TYPE, type);
 
 	if (nft_mxml_num_parse(tree, "code", MXML_DESCEND_FIRST, BASE_DEC,
-			       &reject->icmp_code, NFT_TYPE_U8, NFT_XML_MAND,
-			       err) != 0)
+			       &code, NFT_TYPE_U8, NFT_XML_MAND, err) < 0)
 		return -1;
-
-	e->flags |= (1 << NFT_EXPR_REJECT_CODE);
+	nft_rule_expr_set_u8(e, NFT_EXPR_REJECT_CODE, code);
 
 	return 0;
 #else
