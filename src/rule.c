@@ -816,6 +816,15 @@ static int nft_rule_snprintf_json(char *buf, size_t size, struct nft_rule *r,
 		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
+		/*
+		 * Remove comma from the first element if there is type
+		 * key-value pair only. Example: "expr":[{"type":"log"}]
+		 */
+		if (ret == 0) {
+			offset--;
+			len--;
+		}
+
 		ret = snprintf(buf+offset, len, "},");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
