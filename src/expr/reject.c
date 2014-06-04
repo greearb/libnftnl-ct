@@ -155,14 +155,12 @@ nft_rule_expr_reject_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 	uint8_t code;
 
 	if (nft_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &type, NFT_TYPE_U32, NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_REJECT_TYPE, type);
+			       &type, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_REJECT_TYPE, type);
 
 	if (nft_mxml_num_parse(tree, "code", MXML_DESCEND_FIRST, BASE_DEC,
-			       &code, NFT_TYPE_U8, NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_rule_expr_set_u8(e, NFT_EXPR_REJECT_CODE, code);
+			       &code, NFT_TYPE_U8, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u8(e, NFT_EXPR_REJECT_CODE, code);
 
 	return 0;
 #else
@@ -183,11 +181,21 @@ static int nft_rule_expr_reject_snprintf_default(char *buf, size_t len,
 static int nft_rule_expr_reject_snprintf_xml(char *buf, size_t len,
 					     struct nft_rule_expr *e)
 {
+	int ret, size = len, offset = 0;
 	struct nft_expr_reject *reject = nft_expr_data(e);
 
-	return snprintf(buf, len, "<type>%u</type>"
-				  "<code>%u</code>",
-			reject->type, reject->icmp_code);
+	if (e->flags & (1 << NFT_EXPR_REJECT_TYPE)) {
+		ret = snprintf(buf+offset, len, "<type>%u</type>",
+			       reject->type);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_REJECT_CODE)) {
+		ret = snprintf(buf+offset, len, "<code>%u</code>",
+			       reject->icmp_code);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	return offset;
 }
 
 static int nft_rule_expr_reject_snprintf_json(char *buf, size_t len,
