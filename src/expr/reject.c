@@ -127,7 +127,7 @@ nft_rule_expr_reject_json_parse(struct nft_rule_expr *e, json_t *root,
 {
 #ifdef JSON_PARSING
 	uint32_t type;
-	uint16_t code;
+	uint8_t code;
 
 	if (nft_jansson_parse_val(root, "type", NFT_TYPE_U32, &type, err) < 0)
 		return -1;
