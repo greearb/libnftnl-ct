@@ -339,63 +339,55 @@ int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
 			  struct nft_parse_err *err)
 {
 	json_t *root, *array, *json_elem;
-	uint32_t uval32;
+	uint32_t flags, key_type, key_len, data_type, data_len;
 	int family, i;
-	const char *valstr;
+	const char *name, *table;
 	struct nft_set_elem *elem;
 
 	root = nft_jansson_get_node(tree, "set", err);
 	if (root == NULL)
 		return -1;
 
-	valstr = nft_jansson_parse_str(root, "name", err);
-	if (valstr == NULL)
+	name = nft_jansson_parse_str(root, "name", err);
+	if (name == NULL)
 		return -1;
 
-	nft_set_attr_set_str(s, NFT_SET_ATTR_NAME, valstr);
+	nft_set_attr_set_str(s, NFT_SET_ATTR_NAME, name);
 
-	valstr = nft_jansson_parse_str(root, "table", err);
-	if (valstr == NULL)
+	table = nft_jansson_parse_str(root, "table", err);
+	if (table == NULL)
 		return -1;
 
-	nft_set_attr_set_str(s, NFT_SET_ATTR_TABLE, valstr);
+	nft_set_attr_set_str(s, NFT_SET_ATTR_TABLE, table);
 
-	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &uval32, err) < 0)
-		return -1;
+	if (nft_jansson_parse_family(root, &family, err) == 0)
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_FAMILY, family);
 
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_FLAGS, uval32);
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &flags, err) == 0)
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_FLAGS, flags);
 
-	if (nft_jansson_parse_family(root, &family, err) < 0)
-		return -1;
+	if (nft_jansson_parse_val(root, "key_type", NFT_TYPE_U32, &key_type,
+				  err) == 0)
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_TYPE, key_type);
 
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_FAMILY, family);
-
-	if (nft_jansson_parse_val(root, "key_type", NFT_TYPE_U32, &uval32,
-				  err) < 0)
-		return -1;
-
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_TYPE, uval32);
-
-	if (nft_jansson_parse_val(root, "key_len", NFT_TYPE_U32, &uval32,
-				  err) < 0)
-		return -1;
-
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_LEN, uval32);
+	if (nft_jansson_parse_val(root, "key_len", NFT_TYPE_U32, &key_len,
+				  err) == 0)
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_LEN, key_len);
 
 	if (nft_jansson_node_exist(root, "data_type")) {
 		if (nft_jansson_parse_val(root, "data_type", NFT_TYPE_U32,
-					  &uval32, err) < 0)
+					  &data_type, err) < 0)
 			goto err;
 
-		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_TYPE, uval32);
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_TYPE, data_type);
 	}
 
 	if (nft_jansson_node_exist(root, "data_len")) {
 		if (nft_jansson_parse_val(root, "data_len", NFT_TYPE_U32,
-					  &uval32, err) < 0)
+					  &data_len, err) < 0)
 			goto err;
 
-		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_LEN, uval32);
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_LEN, data_len);
 	}
 
 	if (nft_jansson_node_exist(root, "set_elem")) {
@@ -584,46 +576,73 @@ static int nft_set_snprintf_json(char *buf, size_t size, struct nft_set *s,
 	int len = size, offset = 0, ret;
 	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, len, "{\"set\":{\"name\":\"%s\","
-				  "\"table\":\"%s\","
-				  "\"flags\":%u,\"family\":\"%s\","
-				  "\"key_type\":%u,\"key_len\":%u",
-			s->name, s->table, s->set_flags,
-			nft_family2str(s->family), s->key_type, s->key_len);
+	ret = snprintf(buf, len, "{\"set\":{");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	if(s->flags & (1 << NFT_SET_ATTR_DATA_TYPE) &&
-	   s->flags & (1 << NFT_SET_ATTR_DATA_LEN)){
-		ret = snprintf(buf+offset, len,
-				  ",\"data_type\":%u,\"data_len\":%u",
-			s->data_type, s->data_len);
+	if (s->flags & (1 << NFT_SET_ATTR_NAME)) {
+		ret = snprintf(buf + offset, len, "\"name\":\"%s\"",
+			       s->name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
+	if (s->flags & (1 << NFT_SET_ATTR_TABLE)) {
+		ret = snprintf(buf + offset, len, ",\"table\":\"%s\"",
+			       s->table);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (s->flags & (1 << NFT_SET_ATTR_FLAGS)) {
+		ret = snprintf(buf + offset, len, ",\"flags\":%u",
+			       s->set_flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (s->flags & (1 << NFT_SET_ATTR_FAMILY)) {
+		ret = snprintf(buf + offset, len, ",\"family\":\"%s\"",
+			       nft_family2str(s->family));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (s->flags & (1 << NFT_SET_ATTR_KEY_TYPE)) {
+		ret = snprintf(buf + offset, len, ",\"key_type\":%u",
+			       s->key_type);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (s->flags & (1 << NFT_SET_ATTR_KEY_LEN)) {
+		ret = snprintf(buf + offset, len, ",\"key_len\":%u",
+			       s->key_len);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if(s->flags & (1 << NFT_SET_ATTR_DATA_TYPE)) {
+		ret = snprintf(buf + offset, len,
+				  ",\"data_type\":%u", s->data_type);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if(s->flags & (1 << NFT_SET_ATTR_DATA_LEN)) {
+		ret = snprintf(buf + offset, len, ",\"data_len\":%u", s->data_len);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 	/* Empty set? Skip printinf of elements */
 	if (list_empty(&s->element_list)){
-		ret = snprintf(buf+offset, len, "}}");
+		ret = snprintf(buf + offset, len, "}}");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		return offset;
 	}
 
-	ret = snprintf(buf+offset, len, ",\"set_elem\":[");
+	ret = snprintf(buf + offset, len, ",\"set_elem\":[");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	list_for_each_entry(elem, &s->element_list, head) {
-		ret = snprintf(buf+offset, len, "{");
+		ret = snprintf(buf + offset, len, "{");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = nft_set_elem_snprintf(buf+offset, len, elem, type, flags);
+		ret = nft_set_elem_snprintf(buf + offset, len, elem, type,
+					    flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		ret = snprintf(buf+offset, len, "},");
+		ret = snprintf(buf + offset, len, "},");
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 	/* Overwrite trailing ", " from last set element */
 	offset --;
 
-	ret = snprintf(buf+offset, len, "]}}");
+	ret = snprintf(buf + offset, len, "]}}");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;

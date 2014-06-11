@@ -240,18 +240,14 @@ int nft_jansson_data_reg_parse(json_t *root, const char *node_name,
 int nft_jansson_set_elem_parse(struct nft_set_elem *e, json_t *root,
 			       struct nft_parse_err *err)
 {
-	uint32_t uval32;
 	int set_elem_data;
+	uint32_t flags;
 
-	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &uval32, err) < 0)
-		return -1;
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &flags, err) == 0)
+		nft_set_elem_attr_set_u32(e, NFT_SET_ELEM_ATTR_FLAGS, flags);
 
-	nft_set_elem_attr_set_u32(e, NFT_SET_ELEM_ATTR_FLAGS, uval32);
-
-	if (nft_jansson_data_reg_parse(root, "key", &e->key, err) != DATA_VALUE)
-		return -1;
-
-	e->flags |= (1 << NFT_SET_ELEM_ATTR_KEY);
+	if (nft_jansson_data_reg_parse(root, "key", &e->key, err) == DATA_VALUE)
+		e->flags |= (1 << NFT_SET_ELEM_ATTR_KEY);
 
 	if (nft_jansson_node_exist(root, "data")) {
 		set_elem_data = nft_jansson_data_reg_parse(root, "data",
@@ -264,7 +260,6 @@ int nft_jansson_set_elem_parse(struct nft_set_elem *e, json_t *root,
 			e->flags |= (1 << NFT_SET_ELEM_ATTR_VERDICT);
 			if (e->data.chain != NULL)
 				e->flags |= (1 << NFT_SET_ELEM_ATTR_CHAIN);
-
 			break;
 		case DATA_NONE:
 		default:
