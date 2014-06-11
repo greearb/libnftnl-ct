@@ -49,20 +49,20 @@ void nft_parse_err_free(struct nft_parse_err *err)
 }
 EXPORT_SYMBOL(nft_parse_err_free);
 
-int nft_parse_perror(const char *str, struct nft_parse_err *err)
+int nft_parse_perror(const char *msg, struct nft_parse_err *err)
 {
 	switch (err->error) {
 	case NFT_PARSE_EBADINPUT:
-		return fprintf(stderr, "%s : Bad input format in line %d column %d\n",
-		       str, err->line, err->column);
+		return fprintf(stderr, "%s: Bad input format in line %d column %d\n",
+			       msg, err->line, err->column);
 	case NFT_PARSE_EMISSINGNODE:
-		return fprintf(stderr, "%s : Node \"%s\" not found\n",
-				str, err->node_name);
+		return fprintf(stderr, "%s: Node \"%s\" not found\n",
+			       msg, err->node_name);
 	case NFT_PARSE_EBADTYPE:
 		return fprintf(stderr, "%s: Invalid type in node \"%s\"\n",
-				str, err->node_name);
+			       msg, err->node_name);
 	default:
-		return fprintf(stderr, "Undefined error\n");
+		return fprintf(stderr, "%s: Undefined error\n", msg);
 	}
 }
 EXPORT_SYMBOL(nft_parse_perror);
