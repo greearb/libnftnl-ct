@@ -382,13 +382,13 @@ int nft_mxml_set_elem_parse(mxml_node_t *tree, struct nft_set_elem *e,
 			    struct nft_parse_err *err)
 {
 	int set_elem_data;
+	uint32_t set_elem_flags;
 
-	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST,
-			       BASE_DEC, &e->set_elem_flags,
-			       NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
+	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
+			       &set_elem_flags, NFT_TYPE_U32, NFT_XML_MAND,
+			       err) < 0)
 		return -1;
-
-	e->flags |= (1 << NFT_SET_ELEM_ATTR_FLAGS);
+	nft_set_elem_attr_set_u32(e, NFT_SET_ELEM_ATTR_FLAGS, set_elem_flags);
 
 	if (nft_mxml_data_reg_parse(tree, "key", &e->key,
 				    NFT_XML_MAND, err) != DATA_VALUE)

@@ -454,67 +454,53 @@ int nft_mxml_set_parse(mxml_node_t *tree, struct nft_set *s,
 	struct nft_set_elem *elem;
 	const char *name, *table;
 	int family;
+	uint32_t set_flags, key_type, key_len;
+	uint32_t data_type, data_len;
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFT_XML_MAND, err);
 	if (name == NULL)
 		return -1;
-
-	if (s->name)
-		xfree(s->name);
-
-	s->name = strdup(name);
-	s->flags |= (1 << NFT_SET_ATTR_NAME);
+	nft_set_attr_set_str(s, NFT_SET_ATTR_NAME, name);
 
 	table = nft_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
 				   NFT_XML_MAND, err);
 	if (table == NULL)
 		return -1;
-
-	if (s->table)
-		xfree(s->table);
-
-	s->table = strdup(table);
-	s->flags |= (1 << NFT_SET_ATTR_TABLE);
+	nft_set_attr_set_str(s, NFT_SET_ATTR_TABLE, table);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFT_XML_MAND, err);
 	if (family < 0)
 		return -1;
-
-	s->family = family;
-
-	s->flags |= (1 << NFT_SET_ATTR_FAMILY);
+	nft_set_attr_set_u32(s, NFT_SET_ATTR_FAMILY, family);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &s->set_flags, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
+			       &set_flags, NFT_TYPE_U32, NFT_XML_MAND, err) < 0)
 		return -1;
-
-	s->flags |= (1 << NFT_SET_ATTR_FLAGS);
+	nft_set_attr_set_u32(s, NFT_SET_ATTR_FLAGS, set_flags);
 
 	if (nft_mxml_num_parse(tree, "key_type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &s->key_type, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
+			       &key_type, NFT_TYPE_U32, NFT_XML_MAND, err) < 0)
 		return -1;
-
-	s->flags |= (1 << NFT_SET_ATTR_KEY_TYPE);
+	nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_TYPE, key_type);
 
 	if (nft_mxml_num_parse(tree, "key_len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &s->key_len, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
+			       &key_len, NFT_TYPE_U32, NFT_XML_MAND, err) < 0)
 		return -1;
-
-	s->flags |= (1 << NFT_SET_ATTR_KEY_LEN);
+	nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_LEN, key_len);
 
 	if (nft_mxml_num_parse(tree, "data_type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &s->data_type, NFT_TYPE_U32,
+			       &data_type, NFT_TYPE_U32,
 			       NFT_XML_OPT, err) == 0) {
-		s->flags |= (1 << NFT_SET_ATTR_DATA_TYPE);
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_TYPE, data_type);
 
 		if (nft_mxml_num_parse(tree, "data_len", MXML_DESCEND_FIRST,
-				       BASE_DEC, &s->data_len, NFT_TYPE_U32,
-				       NFT_XML_MAND, err) != 0)
+				       BASE_DEC, &data_len, NFT_TYPE_U32,
+				       NFT_XML_MAND, err) < 0)
 			return -1;
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_LEN, data_len);
 
-		s->flags |= (1 << NFT_SET_ATTR_DATA_LEN);
 	}
 
 	for (node = mxmlFindElement(tree, tree, "set_elem", NULL,
