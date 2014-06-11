@@ -140,7 +140,7 @@ failparsing:
 	fclose(fp);
 	printf("parsing %s: ", filename);
 	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
-	nft_parse_perror("fail", err);
+	nft_parse_perror("Reason", err);
 	return -1;
 }
 
@@ -177,6 +177,7 @@ failparsing:
 	fclose(fp);
 	printf("parsing %s: ", filename);
 	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
+	nft_parse_perror("Reason", err);
 	return -1;
 }
 
