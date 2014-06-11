@@ -471,19 +471,17 @@ int nft_mxml_set_parse(mxml_node_t *tree, struct nft_set *s,
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFT_XML_MAND, err);
-	if (family < 0)
-		return -1;
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_FAMILY, family);
+	if (family >= 0)
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_FAMILY, family);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &set_flags, NFT_TYPE_U32, NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_FLAGS, set_flags);
+			       &set_flags, NFT_TYPE_U32, NFT_XML_MAND,
+			       err) == 0)
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_FLAGS, set_flags);
 
 	if (nft_mxml_num_parse(tree, "key_type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &key_type, NFT_TYPE_U32, NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_TYPE, key_type);
+			       &key_type, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_TYPE, key_type);
 
 	if (nft_mxml_num_parse(tree, "key_len", MXML_DESCEND_FIRST, BASE_DEC,
 			       &key_len, NFT_TYPE_U32, NFT_XML_MAND, err) < 0)
@@ -497,9 +495,8 @@ int nft_mxml_set_parse(mxml_node_t *tree, struct nft_set *s,
 
 		if (nft_mxml_num_parse(tree, "data_len", MXML_DESCEND_FIRST,
 				       BASE_DEC, &data_len, NFT_TYPE_U32,
-				       NFT_XML_MAND, err) < 0)
-			return -1;
-		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_LEN, data_len);
+				       NFT_XML_MAND, err) == 0)
+			nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_LEN, data_len);
 
 	}
 
@@ -668,34 +665,63 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 	int len = size, offset = 0;
 	struct nft_set_elem *elem;
 
-	ret = snprintf(buf, len, "<set><family>%s</family>"
-				  "<table>%s</table>"
-				  "<name>%s</name>"
-				  "<flags>%u</flags>"
-				  "<key_type>%u</key_type>"
-				  "<key_len>%u</key_len>",
-			nft_family2str(s->family), s->table, s->name,
-			s->set_flags, s->key_type, s->key_len);
+	ret = snprintf(buf, len, "<set>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	if (s->flags & (1 << NFT_SET_ATTR_DATA_TYPE) &&
-	    s->flags & (1 << NFT_SET_ATTR_DATA_LEN)) {
-		ret = snprintf(buf+offset, len, "<data_type>%u</data_type>"
-			       "<data_len>%u</data_len>",
-			       s->data_type, s->data_len);
+	if (s->flags & (1 << NFT_SET_ATTR_FAMILY)) {
+		ret = snprintf(buf + offset, len, "<family>%s</family>",
+			       nft_family2str(s->family));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
+	if (s->flags & (1 << NFT_SET_ATTR_TABLE)) {
+		ret = snprintf(buf + offset, len, "<table>%s</table>",
+			       s->table);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (s->flags & (1 << NFT_SET_ATTR_NAME)) {
+		ret = snprintf(buf + offset, len, "<name>%s</name>",
+			       s->name);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (s->flags & (1 << NFT_SET_ATTR_FLAGS)) {
+		ret = snprintf(buf + offset, len, "<flags>%u</flags>",
+			       s->set_flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (s->flags & (1 << NFT_SET_ATTR_KEY_TYPE)) {
+		ret = snprintf(buf + offset, len, "<key_type>%u</key_type>",
+			       s->key_type);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (s->flags & (1 << NFT_SET_ATTR_KEY_LEN)) {
+		ret = snprintf(buf + offset, len, "<key_len>%u</key_len>",
+			       s->key_len);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (s->flags & (1 << NFT_SET_ATTR_DATA_TYPE)) {
+		ret = snprintf(buf + offset, len, "<data_type>%u</data_type>",
+			       s->data_type);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (s->flags & (1 << NFT_SET_ATTR_DATA_LEN)) {
+		ret = snprintf(buf + offset, len, "<data_len>%u</data_len>",
+			       s->data_len);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	if (!list_empty(&s->element_list)) {
 		list_for_each_entry(elem, &s->element_list, head) {
-			ret = nft_set_elem_snprintf(buf+offset, len, elem,
+			ret = nft_set_elem_snprintf(buf + offset, len, elem,
 						    NFT_OUTPUT_XML, flags);
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 	}
 
-	ret = snprintf(buf+offset, len, "</set>");
+	ret = snprintf(buf + offset, len, "</set>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
