@@ -377,7 +377,7 @@ int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
 	if (nft_jansson_node_exist(root, "data_type")) {
 		if (nft_jansson_parse_val(root, "data_type", NFT_TYPE_U32,
 					  &data_type, err) < 0)
-			goto err;
+			return -1;
 
 		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_TYPE, data_type);
 	}
@@ -385,7 +385,7 @@ int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
 	if (nft_jansson_node_exist(root, "data_len")) {
 		if (nft_jansson_parse_val(root, "data_len", NFT_TYPE_U32,
 					  &data_len, err) < 0)
-			goto err;
+			return -1;
 
 		nft_set_attr_set_u32(s, NFT_SET_ATTR_DATA_LEN, data_len);
 	}
@@ -395,27 +395,22 @@ int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
 		for (i = 0; i < json_array_size(array); i++) {
 			elem = nft_set_elem_alloc();
 			if (elem == NULL)
-				goto err;
+				return -1;
 
 			json_elem = json_array_get(array, i);
 			if (json_elem == NULL)
-				goto err;
+				return -1;
 
 			if (nft_jansson_set_elem_parse(elem,
 						       json_elem, err) < 0)
-				goto err;
+				return -1;
 
 			list_add_tail(&elem->head, &s->element_list);
 		}
 
 	}
 
-	nft_jansson_free_root(tree);
 	return 0;
-err:
-	nft_jansson_free_root(tree);
-	return -1;
-
 }
 #endif
 
@@ -426,12 +421,16 @@ static int nft_set_json_parse(struct nft_set *s, const void *json,
 #ifdef JSON_PARSING
 	json_t *tree;
 	json_error_t error;
+	int ret;
 
 	tree = nft_jansson_create_root(json, &error, err, input);
 	if (tree == NULL)
 		return -1;
 
-	return nft_jansson_parse_set(s, tree, err);
+	ret = nft_jansson_parse_set(s, tree, err);
+	nft_jansson_free_root(tree);
+
+	return ret;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
