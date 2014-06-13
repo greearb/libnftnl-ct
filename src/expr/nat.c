@@ -225,28 +225,20 @@ static int nft_rule_expr_nat_json_parse(struct nft_rule_expr *e, json_t *root,
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_FAMILY, val32);
 
 	if (nft_jansson_parse_reg(root, "sreg_addr_min", NFT_TYPE_U32,
-				  &reg, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MIN, reg);
+				  &reg, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MIN, reg);
 
 	if (nft_jansson_parse_reg(root, "sreg_addr_max", NFT_TYPE_U32,
-				  &reg, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MAX, reg);
+				  &reg, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MAX, reg);
 
 	if (nft_jansson_parse_reg(root, "sreg_proto_min", NFT_TYPE_U32,
-				  &reg, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MIN, reg);
+				  &reg, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MIN, reg);
 
 	if (nft_jansson_parse_reg(root, "sreg_proto_max", NFT_TYPE_U32,
-				  &reg, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MAX, reg);
+				  &reg, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MAX, reg);
 
 	return 0;
 #else
