@@ -164,28 +164,25 @@ nft_rule_expr_queue_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 			      struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
-	struct nft_expr_queue *queue = nft_expr_data(e);
+	uint16_t queue_num, queue_total, flags;
 
 	if (nft_mxml_num_parse(tree, "num", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue->queuenum, NFT_TYPE_U16, NFT_XML_MAND,
+			       &queue_num, NFT_TYPE_U16, NFT_XML_MAND,
 			       err) != 0)
 		return -1;
-
-	e->flags |= (1 << NFT_EXPR_QUEUE_NUM);
+	nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_NUM, queue_num);
 
 	if (nft_mxml_num_parse(tree, "total", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue->queues_total, NFT_TYPE_U8,
+			       &queue_total, NFT_TYPE_U8,
 			       NFT_XML_MAND, err) != 0)
 		return -1;
-
-	e->flags |= (1 << NFT_EXPR_QUEUE_TOTAL);
+	nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_TOTAL, queue_total);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue->flags, NFT_TYPE_U8,
+			       &flags, NFT_TYPE_U8,
 			       NFT_XML_MAND, err) != 0)
 		return -1;
-
-	e->flags |= (1 << NFT_EXPR_QUEUE_FLAGS);
+	nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_FLAGS, flags);
 
 	return 0;
 #else
