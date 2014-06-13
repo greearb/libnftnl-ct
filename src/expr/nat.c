@@ -283,24 +283,20 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_FAMILY, family);
 
 	if (nft_mxml_reg_parse(tree, "sreg_addr_min", &reg_addr_min,
-			       MXML_DESCEND, NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MIN, reg_addr_min);
+			       MXML_DESCEND, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MIN, reg_addr_min);
 
 	if (nft_mxml_reg_parse(tree, "sreg_addr_max", &reg_addr_max,
-			       MXML_DESCEND, NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MAX, reg_addr_max);
+			       MXML_DESCEND, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_ADDR_MAX, reg_addr_max);
 
 	if (nft_mxml_reg_parse(tree, "sreg_proto_min", &reg_proto_min,
-			       MXML_DESCEND, NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MIN, reg_proto_min);
+			       MXML_DESCEND, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MIN, reg_proto_min);
 
 	if (nft_mxml_reg_parse(tree, "sreg_proto_max", &reg_proto_max,
-			       MXML_DESCEND, NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MAX, reg_proto_max);
+			       MXML_DESCEND, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_NAT_REG_PROTO_MAX, reg_proto_max);
 
 	return 0;
 #else
