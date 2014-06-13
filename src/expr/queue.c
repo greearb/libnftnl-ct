@@ -134,11 +134,12 @@ nft_rule_expr_queue_json_parse(struct nft_rule_expr *e, json_t *root,
 			       struct nft_parse_err *err)
 {
 #ifdef JSON_PARSING
-	uint32_t type;
+	uint16_t type;
 	uint16_t code;
 
 	if (nft_jansson_parse_val(root, "num", NFT_TYPE_U16, &type, err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_QUEUE_NUM, type);
+		nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_NUM, type);
+	nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_NUM, type);
 
 	if (nft_jansson_parse_val(root, "total", NFT_TYPE_U16, &code, err) == 0)
 		nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_TOTAL, code);
@@ -166,12 +167,12 @@ nft_rule_expr_queue_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 		nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_NUM, queue_num);
 
 	if (nft_mxml_num_parse(tree, "total", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue_total, NFT_TYPE_U8,
+			       &queue_total, NFT_TYPE_U16,
 			       NFT_XML_MAND, err) == 0)
 		nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_TOTAL, queue_total);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &flags, NFT_TYPE_U8,
+			       &flags, NFT_TYPE_U16,
 			       NFT_XML_MAND, err) == 0)
 		nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_FLAGS, flags);
 
