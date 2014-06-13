@@ -137,20 +137,14 @@ nft_rule_expr_queue_json_parse(struct nft_rule_expr *e, json_t *root,
 	uint32_t type;
 	uint16_t code;
 
-	if (nft_jansson_parse_val(root, "num", NFT_TYPE_U16, &type, err) < 0)
-		return -1;
+	if (nft_jansson_parse_val(root, "num", NFT_TYPE_U16, &type, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_QUEUE_NUM, type);
 
-	nft_rule_expr_set_u32(e, NFT_EXPR_QUEUE_NUM, type);
+	if (nft_jansson_parse_val(root, "total", NFT_TYPE_U16, &code, err) == 0)
+		nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_TOTAL, code);
 
-	if (nft_jansson_parse_val(root, "total", NFT_TYPE_U16, &code, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_TOTAL, code);
-
-	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U16, &code, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_FLAGS, code);
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U16, &code, err) == 0)
+		nft_rule_expr_set_u16(e, NFT_EXPR_QUEUE_FLAGS, code);
 
 	return 0;
 #else
@@ -241,13 +235,31 @@ static int nft_rule_expr_queue_snprintf_xml(char *buf, size_t len,
 static int nft_rule_expr_queue_snprintf_json(char *buf, size_t len,
 					     struct nft_rule_expr *e)
 {
+	int ret, size = len, offset = 0;
 	struct nft_expr_queue *queue = nft_expr_data(e);
 
-	return snprintf(buf, len, "\"num\":%u,"
-				  "\"total\":%u,"
-				  "\"flags\":%u,",
-			queue->queuenum, queue->queues_total,
-			queue->flags);
+	if (e->flags & (1 << NFT_EXPR_QUEUE_NUM)) {
+		ret = snprintf(buf + offset, len, "\"num\":%u,",
+			       queue->queuenum);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFT_EXPR_QUEUE_TOTAL)) {
+		ret = snprintf(buf + offset, len, "\"total\":%u,",
+			       queue->queues_total);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_QUEUE_FLAGS)) {
+		ret = snprintf(buf + offset, len, "\"flags\":%u,",
+			       queue->flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	/* Remove the last comma characther */
+	if (offset > 0)
+		offset--;
+
+	return offset;
 }
 
 static int
