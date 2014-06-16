@@ -187,24 +187,30 @@ static int nft_rule_expr_queue_snprintf_default(char *buf, size_t len,
 						struct nft_rule_expr *e)
 {
 	struct nft_expr_queue *queue = nft_expr_data(e);
-	int ret;
-	int one = 0;
+	int ret, size = len, offset = 0;
+	uint16_t total_queues;
 
-	ret = snprintf(buf, len, "num %u total %u", queue->queuenum,
-		       queue->queues_total);
-	if (queue->flags) {
-		ret += snprintf(buf + ret, len - ret, " options ");
-		if (queue->flags & NFT_QUEUE_FLAG_BYPASS) {
-			ret += snprintf(buf + ret, len - ret, "bypass");
-			one = 1;
+	total_queues = queue->queuenum + queue->queues_total -1;
+
+	ret = snprintf(buf + offset, len, "num %u", queue->queuenum);
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (queue->queues_total && total_queues != queue->queuenum) {
+		ret = snprintf(buf + offset, len, "-%u", total_queues);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFT_EXPR_QUEUE_FLAGS)) {
+		if (queue->flags & (NFT_QUEUE_FLAG_BYPASS)) {
+			ret = snprintf(buf + offset, len, " bypass");
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
-		if (queue->flags & NFT_QUEUE_FLAG_CPU_FANOUT) {
-			if (one)
-				ret += snprintf(buf + ret, len - ret, ",");
-			ret += snprintf(buf + ret, len - ret, "fanout");
+		if (queue->flags & (NFT_QUEUE_FLAG_CPU_FANOUT)) {
+			ret = snprintf(buf + offset, len, " fanout");
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 	}
-	return ret;
+	return offset;
 }
 
 static int nft_rule_expr_queue_snprintf_xml(char *buf, size_t len,
@@ -212,7 +218,6 @@ static int nft_rule_expr_queue_snprintf_xml(char *buf, size_t len,
 {
 	int ret, size = len, offset = 0;
 	struct nft_expr_queue *queue = nft_expr_data(e);
-
 
 	if (e->flags & (1 << NFT_EXPR_QUEUE_NUM)) {
 		ret = snprintf(buf + offset, len, "<num>%u</num>",
