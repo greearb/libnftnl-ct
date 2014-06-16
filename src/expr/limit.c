@@ -146,21 +146,19 @@ static int nft_rule_expr_limit_xml_parse(struct nft_rule_expr *e,
 					 struct nft_parse_err *err)
 {
 #ifdef XML_PARSING
-	struct nft_expr_limit *limit = nft_expr_data(e);
+	uint64_t rate, unit;
 
 	if (nft_mxml_num_parse(tree, "rate", MXML_DESCEND_FIRST, BASE_DEC,
-			       &limit->rate, NFT_TYPE_U64, NFT_XML_MAND,
-			       err) != 0)
+			       &rate, NFT_TYPE_U64, NFT_XML_MAND,
+			       err) < 0)
 		return -1;
-
-	e->flags |= (1 << NFT_EXPR_LIMIT_RATE);
+	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_RATE, rate);
 
 	if (nft_mxml_num_parse(tree, "unit", MXML_DESCEND_FIRST, BASE_DEC,
-			       &limit->unit, NFT_TYPE_U64, NFT_XML_MAND,
-			       err) != 0)
+			       &unit, NFT_TYPE_U64, NFT_XML_MAND,
+			       err) < 0)
 		return -1;
-
-	e->flags |= (1 << NFT_EXPR_LIMIT_UNIT);
+	nft_rule_expr_set_u64(e, NFT_EXPR_LIMIT_UNIT, unit);
 
 	return 0;
 #else
