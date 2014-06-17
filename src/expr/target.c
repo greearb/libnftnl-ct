@@ -124,7 +124,7 @@ nft_rule_expr_target_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 	if (e->flags & (1 << NFT_EXPR_TG_REV))
 		mnl_attr_put_u32(nlh, NFTA_TARGET_REV, htonl(tg->rev));
 	if (e->flags & (1 << NFT_EXPR_TG_INFO))
-		mnl_attr_put(nlh, NFTA_TARGET_INFO, XT_ALIGN(tg->data_len), tg->data);
+		mnl_attr_put(nlh, NFTA_TARGET_INFO, tg->data_len, tg->data);
 }
 
 static int nft_rule_expr_target_parse(struct nft_rule_expr *e, struct nlattr *attr)

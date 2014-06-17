@@ -124,7 +124,7 @@ nft_rule_expr_match_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
 	if (e->flags & (1 << NFT_EXPR_MT_REV))
 		mnl_attr_put_u32(nlh, NFTA_MATCH_REV, htonl(mt->rev));
 	if (e->flags & (1 << NFT_EXPR_MT_INFO))
-		mnl_attr_put(nlh, NFTA_MATCH_INFO, XT_ALIGN(mt->data_len), mt->data);
+		mnl_attr_put(nlh, NFTA_MATCH_INFO, mt->data_len, mt->data);
 }
 
 static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *attr)
