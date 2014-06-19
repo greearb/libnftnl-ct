@@ -249,36 +249,30 @@ nft_rule_expr_byteorder_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 	uint32_t sreg, dreg, len, size;
 
 	if (nft_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
-			       NFT_XML_MAND, err) < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SREG, sreg);
+			       NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SREG, sreg);
 
 	if (nft_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND, NFT_XML_MAND,
-			       err) < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_DREG, dreg);
+			       err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_DREG, dreg);
 
 	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFT_XML_MAND,
 				err);
-	if (op == NULL)
-		return -1;
+	if (op != NULL) {
+		ntoh = nft_str2ntoh(op);
+		if (ntoh < 0)
+			return -1;
 
-	ntoh = nft_str2ntoh(op);
-	if (ntoh < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_OP, ntoh);
+		nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_OP, ntoh);
+	}
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &len, NFT_TYPE_U32, NFT_XML_MAND,
-			       err) < 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_LEN, len);
+			       &len, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_LEN, len);
 
 	if (nft_mxml_num_parse(tree, "size", MXML_DESCEND_FIRST, BASE_DEC,
-			       &size, NFT_TYPE_U32, NFT_XML_MAND,
-			       err) != 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SIZE, size);
+			       &size, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SIZE, size);
 
 	return 0;
 #else
@@ -312,15 +306,31 @@ static int nft_rule_expr_byteorder_snprintf_xml(char *buf, size_t size,
 	struct nft_expr_byteorder *byteorder = nft_expr_data(e);
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "<sreg>%u</sreg>"
-				 "<dreg>%u</dreg>"
-				 "<op>%s</op>"
-				 "<len>%u</len>"
-				 "<size>%u</size>",
-		       byteorder->sreg, byteorder->dreg,
-		       expr_byteorder_str[byteorder->op],
-		       byteorder->len, byteorder->size);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	if (e->flags & (1 << NFT_EXPR_BYTEORDER_SREG)) {
+		ret = snprintf(buf + offset, len, "<sreg>%u</sreg>",
+			       byteorder->sreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_BYTEORDER_DREG)) {
+		ret = snprintf(buf + offset, len, "<dreg>%u</dreg>",
+			       byteorder->dreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_BYTEORDER_OP)) {
+		ret = snprintf(buf + offset, len, "<op>%s</op>",
+			       expr_byteorder_str[byteorder->op]);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_BYTEORDER_LEN)) {
+		ret = snprintf(buf + offset, len, "<len>%u</len>",
+			       byteorder->len);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_BYTEORDER_SIZE)) {
+		ret = snprintf(buf + offset, len, "<size>%u</size>",
+			       byteorder->size);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	return offset;
 }
