@@ -218,14 +218,12 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	struct nft_expr_cmp *cmp = nft_expr_data(e);
 	const char *op;
 	int32_t op_value;
-	uint32_t reg;
+	uint32_t sreg;
 
-	if (nft_mxml_reg_parse(tree, "sreg", &reg, MXML_DESCEND_FIRST,
+	if (nft_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
 			       NFT_XML_MAND, err) != 0)
 		return -1;
-
-	cmp->sreg = reg;
-	e->flags |= (1 << NFT_EXPR_CMP_SREG);
+	nft_rule_expr_set_u32(e, NFT_EXPR_CMP_SREG, sreg);
 
 	op = nft_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFT_XML_MAND,
 				err);
@@ -235,9 +233,7 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	op_value = nft_str2cmp(op);
 	if (op_value < 0)
 		return -1;
-
-	cmp->op = op_value;
-	e->flags |= (1 << NFT_EXPR_CMP_OP);
+	nft_rule_expr_set_u32(e, NFT_EXPR_CMP_OP, op_value);
 
 	if (nft_mxml_data_reg_parse(tree, "cmpdata",
 				    &cmp->data, NFT_XML_MAND,
