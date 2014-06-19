@@ -253,9 +253,10 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 #endif
 }
 
-static int
-nft_rule_expr_cmp_snprintf_json(char *buf, size_t size, struct nft_expr_cmp *cmp)
+static int nft_rule_expr_cmp_snprintf_json(char *buf, size_t size,
+					   struct nft_rule_expr *e)
 {
+	struct nft_expr_cmp *cmp = nft_expr_data(e);
 	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "\"sreg\":%u,\"op\":\"%s\",",
@@ -269,9 +270,10 @@ nft_rule_expr_cmp_snprintf_json(char *buf, size_t size, struct nft_expr_cmp *cmp
 	return offset;
 }
 
-static int
-nft_rule_expr_cmp_snprintf_xml(char *buf, size_t size, struct nft_expr_cmp *cmp)
+static int nft_rule_expr_cmp_snprintf_xml(char *buf, size_t size,
+					  struct nft_rule_expr *e)
 {
+	struct nft_expr_cmp *cmp = nft_expr_data(e);
 	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "<sreg>%u</sreg><op>%s</op>",
@@ -285,10 +287,10 @@ nft_rule_expr_cmp_snprintf_xml(char *buf, size_t size, struct nft_expr_cmp *cmp)
 	return offset;
 }
 
-static int
-nft_rule_expr_cmp_snprintf_default(char *buf, size_t size,
-				   struct nft_expr_cmp *cmp)
+static int nft_rule_expr_cmp_snprintf_default(char *buf, size_t size,
+					      struct nft_rule_expr *e)
 {
+	struct nft_expr_cmp *cmp = nft_expr_data(e);
 	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "%s reg %u ",
@@ -306,15 +308,13 @@ static int
 nft_rule_expr_cmp_snprintf(char *buf, size_t size, uint32_t type,
 			   uint32_t flags, struct nft_rule_expr *e)
 {
-	struct nft_expr_cmp *cmp = nft_expr_data(e);
-
 	switch(type) {
 	case NFT_OUTPUT_DEFAULT:
-		return nft_rule_expr_cmp_snprintf_default(buf, size, cmp);
+		return nft_rule_expr_cmp_snprintf_default(buf, size, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_cmp_snprintf_xml(buf, size, cmp);
+		return nft_rule_expr_cmp_snprintf_xml(buf, size, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_cmp_snprintf_json(buf, size, cmp);
+		return nft_rule_expr_cmp_snprintf_json(buf, size, e);
 	default:
 		break;
 	}
