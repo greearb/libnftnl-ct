@@ -279,11 +279,11 @@ nft_rule_expr_bitwise_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int
-nft_rule_expr_bitwise_snprintf_json(char *buf, size_t size,
-				   struct nft_expr_bitwise *bitwise)
+static int nft_rule_expr_bitwise_snprintf_json(char *buf, size_t size,
+					       struct nft_rule_expr *e)
 {
 	int len = size, offset = 0, ret;
+	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
 
 	ret = snprintf(buf, len, "\"sreg\":%u,"
 				 "\"dreg\":%u,"
@@ -311,10 +311,10 @@ nft_rule_expr_bitwise_snprintf_json(char *buf, size_t size,
 	return offset;
 }
 
-static int
-nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
-				   struct nft_expr_bitwise *bitwise)
+static int nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
+					      struct nft_rule_expr *e)
 {
+	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
 	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "<sreg>%u</sreg>"
@@ -343,10 +343,10 @@ nft_rule_expr_bitwise_snprintf_xml(char *buf, size_t size,
 	return offset;
 }
 
-static int
-nft_rule_expr_bitwise_snprintf_default(char *buf, size_t size,
-				       struct nft_expr_bitwise *bitwise)
+static int nft_rule_expr_bitwise_snprintf_default(char *buf, size_t size,
+						  struct nft_rule_expr *e)
 {
+	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
 	int len = size, offset = 0, ret;
 
 	ret = snprintf(buf, len, "reg %u = (reg=%u & ",
@@ -371,16 +371,13 @@ static int
 nft_rule_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
-	struct nft_expr_bitwise *bitwise = nft_expr_data(e);
-
 	switch(type) {
 	case NFT_OUTPUT_DEFAULT:
-		return nft_rule_expr_bitwise_snprintf_default(buf, size,
-							      bitwise);
+		return nft_rule_expr_bitwise_snprintf_default(buf, size, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_bitwise_snprintf_xml(buf, size, bitwise);
+		return nft_rule_expr_bitwise_snprintf_xml(buf, size, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_bitwise_snprintf_json(buf, size, bitwise);
+		return nft_rule_expr_bitwise_snprintf_json(buf, size, e);
 	default:
 		break;
 	}
