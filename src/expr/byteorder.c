@@ -199,18 +199,18 @@ nft_rule_expr_byteorder_json_parse(struct nft_rule_expr *e, json_t *root,
 {
 #ifdef JSON_PARSING
 	const char *op;
-	uint32_t uval32;
+	uint32_t sreg, dreg, len, size;
 	int ntoh;
 
-	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &uval32, err) < 0)
+	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &sreg, err) < 0)
 		return -1;
 
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SREG, uval32);
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SREG, sreg);
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &uval32, err) < 0)
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &dreg, err) < 0)
 		return -1;
 
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_DREG, uval32);
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_DREG, dreg);
 
 	op = nft_jansson_parse_str(root, "op", err);
 	if (op == NULL)
@@ -222,15 +222,15 @@ nft_rule_expr_byteorder_json_parse(struct nft_rule_expr *e, json_t *root,
 
 	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_OP, ntoh);
 
-	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &uval32, err) < 0)
+	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &len, err) < 0)
 		return -1;
 
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_LEN, uval32);
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_LEN, len);
 
-	if (nft_jansson_parse_val(root, "size", NFT_TYPE_U32, &uval32, err) < 0)
+	if (nft_jansson_parse_val(root, "size", NFT_TYPE_U32, &size, err) < 0)
 		return -1;
 
-	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SIZE, uval32);
+	nft_rule_expr_set_u32(e, NFT_EXPR_BYTEORDER_SIZE, size);
 
 	return 0;
 #else
