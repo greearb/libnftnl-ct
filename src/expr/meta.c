@@ -187,29 +187,22 @@ static int nft_rule_expr_meta_json_parse(struct nft_rule_expr *e, json_t *root,
 	int key;
 
 	key_str = nft_jansson_parse_str(root, "key", err);
-	if (key_str == NULL)
-		return -1;
-
-	key = str2meta_key(key_str);
-	if (key < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_META_KEY, key);
+	if (key_str != NULL) {
+		key = str2meta_key(key_str);
+		if (key >= 0)
+			nft_rule_expr_set_u32(e, NFT_EXPR_META_KEY, key);
+	}
 
 	if (nft_jansson_node_exist(root, "dreg")) {
 		if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg,
-					  err) < 0)
-			return -1;
-
-		nft_rule_expr_set_u32(e, NFT_EXPR_META_DREG, reg);
+					  err) == 0)
+			nft_rule_expr_set_u32(e, NFT_EXPR_META_DREG, reg);
 	}
 
 	if (nft_jansson_node_exist(root, "sreg")) {
 		if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg,
-					  err) < 0)
-			return -1;
-
-		nft_rule_expr_set_u32(e, NFT_EXPR_META_SREG, reg);
+					  err) == 0)
+			nft_rule_expr_set_u32(e, NFT_EXPR_META_SREG, reg);
 	}
 
 	return 0;
@@ -301,27 +294,25 @@ nft_rule_expr_meta_snprintf_json(char *buf, size_t size,
 	struct nft_expr_meta *meta = nft_expr_data(e);
 
 	if (e->flags & (1 << NFT_EXPR_META_DREG)) {
-		ret = snprintf(buf+offset, len, "\"dreg\":%u,",
+		ret = snprintf(buf + offset, len, "\"dreg\":%u,",
 			       meta->dreg);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
 	if (e->flags & (1 << NFT_EXPR_META_KEY)) {
-		ret = snprintf(buf+offset, len, "\"key\":\"%s\",",
-						meta_key2str(meta->key));
+		ret = snprintf(buf + offset, len, "\"key\":\"%s\",",
+			       meta_key2str(meta->key));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
 	if (e->flags & (1 << NFT_EXPR_META_SREG)) {
-		ret = snprintf(buf+offset, len, "\"sreg\":%u,",
+		ret = snprintf(buf + offset, len, "\"sreg\":%u,",
 			       meta->sreg);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
+	/* Remove the last comma separator */
+	if (offset > 0)
+		offset--;
 
-	/* Remove the last separator characther */
-	buf[offset-1] = '\0';
-
-	return offset-1;
+	return offset;
 }
 
 static int
