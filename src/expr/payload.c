@@ -170,14 +170,24 @@ nft_rule_expr_payload_snprintf_json(char *buf, size_t len, uint32_t flags,
 	struct nft_expr_payload *payload = nft_expr_data(e);
 	int size = len, offset = 0, ret;
 
-	ret = snprintf(buf, len, "\"dreg\":%u,"
-				 "\"offset\":%u,"
-				 "\"len\":%u,"
-				 "\"base\":\"%s\"",
-		       payload->dreg, payload->offset, payload->len,
-		       base2str(payload->base));
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_DREG)) {
+		ret = snprintf(buf, len, "\"dreg\":%u,", payload->dreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_OFFSET)) {
+		ret = snprintf(buf + offset, len, "\"offset\":%u,",
+			       payload->offset);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_LEN)) {
+		ret = snprintf(buf + offset, len, "\"len\":%u,", payload->len);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_BASE)) {
+		ret = snprintf(buf + offset, len, "\"base\":\"%s\"",
+			       base2str(payload->base));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 	return offset;
 }
 
@@ -204,31 +214,24 @@ nft_rule_expr_payload_json_parse(struct nft_rule_expr *e, json_t *root,
 	uint32_t reg, uval32;
 	int base;
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_DREG, reg);
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_DREG, reg);
 
 	base_str = nft_jansson_parse_str(root, "base", err);
-	if (base_str == NULL)
-		return -1;
+	if (base_str != NULL) {
+		base = nft_str2base(base_str);
+		if (base < 0)
+			return -1;
 
-	base = nft_str2base(base_str);
-	if (base < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_BASE, base);
+		nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_BASE, base);
+	}
 
 	if (nft_jansson_parse_val(root, "offset", NFT_TYPE_U32, &uval32,
-				  err) < 0)
-		return -1;
+				  err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_OFFSET, uval32);
 
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_OFFSET, uval32);
-
-	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &uval32, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_LEN, uval32);
+	if (nft_jansson_parse_val(root, "len", NFT_TYPE_U32, &uval32, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_LEN, uval32);
 
 	return 0;
 #else
