@@ -247,32 +247,27 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 	uint32_t dreg, offset, len;
 
 	if (nft_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
-			       NFT_XML_MAND, err) != 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_DREG, dreg);
+			       NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_DREG, dreg);
 
 	base_str = nft_mxml_str_parse(tree, "base", MXML_DESCEND_FIRST,
 				      NFT_XML_MAND, err);
-	if (base_str == NULL)
-		return -1;
+	if (base_str != NULL) {
+		base = nft_str2base(base_str);
+		if (base < 0)
+			return -1;
 
-	base = nft_str2base(base_str);
-	if (base < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_BASE, base);
+		nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_BASE, base);
+	}
 
 	if (nft_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
-			       &offset, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_OFFSET, offset);
+			       &offset, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_OFFSET, offset);
 
 
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &len, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_LEN, len);
+			       &len, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_LEN, len);
 
 	return 0;
 #else
@@ -288,13 +283,24 @@ nft_rule_expr_payload_snprintf_xml(char *buf, size_t len, uint32_t flags,
 	struct nft_expr_payload *payload = nft_expr_data(e);
 	int size = len, offset = 0, ret;
 
-	ret = snprintf(buf, len, "<dreg>%u</dreg>"
-				 "<offset>%u</offset>"
-				 "<len>%u</len>"
-				 "<base>%s</base>",
-		       payload->dreg, payload->offset, payload->len,
-		       base2str(payload->base));
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_DREG)) {
+		ret = snprintf(buf, len, "<dreg>%u</dreg>", payload->dreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_OFFSET)) {
+		ret = snprintf(buf + offset, len, "<offset>%u</offset>",
+			       payload->offset);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_LEN)) {
+		ret = snprintf(buf + offset, len, "<len>%u</len>", payload->len);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_BASE)) {
+		ret = snprintf(buf + offset, len, "<base>%s</base>",
+			       base2str(payload->base));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	return offset;
 }
