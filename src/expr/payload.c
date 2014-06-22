@@ -165,15 +165,17 @@ static const char *base2str(enum nft_payload_bases base)
 
 static int
 nft_rule_expr_payload_snprintf_json(char *buf, size_t len, uint32_t flags,
-				   struct nft_expr_payload *p)
+				   struct nft_rule_expr *e)
 {
+	struct nft_expr_payload *payload = nft_expr_data(e);
 	int size = len, offset = 0, ret;
 
 	ret = snprintf(buf, len, "\"dreg\":%u,"
 				 "\"offset\":%u,"
 				 "\"len\":%u,"
 				 "\"base\":\"%s\"",
-		       p->dreg, p->offset, p->len, base2str(p->base));
+		       payload->dreg, payload->offset, payload->len,
+		       base2str(payload->base));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -281,15 +283,17 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 
 static int
 nft_rule_expr_payload_snprintf_xml(char *buf, size_t len, uint32_t flags,
-				   struct nft_expr_payload *p)
+				   struct nft_rule_expr *e)
 {
+	struct nft_expr_payload *payload = nft_expr_data(e);
 	int size = len, offset = 0, ret;
 
 	ret = snprintf(buf, len, "<dreg>%u</dreg>"
 				 "<offset>%u</offset>"
 				 "<len>%u</len>"
 				 "<base>%s</base>",
-		       p->dreg, p->offset, p->len, base2str(p->base));
+		       payload->dreg, payload->offset, payload->len,
+		       base2str(payload->base));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -307,11 +311,9 @@ nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 				payload->len, base2str(payload->base),
 				payload->offset, payload->dreg);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_payload_snprintf_xml(buf, len, flags,
-							  payload);
+		return nft_rule_expr_payload_snprintf_xml(buf, len, flags, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_payload_snprintf_json(buf, len, flags,
-							  payload);
+		return nft_rule_expr_payload_snprintf_json(buf, len, flags, e);
 	default:
 		break;
 	}
