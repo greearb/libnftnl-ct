@@ -178,10 +178,8 @@ nft_rule_expr_target_json_parse(struct nft_rule_expr *e, json_t *root,
 	const char *name;
 
 	name = nft_jansson_parse_str(root, "name", err);
-	if (name == NULL)
-		return -1;
-
-	nft_rule_expr_set_str(e, NFT_EXPR_TG_NAME, name);
+	if (name != NULL)
+		nft_rule_expr_set_str(e, NFT_EXPR_TG_NAME, name);
 
 	return 0;
 #else
@@ -217,8 +215,10 @@ static int nft_rule_exp_target_snprintf_json(char *buf, size_t len,
 	struct nft_expr_target *target = nft_expr_data(e);
 	int ret, size = len, offset = 0;
 
-	ret = snprintf(buf, len, "\"name\":\"%s\"", target->name);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	if (e->flags & (1 << NFT_EXPR_TG_NAME)) {
+		ret = snprintf(buf, len, "\"name\":\"%s\"", target->name);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	return offset;
 }
