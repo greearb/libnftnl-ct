@@ -199,10 +199,8 @@ nft_rule_expr_target_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFT_XML_MAND, err);
-	if (name == NULL)
-		return -1;
-
-	nft_rule_expr_set_str(e, NFT_EXPR_TG_NAME, name);
+	if (name != NULL)
+		nft_rule_expr_set_str(e, NFT_EXPR_TG_NAME, name);
 
 	/* tg->info is ignored until other solution is reached */
 
@@ -232,8 +230,10 @@ static int nft_rule_exp_target_snprintf_xml(char *buf, size_t len,
 	int ret, size=len;
 	int offset = 0;
 
-	ret = snprintf(buf, len, "<name>%s</name>", target->name);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	if (e->flags & (1 << NFT_EXPR_TG_NAME)) {
+		ret = snprintf(buf, len, "<name>%s</name>", target->name);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	return offset;
 }
