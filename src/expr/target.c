@@ -216,27 +216,26 @@ nft_rule_expr_target_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static
-int nft_rule_exp_target_snprintf_json(char *buf, size_t len,
-				struct nft_expr_target *tg)
+static int nft_rule_exp_target_snprintf_json(char *buf, size_t len,
+					     struct nft_rule_expr *e)
 {
+	struct nft_expr_target *target = nft_expr_data(e);
 	int ret, size = len, offset = 0;
 
-	ret = snprintf(buf, len, "\"name\":\"%s\"",
-			tg->name);
+	ret = snprintf(buf, len, "\"name\":\"%s\"", target->name);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }
 
-static
-int nft_rule_exp_target_snprintf_xml(char *buf, size_t len,
-				struct nft_expr_target *tg)
+static int nft_rule_exp_target_snprintf_xml(char *buf, size_t len,
+					    struct nft_rule_expr *e)
 {
+	struct nft_expr_target *target = nft_expr_data(e);
 	int ret, size=len;
 	int offset = 0;
 
-	ret = snprintf(buf, len, "<name>%s</name>", tg->name);
+	ret = snprintf(buf, len, "<name>%s</name>", target->name);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -253,9 +252,9 @@ nft_rule_expr_target_snprintf(char *buf, size_t len, uint32_t type,
 		return snprintf(buf, len, "name %s rev %u ",
 				target->name, target->rev);
 	case NFT_OUTPUT_XML:
-		return nft_rule_exp_target_snprintf_xml(buf, len, target);
+		return nft_rule_exp_target_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_exp_target_snprintf_json(buf, len, target);
+		return nft_rule_exp_target_snprintf_json(buf, len, e);
 	default:
 		break;
 	}
