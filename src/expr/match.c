@@ -216,8 +216,9 @@ static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, mxml_node_t *t
 }
 
 static int nft_rule_expr_match_snprintf_json(char *buf, size_t len,
-					    struct nft_expr_match *mt)
+					     struct nft_rule_expr *e)
 {
+	struct nft_expr_match *mt = nft_expr_data(e);
 	int ret, size = len, offset = 0;
 
 	ret = snprintf(buf, len, "\"name\":\"%s\"",
@@ -228,8 +229,9 @@ static int nft_rule_expr_match_snprintf_json(char *buf, size_t len,
 }
 
 static int nft_rule_expr_match_snprintf_xml(char *buf, size_t len,
-					    struct nft_expr_match *mt)
+					    struct nft_rule_expr *e)
 {
+	struct nft_expr_match *mt = nft_expr_data(e);
 	int ret, size=len;
 	int offset = 0;
 
@@ -251,9 +253,9 @@ nft_rule_expr_match_snprintf(char *buf, size_t len, uint32_t type,
 		return snprintf(buf, len, "name %s rev %u ",
 				match->name, match->rev);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_match_snprintf_xml(buf, len, match);
+		return nft_rule_expr_match_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_match_snprintf_json(buf, len, match);
+		return nft_rule_expr_match_snprintf_json(buf, len, e);
 	default:
 		break;
 	}
