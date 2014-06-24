@@ -169,23 +169,45 @@ nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 	return -1;
 #endif
 }
-
-static int
-nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
-			       uint32_t flags, struct nft_rule_expr *e)
+static int nft_rule_expr_counter_snprintf_json(char *buf, size_t len,
+					       struct nft_rule_expr *e)
 {
 	struct nft_expr_counter *ctr = nft_expr_data(e);
 
+	return snprintf(buf, len, "\"pkts\":%"PRIu64",\"bytes\":%"PRIu64"",
+			ctr->pkts, ctr->bytes);
+}
+
+static int nft_rule_expr_counter_snprintf_xml(char *buf, size_t len,
+					      struct nft_rule_expr *e)
+{
+	struct nft_expr_counter *ctr = nft_expr_data(e);
+
+	return snprintf(buf, len, "<pkts>%"PRIu64"</pkts>"
+				  "<bytes>%"PRIu64"</bytes>",
+			ctr->pkts, ctr->bytes);
+}
+
+static int nft_rule_expr_counter_snprintf_default(char *buf, size_t len,
+						  struct nft_rule_expr *e)
+{
+	struct nft_expr_counter *ctr = nft_expr_data(e);
+
+	return snprintf(buf, len, "pkts %"PRIu64" bytes %"PRIu64" ",
+			ctr->pkts, ctr->bytes);
+}
+
+static int nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
+					  uint32_t flags,
+					  struct nft_rule_expr *e)
+{
 	switch(type) {
 	case NFT_OUTPUT_DEFAULT:
-		return snprintf(buf, len, "pkts %"PRIu64" bytes %"PRIu64" ",
-				ctr->pkts, ctr->bytes);
+		return nft_rule_expr_counter_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return snprintf(buf, len, "<pkts>%"PRIu64"</pkts><bytes>%"PRIu64"</bytes>",
-				ctr->pkts, ctr->bytes);
+		return nft_rule_expr_counter_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return snprintf(buf, len, "\"pkts\":%"PRIu64",\"bytes\":%"PRIu64"",
-				ctr->pkts, ctr->bytes);
+		return nft_rule_expr_counter_snprintf_json(buf, len, e);
 	default:
 		break;
 	}
