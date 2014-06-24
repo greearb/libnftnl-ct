@@ -125,15 +125,13 @@ nft_rule_expr_counter_json_parse(struct nft_rule_expr *e, json_t *root,
 #ifdef JSON_PARSING
 	uint64_t uval64;
 
-	if (nft_jansson_parse_val(root, "pkts", NFT_TYPE_U64, &uval64, err) < 0)
-		return -1;
+	if (nft_jansson_parse_val(root, "pkts", NFT_TYPE_U64, &uval64,
+				  err) == 0)
+		nft_rule_expr_set_u64(e, NFT_EXPR_CTR_PACKETS, uval64);
 
-	nft_rule_expr_set_u64(e, NFT_EXPR_CTR_PACKETS, uval64);
-
-	if (nft_jansson_parse_val(root, "bytes", NFT_TYPE_U64, &uval64, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u64(e, NFT_EXPR_CTR_BYTES, uval64);
+	if (nft_jansson_parse_val(root, "bytes", NFT_TYPE_U64, &uval64,
+				  err) == 0)
+		nft_rule_expr_set_u64(e, NFT_EXPR_CTR_BYTES, uval64);
 
 	return 0;
 #else
@@ -166,10 +164,23 @@ nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 static int nft_rule_expr_counter_snprintf_json(char *buf, size_t len,
 					       struct nft_rule_expr *e)
 {
+	int ret, size = len, offset = 0;
 	struct nft_expr_counter *ctr = nft_expr_data(e);
 
-	return snprintf(buf, len, "\"pkts\":%"PRIu64",\"bytes\":%"PRIu64"",
-			ctr->pkts, ctr->bytes);
+	if (e->flags & (1 << NFT_EXPR_CTR_PACKETS)) {
+		ret = snprintf(buf, len,"\"pkts\":%"PRIu64",", ctr->pkts);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_CTR_BYTES)) {
+		ret = snprintf(buf + offset, len, "\"bytes\":%"PRIu64",", ctr->bytes);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	/* Remove the last comma characther */
+	if (offset > 0)
+		offset--;
+
+	return offset;
 }
 
 static int nft_rule_expr_counter_snprintf_xml(char *buf, size_t len,
