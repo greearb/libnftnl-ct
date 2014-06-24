@@ -292,24 +292,22 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 	uint32_t dreg, sreg;
 
 	if (nft_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
-			       NFT_XML_OPT, err) >= 0)
+			       NFT_XML_OPT, err) == 0)
 		nft_rule_expr_set_u32(e, NFT_EXPR_CT_DREG, dreg);
 
 	if (nft_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
-			       NFT_XML_OPT, err) >= 0)
+			       NFT_XML_OPT, err) == 0)
 		nft_rule_expr_set_u32(e, NFT_EXPR_CT_SREG, sreg);
 
 	key_str = nft_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST,
 				     NFT_XML_MAND, err);
-	if (key_str == NULL)
-		return -1;
+	if (key_str != NULL) {
+		key = str2ctkey(key_str);
+		if (key < 0)
+			return -1;
 
-	key = str2ctkey(key_str);
-	if (key < 0)
-		goto err;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_CT_KEY, key);
-
+		nft_rule_expr_set_u32(e, NFT_EXPR_CT_KEY, key);
+	}
 	dir_str = nft_mxml_str_parse(tree, "dir", MXML_DESCEND_FIRST,
 				     NFT_XML_OPT, err);
 	if (dir_str != NULL) {
@@ -318,7 +316,6 @@ static int nft_rule_expr_ct_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree
 			err->error = NFT_PARSE_EBADTYPE;
 			goto err;
 		}
-
 		nft_rule_expr_set_u8(e, NFT_EXPR_CT_DIR, dir);
 	}
 
@@ -373,23 +370,20 @@ nft_expr_ct_snprintf_xml(char *buf, size_t size, struct nft_rule_expr *e)
 	struct nft_expr_ct *ct = nft_expr_data(e);
 
 	if (e->flags & (1 << NFT_EXPR_CT_DREG)) {
-		ret = snprintf(buf+offset, len, "<dreg>%u</dreg>", ct->dreg);
+		ret = snprintf(buf + offset, len, "<dreg>%u</dreg>", ct->dreg);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
 	if (e->flags & (1 << NFT_EXPR_CT_SREG)) {
-		ret = snprintf(buf+offset, len, "<sreg>%u</sreg>", ct->sreg);
+		ret = snprintf(buf + offset, len, "<sreg>%u</sreg>", ct->sreg);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
 	if (e->flags & (1 << NFT_EXPR_CT_KEY)) {
-		ret = snprintf(buf+offset, len, "<key>%s</key>",
+		ret = snprintf(buf + offset, len, "<key>%s</key>",
 			       ctkey2str(ct->key));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
-
 	if (nft_rule_expr_is_set(e, NFT_EXPR_CT_DIR)) {
-		ret = snprintf(buf+offset, len, "<dir>%s</dir>",
+		ret = snprintf(buf + offset, len, "<dir>%s</dir>",
 			       ctdir2str(ct->dir));
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
