@@ -358,9 +358,10 @@ nft_expr_ct_snprintf_json(char *buf, size_t size, struct nft_rule_expr *e)
 	}
 
 	/* Remove the last separator characther  */
-	buf[offset-1] = '\0';
+	if (offset > 0)
+		offset--;
 
-	return offset-1;
+	return offset;
 }
 
 static int
