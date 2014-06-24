@@ -285,32 +285,52 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
+static int nft_rule_expr_exthdr_snprintf_json(char *buf, size_t len,
+					      struct nft_rule_expr *e)
+{
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
+
+	return snprintf(buf, len, "\"dreg\":%u,"
+				  "\"exthdr_type\":\"%s\",\"offset\":%u,"
+				  "\"len\":%u",
+			exthdr->dreg, exthdr_type2str(exthdr->type),
+			exthdr->offset, exthdr->len);
+}
+
+static int nft_rule_expr_exthdr_snprintf_xml(char *buf, size_t len,
+					     struct nft_rule_expr *e)
+{
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
+
+	return snprintf(buf, len, "<dreg>%u</dreg>"
+				  "<exthdr_type>%s</exthdr_type>"
+				  "<offset>%u</offset>"
+				  "<len>%u</len>",
+			exthdr->dreg, exthdr_type2str(exthdr->type),
+			exthdr->offset, exthdr->len);
+}
+
+static int nft_rule_expr_exthdr_snprintf_default(char *buf, size_t len,
+						 struct nft_rule_expr *e)
+{
+	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
+
+	return snprintf(buf, len, "load %ub @ %u + %u => reg %u ",
+			exthdr->len, exthdr->type, exthdr->offset,
+			exthdr->dreg);
+}
+
 static int
 nft_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
-	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
-
 	switch(type) {
 	case NFT_OUTPUT_DEFAULT:
-		return snprintf(buf, len, "load %ub @ %u + %u => reg %u ",
-				exthdr->len, exthdr->type,
-				exthdr->offset, exthdr->dreg);
+		return nft_rule_expr_exthdr_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return snprintf(buf, len, "<dreg>%u</dreg>"
-					  "<exthdr_type>%s</exthdr_type>"
-					  "<offset>%u</offset>"
-					  "<len>%u</len>",
-					exthdr->dreg,
-					exthdr_type2str(exthdr->type),
-					exthdr->offset, exthdr->len);
+		return nft_rule_expr_exthdr_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return snprintf(buf, len, "\"dreg\":%u,"
-					  "\"exthdr_type\":\"%s\",\"offset\":%u,"
-					  "\"len\":%u",
-					exthdr->dreg,
-					exthdr_type2str(exthdr->type),
-					exthdr->offset, exthdr->len);
+		return nft_rule_expr_exthdr_snprintf_json(buf, len, e);
 	default:
 		break;
 	}
