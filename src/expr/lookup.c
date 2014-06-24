@@ -199,17 +199,15 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 
 	set_name = nft_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST,
 				      NFT_XML_MAND, err);
-	if (set_name == NULL)
-		return -1;
-	nft_rule_expr_set_str(e, NFT_EXPR_LOOKUP_SET, set_name);
+	if (set_name != NULL)
+		nft_rule_expr_set_str(e, NFT_EXPR_LOOKUP_SET, set_name);
 
-	if (nft_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND,
-			       NFT_XML_MAND, err) != 0)
-		return -1;
-	nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SREG, sreg);
+	if (nft_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND, NFT_XML_MAND,
+			       err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SREG, sreg);
 
-	if (nft_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND,
-			       NFT_XML_OPT, err) == 0)
+	if (nft_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND, NFT_XML_OPT,
+			       err) == 0)
 		nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_DREG, dreg);
 
 	return 0;
@@ -246,12 +244,16 @@ nft_rule_expr_lookup_snprintf_xml(char *buf, size_t size,
 	int len = size, offset = 0, ret;
 	struct nft_expr_lookup *l = nft_expr_data(e);
 
-	ret = snprintf(buf, len, "<set>%s</set><sreg>%u</sreg>",
-		       l->set_name, l->sreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_SET)) {
+		ret = snprintf(buf, len, "<set>%s</set>", l->set_name);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_SREG)) {
+		ret = snprintf(buf + offset, len, "<sreg>%u</sreg>", l->sreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 	if (e->flags & (1 << NFT_EXPR_LOOKUP_DREG)) {
-		ret = snprintf(buf+offset, len, "<dreg>%u</dreg>", l->dreg);
+		ret = snprintf(buf + offset, len, "<dreg>%u</dreg>", l->dreg);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
