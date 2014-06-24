@@ -230,44 +230,28 @@ static int nft_rule_expr_ct_json_parse(struct nft_rule_expr *e, json_t *root,
 	uint8_t dir;
 	int key;
 
-	if (nft_jansson_node_exist(root, "dreg")) {
-		if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
-			return -1;
-
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) == 0)
 		nft_rule_expr_set_u32(e, NFT_EXPR_CT_DREG, reg);
-	}
 
-	if (nft_jansson_node_exist(root, "sreg")) {
-		if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg, err) < 0)
-			return -1;
-
+	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg, err) == 0)
 		nft_rule_expr_set_u32(e, NFT_EXPR_CT_SREG, reg);
-	}
 
-	if (nft_jansson_node_exist(root, "key")) {
-		key_str = nft_jansson_parse_str(root, "key", err);
-		if (key_str == NULL)
-			return -1;
-
+	key_str = nft_jansson_parse_str(root, "key", err);
+	if (key_str != NULL) {
 		key = str2ctkey(key_str);
 		if (key < 0)
-			goto err;
-
-		nft_rule_expr_set_u32(e, NFT_EXPR_CT_KEY, key);
-
-	}
-
-	if (nft_jansson_node_exist(root, "dir")) {
-		dir_str = nft_jansson_parse_str(root, "dir", err);
-		if (dir_str == NULL)
 			return -1;
 
+		nft_rule_expr_set_u32(e, NFT_EXPR_CT_KEY, key);
+	}
+
+	dir_str = nft_jansson_parse_str(root, "dir", err);
+	if (dir_str != NULL) {
 		if (str2ctdir(dir_str, &dir) != 0) {
 			err->node_name = "dir";
 			err->error = NFT_PARSE_EBADTYPE;
 			goto err;
 		}
-
 		nft_rule_expr_set_u8(e, NFT_EXPR_CT_DIR, dir);
 	}
 
