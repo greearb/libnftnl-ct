@@ -164,23 +164,17 @@ nft_rule_expr_lookup_json_parse(struct nft_rule_expr *e, json_t *root,
 {
 #ifdef JSON_PARSING
 	const char *set_name;
-	int32_t reg;
+	uint32_t sreg, dreg;
 
 	set_name = nft_jansson_parse_str(root, "set", err);
-	if (set_name == NULL)
-		return -1;
+	if (set_name != NULL)
+		nft_rule_expr_set_str(e, NFT_EXPR_LOOKUP_SET, set_name);
 
-	nft_rule_expr_set_str(e, NFT_EXPR_LOOKUP_SET, set_name);
+	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &sreg, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SREG, sreg);
 
-	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &reg, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SREG, reg);
-
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) < 0)
-		return -1;
-
-	nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_DREG, reg);
+	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &dreg, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_DREG, dreg);
 
 	return 0;
 #else
@@ -224,18 +218,24 @@ nft_rule_expr_lookup_snprintf_json(char *buf, size_t size,
 	int len = size, offset = 0, ret;
 	struct nft_expr_lookup *l = nft_expr_data(e);
 
-	ret = snprintf(buf, len, "\"set\":\"%s\",\"sreg\":%u",
-			l->set_name, l->sreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	if (e->flags & (1 << NFT_EXPR_LOOKUP_DREG)) {
-		ret = snprintf(buf+offset, len, ",\"dreg\":%u", l->dreg);
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_SET)) {
+		ret = snprintf(buf, len, "\"set\":\"%s\",", l->set_name);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_SREG)) {
+		ret = snprintf(buf + offset, len, "\"sreg\":%u,", l->sreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_DREG)) {
+		ret = snprintf(buf + offset, len, "\"dreg\":%u,", l->dreg);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	/* Remove the last comma characther */
+	if (offset > 0)
+		offset--;
 
 	return offset;
 }
-
 
 static int
 nft_rule_expr_lookup_snprintf_xml(char *buf, size_t size,
