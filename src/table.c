@@ -72,8 +72,7 @@ void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
 	case NFT_TABLE_ATTR_FAMILY:
 		break;
 	case NFT_TABLE_ATTR_USE:
-		/* Cannot be unset, ignoring it */
-		return;
+		break;
 	}
 	t->flags &= ~(1 << attr);
 }
@@ -106,8 +105,8 @@ void nft_table_attr_set_data(struct nft_table *t, uint16_t attr,
 		t->family = *((uint32_t *)data);
 		break;
 	case NFT_TABLE_ATTR_USE:
-		/* Cannot be set, ignoring it */
-		return;
+		t->use = *((uint32_t *)data);
+		break;
 	}
 	t->flags |= (1 << attr);
 }
@@ -263,7 +262,7 @@ int nft_mxml_table_parse(mxml_node_t *tree, struct nft_table *t,
 {
 	const char *name;
 	int family;
-	uint32_t flags;
+	uint32_t flags, use;
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFT_XML_MAND, err);
@@ -281,6 +280,10 @@ int nft_mxml_table_parse(mxml_node_t *tree, struct nft_table *t,
 			       &flags, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
 		return -1;
 	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
+
+	if (nft_mxml_num_parse(tree, "use", MXML_DESCEND, BASE_DEC,
+			       &use, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
+		nft_table_attr_set_u32(t, NFT_TABLE_ATTR_USE, use);
 
 	return 0;
 }
@@ -310,7 +313,7 @@ int nft_jansson_parse_table(struct nft_table *t, json_t *tree,
 			    struct nft_parse_err *err)
 {
 	json_t *root;
-	uint32_t flags;
+	uint32_t flags, use;
 	const char *str;
 	int family;
 
@@ -333,6 +336,9 @@ int nft_jansson_parse_table(struct nft_table *t, json_t *tree,
 		return -1;
 
 	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
+
+	if (nft_jansson_parse_val(root, "use", NFT_TYPE_U32, &use, err) == 0)
+		nft_table_attr_set_u32(t, NFT_TABLE_ATTR_USE, use);
 
 	return 0;
 }
