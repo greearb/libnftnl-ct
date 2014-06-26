@@ -263,32 +263,24 @@ int nft_mxml_table_parse(mxml_node_t *tree, struct nft_table *t,
 {
 	const char *name;
 	int family;
+	uint32_t flags;
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFT_XML_MAND, err);
 	if (name == NULL)
 		return -1;
-
-	if (t->name)
-		xfree(t->name);
-
-	t->name = strdup(name);
-	t->flags |= (1 << NFT_TABLE_ATTR_NAME);
+	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, name);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFT_XML_MAND, err);
 	if (family < 0)
 		return -1;
-
-	t->family = family;
-	t->flags |= (1 << NFT_TABLE_ATTR_FAMILY);
+	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND, BASE_DEC,
-			       &t->table_flags, NFT_TYPE_U32,
-			       NFT_XML_MAND, err) != 0)
+			       &flags, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
 		return -1;
-
-	t->flags |= (1 << NFT_TABLE_ATTR_FLAGS);
+	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
 
 	return 0;
 }
