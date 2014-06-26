@@ -319,20 +319,15 @@ int nft_jansson_parse_table(struct nft_table *t, json_t *tree,
 		return -1;
 
 	str = nft_jansson_parse_str(root, "name", err);
-	if (str == NULL)
-		return -1;
+	if (str != NULL)
+		nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, str);
 
-	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, str);
+	if (nft_jansson_parse_family(root, &family, err) == 0)
+		nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
 
-	if (nft_jansson_parse_family(root, &family, err) != 0)
-		return -1;
-
-	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
-
-	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &flags, err) < 0)
-		return -1;
-
-	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
+	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &flags,
+				  err) == 0)
+		nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
 
 	if (nft_jansson_parse_val(root, "use", NFT_TYPE_U32, &use, err) == 0)
 		nft_table_attr_set_u32(t, NFT_TABLE_ATTR_USE, use);
@@ -407,16 +402,41 @@ EXPORT_SYMBOL(nft_table_parse_file);
 
 static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 {
-	return snprintf(buf, size,
-			"{\"table\":{"
-			"\"name\":\"%s\","
-			"\"family\":\"%s\","
-			"\"flags\":%d,"
-			"\"use\":%d"
-			"}"
-			"}" ,
-			t->name, nft_family2str(t->family),
-			t->table_flags, t->use);
+	int ret, len = size, offset = 0;
+
+	ret = snprintf(buf, size, "{\"table\":{");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = 0;
+
+	if (t->flags & (1 << NFT_TABLE_ATTR_NAME)) {
+		ret = snprintf(buf + offset, size, "\"name\":\"%s\",", t->name);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (t->flags & (1 << NFT_TABLE_ATTR_FAMILY)) {
+		ret = snprintf(buf + offset, size, "\"family\":\"%s\",",
+			       nft_family2str(t->family));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS)) {
+		ret = snprintf(buf + offset, size, "\"flags\":%u,",
+			       t->table_flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (t->flags & (1 << NFT_TABLE_ATTR_USE)) {
+		ret = snprintf(buf + offset, size, "\"use\":%u,", t->use);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	/* If  some values is set, ret is not 0. So, It's needed to remove the
+	 * last comma characther
+	 */
+	if (ret > 0)
+		offset--;
+
+	ret = snprintf(buf + offset, size, "}}");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
 }
 
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
