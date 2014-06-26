@@ -266,20 +266,17 @@ int nft_mxml_table_parse(mxml_node_t *tree, struct nft_table *t,
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFT_XML_MAND, err);
-	if (name == NULL)
-		return -1;
-	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, name);
+	if (name != NULL)
+		nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, name);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFT_XML_MAND, err);
-	if (family < 0)
-		return -1;
-	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
+	if (family >= 0)
+		nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
 
 	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND, BASE_DEC,
-			       &flags, NFT_TYPE_U32, NFT_XML_MAND, err) != 0)
-		return -1;
-	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
+			       &flags, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
+		nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
 
 	if (nft_mxml_num_parse(tree, "use", MXML_DESCEND, BASE_DEC,
 			       &use, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
@@ -424,10 +421,34 @@ static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
 
 static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
 {
-	return snprintf(buf, size, "<table><name>%s</name><family>%s</family>"
-			"<flags>%d</flags><use>%d</use></table>",
-			t->name, nft_family2str(t->family),
-			t->table_flags, t->use);
+	int ret, len = size, offset = 0;
+
+	ret = snprintf(buf, size, "<table>");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (t->flags & (1 << NFT_TABLE_ATTR_NAME)) {
+		ret = snprintf(buf + offset, size, "<name>%s</name>", t->name);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (t->flags & (1 << NFT_TABLE_ATTR_FAMILY)) {
+		ret = snprintf(buf + offset, size, "<family>%s</family>",
+			       nft_family2str(t->family));
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS)) {
+		ret = snprintf(buf + offset, size, "<flags>%u</flags>",
+			       t->table_flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (t->flags & (1 << NFT_TABLE_ATTR_USE)) {
+		ret = snprintf(buf + offset, size, "<use>%u</use>", t->use);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	ret = snprintf(buf + offset, size, "</table>");
+	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	return offset;
 }
 
 static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)
