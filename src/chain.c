@@ -115,8 +115,7 @@ void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr)
 		}
 		break;
 	case NFT_CHAIN_ATTR_USE:
-		/* cannot be unset?, ignore it */
-		return;
+		break;
 	case NFT_CHAIN_ATTR_TYPE:
 		if (c->type) {
 			xfree(c->type);
@@ -178,8 +177,8 @@ void nft_chain_attr_set_data(struct nft_chain *c, uint16_t attr,
 		c->policy = *((uint32_t *)data);
 		break;
 	case NFT_CHAIN_ATTR_USE:
-		/* cannot be set, ignore it */
-		return;
+		c->use = *((uint32_t *)data);
+		break;
 	case NFT_CHAIN_ATTR_BYTES:
 		c->bytes = *((uint64_t *)data);
 		break;
@@ -356,6 +355,8 @@ void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain 
 	}
 	if (c->flags & (1 << NFT_CHAIN_ATTR_POLICY))
 		mnl_attr_put_u32(nlh, NFTA_CHAIN_POLICY, htonl(c->policy));
+	if (c->flags & (1 << NFT_CHAIN_ATTR_USE))
+		mnl_attr_put_u32(nlh, NFTA_CHAIN_USE, htonl(c->use));
 	if ((c->flags & (1 << NFT_CHAIN_ATTR_PACKETS)) &&
 	    (c->flags & (1 << NFT_CHAIN_ATTR_BYTES))) {
 		struct nlattr *nest;
@@ -566,7 +567,7 @@ int nft_jansson_parse_chain(struct nft_chain *c, json_t *tree,
 	json_t *root;
 	uint64_t uval64;
 	int policy;
-	int32_t val32;
+	int32_t val32, use;
 	const char *valstr;
 
 	root = nft_jansson_get_node(tree, "chain", err);
@@ -608,6 +609,9 @@ int nft_jansson_parse_chain(struct nft_chain *c, json_t *tree,
 		return -1;
 
 	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TABLE, valstr);
+
+	if (nft_jansson_parse_val(root, "use", NFT_TYPE_U32, &use, err) == 0)
+		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_USE, use);
 
 	if (nft_jansson_node_exist(root, "hooknum")) {
 		valstr = nft_jansson_parse_str(root, "type", err);
@@ -681,7 +685,7 @@ int nft_mxml_chain_parse(mxml_node_t *tree, struct nft_chain *c,
 {
 	const char *table, *name, *hooknum_str, *policy_str, *type;
 	int family, hooknum, policy;
-	uint64_t handle, bytes, packets, prio;
+	uint64_t handle, bytes, packets, prio, use;
 
 	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFT_XML_MAND, err);
@@ -710,6 +714,10 @@ int nft_mxml_chain_parse(mxml_node_t *tree, struct nft_chain *c,
 	if (table == NULL)
 		return -1;
 	nft_chain_attr_set_str(c, NFT_CHAIN_ATTR_TABLE, table);
+
+	if (nft_mxml_num_parse(tree, "use", MXML_DESCEND_FIRST, BASE_DEC,
+			       &use, NFT_TYPE_U64, NFT_XML_MAND, err) == 0)
+		nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_PACKETS, use);
 
 	family = nft_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFT_XML_MAND, err);
@@ -860,6 +868,10 @@ static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
 		       c->name, c->handle, c->bytes, c->packets, c->table);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
+	if (c->flags & (1 << NFT_CHAIN_ATTR_USE)) {
+		ret = snprintf(buf + offset, len, "<use>%u</use>", c->use);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
 		ret =  snprintf(buf+offset, len,
 				"<type>%s</type>"
