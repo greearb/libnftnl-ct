@@ -300,7 +300,7 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 		}
         }
 	if (ret < 0) {
-		xfree(e);
+		nft_set_elem_free(e);
 		return -1;
 	}
 
