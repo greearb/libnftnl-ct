@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <libnftnl/common.h>
+#include <linux/netfilter/nf_tables.h>
 
 #define BASE_DEC 10
 #define BASE_HEX 16
@@ -168,6 +169,10 @@ struct nft_set {
 	uint32_t		data_type;
 	uint32_t		data_len;
 	uint32_t		id;
+	enum nft_set_policies	policy;
+	struct {
+		uint32_t		size;
+	} desc;
 	struct list_head	element_list;
 
 	uint32_t		flags;
