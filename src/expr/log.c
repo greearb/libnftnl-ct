@@ -233,7 +233,7 @@ static int nft_rule_expr_log_xml_parse(struct nft_rule_expr *e,
 {
 #ifdef XML_PARSING
 	const char *prefix;
-	uint32_t snaplen, level;
+	uint32_t snaplen, level, flags;
 	uint16_t group, qthreshold;
 
 	prefix = nft_mxml_str_parse(tree, "prefix", MXML_DESCEND_FIRST,
