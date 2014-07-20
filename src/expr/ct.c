@@ -96,16 +96,12 @@ static int nft_rule_expr_ct_cb(const struct nlattr *attr, void *data)
 	case NFTA_CT_KEY:
 	case NFTA_CT_DREG:
 	case NFTA_CT_SREG:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	case NFTA_CT_DIRECTION:
-		if (mnl_attr_validate(attr, MNL_TYPE_U8) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U8) < 0)
+			abi_breakage();
 		break;
 	}
 

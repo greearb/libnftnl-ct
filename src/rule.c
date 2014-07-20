@@ -332,34 +332,24 @@ static int nft_rule_parse_attr_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_RULE_TABLE:
 	case NFTA_RULE_CHAIN:
-		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
 		break;
 	case NFTA_RULE_HANDLE:
-		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
+			abi_breakage();
 		break;
 	case NFTA_RULE_COMPAT:
-		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
+			abi_breakage();
 		break;
 	case NFTA_RULE_POSITION:
-		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
+			abi_breakage();
 		break;
 	case NFTA_RULE_USERDATA:
-		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0)
+			abi_breakage();
 		break;
 	}
 
@@ -377,16 +367,12 @@ static int nft_rule_parse_expr_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTA_EXPR_NAME:
-		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
 		break;
 	case NFTA_EXPR_DATA:
-		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
+			abi_breakage();
 		break;
 	}
 
@@ -441,10 +427,8 @@ static int nft_rule_parse_compat_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_RULE_COMPAT_PROTO:
 	case NFTA_RULE_COMPAT_FLAGS:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	}
 

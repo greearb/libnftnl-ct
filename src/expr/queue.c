@@ -80,10 +80,8 @@ static int nft_rule_expr_queue_cb(const struct nlattr *attr, void *data)
 	case NFTA_QUEUE_NUM:
 	case NFTA_QUEUE_TOTAL:
 	case NFTA_QUEUE_FLAGS:
-		if (mnl_attr_validate(attr, MNL_TYPE_U16) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U16) < 0)
+			abi_breakage();
 		break;
 	}
 

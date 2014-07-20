@@ -225,3 +225,10 @@ void __nft_assert_fail(uint16_t attr, const char *filename, int line)
 		attr, filename, line);
 	exit(EXIT_FAILURE);
 }
+
+void __noreturn __abi_breakage(const char *file, int line, const char *reason)
+{
+       fprintf(stderr, "nf_tables kernel ABI is broken, contact your vendor.\n"
+		       "%s:%d reason: %s\n", file, line, reason);
+       exit(EXIT_FAILURE);
+}

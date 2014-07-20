@@ -232,17 +232,13 @@ static int nft_set_elem_parse_attr_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTA_SET_ELEM_FLAGS:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	case NFTA_SET_ELEM_KEY:
 	case NFTA_SET_ELEM_DATA:
-		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
+			abi_breakage();
 		break;
 	}
 
@@ -312,16 +308,12 @@ nft_set_elem_list_parse_attr_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_SET_ELEM_LIST_TABLE:
 	case NFTA_SET_ELEM_LIST_SET:
-		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
 		break;
 	case NFTA_SET_ELEM_LIST_ELEMENTS:
-		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
+			abi_breakage();
 		break;
 	}
 

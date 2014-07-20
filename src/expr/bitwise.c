@@ -99,17 +99,13 @@ static int nft_rule_expr_bitwise_cb(const struct nlattr *attr, void *data)
 	case NFTA_BITWISE_SREG:
 	case NFTA_BITWISE_DREG:
 	case NFTA_BITWISE_LEN:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	case NFTA_BITWISE_MASK:
 	case NFTA_BITWISE_XOR:
-		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0)
+			abi_breakage();
 		break;
 	}
 

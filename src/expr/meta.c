@@ -86,10 +86,8 @@ static int nft_rule_expr_meta_cb(const struct nlattr *attr, void *data)
 	case NFTA_META_KEY:
 	case NFTA_META_DREG:
 	case NFTA_META_SREG:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	}
 

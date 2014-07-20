@@ -75,10 +75,8 @@ static int nft_rule_expr_limit_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_LIMIT_RATE:
 	case NFTA_LIMIT_UNIT:
-		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
+			abi_breakage();
 		break;
 	}
 

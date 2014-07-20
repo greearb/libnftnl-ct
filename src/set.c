@@ -265,10 +265,8 @@ static int nft_set_parse_attr_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_SET_TABLE:
 	case NFTA_SET_NAME:
-		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
 		break;
 	case NFTA_SET_FLAGS:
 	case NFTA_SET_KEY_TYPE:
@@ -276,10 +274,8 @@ static int nft_set_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_SET_DATA_TYPE:
 	case NFTA_SET_DATA_LEN:
 	case NFTA_SET_ID:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	}
 

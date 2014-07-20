@@ -385,30 +385,22 @@ static int nft_chain_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_CHAIN_NAME:
 	case NFTA_CHAIN_TABLE:
 	case NFTA_CHAIN_TYPE:
-		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
 		break;
 	case NFTA_CHAIN_HOOK:
 	case NFTA_CHAIN_COUNTERS:
-		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
+			abi_breakage();
 		break;
 	case NFTA_CHAIN_POLICY:
 	case NFTA_CHAIN_USE:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	case NFTA_CHAIN_HANDLE:
-		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
+			abi_breakage();
 		break;
 	}
 
@@ -427,10 +419,8 @@ static int nft_chain_parse_counters_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_COUNTER_BYTES:
 	case NFTA_COUNTER_PACKETS:
-		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
+			abi_breakage();
 		break;
 	}
 
@@ -467,10 +457,8 @@ static int nft_chain_parse_hook_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_HOOK_HOOKNUM:
 	case NFTA_HOOK_PRIORITY:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	}
 

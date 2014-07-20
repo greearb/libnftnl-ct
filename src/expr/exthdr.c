@@ -95,18 +95,14 @@ static int nft_rule_expr_exthdr_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTA_EXTHDR_TYPE:
-		if (mnl_attr_validate(attr, MNL_TYPE_U8) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U8) < 0)
+			abi_breakage();
 		break;
 	case NFTA_EXTHDR_DREG:
 	case NFTA_EXTHDR_OFFSET:
 	case NFTA_EXTHDR_LEN:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	}
 

@@ -103,25 +103,19 @@ static int nft_rule_expr_log_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTA_LOG_PREFIX:
-		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
 		break;
 	case NFTA_LOG_GROUP:
 	case NFTA_LOG_QTHRESHOLD:
-		if (mnl_attr_validate(attr, MNL_TYPE_U16) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U16) < 0)
+			abi_breakage();
 		break;
 	case NFTA_LOG_SNAPLEN:
 	case NFTA_LOG_LEVEL:
 	case NFTA_LOG_FLAGS:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	}
 

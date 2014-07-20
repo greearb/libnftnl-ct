@@ -211,4 +211,13 @@ void __nft_assert_fail(uint16_t attr, const char *filename, int line);
 		nft_assert(data, attr, _validate_array[_attr] == _data_len);	\
 })
 
+#define __noreturn	__attribute__((__noreturn__))
+
+void __noreturn __abi_breakage(const char *file, int line, const char *reason);
+
+#include <string.h>
+
+#define abi_breakage()	\
+	__abi_breakage(__FILE__, __LINE__, strerror(errno));
+
 #endif

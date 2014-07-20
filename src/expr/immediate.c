@@ -89,16 +89,12 @@ static int nft_rule_expr_immediate_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTA_IMMEDIATE_DREG:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
 		break;
 	case NFTA_IMMEDIATE_DATA:
-		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0) {
-			perror("mnl_attr_validate");
-			return MNL_CB_ERROR;
-		}
+		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0)
+			abi_breakage();
 		break;
 	}
 
