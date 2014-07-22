@@ -206,3 +206,7 @@ LIBNFTNL_1.1 {
   nft_set_attr_set_data;
   nft_set_attr_get_data;
 } LIBNFTNL_1.0;
+
+LIBNFTNL_1.2 {
+  nft_set_elems_nlmsg_build_payload_iter;
+} LIBNFTNL_1.1;

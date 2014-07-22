@@ -123,4 +123,7 @@ struct nft_set_elem *nft_set_elems_iter_cur(struct nft_set_elems_iter *iter);
 struct nft_set_elem *nft_set_elems_iter_next(struct nft_set_elems_iter *iter);
 void nft_set_elems_iter_destroy(struct nft_set_elems_iter *iter);
 
+int nft_set_elems_nlmsg_build_payload_iter(struct nlmsghdr *nlh,
+					   struct nft_set_elems_iter *iter);
+
 #endif /* _LIBNFTNL_SET_H_ */

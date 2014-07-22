@@ -197,27 +197,41 @@ void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 	}
 }
 
-void nft_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s)
+static void nft_set_elem_nlmsg_build_def(struct nlmsghdr *nlh,
+					 struct nft_set *s)
 {
-	struct nft_set_elem *elem;
-	struct nlattr *nest1;
-	int i = 0;
-
 	if (s->flags & (1 << NFT_SET_ATTR_NAME))
 		mnl_attr_put_strz(nlh, NFTA_SET_ELEM_LIST_SET, s->name);
 	if (s->flags & (1 << NFT_SET_ATTR_ID))
 		mnl_attr_put_u32(nlh, NFTA_SET_ELEM_LIST_SET_ID, htonl(s->id));
 	if (s->flags & (1 << NFT_SET_ATTR_TABLE))
 		mnl_attr_put_strz(nlh, NFTA_SET_ELEM_LIST_TABLE, s->table);
+}
+
+static struct nlattr *nft_set_elem_attr_build(struct nlmsghdr *nlh,
+					      struct nft_set_elem *elem, int i)
+{
+	struct nlattr *nest2;
+
+	nest2 = mnl_attr_nest_start(nlh, i);
+	nft_set_elem_nlmsg_build_payload(nlh, elem);
+	mnl_attr_nest_end(nlh, nest2);
+
+	return nest2;
+}
+
+void nft_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s)
+{
+	struct nft_set_elem *elem;
+	struct nlattr *nest1;
+	int i = 0;
+
+	nft_set_elem_nlmsg_build_def(nlh, s);
 
 	nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_LIST_ELEMENTS);
-	list_for_each_entry(elem, &s->element_list, head) {
-		struct nlattr *nest2;
+	list_for_each_entry(elem, &s->element_list, head)
+		nft_set_elem_attr_build(nlh, elem, ++i);
 
-		nest2 = mnl_attr_nest_start(nlh, ++i);
-		nft_set_elem_nlmsg_build_payload(nlh, elem);
-		mnl_attr_nest_end(nlh, nest2);
-	}
 	mnl_attr_nest_end(nlh, nest1);
 }
 EXPORT_SYMBOL(nft_set_elems_nlmsg_build_payload);
@@ -661,6 +675,7 @@ int nft_set_elem_foreach(struct nft_set *s,
 EXPORT_SYMBOL(nft_set_elem_foreach);
 
 struct nft_set_elems_iter {
+	struct nft_set			*set;
 	struct list_head		*list;
 	struct nft_set_elem		*cur;
 };
@@ -673,6 +688,7 @@ struct nft_set_elems_iter *nft_set_elems_iter_create(struct nft_set *s)
 	if (iter == NULL)
 		return NULL;
 
+	iter->set = s;
 	iter->list = &s->element_list;
 	iter->cur = list_entry(s->element_list.next, struct nft_set_elem, head);
 
@@ -703,3 +719,48 @@ void nft_set_elems_iter_destroy(struct nft_set_elems_iter *iter)
 	xfree(iter);
 }
 EXPORT_SYMBOL(nft_set_elems_iter_destroy);
+
+static bool nft_attr_nest_overflow(struct nlmsghdr *nlh,
+				   const struct nlattr *from,
+				   const struct nlattr *to)
+{
+	int len = (void *)to + to->nla_len - (void *)from;
+
+	/* The attribute length field is 16 bits long, thus the maximum payload
+	 * that an attribute can convey is UINT16_MAX. In case of overflow,
+	 * discard the last that did not fit into the attribute.
+	 */
+	if (len > UINT16_MAX) {
+		nlh->nlmsg_len -= to->nla_len;
+		return true;
+	}
+	return false;
+}
+
+int nft_set_elems_nlmsg_build_payload_iter(struct nlmsghdr *nlh,
+					   struct nft_set_elems_iter *iter)
+{
+	struct nft_set_elem *elem;
+	struct nlattr *nest1, *nest2;
+	int i = 0, ret = 0;
+
+	nft_set_elem_nlmsg_build_def(nlh, iter->set);
+
+	nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_LIST_ELEMENTS);
+	elem = nft_set_elems_iter_next(iter);
+	while (elem != NULL) {
+		nest2 = nft_set_elem_attr_build(nlh, elem, ++i);
+		if (nft_attr_nest_overflow(nlh, nest1, nest2)) {
+			/* Go back to previous not to miss this element */
+			iter->cur = list_entry(iter->cur->head.prev,
+					       struct nft_set_elem, head);
+			ret = 1;
+			break;
+		}
+		elem = nft_set_elems_iter_next(iter);
+	}
+	mnl_attr_nest_end(nlh, nest1);
+
+	return ret;
+}
+EXPORT_SYMBOL(nft_set_elems_nlmsg_build_payload_iter);
