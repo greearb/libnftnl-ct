@@ -209,4 +209,7 @@ LIBNFTNL_1.1 {
 
 LIBNFTNL_1.2 {
   nft_set_elems_nlmsg_build_payload_iter;
+  nft_batch_is_supported;
+  nft_batch_begin;
+  nft_batch_end;
 } LIBNFTNL_1.1;

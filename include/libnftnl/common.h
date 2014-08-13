@@ -36,4 +36,9 @@ struct nlmsghdr *nft_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
 struct nft_parse_err *nft_parse_err_alloc(void);
 void nft_parse_err_free(struct nft_parse_err *);
 int nft_parse_perror(const char *str, struct nft_parse_err *err);
+
+int nft_batch_is_supported(void);
+void nft_batch_begin(char *buf, uint32_t seq);
+void nft_batch_end(char *buf, uint32_t seq);
+
 #endif

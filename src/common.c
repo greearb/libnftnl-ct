@@ -9,12 +9,15 @@
 
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <time.h>
 #include <linux/netlink.h>
 #include <linux/netfilter/nfnetlink.h>
 
 #include <libmnl/libmnl.h>
 #include <libnftnl/common.h>
+#include <libnftnl/set.h>
 
+#include <errno.h>
 #include "internal.h"
 
 struct nlmsghdr *nft_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
@@ -137,6 +140,34 @@ int nft_event_footer_snprintf(char *buf, size_t size, uint32_t type,
 	}
 }
 
+static void nft_batch_build_hdr(char *buf, uint16_t type, uint32_t seq)
+{
+	struct nlmsghdr *nlh;
+	struct nfgenmsg *nfg;
+
+	nlh = mnl_nlmsg_put_header(buf);
+	nlh->nlmsg_type = type;
+	nlh->nlmsg_flags = NLM_F_REQUEST;
+	nlh->nlmsg_seq = seq;
+
+	nfg = mnl_nlmsg_put_extra_header(nlh, sizeof(*nfg));
+	nfg->nfgen_family = AF_UNSPEC;
+	nfg->version = NFNETLINK_V0;
+	nfg->res_id = NFNL_SUBSYS_NFTABLES;
+}
+
+void nft_batch_begin(char *buf, uint32_t seq)
+{
+	nft_batch_build_hdr(buf, NFNL_MSG_BATCH_BEGIN, seq);
+}
+EXPORT_SYMBOL(nft_batch_begin);
+
+void nft_batch_end(char *buf, uint32_t seq)
+{
+	nft_batch_build_hdr(buf, NFNL_MSG_BATCH_END, seq);
+}
+EXPORT_SYMBOL(nft_batch_end);
+
 int nft_event_footer_fprintf(FILE *fp, uint32_t type, uint32_t flags)
 {
 	char buf[32]; /* enough for the maximum string length above */
@@ -146,3 +177,62 @@ int nft_event_footer_fprintf(FILE *fp, uint32_t type, uint32_t flags)
 
 	return fprintf(fp, "%s", buf);
 }
+
+int nft_batch_is_supported(void)
+{
+	struct mnl_socket *nl;
+	struct mnl_nlmsg_batch *b;
+	char buf[MNL_SOCKET_BUFFER_SIZE];
+	uint32_t seq = time(NULL), req_seq;
+	int ret;
+
+	nl = mnl_socket_open(NETLINK_NETFILTER);
+	if (nl == NULL)
+		return -1;
+
+	if (mnl_socket_bind(nl, 0, MNL_SOCKET_AUTOPID) < 0)
+		return -1;
+
+	b = mnl_nlmsg_batch_start(buf, sizeof(buf));
+
+	nft_batch_begin(mnl_nlmsg_batch_current(b), seq++);
+	mnl_nlmsg_batch_next(b);
+
+	req_seq = seq;
+	nft_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(b),
+				NFT_MSG_NEWSET, AF_INET,
+				NLM_F_ACK, seq++);
+	mnl_nlmsg_batch_next(b);
+
+	nft_batch_end(mnl_nlmsg_batch_current(b), seq++);
+	mnl_nlmsg_batch_next(b);
+
+	ret = mnl_socket_sendto(nl, mnl_nlmsg_batch_head(b),
+				mnl_nlmsg_batch_size(b));
+	if (ret < 0)
+		goto err;
+
+	mnl_nlmsg_batch_stop(b);
+
+	ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
+	while (ret > 0) {
+		ret = mnl_cb_run(buf, ret, req_seq, mnl_socket_get_portid(nl),
+				 NULL, NULL);
+		if (ret <= 0)
+			break;
+
+		ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
+	}
+	mnl_socket_close(nl);
+
+	/* We're sending an incomplete message to see if the kernel supports
+	 * set messages in batches. EINVAL means that we sent an incomplete
+	 * message with missing attributes. The kernel just ignores messages
+	 * that we cannot include in the batch.
+	 */
+	return (ret == -1 && errno == EINVAL) ? 1 : 0;
+err:
+	mnl_nlmsg_batch_stop(b);
+	return -1;
+}
+EXPORT_SYMBOL(nft_batch_is_supported);
