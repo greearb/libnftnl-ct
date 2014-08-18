@@ -20,6 +20,22 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/chain.h>
 
+static struct nft_chain *chain_del_parse(int argc, char *argv[])
+{
+	struct nft_chain *t;
+
+	t = nft_chain_alloc();
+	if (t == NULL) {
+		perror("OOM");
+		return NULL;
+	}
+
+	nft_chain_attr_set(t, NFT_CHAIN_ATTR_TABLE, argv[2]);
+	nft_chain_attr_set(t, NFT_CHAIN_ATTR_NAME, argv[3]);
+
+	return t;
+}
+
 int main(int argc, char *argv[])
 {
 	struct mnl_socket *nl;
@@ -48,16 +64,13 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	t = nft_chain_alloc();
-	if (t == NULL) {
-		perror("OOM");
+	t = chain_del_parse(argc, argv);
+	if (t == NULL)
 		exit(EXIT_FAILURE);
-	}
+
 	seq = time(NULL);
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_DELCHAIN, family,
 					NLM_F_ACK, seq);
-	nft_chain_attr_set(t, NFT_CHAIN_ATTR_TABLE, argv[2]);
-	nft_chain_attr_set(t, NFT_CHAIN_ATTR_NAME, argv[3]);
 	nft_chain_nlmsg_build_payload(nlh, t);
 	nft_chain_free(t);
 
