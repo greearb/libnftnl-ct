@@ -180,11 +180,6 @@ int nft_str2verdict(const char *verdict, int *verdict_num)
 	return -1;
 }
 
-void xfree(const void *ptr)
-{
-	free((void *)ptr);
-}
-
 int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags,
 		int (*snprintf_cb)(char *buf, size_t bufsiz, void *obj,
 				   uint32_t type, uint32_t flags))

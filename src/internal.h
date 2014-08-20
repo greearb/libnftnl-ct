@@ -16,6 +16,8 @@
 #include <libnftnl/common.h>
 #include <linux/netfilter/nf_tables.h>
 
+#define xfree(ptr)	free((void *)ptr);
+
 #define BASE_DEC 10
 #define BASE_HEX 16
 
@@ -143,8 +145,6 @@ int nft_event_header_fprintf(FILE *fp, uint32_t format, uint32_t flags);
 int nft_event_footer_snprintf(char *buf, size_t bufsize,
 			      uint32_t format, uint32_t flags);
 int nft_event_footer_fprintf(FILE *fp, uint32_t format, uint32_t flags);
-
-void xfree(const void *ptr);
 
 struct expr_ops;
 
