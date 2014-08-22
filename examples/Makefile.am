@@ -1,8 +1,7 @@
 include $(top_srcdir)/Make_global.am
 
 check_PROGRAMS = nft-table-add		\
-		 nft-table-xml-add	\
-		 nft-table-json-add	\
+		 nft-table-parse-add	\
 		 nft-table-upd		\
 		 nft-table-del		\
 		 nft-table-get		\
@@ -29,11 +28,8 @@ check_PROGRAMS = nft-table-add		\
 nft_table_add_SOURCES = nft-table-add.c
 nft_table_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
-nft_table_xml_add_SOURCES = nft-table-xml-add.c
-nft_table_xml_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
-
-nft_table_json_add_SOURCES = nft-table-json-add.c
-nft_table_json_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+nft_table_parse_add_SOURCES = nft-table-parse-add.c
+nft_table_parse_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_table_upd_SOURCES = nft-table-upd.c
 nft_table_upd_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}

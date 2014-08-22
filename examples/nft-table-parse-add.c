@@ -1,8 +1,4 @@
 /*
- * (C) 2013 by Álvaro Neira Ayuso <alvaroneay@gmail.com>
- *
- * Based on nft-table-xml-add from:
- *
  * (C) 2013 by Pablo Neira Ayuso <pablo@netfilter.org>
  * (C) 2013 by Arturo Borrero Gonzalez <arturo.borrero.glez@gmail.com>
  *
@@ -27,6 +23,50 @@
 
 #include <libmnl/libmnl.h>
 #include <libnftnl/table.h>
+#include <libnftnl/common.h>
+
+static struct nft_table *table_parse_file(const char *file, uint16_t format)
+{
+	int fd;
+	struct nft_table *t;
+	struct nft_parse_err *err;
+	char data[4096];
+
+	t = nft_table_alloc();
+	if (t == NULL) {
+		perror("OOM");
+		return NULL;
+	}
+
+	fd = open(file, O_RDONLY);
+	if (fd < 0) {
+		perror("open");
+		return NULL;
+	}
+
+	if (read(fd, data, sizeof(data)) < 0) {
+		perror("read");
+		close(fd);
+		return NULL;
+	}
+	close(fd);
+
+	err = nft_parse_err_alloc();
+	if (err == NULL) {
+		perror("error");
+		return NULL;
+	}
+
+	if (nft_table_parse(t, format, data, err) < 0) {
+		nft_parse_perror("Unable to parse file", err);
+		nft_parse_err_free(err);
+		return NULL;
+	}
+
+	nft_parse_err_free(err);
+	return t;
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -35,49 +75,31 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq;
 	struct nft_table *t = NULL;
-	int ret, fd;
-	uint16_t family;
-	char json[4096];
-	char reprint[4096];
-	struct nft_parse_err *err;
+	int ret;
+	uint16_t family, format, outformat;
 
-	if (argc < 2) {
-		printf("Usage: %s <json-file>\n", argv[0]);
+	if (argc < 3) {
+		printf("Usage: %s {xml|json} <file>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
-	fd = open(argv[1], O_RDONLY);
-	if (fd < 0) {
-		perror("open");
+	if (strcmp(argv[1], "xml") == 0) {
+		format = NFT_PARSE_XML;
+		outformat = NFT_OUTPUT_XML;
+	} else if (strcmp(argv[1], "json") == 0) {
+		format = NFT_PARSE_JSON;
+		outformat = NFT_OUTPUT_JSON;
+	} else {
+		printf("Unknown format: xml, json\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if (read(fd, json, sizeof(json)) < 0) {
-		perror("read");
-		close(fd);
+	t = table_parse_file(argv[2], format);
+	if (t == NULL)
 		exit(EXIT_FAILURE);
-	}
-	close(fd);
 
-	t = nft_table_alloc();
-	if (t == NULL) {
-		perror("OOM");
-		exit(EXIT_FAILURE);
-	}
-
-	err = nft_parse_err_alloc();
-	if (err == NULL) {
-		perror("error");
-		exit(EXIT_FAILURE);
-	}
-
-	if (nft_table_parse(t, NFT_PARSE_JSON, json, err) < 0) {
-		nft_parse_perror("Unable to parse JSON file", err);
-		exit(EXIT_FAILURE);
-	}
-
-	nft_table_snprintf(reprint, sizeof(reprint), t, NFT_OUTPUT_JSON, 0);
-	printf("Parsed:\n%s\n", reprint);
+	nft_table_fprintf(stdout, t, outformat, 0);
+	fprintf(stdout, "\n");
 
 	family = nft_table_attr_get_u32(t, NFT_TABLE_ATTR_FAMILY);
 
@@ -87,7 +109,6 @@ int main(int argc, char *argv[])
 					NLM_F_CREATE|NLM_F_ACK, seq);
 	nft_table_nlmsg_build_payload(nlh, t);
 	nft_table_free(t);
-	nft_parse_err_free(err);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
