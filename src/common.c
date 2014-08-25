@@ -114,14 +114,15 @@ int nft_event_header_snprintf(char *buf, size_t size, uint32_t type,
 	return ret;
 }
 
+static int nft_event_header_fprintf_cb(char *buf, size_t size, void *unused,
+				       uint32_t type, uint32_t flags)
+{
+	return nft_event_header_snprintf(buf, size, type, flags);
+}
+
 int nft_event_header_fprintf(FILE *fp, uint32_t type, uint32_t flags)
 {
-	char buf[64]; /* enough for the maximum string length above */
-
-	nft_event_header_snprintf(buf, sizeof(buf), type, flags);
-	buf[sizeof(buf) - 1] = '\0';
-
-	return fprintf(fp, "%s", buf);
+	return nft_fprintf(fp, NULL, type, flags, nft_event_header_fprintf_cb);
 }
 
 int nft_event_footer_snprintf(char *buf, size_t size, uint32_t type,
@@ -138,6 +139,17 @@ int nft_event_footer_snprintf(char *buf, size_t size, uint32_t type,
 	default:
 		return 0;
 	}
+}
+
+static int nft_event_footer_fprintf_cb(char *buf, size_t size, void *unused,
+				       uint32_t type, uint32_t flags)
+{
+	return nft_event_footer_snprintf(buf, size, type, flags);
+}
+
+int nft_event_footer_fprintf(FILE *fp, uint32_t type, uint32_t flags)
+{
+	return nft_fprintf(fp, NULL, type, flags, nft_event_footer_fprintf_cb);
 }
 
 static void nft_batch_build_hdr(char *buf, uint16_t type, uint32_t seq)
@@ -167,16 +179,6 @@ void nft_batch_end(char *buf, uint32_t seq)
 	nft_batch_build_hdr(buf, NFNL_MSG_BATCH_END, seq);
 }
 EXPORT_SYMBOL(nft_batch_end);
-
-int nft_event_footer_fprintf(FILE *fp, uint32_t type, uint32_t flags)
-{
-	char buf[32]; /* enough for the maximum string length above */
-
-	nft_event_footer_snprintf(buf, sizeof(buf), type, flags);
-	buf[sizeof(buf) - 1] = '\0';
-
-	return fprintf(fp, "%s", buf);
-}
 
 int nft_batch_is_supported(void)
 {
