@@ -20,12 +20,14 @@
 
 #include <linux/netfilter/nf_tables.h>
 #include <linux/netfilter/nf_tables_compat.h>
-#include <linux/netfilter/x_tables.h>
 
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 
 #include "expr_ops.h"
+
+/* From include/linux/netfilter/x_tables.h */
+#define XT_EXTENSION_MAXNAMELEN 29
 
 struct nft_expr_target {
 	char		name[XT_EXTENSION_MAXNAMELEN];

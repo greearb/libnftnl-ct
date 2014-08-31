@@ -16,7 +16,6 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <linux/netfilter/nf_tables.h>
-#include <linux/netfilter/xt_iprange.h>
 #include <libmnl/libmnl.h>
 #include <libnftnl/rule.h>
 #include <libnftnl/expr.h>
@@ -60,7 +59,7 @@ int main(int argc, char *argv[])
 	char buf[4096];
 	struct nft_rule_expr_iter *iter_a, *iter_b;
 	struct nft_rule_expr *rule_a, *rule_b;
-	struct xt_iprange_mtinfo *info;
+	char data[16] = "0123456789abcdef";
 
 	a = nft_rule_alloc();
 	b = nft_rule_alloc();
@@ -72,17 +71,7 @@ int main(int argc, char *argv[])
 
 	nft_rule_expr_set_str(ex, NFT_EXPR_MT_NAME, "Tests");
 	nft_rule_expr_set_u32(ex, NFT_EXPR_MT_REV, 0x12345678);
-
-        info = calloc(1, sizeof(struct xt_iprange_mtinfo));
-        if (info == NULL)
-                print_err("OOM");
-
-        info->src_min.ip = info->dst_min.ip = inet_addr("127.0.0.1");
-        info->src_max.ip = info->dst_max.ip = inet_addr("127.0.0.1");
-        info->flags = IPRANGE_SRC;
-
-        nft_rule_expr_set(ex, NFT_EXPR_MT_INFO, info, sizeof(info));
-
+	nft_rule_expr_set(ex, NFT_EXPR_MT_INFO, strdup(data), sizeof(data));
 	nft_rule_add_expr(a, ex);
 
 	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, AF_INET, 0, 1234);

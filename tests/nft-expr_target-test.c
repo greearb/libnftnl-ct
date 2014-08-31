@@ -15,8 +15,6 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <linux/netfilter/nf_tables.h>
-#include <linux/netfilter/xt_iprange.h>
-#include <linux/netfilter/xt_LOG.h>
 #include <libmnl/libmnl.h>
 #include <libnftnl/rule.h>
 #include <libnftnl/expr.h>
@@ -57,10 +55,10 @@ int main(int argc, char *argv[])
 	struct nft_rule *a, *b;
 	struct nft_rule_expr *ex;
 	struct nlmsghdr *nlh;
-	struct xt_log_info *info;
 	char buf[4096];
 	struct nft_rule_expr_iter *iter_a, *iter_b;
 	struct nft_rule_expr *rule_a, *rule_b;
+	char data[16] = "0123456789abcdef";
 
 	a = nft_rule_alloc();
 	b = nft_rule_alloc();
@@ -70,18 +68,10 @@ int main(int argc, char *argv[])
 	ex = nft_rule_expr_alloc("target");
 	if (ex == NULL)
 		print_err("OOM");
+
 	nft_rule_expr_set(ex, NFT_EXPR_TG_NAME, "test", strlen("test"));
 	nft_rule_expr_set_u32(ex, NFT_EXPR_TG_REV, 0x12345678);
-
-	info = calloc(1, sizeof(struct xt_log_info));
-	if (info == NULL)
-		print_err("OOM");
-	sprintf(info->prefix, "test: ");
-	info->prefix[sizeof(info->prefix)-1] = '\0';
-	info->logflags = 0x0f;
-	info->level = 5;
-	nft_rule_expr_set(ex, NFT_EXPR_TG_INFO, info, sizeof(*info));
-
+	nft_rule_expr_set(ex, NFT_EXPR_TG_INFO, strdup(data), sizeof(data));
 	nft_rule_add_expr(a, ex);
 
 	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, AF_INET, 0, 1234);
