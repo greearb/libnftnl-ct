@@ -156,6 +156,11 @@ enum {
 	NFT_EXPR_QUEUE_TOTAL,
 	NFT_EXPR_QUEUE_FLAGS,
 };
+
+enum {
+	NFT_EXPR_MASQ_FLAGS	= NFT_RULE_EXPR_ATTR_BASE,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
