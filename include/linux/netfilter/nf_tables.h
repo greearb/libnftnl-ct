@@ -51,6 +51,8 @@ enum nft_verdicts {
  * @NFT_MSG_NEWSETELEM: create a new set element (enum nft_set_elem_attributes)
  * @NFT_MSG_GETSETELEM: get a set element (enum nft_set_elem_attributes)
  * @NFT_MSG_DELSETELEM: delete a set element (enum nft_set_elem_attributes)
+ * @NFT_MSG_NEWGEN: announce a new generation, only for events (enum nft_gen_attributes)
+ * @NFT_MSG_GETGEN: get the rule-set generation (enum nft_gen_attributes)
  */
 enum nf_tables_msg_types {
 	NFT_MSG_NEWTABLE,
@@ -68,6 +70,8 @@ enum nf_tables_msg_types {
 	NFT_MSG_NEWSETELEM,
 	NFT_MSG_GETSETELEM,
 	NFT_MSG_DELSETELEM,
+	NFT_MSG_NEWGEN,
+	NFT_MSG_GETGEN,
 	NFT_MSG_MAX,
 };
 
@@ -785,7 +789,7 @@ enum nft_nat_types {
  * @NFTA_NAT_REG_ADDR_MAX: source register of address range end (NLA_U32: nft_registers)
  * @NFTA_NAT_REG_PROTO_MIN: source register of proto range start (NLA_U32: nft_registers)
  * @NFTA_NAT_REG_PROTO_MAX: source register of proto range end (NLA_U32: nft_registers)
- * @NFTA_NAT_FLAGS: additional NAT configuration (NF_NAT_RANGE_*) (NLA_U32)
+ * @NFTA_NAT_FLAGS: NAT flags (see NF_NAT_RANGE_* in linux/netfilter/nf_nat.h) (NLA_U32)
  */
 enum nft_nat_attributes {
 	NFTA_NAT_UNSPEC,
@@ -803,7 +807,7 @@ enum nft_nat_attributes {
 /**
  * enum nft_masq_attributes - nf_tables masquerade expression attributes
  *
- * @NFTA_MASQ_FLAGS: additional masquerade configuration (NF_NAT_RANGE_*) (NLA_U32)
+ * @NFTA_MASQ_FLAGS: NAT flags (see NF_NAT_RANGE_* in linux/netfilter/nf_nat.h) (NLA_U32)
  */
 enum nft_masq_attributes {
 	NFTA_MASQ_UNSPEC,
@@ -812,5 +816,16 @@ enum nft_masq_attributes {
 };
 #define NFTA_MASQ_MAX		(__NFTA_MASQ_MAX - 1)
 
+/**
+ * enum nft_gen_attributes - nf_tables ruleset generation attributes
+ *
+ * @NFTA_GEN_ID: Ruleset generation ID (NLA_U32)
+ */
+enum nft_gen_attributes {
+	NFTA_GEN_UNSPEC,
+	NFTA_GEN_ID,
+	__NFTA_GEN_MAX
+};
+#define NFTA_GEN_MAX		(__NFTA_GEN_MAX - 1)
 
 #endif /* _LINUX_NF_TABLES_H */

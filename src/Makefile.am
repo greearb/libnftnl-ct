@@ -7,6 +7,7 @@ libnftnl_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libnftnl.map	\
 
 libnftnl_la_SOURCES = utils.c		\
 		      common.c		\
+		      gen.c		\
 		      table.c		\
 		      chain.c		\
 		      rule.c		\

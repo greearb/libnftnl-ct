@@ -22,6 +22,7 @@
 #include <libnftnl/chain.h>
 #include <libnftnl/rule.h>
 #include <libnftnl/set.h>
+#include <libnftnl/gen.h>
 #include <libnftnl/common.h>
 
 static uint32_t event2flag(uint32_t event)
@@ -32,6 +33,7 @@ static uint32_t event2flag(uint32_t event)
 	case NFT_MSG_NEWRULE:
 	case NFT_MSG_NEWSET:
 	case NFT_MSG_NEWSETELEM:
+	case NFT_MSG_NEWGEN:
 		return NFT_OF_EVENT_NEW;
 	case NFT_MSG_DELTABLE:
 	case NFT_MSG_DELCHAIN:
@@ -165,6 +167,29 @@ err:
 	return MNL_CB_OK;
 }
 
+static int gen_cb(const struct nlmsghdr *nlh, int event, int type)
+{
+	struct nft_gen *gen;
+
+	gen = nft_gen_alloc();
+	if (gen == NULL) {
+		perror("OOM");
+		goto err;
+	}
+
+	if (nft_gen_nlmsg_parse(nlh, gen) < 0) {
+		perror("nft_gen_parse");
+		goto err_free;
+	}
+
+	nft_gen_fprintf(stdout, gen, type, event2flag(event));
+	fprintf(stdout, "\n");
+err_free:
+	nft_gen_free(gen);
+err:
+	return MNL_CB_OK;
+}
+
 static int events_cb(const struct nlmsghdr *nlh, void *data)
 {
 	int ret = MNL_CB_OK;
@@ -191,6 +216,9 @@ static int events_cb(const struct nlmsghdr *nlh, void *data)
 	case NFT_MSG_NEWSETELEM:
 	case NFT_MSG_DELSETELEM:
 		ret = setelem_cb(nlh, event, type);
+		break;
+	case NFT_MSG_NEWGEN:
+		ret = gen_cb(nlh, event, type);
 		break;
 	}
 

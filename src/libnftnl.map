@@ -212,4 +212,18 @@ LIBNFTNL_1.2 {
   nft_batch_is_supported;
   nft_batch_begin;
   nft_batch_end;
+
+  nft_gen_alloc;
+  nft_gen_free;
+  nft_gen_attr_is_set;
+  nft_gen_attr_unset;
+  nft_gen_attr_set_data;
+  nft_gen_attr_set;
+  nft_gen_attr_set_u32;
+  nft_gen_attr_get_data;
+  nft_gen_attr_get;
+  nft_gen_attr_get_u32;
+  nft_gen_nlmsg_parse;
+  nft_gen_snprintf;
+  nft_gen_fprintf;
 } LIBNFTNL_1.1;
