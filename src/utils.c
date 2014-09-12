@@ -190,7 +190,7 @@ int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags,
 	int ret;
 
 	ret = snprintf_cb(buf, bufsiz, obj, type, flags);
-	if (ret < 0)
+	if (ret <= 0)
 		goto out;
 
 	if (ret >= NFT_SNPRINTF_BUFSIZ) {
@@ -201,7 +201,7 @@ int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags,
 			return -1;
 
 		ret = snprintf_cb(buf, bufsiz, obj, type, flags);
-		if (ret < 0)
+		if (ret <= 0)
 			goto out;
 	}
 
