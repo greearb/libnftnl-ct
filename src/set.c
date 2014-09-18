@@ -340,7 +340,7 @@ static int nft_set_desc_parse_attr_cb(const struct nlattr *attr, void *data)
 static int nft_set_desc_parse(struct nft_set *s,
 			      const struct nlattr *attr)
 {
-	struct nlattr *tb[NFTA_SET_MAX+1] = {};
+	struct nlattr *tb[NFTA_SET_DESC_MAX + 1] = {};
 
 	if (mnl_attr_parse_nested(attr, nft_set_desc_parse_attr_cb, tb) < 0)
 		return -1;
@@ -351,24 +351,6 @@ static int nft_set_desc_parse(struct nft_set *s,
 	}
 
 	return 0;
-}
-
-static int nft_set_nlmsg_desc_parse(const struct nlattr *nest,
-				    struct nft_set *s)
-{
-	struct nlattr *attr;
-	int ret = 0;
-
-	mnl_attr_for_each_nested(attr, nest) {
-		if (mnl_attr_get_type(attr) != NFTA_SET_DESC)
-			return -1;
-
-		ret = nft_set_desc_parse(s, attr);
-		if (ret != 0)
-			break;
-	}
-
-	return ret;
 }
 
 int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
@@ -417,7 +399,7 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 		s->flags |= (1 << NFT_SET_ATTR_POLICY);
 	}
 	if (tb[NFTA_SET_DESC])
-		ret = nft_set_nlmsg_desc_parse(tb[NFTA_SET_DESC], s);
+		ret = nft_set_desc_parse(s, tb[NFTA_SET_DESC]);
 
 	s->family = nfg->nfgen_family;
 	s->flags |= (1 << NFT_SET_ATTR_FAMILY);
