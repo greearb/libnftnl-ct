@@ -1,7 +1,11 @@
 #ifndef _NFNETLINK_H
 #define _NFNETLINK_H
 #include <linux/types.h>
+#ifdef __ANDROID__
+#include <linux/netfilter/nfnetlink_compat_priv.h>
+#else
 #include <linux/netfilter/nfnetlink_compat.h>
+#endif
 
 enum nfnetlink_groups {
 	NFNLGRP_NONE,
