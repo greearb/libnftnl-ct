@@ -23,6 +23,12 @@
 
 #define NFT_SNPRINTF_BUFSIZ 4096
 
+#ifdef __ANDROID__
+#define be32toh betoh32
+#define be64toh betoh64
+#endif
+
+
 enum nft_type {
 	NFT_TYPE_U8,
 	NFT_TYPE_U16,
