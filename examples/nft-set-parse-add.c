@@ -27,6 +27,49 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/set.h>
 
+static struct nft_set *set_parse_file(const char *file, uint16_t format)
+{
+	int fd;
+	struct nft_set *s;
+	struct nft_parse_err *err;
+	char data[4096];
+
+	s = nft_set_alloc();
+	if (s == NULL) {
+		perror("OOM");
+		return NULL;
+	}
+
+	fd = open(file, O_RDONLY);
+	if (fd < 0) {
+		perror("open");
+		return NULL;
+	}
+
+	if (read(fd, data, sizeof(data)) < 0) {
+		perror("read");
+		close(fd);
+		return NULL;
+	}
+	close(fd);
+
+	err = nft_parse_err_alloc();
+	if (err == NULL) {
+		perror("error");
+		return NULL;
+	}
+
+	if (nft_set_parse(s, format, data, err) < 0) {
+		nft_parse_perror("Unable to parse file", err);
+		nft_parse_err_free(err);
+		return NULL;
+	}
+
+	nft_parse_err_free(err);
+	return s;
+
+}
+
 int main(int argc, char *argv[])
 {
 	struct mnl_socket *nl;
@@ -34,50 +77,31 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq;
 	struct nft_set *s;
-	int ret, fd;
-	uint16_t family;
-	char json[4096];
-	char reprint[4096];
-	struct nft_parse_err *err;
+	int ret;
+	uint16_t family, format, outformat;
 
 	if (argc < 2) {
-		printf("Usage: %s <json-file>\n", argv[0]);
+		printf("Usage: %s {xml|json} <file>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
-	s = nft_set_alloc();
-	if (s == NULL) {
-		perror("OOM");
+	if (strcmp(argv[1], "xml") == 0) {
+		format = NFT_PARSE_XML;
+		outformat = NFT_OUTPUT_XML;
+	} else if (strcmp(argv[1], "json") == 0) {
+		format = NFT_PARSE_JSON;
+		outformat = NFT_OUTPUT_JSON;
+	} else {
+		printf("Unknown format: xml, json\n");
 		exit(EXIT_FAILURE);
 	}
 
-	fd = open(argv[1], O_RDONLY);
-	if (fd < 0) {
-		perror("open");
+	s = set_parse_file(argv[2], format);
+	if (s == NULL)
 		exit(EXIT_FAILURE);
-	}
 
-	if (read(fd, json, sizeof(json)) < 0) {
-		perror("read");
-		close(fd);
-		exit(EXIT_FAILURE);
-	}
-
-	err = nft_parse_err_alloc();
-	if (err == NULL) {
-		perror("error");
-		exit(EXIT_FAILURE);
-	}
-
-	close(fd);
-
-	if (nft_set_parse(s, NFT_PARSE_JSON, json, err) < 0) {
-		nft_parse_perror("Unable to parse JSON file", err);
-		exit(EXIT_FAILURE);
-	}
-
-	nft_set_snprintf(reprint, sizeof(reprint), s, NFT_OUTPUT_JSON, 0);
-	printf("Parsed:\n%s\n", reprint);
+	nft_set_fprintf(stdout, s, outformat, 0);
+	fprintf(stdout, "\n");
 
 	family = nft_set_attr_get_u32(s, NFT_SET_ATTR_FAMILY);
 
@@ -87,7 +111,6 @@ int main(int argc, char *argv[])
 					NLM_F_CREATE|NLM_F_ACK, seq);
 	nft_set_nlmsg_build_payload(nlh, s);
 	nft_set_free(s);
-	nft_parse_err_free(err);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
