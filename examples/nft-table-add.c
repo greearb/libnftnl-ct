@@ -85,7 +85,8 @@ int main(int argc, char *argv[])
 
 	table_seq = seq;
 	family = nft_table_attr_get_u32(t, NFT_TABLE_ATTR_FAMILY);
-	nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, family,
+	nlh = nft_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+					NFT_MSG_NEWTABLE, family,
 					NLM_F_ACK, seq++);
 	nft_table_nlmsg_build_payload(nlh, t);
 	nft_table_free(t);
