@@ -10,6 +10,7 @@
 ./nft-expr_log-test
 ./nft-expr_lookup-test
 ./nft-expr_match-test
+./nft-expr_masq-test
 ./nft-expr_meta-test
 ./nft-expr_nat-test
 ./nft-expr_payload-test
