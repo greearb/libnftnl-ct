@@ -169,8 +169,10 @@ static int nft_rule_expr_masq_snprintf_default(char *buf, size_t len,
 {
 	struct nft_expr_masq *masq = nft_expr_data(e);
 
-	return snprintf(buf, len, " flags %u ",
-			 masq->flags);
+	if (e->flags & (1 << NFT_EXPR_MASQ_FLAGS))
+		return snprintf(buf, len, "flags 0x%x ", masq->flags);
+
+	return 0;
 }
 
 static int nft_rule_expr_masq_snprintf(char *buf, size_t len, uint32_t type,
