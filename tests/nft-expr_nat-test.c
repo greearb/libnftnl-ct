@@ -49,6 +49,9 @@ static void cmp_nft_rule_expr(struct nft_rule_expr *rule_a,
 	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_NAT_REG_PROTO_MAX) !=
 	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_NAT_REG_PROTO_MAX))
 		print_err("Expr NFT_EXPR_NAT_REG_PROTO_MAX mismatches");
+	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_NAT_FLAGS) !=
+	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_NAT_FLAGS))
+		print_err("Expr NFT_EXPR_NAT_FLAGS mismatches");
 }
 
 int main(int argc, char *argv[])
@@ -74,6 +77,7 @@ int main(int argc, char *argv[])
 	nft_rule_expr_set_u32(ex, NFT_EXPR_NAT_REG_ADDR_MAX, 0x1234568);
 	nft_rule_expr_set_u32(ex, NFT_EXPR_NAT_REG_PROTO_MIN, 0x1234568);
 	nft_rule_expr_set_u32(ex, NFT_EXPR_NAT_REG_PROTO_MAX, 0x1234568);
+	nft_rule_expr_set_u32(ex, NFT_EXPR_NAT_FLAGS, 0x1234568);
 
 	nft_rule_add_expr(a, ex);
 
