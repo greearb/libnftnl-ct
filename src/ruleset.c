@@ -234,6 +234,7 @@ static int nft_ruleset_json_parse_sets(struct nft_ruleset *rs, json_t *array,
 				       struct nft_parse_err *err)
 {
 	int i, len;
+	uint32_t set_id = 0;
 	json_t *node;
 	struct nft_set *s = NULL;
 	struct nft_set_list *list = nft_set_list_alloc();
@@ -265,6 +266,7 @@ static int nft_ruleset_json_parse_sets(struct nft_ruleset *rs, json_t *array,
 			goto err;
 		}
 
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_ID, set_id++);
 		nft_set_list_add_tail(s, list);
 	}
 
@@ -457,6 +459,7 @@ static int
 nft_ruleset_xml_parse_sets(struct nft_ruleset *rs, mxml_node_t *tree,
 			   struct nft_parse_err *err)
 {
+	uint32_t set_id = 0;
 	mxml_node_t *node;
 	struct nft_set *s;
 	struct nft_set_list *set_list = nft_set_list_alloc();
@@ -479,6 +482,7 @@ nft_ruleset_xml_parse_sets(struct nft_ruleset *rs, mxml_node_t *tree,
 			goto err_free;
 		}
 
+		nft_set_attr_set_u32(s, NFT_SET_ATTR_ID, set_id++);
 		nft_set_list_add_tail(s, set_list);
 	}
 
