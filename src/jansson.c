@@ -187,11 +187,13 @@ int nft_jansson_str2num(json_t *root, const char *node_name, int base,
 }
 
 struct nft_rule_expr *nft_jansson_expr_parse(json_t *root,
-					     struct nft_parse_err *err)
+					     struct nft_parse_err *err,
+					     struct nft_set_list *set_list)
 {
 	struct nft_rule_expr *e;
 	const char *type;
-	int ret;
+	struct nft_set *set_cur = NULL;
+	int ret, set_id;
 
 	type = nft_jansson_parse_str(root, "type", err);
 	if (type == NULL)
@@ -204,6 +206,11 @@ struct nft_rule_expr *nft_jansson_expr_parse(json_t *root,
 	}
 
 	ret = e->ops->json_parse(e, root, err);
+
+	if (set_list != NULL &&
+	    strcmp(type, "lookup") == 0 &&
+	    nft_set_lookup_id(e, set_list, &set_id))
+		nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SET_ID, set_id);
 
 	return ret < 0 ? NULL : e;
 }

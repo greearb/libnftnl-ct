@@ -24,6 +24,7 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libnftnl/set.h>
+#include <libnftnl/expr.h>
 
 #include "linux_list.h"
 #include "expr/data_reg.h"
@@ -1049,3 +1050,45 @@ void nft_set_list_iter_destroy(struct nft_set_list_iter *iter)
 	xfree(iter);
 }
 EXPORT_SYMBOL(nft_set_list_iter_destroy);
+
+static struct nft_set *nft_set_lookup(const char *this_set_name,
+				      struct nft_set_list *set_list)
+{
+	struct nft_set_list_iter *iter;
+	struct nft_set *s;
+	const char *set_name;
+
+	iter = nft_set_list_iter_create(set_list);
+	if (iter == NULL)
+		return NULL;
+
+	s = nft_set_list_iter_cur(iter);
+	while (s != NULL) {
+		set_name  = nft_set_attr_get_str(s, NFT_SET_ATTR_NAME);
+		if (strcmp(this_set_name, set_name) == 0)
+			break;
+
+		s = nft_set_list_iter_next(iter);
+	}
+	nft_set_list_iter_destroy(iter);
+
+	return s;
+}
+
+int nft_set_lookup_id(struct nft_rule_expr *e,
+		      struct nft_set_list *set_list, uint32_t *set_id)
+{
+	const char *set_name;
+	struct nft_set *s;
+
+	set_name = nft_rule_expr_get_str(e, NFT_EXPR_LOOKUP_SET);
+	if (set_name == NULL)
+		return 0;
+
+	s = nft_set_lookup(set_name, set_list);
+	if (s == NULL)
+		return 0;
+
+	*set_id = nft_set_attr_get_u32(s, NFT_SET_ATTR_ID);
+	return 1;
+}

@@ -58,13 +58,15 @@ err:
 }
 
 struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node,
-					  struct nft_parse_err *err)
+					  struct nft_parse_err *err,
+					  struct nft_set_list *set_list)
 {
 	mxml_node_t *tree;
 	struct nft_rule_expr *e;
 	const char *expr_name;
 	char *xml_text;
-	int ret;
+	struct nft_set *set_cur = NULL;
+	int ret, set_id;
 
 	expr_name = mxmlElementGetAttr(node, "type");
 	if (expr_name == NULL) {
@@ -89,6 +91,11 @@ struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node,
 
 	ret = e->ops->xml_parse(e, tree, err);
 	mxmlDelete(tree);
+
+	if (set_list != NULL &&
+	    strcmp(expr_name, "lookup") == 0 &&
+	    nft_set_lookup_id(e, set_list, &set_id))
+		nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SET_ID, set_id);
 
 	return ret < 0 ? NULL : e;
 err_expr:
