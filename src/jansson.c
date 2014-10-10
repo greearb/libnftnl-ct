@@ -192,8 +192,8 @@ struct nft_rule_expr *nft_jansson_expr_parse(json_t *root,
 {
 	struct nft_rule_expr *e;
 	const char *type;
-	struct nft_set *set_cur = NULL;
-	int ret, set_id;
+	uint32_t set_id;
+	int ret;
 
 	type = nft_jansson_parse_str(root, "type", err);
 	if (type == NULL)

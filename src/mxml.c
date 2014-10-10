@@ -65,8 +65,8 @@ struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node,
 	struct nft_rule_expr *e;
 	const char *expr_name;
 	char *xml_text;
-	struct nft_set *set_cur = NULL;
-	int ret, set_id;
+	uint32_t set_id;
+	int ret;
 
 	expr_name = mxmlElementGetAttr(node, "type");
 	if (expr_name == NULL) {
