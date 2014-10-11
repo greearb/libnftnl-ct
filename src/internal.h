@@ -92,6 +92,8 @@ int nft_mxml_set_parse(mxml_node_t *tree, struct nft_set *s,
 		       struct nft_parse_err *err);
 #endif
 
+struct nft_set_list;
+struct nft_rule_expr;
 int nft_set_lookup_id(struct nft_rule_expr *e, struct nft_set_list *set_list,
 		      uint32_t *set_id);
 
