@@ -1,0 +1,1 @@
+{"nftables":[{"rule":{"family":"ip6","table":"nat","chain":"prerouting","handle":4,"expr":[{"type":"redir"}]}}]}

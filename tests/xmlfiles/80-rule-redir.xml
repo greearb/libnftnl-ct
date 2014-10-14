@@ -1,0 +1,1 @@
+<nftables><rule><family>ip6</family><table>nat</table><chain>prerouting</chain><handle>4</handle><expr type="redir"></expr></rule></nftables>
