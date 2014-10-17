@@ -161,6 +161,12 @@ enum {
 	NFT_EXPR_MASQ_FLAGS	= NFT_RULE_EXPR_ATTR_BASE,
 };
 
+enum {
+	NFT_EXPR_REDIR_REG_PROTO_MIN	= NFT_RULE_EXPR_ATTR_BASE,
+	NFT_EXPR_REDIR_REG_PROTO_MAX,
+	NFT_EXPR_REDIR_FLAGS,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
