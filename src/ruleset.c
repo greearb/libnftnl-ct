@@ -111,7 +111,7 @@ void nft_ruleset_attr_set(struct nft_ruleset *r, uint16_t attr, void *data)
 }
 EXPORT_SYMBOL(nft_ruleset_attr_set);
 
-const void *nft_ruleset_attr_get(const struct nft_ruleset *r, uint16_t attr)
+void *nft_ruleset_attr_get(const struct nft_ruleset *r, uint16_t attr)
 {
 	if (!(r->flags & (1 << attr)))
 		return NULL;
