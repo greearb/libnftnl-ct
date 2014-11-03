@@ -23,7 +23,7 @@
 #include "expr_ops.h"
 
 #ifndef NFT_META_MAX
-#define NFT_META_MAX (NFT_META_OIFGROUP + 1)
+#define NFT_META_MAX (NFT_META_CGROUP + 1)
 #endif
 
 struct nft_expr_meta {
@@ -157,6 +157,7 @@ static const char *meta_key2str_array[NFT_META_MAX] = {
 	[NFT_META_CPU]		= "cpu",
 	[NFT_META_IIFGROUP]	= "iifgroup",
 	[NFT_META_OIFGROUP]	= "oifgroup",
+	[NFT_META_CGROUP]	= "cgroup",
 };
 
 static const char *meta_key2str(uint8_t key)
