@@ -22,6 +22,7 @@
 #include <libnftnl/expr.h>
 #include "data_reg.h"
 #include "expr_ops.h"
+#include <buffer.h>
 
 #ifndef IFNAMSIZ
 #define IFNAMSIZ	16
@@ -208,52 +209,20 @@ nft_rule_expr_lookup_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 }
 
 static int
-nft_rule_expr_lookup_snprintf_json(char *buf, size_t size,
-				   struct nft_rule_expr *e)
+nft_rule_expr_lookup_export(char *buf, size_t size,
+			    struct nft_rule_expr *e, int type)
 {
-	int len = size, offset = 0, ret;
 	struct nft_expr_lookup *l = nft_expr_data(e);
+	NFT_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_LOOKUP_SET)) {
-		ret = snprintf(buf, len, "\"set\":\"%s\",", l->set_name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_LOOKUP_SREG)) {
-		ret = snprintf(buf + offset, len, "\"sreg\":%u,", l->sreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_LOOKUP_DREG)) {
-		ret = snprintf(buf + offset, len, "\"dreg\":%u,", l->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	/* Remove the last comma characther */
-	if (offset > 0)
-		offset--;
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_SET))
+		nft_buf_str(&b, type, l->set_name, SET);
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_SREG))
+		nft_buf_u32(&b, type, l->sreg, SREG);
+	if (e->flags & (1 << NFT_EXPR_LOOKUP_DREG))
+		nft_buf_u32(&b, type, l->dreg, DREG);
 
-	return offset;
-}
-
-static int
-nft_rule_expr_lookup_snprintf_xml(char *buf, size_t size,
-				  struct nft_rule_expr *e)
-{
-	int len = size, offset = 0, ret;
-	struct nft_expr_lookup *l = nft_expr_data(e);
-
-	if (e->flags & (1 << NFT_EXPR_LOOKUP_SET)) {
-		ret = snprintf(buf, len, "<set>%s</set>", l->set_name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_LOOKUP_SREG)) {
-		ret = snprintf(buf + offset, len, "<sreg>%u</sreg>", l->sreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_LOOKUP_DREG)) {
-		ret = snprintf(buf + offset, len, "<dreg>%u</dreg>", l->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int
@@ -284,9 +253,8 @@ nft_rule_expr_lookup_snprintf(char *buf, size_t size, uint32_t type,
 	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_lookup_snprintf_default(buf, size, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_lookup_snprintf_xml(buf, size, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_lookup_snprintf_json(buf, size, e);
+		return nft_rule_expr_lookup_export(buf, size, e, type);
 	default:
 		break;
 	}

@@ -20,6 +20,7 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 #include "expr_ops.h"
+#include <buffer.h>
 
 struct nft_expr_queue {
 	uint16_t		queuenum;
@@ -211,59 +212,20 @@ static int nft_rule_expr_queue_snprintf_default(char *buf, size_t len,
 	return offset;
 }
 
-static int nft_rule_expr_queue_snprintf_xml(char *buf, size_t len,
-					    struct nft_rule_expr *e)
+static int nft_rule_expr_queue_export(char *buf, size_t size,
+				      struct nft_rule_expr *e, int type)
 {
-	int ret, size = len, offset = 0;
 	struct nft_expr_queue *queue = nft_expr_data(e);
+	NFT_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_QUEUE_NUM)) {
-		ret = snprintf(buf + offset, len, "<num>%u</num>",
-			       queue->queuenum);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	if (e->flags & (1 << NFT_EXPR_QUEUE_NUM))
+		nft_buf_u32(&b, type, queue->queuenum, NUM);
+	if (e->flags & (1 << NFT_EXPR_QUEUE_TOTAL))
+		nft_buf_u32(&b, type, queue->queues_total, TOTAL);
+	if (e->flags & (1 << NFT_EXPR_QUEUE_FLAGS))
+		nft_buf_u32(&b, type, queue->flags, FLAGS);
 
-	if (e->flags & (1 << NFT_EXPR_QUEUE_TOTAL)) {
-		ret = snprintf(buf + offset, len, "<total>%u</total>",
-			       queue->queues_total);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_QUEUE_FLAGS)) {
-		ret = snprintf(buf + offset, len, "<flags>%u</flags>",
-			       queue->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	return offset;
-}
-
-static int nft_rule_expr_queue_snprintf_json(char *buf, size_t len,
-					     struct nft_rule_expr *e)
-{
-	int ret, size = len, offset = 0;
-	struct nft_expr_queue *queue = nft_expr_data(e);
-
-	if (e->flags & (1 << NFT_EXPR_QUEUE_NUM)) {
-		ret = snprintf(buf + offset, len, "\"num\":%u,",
-			       queue->queuenum);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (e->flags & (1 << NFT_EXPR_QUEUE_TOTAL)) {
-		ret = snprintf(buf + offset, len, "\"total\":%u,",
-			       queue->queues_total);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_QUEUE_FLAGS)) {
-		ret = snprintf(buf + offset, len, "\"flags\":%u,",
-			       queue->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	/* Remove the last comma characther */
-	if (offset > 0)
-		offset--;
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int
@@ -271,13 +233,12 @@ nft_rule_expr_queue_snprintf(char *buf, size_t len, uint32_t type,
 			      uint32_t flags, struct nft_rule_expr *e)
 {
 
-	switch(type) {
+	switch (type) {
 	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_queue_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_queue_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_queue_snprintf_json(buf, len, e);
+		return nft_rule_expr_queue_export(buf, len, e, type);
 	default:
 		break;
 	}

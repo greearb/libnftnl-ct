@@ -21,6 +21,7 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 #include "expr_ops.h"
+#include <buffer.h>
 
 struct nft_expr_reject {
 	uint32_t		type;
@@ -170,60 +171,30 @@ static int nft_rule_expr_reject_snprintf_default(char *buf, size_t len,
 			reject->type, reject->icmp_code);
 }
 
-static int nft_rule_expr_reject_snprintf_xml(char *buf, size_t len,
-					     struct nft_rule_expr *e)
+static int nft_rule_expr_reject_export(char *buf, size_t size,
+				       struct nft_rule_expr *e, int type)
 {
-	int ret, size = len, offset = 0;
 	struct nft_expr_reject *reject = nft_expr_data(e);
+	NFT_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_REJECT_TYPE)) {
-		ret = snprintf(buf+offset, len, "<type>%u</type>",
-			       reject->type);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_REJECT_CODE)) {
-		ret = snprintf(buf+offset, len, "<code>%u</code>",
-			       reject->icmp_code);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	if (e->flags & (1 << NFT_EXPR_REJECT_TYPE))
+		nft_buf_u32(&b, type, reject->type, TYPE);
+	if (e->flags & (1 << NFT_EXPR_REJECT_CODE))
+		nft_buf_u32(&b, type, reject->icmp_code, CODE);
 
-	return offset;
-}
-
-static int nft_rule_expr_reject_snprintf_json(char *buf, size_t len,
-					      struct nft_rule_expr *e)
-{
-	int ret, size = len, offset = 0;
-	struct nft_expr_reject *reject = nft_expr_data(e);
-
-	if (e->flags & (1 << NFT_EXPR_REJECT_TYPE)) {
-		ret = snprintf(buf+offset, len, "\"type\":%u,",
-			       reject->type);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_REJECT_CODE)) {
-		ret = snprintf(buf+offset, len, "\"code\":%u,",
-			       reject->icmp_code);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (offset > 0)
-		offset--;
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int
 nft_rule_expr_reject_snprintf(char *buf, size_t len, uint32_t type,
 			      uint32_t flags, struct nft_rule_expr *e)
 {
-	switch(type) {
+	switch (type) {
 	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_reject_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_reject_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_reject_snprintf_json(buf, len, e);
+		return nft_rule_expr_reject_export(buf, len, e, type);
 	default:
 		break;
 	}

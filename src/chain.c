@@ -27,6 +27,7 @@
 #include <linux/netfilter_arp.h>
 
 #include <libnftnl/chain.h>
+#include <buffer.h>
 
 struct nft_chain {
 	struct list_head head;
@@ -787,150 +788,41 @@ int nft_chain_parse_file(struct nft_chain *c, enum nft_parse_type type,
 }
 EXPORT_SYMBOL(nft_chain_parse_file);
 
-static int nft_chain_snprintf_json(char *buf, size_t size, struct nft_chain *c)
+static int nft_chain_export(char *buf, size_t size, struct nft_chain *c,
+			    int type)
 {
-	int ret, len = size, offset = 0;
+	NFT_BUF_INIT(b, buf, size);
 
-	ret = snprintf(buf, len, "{\"chain\":{");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	ret = 0;
-
-	if (c->flags & (1 << NFT_CHAIN_ATTR_NAME)) {
-		ret = snprintf(buf + offset, len, "\"name\":\"%s\",", c->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_HANDLE)) {
-		ret = snprintf(buf + offset, len, "\"handle\":%"PRIu64",",
-			       c->handle);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_BYTES)) {
-		ret = snprintf(buf + offset, len, "\"bytes\":%"PRIu64",",
-			       c->bytes);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_PACKETS)) {
-		ret = snprintf(buf + offset, len, "\"packets\":%"PRIu64",",
-			       c->packets);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_FAMILY)) {
-		ret = snprintf(buf + offset, len, "\"family\":\"%s\",",
-			       nft_family2str(c->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_FAMILY)) {
-		ret = snprintf(buf + offset, len, "\"table\":\"%s\",",
-			       c->table);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_USE)) {
-		ret = snprintf(buf + offset, len, "\"use\":%d,", c->use);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	nft_buf_open(&b, type, CHAIN);
+	if (c->flags & (1 << NFT_CHAIN_ATTR_NAME))
+		nft_buf_str(&b, type, c->name, NAME);
+	if (c->flags & (1 << NFT_CHAIN_ATTR_HANDLE))
+		nft_buf_u64(&b, type, c->handle, HANDLE);
+	if (c->flags & (1 << NFT_CHAIN_ATTR_BYTES))
+		nft_buf_u64(&b, type, c->bytes, BYTES);
+	if (c->flags & (1 << NFT_CHAIN_ATTR_PACKETS))
+		nft_buf_u64(&b, type, c->packets, PACKETS);
+	if (c->flags & (1 << NFT_CHAIN_ATTR_TABLE))
+		nft_buf_str(&b, type, c->table, TABLE);
+	if (c->flags & (1 << NFT_CHAIN_ATTR_FAMILY))
+		nft_buf_str(&b, type, nft_family2str(c->family), FAMILY);
+	if (c->flags & (1 << NFT_CHAIN_ATTR_USE))
+		nft_buf_u32(&b, type, c->use, USE);
 	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
-		if (c->flags & (1 << NFT_CHAIN_ATTR_TYPE)) {
-			ret = snprintf(buf + offset, len, "\"type\":\"%s\",",
-				       c->type);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-
-		ret = snprintf(buf + offset, len, "\"hooknum\":\"%s\",",
-			       nft_hooknum2str(c->family, c->hooknum));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		if (c->flags & (1 << NFT_CHAIN_ATTR_PRIO)) {
-			ret = snprintf(buf + offset, len, "\"prio\":%d,",
-				       c->prio);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-		if (c->flags & (1 << NFT_CHAIN_ATTR_POLICY)) {
-			ret = snprintf(buf + offset, len, "\"policy\":\"%s\",",
-				       nft_verdict2str(c->policy));
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
+		if (c->flags & (1 << NFT_CHAIN_ATTR_TYPE))
+			nft_buf_str(&b, type, c->type, TYPE);
+		if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM))
+			nft_buf_str(&b, type, nft_hooknum2str(c->family,
+					 c->hooknum), HOOKNUM);
+		if (c->flags & (1 << NFT_CHAIN_ATTR_PRIO))
+			nft_buf_s32(&b, type, c->prio, PRIO);
+		if (c->flags & (1 << NFT_CHAIN_ATTR_POLICY))
+			nft_buf_str(&b, type, nft_verdict2str(c->policy), POLICY);
 	}
 
-	/* If ret is not 0, some values are printed. So, It's necessary to
-	 * delete the last comma character
-	 */
-	if (ret > 0)
-		offset--;
+	nft_buf_close(&b, type, CHAIN);
 
-	ret = snprintf(buf + offset, len, "}}");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
-}
-
-static int nft_chain_snprintf_xml(char *buf, size_t size, struct nft_chain *c)
-{
-	int ret, len = size, offset = 0;
-
-	ret = snprintf(buf, len, "<chain>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	if (c->flags & (1 << NFT_CHAIN_ATTR_NAME)) {
-		ret = snprintf(buf + offset, len, "<name>%s</name>", c->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_HANDLE)) {
-		ret = snprintf(buf + offset, len, "<handle>%"PRIu64"</handle>",
-			       c->handle);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_BYTES)) {
-		ret = snprintf(buf + offset, len, "<bytes>%"PRIu64"</bytes>",
-			       c->bytes);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_PACKETS)) {
-		ret = snprintf(buf + offset, len, "<packets>%"PRIu64"</packets>",
-			       c->packets);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_TABLE)) {
-		ret = snprintf(buf + offset, len, "<table>%s</table>",
-			       c->table);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_USE)) {
-		ret = snprintf(buf + offset, len, "<use>%u</use>", c->use);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_HOOKNUM)) {
-		if (c->flags & (1 << NFT_CHAIN_ATTR_TYPE)) {
-			ret = snprintf(buf + offset, len, "<type>%s</type>",
-				       c->type);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-
-		ret = snprintf(buf + offset, len, "<hooknum>%s</hooknum>",
-			       nft_hooknum2str(c->family, c->hooknum));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		if (c->flags & (1 << NFT_CHAIN_ATTR_PRIO)) {
-			ret = snprintf(buf + offset, len, "<prio>%d</prio>",
-				       c->prio);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-		if (c->flags & (1 << NFT_CHAIN_ATTR_POLICY)) {
-			ret = snprintf(buf + offset, len, "<policy>%s</policy>",
-				       nft_verdict2str(c->policy));
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-	}
-	if (c->flags & (1 << NFT_CHAIN_ATTR_FAMILY)) {
-		ret = snprintf(buf + offset, len, "<family>%s</family>",
-			       nft_family2str(c->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	ret = snprintf(buf + offset, len, "</chain>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int nft_chain_snprintf_default(char *buf, size_t size,
@@ -963,15 +855,13 @@ int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
 	ret = nft_event_header_snprintf(buf+offset, len, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	switch(type) {
+	switch (type) {
 	case NFT_OUTPUT_DEFAULT:
 		ret = nft_chain_snprintf_default(buf+offset, len, c);
 		break;
 	case NFT_OUTPUT_XML:
-		ret = nft_chain_snprintf_xml(buf+offset, len, c);
-		break;
 	case NFT_OUTPUT_JSON:
-		ret = nft_chain_snprintf_json(buf+offset, len, c);
+		ret = nft_chain_export(buf+offset, len, c, type);
 		break;
 	default:
 		return -1;

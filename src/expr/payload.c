@@ -25,6 +25,7 @@
 #include <libnftnl/rule.h>
 
 #include "expr_ops.h"
+#include <buffer.h>
 
 struct nft_expr_payload {
 	enum nft_registers	dreg;
@@ -161,34 +162,6 @@ static const char *base2str(enum nft_payload_bases base)
 	return base2str_array[base];
 }
 
-static int
-nft_rule_expr_payload_snprintf_json(char *buf, size_t len, uint32_t flags,
-				   struct nft_rule_expr *e)
-{
-	struct nft_expr_payload *payload = nft_expr_data(e);
-	int size = len, offset = 0, ret;
-
-	if (e->flags & (1 << NFT_EXPR_PAYLOAD_DREG)) {
-		ret = snprintf(buf, len, "\"dreg\":%u,", payload->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_PAYLOAD_OFFSET)) {
-		ret = snprintf(buf + offset, len, "\"offset\":%u,",
-			       payload->offset);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_PAYLOAD_LEN)) {
-		ret = snprintf(buf + offset, len, "\"len\":%u,", payload->len);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_PAYLOAD_BASE)) {
-		ret = snprintf(buf + offset, len, "\"base\":\"%s\"",
-			       base2str(payload->base));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	return offset;
-}
-
 static inline int nft_str2base(const char *base)
 {
 	if (strcmp(base, "link") == 0)
@@ -277,33 +250,22 @@ nft_rule_expr_payload_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int
-nft_rule_expr_payload_snprintf_xml(char *buf, size_t len, uint32_t flags,
-				   struct nft_rule_expr *e)
+static int nft_rule_expr_payload_export(char *buf, size_t size, uint32_t flags,
+					struct nft_rule_expr *e, int type)
 {
 	struct nft_expr_payload *payload = nft_expr_data(e);
-	int size = len, offset = 0, ret;
+	NFT_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_PAYLOAD_DREG)) {
-		ret = snprintf(buf, len, "<dreg>%u</dreg>", payload->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_PAYLOAD_OFFSET)) {
-		ret = snprintf(buf + offset, len, "<offset>%u</offset>",
-			       payload->offset);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_PAYLOAD_LEN)) {
-		ret = snprintf(buf + offset, len, "<len>%u</len>", payload->len);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_PAYLOAD_BASE)) {
-		ret = snprintf(buf + offset, len, "<base>%s</base>",
-			       base2str(payload->base));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_DREG))
+		nft_buf_u32(&b, type, payload->dreg, DREG);
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_OFFSET))
+		nft_buf_u32(&b, type, payload->offset, OFFSET);
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_LEN))
+		nft_buf_u32(&b, type, payload->len, LEN);
+	if (e->flags & (1 << NFT_EXPR_PAYLOAD_BASE))
+		nft_buf_str(&b, type, base2str(payload->base), BASE);
 
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int
@@ -312,15 +274,14 @@ nft_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 {
 	struct nft_expr_payload *payload = nft_expr_data(e);
 
-	switch(type) {
+	switch (type) {
 	case NFT_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "load %ub @ %s header + %u => reg %u ",
 				payload->len, base2str(payload->base),
 				payload->offset, payload->dreg);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_payload_snprintf_xml(buf, len, flags, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_payload_snprintf_json(buf, len, flags, e);
+		return nft_rule_expr_payload_export(buf, len, flags, e, type);
 	default:
 		break;
 	}

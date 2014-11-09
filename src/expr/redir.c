@@ -20,6 +20,7 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 #include "expr_ops.h"
+#include <buffer.h>
 
 struct nft_expr_redir {
 	enum nft_registers sreg_proto_min;
@@ -184,60 +185,20 @@ nft_rule_expr_redir_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int nft_rule_expr_redir_snprintf_json(char *buf, size_t len,
-					     struct nft_rule_expr *e)
+static int nft_rule_expr_redir_export(char *buf, size_t size,
+				      struct nft_rule_expr *e, int type)
 {
-	int ret, size = len, offset = 0;
 	struct nft_expr_redir *redir = nft_expr_data(e);
+        NFT_BUF_INIT(b, buf, size);
 
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_REG_PROTO_MIN)) {
-		ret = snprintf(buf + offset, len, "\"sreg_proto_min\":%u,",
-			       redir->sreg_proto_min);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	if (e->flags & (1 << NFT_EXPR_REDIR_REG_PROTO_MIN))
+		nft_buf_u32(&b, type, redir->sreg_proto_min, SREG_PROTO_MIN);
+	if (e->flags & (1 << NFT_EXPR_REDIR_REG_PROTO_MAX))
+		nft_buf_u32(&b, type, redir->sreg_proto_max, SREG_PROTO_MAX);
+	if (e->flags & (1 << NFT_EXPR_REDIR_FLAGS))
+		nft_buf_u32(&b, type, redir->flags, FLAGS);
 
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_REG_PROTO_MAX)) {
-		ret = snprintf(buf + offset, len, "\"sreg_proto_max\":%u,",
-			       redir->sreg_proto_max);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_FLAGS)) {
-		ret = snprintf(buf + offset, len, "\"flags\":%u",
-			       redir->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
-}
-
-static int nft_rule_expr_redir_snprintf_xml(char *buf, size_t len,
-					    struct nft_rule_expr *e)
-{
-	int ret, size = len, offset = 0;
-	struct nft_expr_redir *redir = nft_expr_data(e);
-
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_REG_PROTO_MIN)) {
-		ret = snprintf(buf + offset, len,
-			       "<sreg_proto_min>%u<sreg_proto_min>",
-			       redir->sreg_proto_min);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_REG_PROTO_MAX)) {
-		ret = snprintf(buf + offset, len,
-			       "<sreg_proto_max>%u</sreg_proto_max>",
-			       redir->sreg_proto_max);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_FLAGS)) {
-		ret = snprintf(buf + offset, len, "<flags>%u</flags>",
-			       redir->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int nft_rule_expr_redir_snprintf_default(char *buf, size_t len,
@@ -275,9 +236,8 @@ nft_rule_expr_redir_snprintf(char *buf, size_t len, uint32_t type,
 	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_redir_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_redir_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_redir_snprintf_json(buf, len, e);
+		return nft_rule_expr_redir_export(buf, len, e, type);
 	default:
 		break;
 	}

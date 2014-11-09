@@ -22,6 +22,7 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 #include "expr_ops.h"
+#include <buffer.h>
 
 struct nft_expr_counter {
 	uint64_t	pkts;
@@ -159,45 +160,19 @@ nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 	return -1;
 #endif
 }
-static int nft_rule_expr_counter_snprintf_json(char *buf, size_t len,
-					       struct nft_rule_expr *e)
+
+static int nft_rule_expr_counter_export(char *buf, size_t size,
+					struct nft_rule_expr *e, int type)
 {
-	int ret, size = len, offset = 0;
 	struct nft_expr_counter *ctr = nft_expr_data(e);
+	NFT_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_CTR_PACKETS)) {
-		ret = snprintf(buf, len,"\"pkts\":%"PRIu64",", ctr->pkts);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_CTR_BYTES)) {
-		ret = snprintf(buf + offset, len, "\"bytes\":%"PRIu64",", ctr->bytes);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	if (e->flags & (1 << NFT_EXPR_CTR_PACKETS))
+		nft_buf_u64(&b, type, ctr->pkts, PKTS);
+	if (e->flags & (1 << NFT_EXPR_CTR_BYTES))
+		nft_buf_u64(&b, type, ctr->bytes, BYTES);
 
-	/* Remove the last comma characther */
-	if (offset > 0)
-		offset--;
-
-	return offset;
-}
-
-static int nft_rule_expr_counter_snprintf_xml(char *buf, size_t len,
-					      struct nft_rule_expr *e)
-{
-	int ret, size = len, offset = 0;
-	struct nft_expr_counter *ctr = nft_expr_data(e);
-
-	if (e->flags & (1 << NFT_EXPR_CTR_PACKETS)) {
-		ret = snprintf(buf, len, "<pkts>%"PRIu64"</pkts>", ctr->pkts);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_CTR_BYTES)) {
-		ret = snprintf(buf + offset, len, "<bytes>%"PRIu64"</bytes>",
-			       ctr->bytes);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int nft_rule_expr_counter_snprintf_default(char *buf, size_t len,
@@ -213,13 +188,12 @@ static int nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 					  uint32_t flags,
 					  struct nft_rule_expr *e)
 {
-	switch(type) {
+	switch (type) {
 	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_counter_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_counter_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_counter_snprintf_json(buf, len, e);
+		return nft_rule_expr_counter_export(buf, len, e, type);
 	default:
 		break;
 	}

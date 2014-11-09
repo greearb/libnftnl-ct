@@ -20,6 +20,7 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 #include "expr_ops.h"
+#include <buffer.h>
 
 struct nft_expr_masq {
 	uint32_t	flags;
@@ -135,33 +136,16 @@ nft_rule_expr_masq_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 	return -1;
 #endif
 }
-static int nft_rule_expr_masq_snprintf_json(char *buf, size_t len,
-					    struct nft_rule_expr *e)
+static int nft_rule_expr_masq_export(char *buf, size_t size,
+				     struct nft_rule_expr *e, int type)
 {
-	int ret, size = len, offset = 0;
 	struct nft_expr_masq *masq = nft_expr_data(e);
+	NFT_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_MASQ_FLAGS)) {
-		ret = snprintf(buf + offset, len, "\"flags\":%u", masq->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	if (e->flags & (1 << NFT_EXPR_MASQ_FLAGS))
+		nft_buf_u32(&b, type, masq->flags, FLAGS);
 
-	return offset;
-}
-
-static int nft_rule_expr_masq_snprintf_xml(char *buf, size_t len,
-					   struct nft_rule_expr *e)
-{
-	int ret, size = len, offset = 0;
-	struct nft_expr_masq *masq = nft_expr_data(e);
-
-	if (e->flags & (1 << NFT_EXPR_MASQ_FLAGS)) {
-		ret = snprintf(buf + offset, len, "<flags>%u</flags>",
-			       masq->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int nft_rule_expr_masq_snprintf_default(char *buf, size_t len,
@@ -182,9 +166,8 @@ static int nft_rule_expr_masq_snprintf(char *buf, size_t len, uint32_t type,
 	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_masq_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_masq_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_masq_snprintf_json(buf, len, e);
+		return nft_rule_expr_masq_export(buf, len, e, type);
 	default:
 		break;
 	}

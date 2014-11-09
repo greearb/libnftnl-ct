@@ -21,6 +21,7 @@
 #include <libnftnl/rule.h>
 #include "expr_ops.h"
 #include "data_reg.h"
+#include <buffer.h>
 
 struct nft_expr_immediate {
 	union nft_data_reg	data;
@@ -248,63 +249,22 @@ nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 }
 
 static int
-nft_rule_expr_immediate_snprintf_json(char *buf, size_t len,
-				     struct nft_rule_expr *e, uint32_t flags)
+nft_rule_expr_immediate_export(char *buf, size_t size, struct nft_rule_expr *e,
+			       int type)
 {
-	int size = len, offset = 0, ret;
 	struct nft_expr_immediate *imm = nft_expr_data(e);
+	NFT_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_IMM_DREG)) {
-		ret = snprintf(buf, len, "\"dreg\":%u,", imm->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {
-		ret = nft_data_reg_snprintf(buf + offset, len, &imm->data,
-					    NFT_OUTPUT_JSON, flags, DATA_VALUE);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	if (e->flags & (1 << NFT_EXPR_IMM_DREG))
+		nft_buf_u32(&b, type, imm->dreg, DREG);
+	if (e->flags & (1 << NFT_EXPR_IMM_DATA))
+		nft_buf_reg(&b, type, &imm->data, DATA_VALUE, DATA);
+	if (e->flags & (1 << NFT_EXPR_IMM_VERDICT))
+		nft_buf_reg(&b, type, &imm->data, DATA_VERDICT, DATA);
+	if (e->flags & (1 << NFT_EXPR_IMM_CHAIN))
+		nft_buf_reg(&b, type, &imm->data, DATA_CHAIN, DATA);
 
-	} else if (e->flags & (1 << NFT_EXPR_IMM_VERDICT)) {
-		ret = nft_data_reg_snprintf(buf + offset, len, &imm->data,
-					  NFT_OUTPUT_JSON, flags, DATA_VERDICT);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	} else if (e->flags & (1 << NFT_EXPR_IMM_CHAIN)) {
-		ret = nft_data_reg_snprintf(buf + offset, len, &imm->data,
-					    NFT_OUTPUT_JSON, flags, DATA_CHAIN);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
-}
-
-static int
-nft_rule_expr_immediate_snprintf_xml(char *buf, size_t len,
-				     struct nft_rule_expr *e, uint32_t flags)
-{
-	int size = len, offset = 0, ret;
-	struct nft_expr_immediate *imm = nft_expr_data(e);
-
-	if (e->flags & (1 << NFT_EXPR_IMM_DREG)) {
-		ret = snprintf(buf, len, "<dreg>%u</dreg>", imm->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_IMM_DATA)) {
-		ret = nft_data_reg_snprintf(buf + offset, len, &imm->data,
-					    NFT_OUTPUT_XML, flags, DATA_VALUE);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	} else if (e->flags & (1 << NFT_EXPR_IMM_VERDICT)) {
-		ret = nft_data_reg_snprintf(buf + offset, len, &imm->data,
-					  NFT_OUTPUT_XML, flags, DATA_VERDICT);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	} else if (e->flags & (1 << NFT_EXPR_IMM_CHAIN)) {
-		ret = nft_data_reg_snprintf(buf + offset, len, &imm->data,
-					    NFT_OUTPUT_XML, flags, DATA_CHAIN);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int
@@ -344,9 +304,8 @@ nft_rule_expr_immediate_snprintf(char *buf, size_t len, uint32_t type,
 	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_immediate_snprintf_default(buf, len, e, flags);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_immediate_snprintf_xml(buf, len, e, flags);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_immediate_snprintf_json(buf, len, e, flags);
+		return nft_rule_expr_immediate_export(buf, len, e, type);
 	default:
 		break;
 	}

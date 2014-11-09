@@ -24,6 +24,7 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libnftnl/table.h>
+#include <buffer.h>
 
 struct nft_table {
 	struct list_head head;
@@ -391,75 +392,24 @@ int nft_table_parse_file(struct nft_table *t, enum nft_parse_type type,
 }
 EXPORT_SYMBOL(nft_table_parse_file);
 
-static int nft_table_snprintf_json(char *buf, size_t size, struct nft_table *t)
+static int nft_table_export(char *buf, size_t size, struct nft_table *t,
+			    int type)
 {
-	int ret, len = size, offset = 0;
+	NFT_BUF_INIT(b, buf, size);
 
-	ret = snprintf(buf, size, "{\"table\":{");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	ret = 0;
+	nft_buf_open(&b, type, TABLE);
+	if (t->flags & (1 << NFT_TABLE_ATTR_NAME))
+		nft_buf_str(&b, type, t->name, NAME);
+	if (t->flags & (1 << NFT_TABLE_ATTR_FAMILY))
+		nft_buf_str(&b, type, nft_family2str(t->family), FAMILY);
+	if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS))
+		nft_buf_u32(&b, type, t->table_flags, FLAGS);
+	if (t->flags & (1 << NFT_TABLE_ATTR_USE))
+		nft_buf_u32(&b, type, t->use, USE);
 
-	if (t->flags & (1 << NFT_TABLE_ATTR_NAME)) {
-		ret = snprintf(buf + offset, size, "\"name\":\"%s\",", t->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (t->flags & (1 << NFT_TABLE_ATTR_FAMILY)) {
-		ret = snprintf(buf + offset, size, "\"family\":\"%s\",",
-			       nft_family2str(t->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS)) {
-		ret = snprintf(buf + offset, size, "\"flags\":%u,",
-			       t->table_flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (t->flags & (1 << NFT_TABLE_ATTR_USE)) {
-		ret = snprintf(buf + offset, size, "\"use\":%u,", t->use);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	nft_buf_close(&b, type, TABLE);
 
-	/* If  some values is set, ret is not 0. So, It's needed to remove the
-	 * last comma characther
-	 */
-	if (ret > 0)
-		offset--;
-
-	ret = snprintf(buf + offset, size, "}}");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
-}
-
-static int nft_table_snprintf_xml(char *buf, size_t size, struct nft_table *t)
-{
-	int ret, len = size, offset = 0;
-
-	ret = snprintf(buf, size, "<table>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	if (t->flags & (1 << NFT_TABLE_ATTR_NAME)) {
-		ret = snprintf(buf + offset, size, "<name>%s</name>", t->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (t->flags & (1 << NFT_TABLE_ATTR_FAMILY)) {
-		ret = snprintf(buf + offset, size, "<family>%s</family>",
-			       nft_family2str(t->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS)) {
-		ret = snprintf(buf + offset, size, "<flags>%u</flags>",
-			       t->table_flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (t->flags & (1 << NFT_TABLE_ATTR_USE)) {
-		ret = snprintf(buf + offset, size, "<use>%u</use>", t->use);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	ret = snprintf(buf + offset, size, "</table>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int nft_table_snprintf_default(char *buf, size_t size, struct nft_table *t)
@@ -477,15 +427,13 @@ int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
 	ret = nft_event_header_snprintf(buf+offset, len, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	switch(type) {
+	switch (type) {
 	case NFT_OUTPUT_DEFAULT:
 		ret = nft_table_snprintf_default(buf+offset, len, t);
 		break;
 	case NFT_OUTPUT_XML:
-		ret = nft_table_snprintf_xml(buf+offset, len, t);
-		break;
 	case NFT_OUTPUT_JSON:
-		ret = nft_table_snprintf_json(buf+offset, len, t);
+		ret = nft_table_export(buf+offset, len, t, type);
 		break;
 	default:
 		return -1;

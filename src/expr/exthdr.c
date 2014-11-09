@@ -25,6 +25,7 @@
 #include <libnftnl/rule.h>
 
 #include "expr_ops.h"
+#include <buffer.h>
 
 #ifndef IPPROTO_MH
 #define IPPROTO_MH 135
@@ -154,7 +155,7 @@ nft_rule_expr_exthdr_parse(struct nft_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static const char *exthdr_type2str(uint32_t type)
+static const char *type2str(uint32_t type)
 {
 	switch (type) {
 	case IPPROTO_HOPOPTS:
@@ -262,65 +263,22 @@ nft_rule_expr_exthdr_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int nft_rule_expr_exthdr_snprintf_json(char *buf, size_t len,
-					      struct nft_rule_expr *e)
+static int nft_rule_expr_exthdr_export(char *buf, size_t len,
+				       struct nft_rule_expr *e, int type)
 {
 	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
-	int ret, size = len, offset = 0;
+	NFT_BUF_INIT(b, buf, len);
 
-	if (e->flags & (1 << NFT_EXPR_EXTHDR_DREG)) {
-		ret = snprintf(buf, len, "\"dreg\":%u,", exthdr->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_EXTHDR_TYPE)) {
-		ret = snprintf(buf + offset, len, "\"exthdr_type\":\"%s\",",
-			       exthdr_type2str(exthdr->type));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_EXTHDR_OFFSET)) {
-		ret = snprintf(buf + offset, len, "\"offset\":%u,",
-			       exthdr->offset);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_EXTHDR_LEN)) {
-		ret = snprintf(buf + offset, len, "\"len\":%u,",
-			       exthdr->len);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	/* Remove the last comma characther */
-	if (offset > 0)
-		offset--;
+	if (e->flags & (1 << NFT_EXPR_EXTHDR_DREG))
+		nft_buf_u32(&b, type, exthdr->dreg, DREG);
+	if (e->flags & (1 << NFT_EXPR_EXTHDR_TYPE))
+		nft_buf_str(&b, type, type2str(exthdr->type), EXTHDR_TYPE);
+	if (e->flags & (1 << NFT_EXPR_EXTHDR_OFFSET))
+		nft_buf_u32(&b, type, exthdr->offset, OFFSET);
+	if (e->flags & (1 << NFT_EXPR_EXTHDR_LEN))
+		nft_buf_u32(&b, type, exthdr->len, LEN);
 
-	return offset;
-}
-
-static int nft_rule_expr_exthdr_snprintf_xml(char *buf, size_t len,
-					     struct nft_rule_expr *e)
-{
-	struct nft_expr_exthdr *exthdr = nft_expr_data(e);
-	int ret, size = len, offset = 0;
-
-	if (e->flags & (1 << NFT_EXPR_EXTHDR_DREG)) {
-		ret = snprintf(buf, len, "<dreg>%u</dreg>", exthdr->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_EXTHDR_TYPE)) {
-		ret = snprintf(buf + offset, len,
-			       "<exthdr_type>%s</exthdr_type>",
-			       exthdr_type2str(exthdr->type));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_EXTHDR_OFFSET)) {
-		ret = snprintf(buf + offset, len, "<offset>%u</offset>",
-			       exthdr->offset);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (e->flags & (1 << NFT_EXPR_EXTHDR_LEN)) {
-		ret = snprintf(buf + offset, len, "<len>%u</len>", exthdr->len);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	return offset;
+	return nft_buf_done(&b);
 }
 
 static int nft_rule_expr_exthdr_snprintf_default(char *buf, size_t len,
@@ -337,13 +295,12 @@ static int
 nft_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 			       uint32_t flags, struct nft_rule_expr *e)
 {
-	switch(type) {
+	switch (type) {
 	case NFT_OUTPUT_DEFAULT:
 		return nft_rule_expr_exthdr_snprintf_default(buf, len, e);
 	case NFT_OUTPUT_XML:
-		return nft_rule_expr_exthdr_snprintf_xml(buf, len, e);
 	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_exthdr_snprintf_json(buf, len, e);
+		return nft_rule_expr_exthdr_export(buf, len, e, type);
 	default:
 		break;
 	}
