@@ -284,7 +284,7 @@ static int nft_rule_expr_nat_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 	uint32_t reg_addr_min, reg_addr_max;
 	uint32_t reg_proto_min, reg_proto_max;
 
-	nat_type = nft_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST,
+	nat_type = nft_mxml_str_parse(tree, "nat_type", MXML_DESCEND_FIRST,
 				      NFT_XML_MAND, err);
 	if (nat_type == NULL)
 		return -1;
