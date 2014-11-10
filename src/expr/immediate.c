@@ -186,7 +186,7 @@ nft_rule_expr_immediate_json_parse(struct nft_rule_expr *e, json_t *root,
 	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &reg, err) == 0)
 		nft_rule_expr_set_u32(e, NFT_EXPR_IMM_DREG, reg);
 
-	datareg_type = nft_jansson_data_reg_parse(root, "immediatedata",
+	datareg_type = nft_jansson_data_reg_parse(root, "data",
 						  &imm->data, err);
 	if (datareg_type >= 0) {
 		switch (datareg_type) {
@@ -223,7 +223,7 @@ nft_rule_expr_immediate_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 			       NFT_XML_MAND, err) == 0)
 		nft_rule_expr_set_u32(e, NFT_EXPR_IMM_DREG, reg);
 
-	datareg_type = nft_mxml_data_reg_parse(tree, "immediatedata",
+	datareg_type = nft_mxml_data_reg_parse(tree, "data",
 					       &imm->data, NFT_XML_MAND, err);
 	if (datareg_type >= 0) {
 		switch (datareg_type) {

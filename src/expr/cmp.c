@@ -201,7 +201,7 @@ static int nft_rule_expr_cmp_json_parse(struct nft_rule_expr *e, json_t *root,
 		nft_rule_expr_set_u32(e, NFT_EXPR_CMP_OP, base);
 	}
 
-	if (nft_jansson_data_reg_parse(root, "cmpdata",
+	if (nft_jansson_data_reg_parse(root, "data",
 				       &cmp->data, err) == DATA_VALUE)
 		e->flags |= (1 << NFT_EXPR_CMP_DATA);
 
@@ -235,7 +235,7 @@ static int nft_rule_expr_cmp_xml_parse(struct nft_rule_expr *e, mxml_node_t *tre
 		nft_rule_expr_set_u32(e, NFT_EXPR_CMP_OP, op_value);
 	}
 
-	if (nft_mxml_data_reg_parse(tree, "cmpdata",
+	if (nft_mxml_data_reg_parse(tree, "data",
 				    &cmp->data, NFT_XML_MAND,
 				    err) == DATA_VALUE)
 		e->flags |= (1 << NFT_EXPR_CMP_DATA);

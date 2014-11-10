@@ -227,10 +227,10 @@ int nft_jansson_data_reg_parse(json_t *root, const char *node_name,
 	if (data == NULL)
 		data = root;
 
-	data = json_object_get(data, "data_reg");
+	data = json_object_get(data, "reg");
 	if (data == NULL) {
 		err->error = NFT_PARSE_EMISSINGNODE;
-		err->node_name = "data_reg";
+		err->node_name = "reg";
 		errno = EINVAL;
 		return -1;
 	}

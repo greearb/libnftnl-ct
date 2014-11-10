@@ -145,21 +145,10 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg,
 	int i;
 	char node_name[6];
 
-	/*
-	* <data_reg type="value">
-	*    <len>16</len>
-	*    <data0>0xc09a002a</data0>
-	*    <data1>0x2700cac1</data1>
-	*    <data2>0x00000000</data2>
-	*    <data3>0x08000000</data3>
-	* </data_reg>
-	*/
-
 	if (nft_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
 			       &reg->len, NFT_TYPE_U8, NFT_XML_MAND, err) != 0)
 		return DATA_NONE;
 
-	/* Get and set <dataN> */
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
 		sprintf(node_name, "data%d", i);
 
@@ -180,7 +169,7 @@ int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree,
 	const char *type;
 	mxml_node_t *node;
 
-	node = mxmlFindElement(tree, tree, "data_reg", "type", NULL,
+	node = mxmlFindElement(tree, tree, "reg", "type", NULL,
 			       MXML_DESCEND_FIRST);
 	if (node == NULL)
 		goto err;
@@ -198,7 +187,7 @@ int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree,
 	return DATA_NONE;
 err:
 	errno = EINVAL;
-	err->node_name = "data_reg";
+	err->node_name = "reg";
 	err->error = NFT_PARSE_EMISSINGNODE;
 	return DATA_NONE;
 #else
@@ -216,7 +205,7 @@ nft_data_reg_value_snprintf_json(char *buf, size_t size,
 	uint32_t utemp;
 	uint8_t *tmp;
 
-	ret = snprintf(buf, len, "\"data_reg\":{\"type\":\"value\",");
+	ret = snprintf(buf, len, "\"reg\":{\"type\":\"value\",");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "\"len\":%u,", reg->len);
@@ -252,7 +241,7 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 	uint32_t be;
 	uint8_t *tmp;
 
-	ret = snprintf(buf, len, "<data_reg type=\"value\">");
+	ret = snprintf(buf, len, "<reg type=\"value\">");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	ret = snprintf(buf+offset, len, "<len>%u</len>", reg->len);
@@ -274,7 +263,7 @@ int nft_data_reg_value_snprintf_xml(char *buf, size_t size,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, len, "</data_reg>");
+	ret = snprintf(buf+offset, len, "</reg>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -317,7 +306,7 @@ nft_data_reg_verdict_snprintf_xml(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret = 0;
 
-	ret = snprintf(buf, size, "<data_reg type=\"verdict\">"
+	ret = snprintf(buf, size, "<reg type=\"verdict\">"
 		       "<verdict>%s</verdict>", nft_verdict2str(reg->verdict));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
@@ -327,7 +316,7 @@ nft_data_reg_verdict_snprintf_xml(char *buf, size_t size,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, len, "</data_reg>");
+	ret = snprintf(buf+offset, len, "</reg>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -339,7 +328,7 @@ nft_data_reg_verdict_snprintf_json(char *buf, size_t size,
 {
 	int len = size, offset = 0, ret = 0;
 
-	ret = snprintf(buf, size, "\"data_reg\":{\"type\":\"verdict\","
+	ret = snprintf(buf, size, "\"reg\":{\"type\":\"verdict\","
 		       "\"verdict\":\"%s\"", nft_verdict2str(reg->verdict));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
