@@ -122,7 +122,8 @@ int main(int argc, char *argv[])
 
 	rule_seq = seq;
 	family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, family,
+	nlh = nft_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+				       NFT_MSG_NEWRULE, family,
 				       NLM_F_CREATE|NLM_F_APPEND|NLM_F_ACK,
 				       seq++);
 	nft_rule_nlmsg_build_payload(nlh, r);
