@@ -4,4 +4,5 @@ pkginclude_HEADERS = table.h		\
 		     expr.h		\
 		     set.h		\
 		     ruleset.h		\
-		     common.h
+		     common.h		\
+		     gen.h
