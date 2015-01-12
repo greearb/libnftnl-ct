@@ -1020,7 +1020,10 @@ struct nft_set_list_iter *nft_set_list_iter_create(struct nft_set_list *l)
 		return NULL;
 
 	iter->list = l;
-	iter->cur = list_entry(l->list.next, struct nft_set, head);
+	if (nft_set_list_is_empty(l))
+		iter->cur = NULL;
+	else
+		iter->cur = list_entry(l->list.next, struct nft_set, head);
 
 	return iter;
 }
@@ -1035,6 +1038,9 @@ EXPORT_SYMBOL(nft_set_list_iter_cur);
 struct nft_set *nft_set_list_iter_next(struct nft_set_list_iter *iter)
 {
 	struct nft_set *s = iter->cur;
+
+	if (s == NULL)
+		return NULL;
 
 	/* get next rule, if any */
 	iter->cur = list_entry(iter->cur->head.next, struct nft_set, head);

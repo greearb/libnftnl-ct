@@ -690,7 +690,11 @@ struct nft_set_elems_iter *nft_set_elems_iter_create(struct nft_set *s)
 
 	iter->set = s;
 	iter->list = &s->element_list;
-	iter->cur = list_entry(s->element_list.next, struct nft_set_elem, head);
+	if (list_empty(&s->element_list))
+		iter->cur = NULL;
+	else
+		iter->cur = list_entry(s->element_list.next,
+				       struct nft_set_elem, head);
 
 	return iter;
 }
@@ -705,6 +709,9 @@ EXPORT_SYMBOL(nft_set_elems_iter_cur);
 struct nft_set_elem *nft_set_elems_iter_next(struct nft_set_elems_iter *iter)
 {
 	struct nft_set_elem *s = iter->cur;
+
+	if (s == NULL)
+		return NULL;
 
 	iter->cur = list_entry(iter->cur->head.next, struct nft_set_elem, head);
 	if (&iter->cur->head == iter->list->next)

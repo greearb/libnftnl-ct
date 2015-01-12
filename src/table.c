@@ -544,7 +544,10 @@ struct nft_table_list_iter *nft_table_list_iter_create(struct nft_table_list *l)
 		return NULL;
 
 	iter->list = l;
-	iter->cur = list_entry(l->list.next, struct nft_table, head);
+	if (nft_table_list_is_empty(l))
+		iter->cur = NULL;
+	else
+		iter->cur = list_entry(l->list.next, struct nft_table, head);
 
 	return iter;
 }
@@ -553,6 +556,9 @@ EXPORT_SYMBOL(nft_table_list_iter_create);
 struct nft_table *nft_table_list_iter_next(struct nft_table_list_iter *iter)
 {
 	struct nft_table *r = iter->cur;
+
+	if (r == NULL)
+		return NULL;
 
 	/* get next table, if any */
 	iter->cur = list_entry(iter->cur->head.next, struct nft_table, head);

@@ -1043,7 +1043,11 @@ struct nft_rule_expr_iter *nft_rule_expr_iter_create(struct nft_rule *r)
 		return NULL;
 
 	iter->r = r;
-	iter->cur = list_entry(r->expr_list.next, struct nft_rule_expr, head);
+	if (list_empty(&r->expr_list))
+		iter->cur = NULL;
+	else
+		iter->cur = list_entry(r->expr_list.next, struct nft_rule_expr,
+				       head);
 
 	return iter;
 }
@@ -1052,6 +1056,9 @@ EXPORT_SYMBOL(nft_rule_expr_iter_create);
 struct nft_rule_expr *nft_rule_expr_iter_next(struct nft_rule_expr_iter *iter)
 {
 	struct nft_rule_expr *expr = iter->cur;
+
+	if (expr == NULL)
+		return NULL;
 
 	/* get next expression, if any */
 	iter->cur = list_entry(iter->cur->head.next, struct nft_rule_expr, head);
@@ -1152,7 +1159,10 @@ struct nft_rule_list_iter *nft_rule_list_iter_create(struct nft_rule_list *l)
 		return NULL;
 
 	iter->list = l;
-	iter->cur = list_entry(l->list.next, struct nft_rule, head);
+	if (nft_rule_list_is_empty(l))
+		iter->cur = NULL;
+	else
+		iter->cur = list_entry(l->list.next, struct nft_rule, head);
 
 	return iter;
 }
@@ -1167,6 +1177,9 @@ EXPORT_SYMBOL(nft_rule_list_iter_cur);
 struct nft_rule *nft_rule_list_iter_next(struct nft_rule_list_iter *iter)
 {
 	struct nft_rule *r = iter->cur;
+
+	if (r == NULL)
+		return NULL;
 
 	/* get next rule, if any */
 	iter->cur = list_entry(iter->cur->head.next, struct nft_rule, head);
