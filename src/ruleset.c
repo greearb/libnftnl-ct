@@ -330,6 +330,23 @@ err:
 	return -1;
 }
 
+static int nft_ruleset_json_parse_ruleset(struct nft_ruleset *rs, json_t *array,
+					  struct nft_parse_err *err)
+{
+	if (nft_ruleset_json_parse_tables(rs, array, err) != 0)
+		return -1;
+
+	if (nft_ruleset_json_parse_chains(rs, array, err) != 0)
+		return -1;
+
+	if (nft_ruleset_json_parse_sets(rs, array, err) != 0)
+		return -1;
+
+	if (nft_ruleset_json_parse_rules(rs, array, err) != 0)
+		return -1;
+
+	return 0;
+}
 #endif
 
 static int nft_ruleset_json_parse(struct nft_ruleset *rs, const void *json,
@@ -349,16 +366,7 @@ static int nft_ruleset_json_parse(struct nft_ruleset *rs, const void *json,
 		goto err;
 	}
 
-	if (nft_ruleset_json_parse_tables(rs, array, err) != 0)
-		goto err;
-
-	if (nft_ruleset_json_parse_chains(rs, array, err) != 0)
-		goto err;
-
-	if (nft_ruleset_json_parse_sets(rs, array, err) != 0)
-		goto err;
-
-	if (nft_ruleset_json_parse_rules(rs, array, err) != 0)
+	if (nft_ruleset_json_parse_ruleset(rs, array, err) != 0)
 		goto err;
 
 	nft_jansson_free_root(root);
@@ -537,6 +545,25 @@ err_free:
 	nft_rule_list_free(rule_list);
 	return -1;
 }
+
+static int nft_ruleset_xml_parse_ruleset(struct nft_ruleset *rs,
+					 mxml_node_t *tree,
+					 struct nft_parse_err *err)
+{
+	if (nft_ruleset_xml_parse_tables(rs, tree, err) != 0)
+		return -1;
+
+	if (nft_ruleset_xml_parse_chains(rs, tree, err) != 0)
+		return -1;
+
+	if (nft_ruleset_xml_parse_sets(rs, tree, err) != 0)
+		return -1;
+
+	if (nft_ruleset_xml_parse_rules(rs, tree, err, rs->set_list) != 0)
+		return -1;
+
+	return 0;
+}
 #endif
 
 static int nft_ruleset_xml_parse(struct nft_ruleset *rs, const void *xml,
@@ -549,16 +576,7 @@ static int nft_ruleset_xml_parse(struct nft_ruleset *rs, const void *xml,
 	if (tree == NULL)
 		return -1;
 
-	if (nft_ruleset_xml_parse_tables(rs, tree, err) != 0)
-		goto err;
-
-	if (nft_ruleset_xml_parse_chains(rs, tree, err) != 0)
-		goto err;
-
-	if (nft_ruleset_xml_parse_sets(rs, tree, err) != 0)
-		goto err;
-
-	if (nft_ruleset_xml_parse_rules(rs, tree, err, rs->set_list) != 0)
+	if (nft_ruleset_xml_parse_ruleset(rs, tree, err) != 0)
 		goto err;
 
 	mxmlDelete(tree);
