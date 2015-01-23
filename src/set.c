@@ -410,18 +410,14 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 EXPORT_SYMBOL(nft_set_nlmsg_parse);
 
 #ifdef JSON_PARSING
-int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
-			  struct nft_parse_err *err)
+static int nft_jansson_parse_set_info(struct nft_set *s, json_t *tree,
+				      struct nft_parse_err *err)
 {
-	json_t *root, *array, *json_elem;
+	json_t *root = tree, *array, *json_elem;
 	uint32_t flags, key_type, key_len, data_type, data_len, policy, size;
 	int family, i;
 	const char *name, *table;
 	struct nft_set_elem *elem;
-
-	root = nft_jansson_get_node(tree, "set", err);
-	if (root == NULL)
-		return -1;
 
 	name = nft_jansson_parse_str(root, "name", err);
 	if (name == NULL)
@@ -502,6 +498,18 @@ int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
 	}
 
 	return 0;
+}
+
+int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
+			  struct nft_parse_err *err)
+{
+	json_t *root;
+
+	root = nft_jansson_get_node(tree, "set", err);
+	if (root == NULL)
+		return -1;
+
+	return nft_jansson_parse_set_info(s, root, err);
 }
 #endif
 
