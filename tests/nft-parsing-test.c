@@ -68,11 +68,11 @@ static int compare_test(uint32_t type, struct nft_ruleset *rs,
 	switch (type) {
 	case TEST_XML_RULESET:
 		nft_ruleset_snprintf(out, sizeof(out), rs,
-				     NFT_OUTPUT_XML, 0);
+				     NFT_OUTPUT_XML, NFT_OF_EVENT_NEW);
 		break;
 	case TEST_JSON_RULESET:
 		nft_ruleset_snprintf(out, sizeof(out), rs,
-				     NFT_OUTPUT_JSON, 0);
+				     NFT_OUTPUT_JSON, NFT_OF_EVENT_NEW);
 		break;
 	default:
 		errno = EINVAL;

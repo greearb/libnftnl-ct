@@ -1,1 +1,1 @@
-<nftables><rule><family>ip</family><table>filter</table><chain>INPUT</chain><handle>100</handle><expr type="match"><name>state</name></expr></rule></nftables>
+<nftables><add><rule><family>ip</family><table>filter</table><chain>INPUT</chain><handle>100</handle><expr type="match"><name>state</name></expr></rule></add></nftables>

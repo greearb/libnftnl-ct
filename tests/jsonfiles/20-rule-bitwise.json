@@ -1,1 +1,1 @@
-{"nftables":[{"rule":{"family":"ip","table":"filter","chain":"input","handle":20,"expr":[{"type":"bitwise","sreg":1,"dreg":1,"len":4,"mask":{"reg":{"type":"value","len":4,"data0":"0x0000000a"}},"xor":{"reg":{"type":"value","len":4,"data0":"0x00000000"}}}]}}]}
+{"nftables":[{"add":[{"rule":{"family":"ip","table":"filter","chain":"input","handle":20,"expr":[{"type":"bitwise","sreg":1,"dreg":1,"len":4,"mask":{"reg":{"type":"value","len":4,"data0":"0x0000000a"}},"xor":{"reg":{"type":"value","len":4,"data0":"0x00000000"}}}]}}]}]}

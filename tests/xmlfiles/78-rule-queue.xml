@@ -1,2 +1,2 @@
-<nftables><rule><family>ip</family><table>filter</table><chain>input</chain><handle>44</handle><position>43</position><expr type="queue"><num>4</num><total>2</total><flags>3</flags></expr></rule></nftables>
+<nftables><add><rule><family>ip</family><table>filter</table><chain>input</chain><handle>44</handle><position>43</position><expr type="queue"><num>4</num><total>2</total><flags>3</flags></expr></rule></add></nftables>
 

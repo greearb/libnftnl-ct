@@ -1,1 +1,1 @@
-<nftables><rule><family>ip6</family><table>filter</table><chain>test</chain><handle>96</handle><expr type="log"><prefix>test_chain</prefix><group>1</group></expr></rule></nftables>
+<nftables><add><rule><family>ip6</family><table>filter</table><chain>test</chain><handle>96</handle><expr type="log"><prefix>test_chain</prefix><group>1</group></expr></rule></add></nftables>

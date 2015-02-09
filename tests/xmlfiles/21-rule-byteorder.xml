@@ -1,1 +1,1 @@
-<nftables><rule><family>ip</family><table>test</table><chain>test</chain><handle>1000</handle><expr type="byteorder"><sreg>3</sreg><dreg>4</dreg><op>hton</op><len>4</len><size>4</size></expr></rule></nftables>
+<nftables><add><rule><family>ip</family><table>test</table><chain>test</chain><handle>1000</handle><expr type="byteorder"><sreg>3</sreg><dreg>4</dreg><op>hton</op><len>4</len><size>4</size></expr></rule></add></nftables>

@@ -1,1 +1,1 @@
-{"nftables":[{"rule":{"family":"ip6","table":"nat","chain":"postrouting","handle":4,"expr":[{"type":"masq","flags":12}]}}]}
+{"nftables":[{"add":[{"rule":{"family":"ip6","table":"nat","chain":"postrouting","handle":4,"expr":[{"type":"masq","flags":12}]}}]}]}

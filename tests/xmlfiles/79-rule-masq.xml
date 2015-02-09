@@ -1,1 +1,1 @@
-<nftables><rule><family>ip6</family><table>nat</table><chain>postrouting</chain><handle>4</handle><expr type="masq"><flags>12</flags></expr></rule></nftables>
+<nftables><add><rule><family>ip6</family><table>nat</table><chain>postrouting</chain><handle>4</handle><expr type="masq"><flags>12</flags></expr></rule></add></nftables>

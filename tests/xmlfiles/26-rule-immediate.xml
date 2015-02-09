@@ -1,1 +1,1 @@
-<nftables><rule><family>ip</family><table>filter</table><chain>input</chain><handle>32</handle><expr type="immediate"><dreg>0</dreg><data><reg type="verdict"><verdict>accept</verdict></reg></data></expr></rule></nftables>
+<nftables><add><rule><family>ip</family><table>filter</table><chain>input</chain><handle>32</handle><expr type="immediate"><dreg>0</dreg><data><reg type="verdict"><verdict>accept</verdict></reg></data></expr></rule></add></nftables>

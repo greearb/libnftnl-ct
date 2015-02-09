@@ -1,1 +1,1 @@
-{"nftables":[{"rule":{"family":"ip","table":"filter","chain":"input","handle":44,"position":43,"expr":[{"type":"queue","num":4,"total":2,"flags":3}]}}]}
+{"nftables":[{"add":[{"rule":{"family":"ip","table":"filter","chain":"input","handle":44,"position":43,"expr":[{"type":"queue","num":4,"total":2,"flags":3}]}}]}]}
