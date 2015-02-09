@@ -25,11 +25,43 @@ enum {
 	NFT_RULESET_ATTR_RULELIST,
 };
 
+enum nft_ruleset_type {
+	NFT_RULESET_UNSPEC = 0,
+	NFT_RULESET_RULESET,
+	NFT_RULESET_TABLE,
+	NFT_RULESET_CHAIN,
+	NFT_RULESET_RULE,
+	NFT_RULESET_SET,
+	NFT_RULESET_SET_ELEMS,
+};
+
 bool nft_ruleset_attr_is_set(const struct nft_ruleset *r, uint16_t attr);
 void nft_ruleset_attr_unset(struct nft_ruleset *r, uint16_t attr);
 void nft_ruleset_attr_set(struct nft_ruleset *r, uint16_t attr, void *data);
 void *nft_ruleset_attr_get(const struct nft_ruleset *r, uint16_t attr);
 
+enum {
+	NFT_RULESET_CTX_CMD = 0,
+	NFT_RULESET_CTX_TYPE,
+	NFT_RULESET_CTX_TABLE,
+	NFT_RULESET_CTX_CHAIN,
+	NFT_RULESET_CTX_RULE,
+	NFT_RULESET_CTX_SET,
+	NFT_RULESET_CTX_DATA,
+};
+
+struct nft_parse_ctx;
+bool nft_ruleset_ctx_is_set(const struct nft_parse_ctx *ctx, uint16_t attr);
+void *nft_ruleset_ctx_get(const struct nft_parse_ctx *ctx, uint16_t attr);
+uint32_t nft_ruleset_ctx_get_u32(const struct nft_parse_ctx *ctx,
+				 uint16_t attr);
+
+int nft_ruleset_parse_file_cb(enum nft_parse_type type, FILE *fp,
+			      struct nft_parse_err *err, void *data,
+			      int (*cb)(const struct nft_parse_ctx *ctx));
+int nft_ruleset_parse_buffer_cb(enum nft_parse_type type, const char *buffer,
+				struct nft_parse_err *err, void *data,
+				int (*cb)(const struct nft_parse_ctx *ctx));
 int nft_ruleset_parse(struct nft_ruleset *rs, enum nft_parse_type type,
 		      const char *data, struct nft_parse_err *err);
 int nft_ruleset_parse_file(struct nft_ruleset *rs, enum nft_parse_type type,

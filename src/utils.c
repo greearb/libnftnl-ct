@@ -203,6 +203,22 @@ const char *nft_cmd2tag(enum nft_cmd_type cmd)
 	return cmd2tag[cmd];
 }
 
+uint32_t nft_str2cmd(const char *cmd)
+{
+	if (strcmp(cmd, ADD) == 0)
+		return NFT_CMD_ADD;
+	else if (strcmp(cmd, INSERT) == 0)
+		return NFT_CMD_INSERT;
+	else if (strcmp(cmd, DELETE) == 0)
+		return NFT_CMD_DELETE;
+	else if (strcmp(cmd, REPLACE) == 0)
+		return NFT_CMD_REPLACE;
+	else if (strcmp(cmd, FLUSH) == 0)
+		return NFT_CMD_FLUSH;
+
+	return NFT_CMD_UNSPEC;
+}
+
 int nft_fprintf(FILE *fp, void *obj, uint32_t cmd, uint32_t type, uint32_t flags,
 		int (*snprintf_cb)(char *buf, size_t bufsiz, void *obj,
 				   uint32_t cmd, uint32_t type, uint32_t flags))

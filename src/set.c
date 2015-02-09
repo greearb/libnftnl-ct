@@ -511,6 +511,18 @@ int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
 
 	return nft_jansson_parse_set_info(s, root, err);
 }
+
+int nft_jansson_parse_elem(struct nft_set *s, json_t *tree,
+			   struct nft_parse_err *err)
+{
+	json_t *root;
+
+	root = nft_jansson_get_node(tree, "element", err);
+	if (root == NULL)
+		return -1;
+
+	return nft_jansson_parse_set_info(s, root, err);
+}
 #endif
 
 static int nft_set_json_parse(struct nft_set *s, const void *json,

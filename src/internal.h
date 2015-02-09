@@ -139,6 +139,8 @@ int nft_jansson_parse_rule(struct nft_rule *r, json_t *tree,
 struct nft_set;
 int nft_jansson_parse_set(struct nft_set *s, json_t *tree,
 			  struct nft_parse_err *err);
+int nft_jansson_parse_elem(struct nft_set *s, json_t *tree,
+			   struct nft_parse_err *err);
 #endif
 
 const char *nft_family2str(uint32_t family);
@@ -149,6 +151,7 @@ int nft_str2verdict(const char *verdict, int *verdict_num);
 int nft_get_value(enum nft_type type, void *val, void *out);
 enum nft_cmd_type nft_flag2cmd(uint32_t flags);
 const char *nft_cmd2tag(enum nft_cmd_type cmd);
+uint32_t nft_str2cmd(const char *cmd);
 
 #include <stdio.h>
 int nft_fprintf(FILE *fp, void *obj, uint32_t cmd, uint32_t type,
