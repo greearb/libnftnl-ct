@@ -26,6 +26,9 @@ union nft_data_reg;
 int nft_buf_open(struct nft_buf *b, int type, const char *tag);
 int nft_buf_close(struct nft_buf *b, int type, const char *tag);
 
+int nft_buf_open_array(struct nft_buf *b, int type, const char *tag);
+int nft_buf_close_array(struct nft_buf *b, int type, const char *tag);
+
 int nft_buf_u32(struct nft_buf *b, int type, uint32_t value, const char *tag);
 int nft_buf_s32(struct nft_buf *b, int type, uint32_t value, const char *tag);
 int nft_buf_u64(struct nft_buf *b, int type, uint64_t value, const char *tag);
@@ -76,5 +79,10 @@ int nft_buf_reg(struct nft_buf *b, int type, union nft_data_reg *reg,
 #define UNIT			"unit"
 #define USE			"use"
 #define XOR			"xor"
+#define ADD			"add"
+#define INSERT			"insert"
+#define DELETE			"delete"
+#define REPLACE			"replace"
+#define FLUSH			"flush"
 
 #endif

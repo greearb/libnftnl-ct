@@ -614,12 +614,13 @@ static int nft_set_elem_snprintf_xml(char *buf, size_t size,
 	return offset;
 }
 
-int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
-			   uint32_t type, uint32_t flags)
+static int nft_set_elem_cmd_snprintf(char *buf, size_t size,
+				     struct nft_set_elem *e, uint32_t cmd,
+				     uint32_t type, uint32_t flags)
 {
 	int ret, len = size, offset = 0;
 
-	ret = nft_event_header_snprintf(buf+offset, len, type, flags);
+	ret = nft_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	switch(type) {
@@ -638,15 +639,23 @@ int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
 
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = nft_event_footer_snprintf(buf+offset, len, type, flags);
+	ret = nft_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }
+
+int nft_set_elem_snprintf(char *buf, size_t size, struct nft_set_elem *e,
+			      uint32_t type, uint32_t flags)
+{
+	return nft_set_elem_cmd_snprintf(buf, size, e, nft_flag2cmd(flags),
+					 type, flags);
+}
 EXPORT_SYMBOL(nft_set_elem_snprintf);
 
 static inline int nft_set_elem_do_snprintf(char *buf, size_t size, void *e,
-					   uint32_t type, uint32_t flags)
+					   uint32_t cmd, uint32_t type,
+					   uint32_t flags)
 {
 	return nft_set_elem_snprintf(buf, size, e, type, flags);
 }
@@ -654,7 +663,8 @@ static inline int nft_set_elem_do_snprintf(char *buf, size_t size, void *e,
 int nft_set_elem_fprintf(FILE *fp, struct nft_set_elem *se, uint32_t type,
 			 uint32_t flags)
 {
-	return nft_fprintf(fp, se, type, flags, nft_set_elem_do_snprintf);
+	return nft_fprintf(fp, se, NFT_CMD_UNSPEC, type, flags,
+			   nft_set_elem_do_snprintf);
 }
 EXPORT_SYMBOL(nft_set_elem_fprintf);
 

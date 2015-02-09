@@ -21,6 +21,16 @@ enum nft_output_flags {
 	NFT_OF_EVENT_ANY	= (NFT_OF_EVENT_NEW | NFT_OF_EVENT_DEL),
 };
 
+enum nft_cmd_type {
+	NFT_CMD_UNSPEC		= 0,
+	NFT_CMD_ADD,
+	NFT_CMD_INSERT,
+	NFT_CMD_DELETE,
+	NFT_CMD_REPLACE,
+	NFT_CMD_FLUSH,
+	NFT_CMD_MAX,
+};
+
 enum nft_parse_type {
 	NFT_PARSE_NONE		= 0,
 	NFT_PARSE_XML,

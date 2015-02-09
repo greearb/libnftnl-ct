@@ -889,8 +889,8 @@ static int nft_set_snprintf_xml(char *buf, size_t size, struct nft_set *s,
 	return offset;
 }
 
-int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
-		     uint32_t type, uint32_t flags)
+static int nft_set_cmd_snprintf(char *buf, size_t size, struct nft_set *s,
+				uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	int ret, len = size, offset = 0;
 	uint32_t inner_flags = flags;
@@ -898,7 +898,7 @@ int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 	/* prevent set_elems to print as events */
 	inner_flags &= ~NFT_OF_EVENT_ANY;
 
-	ret = nft_event_header_snprintf(buf+offset, len, type, flags);
+	ret = nft_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	switch(type) {
@@ -919,15 +919,23 @@ int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
 
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = nft_event_footer_snprintf(buf+offset, len, type, flags);
+	ret = nft_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }
+
+int nft_set_snprintf(char *buf, size_t size, struct nft_set *s,
+		     uint32_t type, uint32_t flags)
+{
+	return nft_set_cmd_snprintf(buf, size, s, nft_flag2cmd(flags), type,
+				    flags);
+}
 EXPORT_SYMBOL(nft_set_snprintf);
 
 static inline int nft_set_do_snprintf(char *buf, size_t size, void *s,
-				      uint32_t type, uint32_t flags)
+				      uint32_t cmd, uint32_t type,
+				      uint32_t flags)
 {
 	return nft_set_snprintf(buf, size, s, type, flags);
 }
@@ -935,7 +943,8 @@ static inline int nft_set_do_snprintf(char *buf, size_t size, void *s,
 int nft_set_fprintf(FILE *fp, struct nft_set *s, uint32_t type,
 		    uint32_t flags)
 {
-	return nft_fprintf(fp, s, type, flags, nft_set_do_snprintf);
+	return nft_fprintf(fp, s, NFT_CMD_UNSPEC, type, flags,
+			   nft_set_do_snprintf);
 }
 EXPORT_SYMBOL(nft_set_fprintf);
 

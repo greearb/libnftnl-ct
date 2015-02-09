@@ -177,16 +177,42 @@ int nft_str2verdict(const char *verdict, int *verdict_num)
 	return -1;
 }
 
-int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags,
+enum nft_cmd_type nft_flag2cmd(uint32_t flags)
+{
+	if (flags & NFT_OF_EVENT_NEW)
+		return NFT_CMD_ADD;
+	else if (flags & NFT_OF_EVENT_DEL)
+		return NFT_CMD_DELETE;
+
+	return NFT_CMD_UNSPEC;
+}
+
+const char *cmd2tag[NFT_CMD_MAX] = {
+	[NFT_CMD_ADD]			= ADD,
+	[NFT_CMD_INSERT]		= INSERT,
+	[NFT_CMD_DELETE]		= DELETE,
+	[NFT_CMD_REPLACE]		= REPLACE,
+	[NFT_CMD_FLUSH]			= FLUSH,
+};
+
+const char *nft_cmd2tag(enum nft_cmd_type cmd)
+{
+	if (cmd >= NFT_CMD_MAX)
+		return "unknown";
+
+	return cmd2tag[cmd];
+}
+
+int nft_fprintf(FILE *fp, void *obj, uint32_t cmd, uint32_t type, uint32_t flags,
 		int (*snprintf_cb)(char *buf, size_t bufsiz, void *obj,
-				   uint32_t type, uint32_t flags))
+				   uint32_t cmd, uint32_t type, uint32_t flags))
 {
 	char _buf[NFT_SNPRINTF_BUFSIZ];
 	char *buf = _buf;
 	size_t bufsiz = sizeof(_buf);
 	int ret;
 
-	ret = snprintf_cb(buf, bufsiz, obj, type, flags);
+	ret = snprintf_cb(buf, bufsiz, obj, cmd, type, flags);
 	if (ret <= 0)
 		goto out;
 
@@ -197,7 +223,7 @@ int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags,
 		if (buf == NULL)
 			return -1;
 
-		ret = snprintf_cb(buf, bufsiz, obj, type, flags);
+		ret = snprintf_cb(buf, bufsiz, obj, cmd, type, flags);
 		if (ret <= 0)
 			goto out;
 	}

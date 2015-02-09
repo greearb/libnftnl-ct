@@ -161,12 +161,12 @@ static int nft_gen_snprintf_default(char *buf, size_t size, struct nft_gen *gen)
 	return snprintf(buf, size, "ruleset generation ID %u", gen->id);
 }
 
-int nft_gen_snprintf(char *buf, size_t size, struct nft_gen *gen,
-		       uint32_t type, uint32_t flags)
+static int nft_gen_cmd_snprintf(char *buf, size_t size, struct nft_gen *gen,
+				uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	int ret, len = size, offset = 0;
 
-	ret = nft_event_header_snprintf(buf + offset, len, type, flags);
+	ret = nft_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	switch(type) {
@@ -178,15 +178,23 @@ int nft_gen_snprintf(char *buf, size_t size, struct nft_gen *gen,
 	}
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = nft_event_footer_snprintf(buf + offset, len, type, flags);
+	ret = nft_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
 }
+
+int nft_gen_snprintf(char *buf, size_t size, struct nft_gen *gen, uint32_t type,
+		     uint32_t flags)
+{;
+	return nft_gen_cmd_snprintf(buf, size, gen, nft_flag2cmd(flags), type,
+				    flags);
+}
 EXPORT_SYMBOL(nft_gen_snprintf);
 
 static inline int nft_gen_do_snprintf(char *buf, size_t size, void *gen,
-				      uint32_t type, uint32_t flags)
+				      uint32_t cmd, uint32_t type,
+				      uint32_t flags)
 {
 	return nft_gen_snprintf(buf, size, gen, type, flags);
 }
@@ -194,6 +202,7 @@ static inline int nft_gen_do_snprintf(char *buf, size_t size, void *gen,
 int nft_gen_fprintf(FILE *fp, struct nft_gen *gen, uint32_t type,
 		    uint32_t flags)
 {
-	return nft_fprintf(fp, gen, type, flags, nft_gen_do_snprintf);
+	return nft_fprintf(fp, gen, NFT_CMD_UNSPEC, type, flags,
+			   nft_gen_do_snprintf);
 }
 EXPORT_SYMBOL(nft_gen_fprintf);

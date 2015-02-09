@@ -90,6 +90,30 @@ int nft_buf_close(struct nft_buf *b, int type, const char *tag)
 	}
 }
 
+int nft_buf_open_array(struct nft_buf *b, int type, const char *tag)
+{
+	switch (type) {
+	case NFT_OUTPUT_JSON:
+		return nft_buf_put(b, "{\"%s\":[", tag);
+	case NFT_OUTPUT_XML:
+		return nft_buf_put(b, "<%s>", tag);
+	default:
+		return 0;
+	}
+}
+
+int nft_buf_close_array(struct nft_buf *b, int type, const char *tag)
+{
+	switch (type) {
+	case NFT_OUTPUT_JSON:
+		return nft_buf_put(b, "]}");
+	case NFT_OUTPUT_XML:
+		return nft_buf_put(b, "</%s>", tag);
+	default:
+		return 0;
+	}
+}
+
 int nft_buf_u32(struct nft_buf *b, int type, uint32_t value, const char *tag)
 {
 	switch (type) {

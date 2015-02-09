@@ -16,6 +16,7 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/common.h>
 #include <libnftnl/set.h>
+#include <buffer.h>
 
 #include <errno.h>
 #include "internal.h"
@@ -70,86 +71,80 @@ int nft_parse_perror(const char *msg, struct nft_parse_err *err)
 }
 EXPORT_SYMBOL(nft_parse_perror);
 
-int nft_event_header_snprintf(char *buf, size_t size, uint32_t type,
-			      uint32_t flags)
+int nft_cmd_header_snprintf(char *buf, size_t size, uint32_t cmd, uint32_t type,
+			    uint32_t flags)
 {
-	int ret = 0;
+	NFT_BUF_INIT(b, buf, size);
 
-	if (!(flags & NFT_OF_EVENT_ANY))
+	if (cmd == NFT_CMD_UNSPEC)
 		return 0;
 
 	switch (type) {
 	case NFT_OUTPUT_XML:
-		if (flags & NFT_OF_EVENT_NEW) {
-			ret = snprintf(buf, size, "<event><type>new</type>");
-		} else if (flags & NFT_OF_EVENT_DEL) {
-			ret = snprintf(buf, size,
-				       "<event><type>delete</type>");
-		} else {
-			ret = snprintf(buf, size,
-				       "<event><type>unknown</type>");
-		}
-		break;
 	case NFT_OUTPUT_JSON:
-		if (flags & NFT_OF_EVENT_NEW) {
-			ret = snprintf(buf, size, "{event:{type:\"new\",{\"");
-		} else if (flags & NFT_OF_EVENT_DEL) {
-			ret = snprintf(buf, size,
-				       "{event:{type:\"delete\",{\"");
-		} else {
-			ret = snprintf(buf, size,
-				       "{event:{type:\"unknown\",{\"");
-		}
+		nft_buf_open_array(&b, type, nft_cmd2tag(cmd));
 		break;
 	default:
-		if (flags & NFT_OF_EVENT_NEW) {
-			ret = snprintf(buf, size, "%9s", "[NEW] ");
-		} else if (flags & NFT_OF_EVENT_DEL) {
-			ret = snprintf(buf, size, "%9s", "[DELETE] ");
-		} else {
-			ret = snprintf(buf, size, "%9s", "[unknown] ");
+		switch (cmd) {
+		case NFT_CMD_ADD:
+			return snprintf(buf, size, "%9s", "[ADD] ");
+		case NFT_CMD_DELETE:
+			return snprintf(buf, size, "%9s", "[DELETE] ");
+		default:
+			return snprintf(buf, size, "%9s", "[unknown] ");
 		}
 		break;
 	}
-	return ret;
+	return nft_buf_done(&b);
 }
 
-static int nft_event_header_fprintf_cb(char *buf, size_t size, void *unused,
-				       uint32_t type, uint32_t flags)
+
+
+static int nft_cmd_header_fprintf_cb(char *buf, size_t size, void *obj,
+				     uint32_t cmd, uint32_t type,
+				     uint32_t flags)
 {
-	return nft_event_header_snprintf(buf, size, type, flags);
+	return nft_cmd_header_snprintf(buf, size, cmd, type, flags);
 }
 
-int nft_event_header_fprintf(FILE *fp, uint32_t type, uint32_t flags)
+int nft_cmd_header_fprintf(FILE *fp, uint32_t cmd, uint32_t type,
+			   uint32_t flags)
 {
-	return nft_fprintf(fp, NULL, type, flags, nft_event_header_fprintf_cb);
+	return nft_fprintf(fp, NULL, cmd, type, flags,
+			   nft_cmd_header_fprintf_cb);
 }
 
-int nft_event_footer_snprintf(char *buf, size_t size, uint32_t type,
-			      uint32_t flags)
+int nft_cmd_footer_snprintf(char *buf, size_t size, uint32_t cmd, uint32_t type,
+			    uint32_t flags)
 {
-	if (!(flags & NFT_OF_EVENT_ANY))
+	NFT_BUF_INIT(b, buf, size);
+
+	if (cmd == NFT_CMD_UNSPEC)
 		return 0;
 
 	switch (type) {
 	case NFT_OUTPUT_XML:
-		return snprintf(buf, size, "</event>");
 	case NFT_OUTPUT_JSON:
-		return snprintf(buf, size, "}}}");
+		nft_buf_close_array(&b, type, nft_cmd2tag(cmd));
+		break;
 	default:
 		return 0;
 	}
+	return nft_buf_done(&b);
 }
 
-static int nft_event_footer_fprintf_cb(char *buf, size_t size, void *unused,
-				       uint32_t type, uint32_t flags)
+static int nft_cmd_footer_fprintf_cb(char *buf, size_t size, void *obj,
+				     uint32_t cmd, uint32_t type,
+				     uint32_t flags)
 {
-	return nft_event_footer_snprintf(buf, size, type, flags);
+	return nft_cmd_footer_snprintf(buf, size, cmd, type, flags);
 }
 
-int nft_event_footer_fprintf(FILE *fp, uint32_t type, uint32_t flags)
+int nft_cmd_footer_fprintf(FILE *fp, uint32_t cmd, uint32_t type,
+			   uint32_t flags)
 {
-	return nft_fprintf(fp, NULL, type, flags, nft_event_footer_fprintf_cb);
+	return nft_fprintf(fp, NULL, cmd, type, flags,
+			   nft_cmd_footer_fprintf_cb);
 }
 
 static void nft_batch_build_hdr(char *buf, uint16_t type, uint32_t seq)

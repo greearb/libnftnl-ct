@@ -784,7 +784,7 @@ nft_ruleset_snprintf_rule(char *buf, size_t size,
 
 static int
 nft_ruleset_do_snprintf(char *buf, size_t size, const struct nft_ruleset *rs,
-			uint32_t type, uint32_t flags)
+			uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	int ret, len = size, offset = 0;
 	void *prev = NULL;
@@ -793,10 +793,10 @@ nft_ruleset_do_snprintf(char *buf, size_t size, const struct nft_ruleset *rs,
 	/* dont pass events flags to child calls of _snprintf() */
 	inner_flags &= ~NFT_OF_EVENT_ANY;
 
-	ret = nft_event_header_snprintf(buf+offset, len, type, flags);
+	ret = snprintf(buf + offset, len, "%s", nft_ruleset_o_opentag(type));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = snprintf(buf+offset, len, "%s", nft_ruleset_o_opentag(type));
+	ret = nft_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (nft_ruleset_attr_is_set(rs, NFT_RULESET_ATTR_TABLELIST) &&
@@ -848,13 +848,28 @@ nft_ruleset_do_snprintf(char *buf, size_t size, const struct nft_ruleset *rs,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf+offset, len, "%s", nft_ruleset_o_closetag(type));
+	ret = nft_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	ret = nft_event_footer_snprintf(buf+offset, len, type, flags);
+	ret = snprintf(buf + offset, len, "%s", nft_ruleset_o_closetag(type));
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
+}
+
+static int nft_ruleset_cmd_snprintf(char *buf, size_t size,
+				    const struct nft_ruleset *r, uint32_t cmd,
+				    uint32_t type, uint32_t flags)
+{
+	switch (type) {
+	case NFT_OUTPUT_DEFAULT:
+	case NFT_OUTPUT_XML:
+	case NFT_OUTPUT_JSON:
+		return nft_ruleset_do_snprintf(buf, size, r, cmd, type, flags);
+	default:
+		errno = EOPNOTSUPP;
+		return -1;
+	}
 }
 
 int nft_ruleset_snprintf(char *buf, size_t size, const struct nft_ruleset *r,
@@ -864,7 +879,9 @@ int nft_ruleset_snprintf(char *buf, size_t size, const struct nft_ruleset *r,
 	case NFT_OUTPUT_DEFAULT:
 	case NFT_OUTPUT_XML:
 	case NFT_OUTPUT_JSON:
-		return nft_ruleset_do_snprintf(buf, size, r, type, flags);
+		return nft_ruleset_cmd_snprintf(buf, size, r,
+						nft_flag2cmd(flags), type,
+						flags);
 	default:
 		errno = EOPNOTSUPP;
 		return -1;
@@ -1017,8 +1034,8 @@ err:
 		return -1;			\
 	len += ret;
 
-int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
-			uint32_t flags)
+static int nft_ruleset_cmd_fprintf(FILE *fp, const struct nft_ruleset *rs,
+				   uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	int len = 0, ret = 0;
 	void *prev = NULL;
@@ -1027,10 +1044,10 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
 	/* dont pass events flags to child calls of _snprintf() */
 	inner_flags &= ~NFT_OF_EVENT_ANY;
 
-	ret = nft_event_header_fprintf(fp, type, flags);
+	ret = fprintf(fp, "%s", nft_ruleset_o_opentag(type));
 	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
-	ret = fprintf(fp, "%s", nft_ruleset_o_opentag(type));
+	ret = nft_cmd_header_fprintf(fp, cmd, type, flags);
 	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 	if ((nft_ruleset_attr_is_set(rs, NFT_RULESET_ATTR_TABLELIST)) &&
@@ -1075,12 +1092,19 @@ int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
 		NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 	}
 
+	ret = nft_cmd_footer_fprintf(fp, cmd, type, flags);
+	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
+
 	ret = fprintf(fp, "%s", nft_ruleset_o_closetag(type));
 	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
-	ret = nft_event_footer_fprintf(fp, type, flags);
-	NFT_FPRINTF_RETURN_OR_FIXLEN(ret, len);
-
 	return len;
+}
+
+int nft_ruleset_fprintf(FILE *fp, const struct nft_ruleset *rs, uint32_t type,
+			uint32_t flags)
+{
+	return nft_ruleset_cmd_fprintf(fp, rs, nft_flag2cmd(flags), type,
+				       flags);
 }
 EXPORT_SYMBOL(nft_ruleset_fprintf);

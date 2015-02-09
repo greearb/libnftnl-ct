@@ -147,15 +147,21 @@ int nft_strtoi(const char *string, int base, void *number, enum nft_type type);
 const char *nft_verdict2str(uint32_t verdict);
 int nft_str2verdict(const char *verdict, int *verdict_num);
 int nft_get_value(enum nft_type type, void *val, void *out);
+enum nft_cmd_type nft_flag2cmd(uint32_t flags);
+const char *nft_cmd2tag(enum nft_cmd_type cmd);
 
 #include <stdio.h>
-int nft_fprintf(FILE *fp, void *obj, uint32_t type, uint32_t flags, int (*snprintf_cb)(char *buf, size_t bufsiz, void *obj, uint32_t type, uint32_t flags));
-int nft_event_header_snprintf(char *buf, size_t bufsize,
-			      uint32_t format, uint32_t flags);
-int nft_event_header_fprintf(FILE *fp, uint32_t format, uint32_t flags);
-int nft_event_footer_snprintf(char *buf, size_t bufsize,
-			      uint32_t format, uint32_t flags);
-int nft_event_footer_fprintf(FILE *fp, uint32_t format, uint32_t flags);
+int nft_fprintf(FILE *fp, void *obj, uint32_t cmd, uint32_t type,
+		uint32_t flags, int (*snprintf_cb)(char *buf, size_t bufsiz,
+		void *obj, uint32_t cmd, uint32_t type, uint32_t flags));
+int nft_cmd_header_snprintf(char *buf, size_t bufsize, uint32_t cmd,
+			    uint32_t format, uint32_t flags);
+int nft_cmd_header_fprintf(FILE *fp, uint32_t cmd, uint32_t format,
+			   uint32_t flags);
+int nft_cmd_footer_snprintf(char *buf, size_t bufsize, uint32_t cmd,
+			    uint32_t format, uint32_t flags);
+int nft_cmd_footer_fprintf(FILE *fp, uint32_t cmd, uint32_t format,
+			   uint32_t flags);
 
 struct expr_ops;
 
