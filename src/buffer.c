@@ -75,7 +75,7 @@ int nft_buf_close(struct nft_buf *b, int type, const char *tag)
 {
 	switch (type) {
 	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "</%s>");
+		return nft_buf_put(b, "</%s>", tag);
 	case NFT_OUTPUT_JSON:
 		/* Remove trailing comma in json */
 		if (b->size > 0 && b->buf[b->size - 1] == ',') {
