@@ -439,10 +439,6 @@ static int nft_ruleset_json_parse_ruleset(struct nft_parse_ctx *ctx,
 	json_t *node, *array = ctx->json;
 	int len, i, ret;
 
-	ctx->set_list = nft_set_list_alloc();
-	if (ctx->set_list == NULL)
-		return -1;
-
 	len = json_array_size(array);
 	for (i = 0; i < len; i++) {
 		node = json_array_get(array, i);
@@ -525,12 +521,16 @@ static int nft_ruleset_json_parse(const void *json,
 	ctx.cb = cb;
 	ctx.format = type;
 
+	ctx.set_list = nft_set_list_alloc();
+	if (ctx.set_list == NULL)
+		return -1;
+
 	if (arg != NULL)
 		nft_ruleset_ctx_set(&ctx, NFT_RULESET_CTX_DATA, arg);
 
 	root = nft_jansson_create_root(json, &error, err, input);
 	if (root == NULL)
-		return -1;
+		goto err;
 
 	array = json_object_get(root, "nftables");
 	if (array == NULL) {
@@ -554,9 +554,11 @@ static int nft_ruleset_json_parse(const void *json,
 			goto err;
 	}
 
+	nft_set_list_free(ctx.set_list);
 	nft_jansson_free_root(root);
 	return 0;
 err:
+	nft_set_list_free(ctx.set_list);
 	nft_jansson_free_root(root);
 	return -1;
 #else
@@ -572,10 +574,6 @@ static int nft_ruleset_xml_parse_ruleset(struct nft_parse_ctx *ctx,
 	const char *node_type;
 	mxml_node_t *node, *array = ctx->xml;
 	int len = 0, ret;
-
-	ctx->set_list = nft_set_list_alloc();
-	if (ctx->set_list == NULL)
-		return -1;
 
 	for (node = mxmlFindElement(array, array, NULL, NULL, NULL,
 				    MXML_DESCEND_FIRST);
@@ -653,12 +651,16 @@ static int nft_ruleset_xml_parse(const void *xml, struct nft_parse_err *err,
 	ctx.cb = cb;
 	ctx.format = type;
 
+	ctx.set_list = nft_set_list_alloc();
+	if (ctx.set_list == NULL)
+		return -1;
+
 	if (arg != NULL)
 		nft_ruleset_ctx_set(&ctx, NFT_RULESET_CTX_DATA, arg);
 
 	tree = nft_mxml_build_tree(xml, "nftables", err, input);
 	if (tree == NULL)
-		return -1;
+		goto err;
 
 	ctx.xml = tree;
 
@@ -670,9 +672,11 @@ static int nft_ruleset_xml_parse(const void *xml, struct nft_parse_err *err,
 		nodecmd = mxmlWalkNext(tree, tree, MXML_NO_DESCEND);
 	}
 
+	nft_set_list_free(ctx.set_list);
 	mxmlDelete(tree);
 	return 0;
 err:
+	nft_set_list_free(ctx.set_list);
 	mxmlDelete(tree);
 	return -1;
 #else
