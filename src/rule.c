@@ -597,10 +597,8 @@ int nft_jansson_parse_rule(struct nft_rule *r, json_t *tree,
 		nft_rule_add_expr(r, e);
 	}
 
-	nft_jansson_free_root(tree);
 	return 0;
 err:
-	nft_jansson_free_root(tree);
 	return -1;
 }
 #endif
@@ -613,12 +611,16 @@ static int nft_rule_json_parse(struct nft_rule *r, const void *json,
 #ifdef JSON_PARSING
 	json_t *tree;
 	json_error_t error;
+	int ret;
 
 	tree = nft_jansson_create_root(json, &error, err, input);
 	if (tree == NULL)
 		return -1;
 
-	return nft_jansson_parse_rule(r, tree, err, set_list);
+	ret = nft_jansson_parse_rule(r, tree, err, set_list);
+
+	nft_jansson_free_root(tree);
+	return ret;
 #else
 	errno = EOPNOTSUPP;
 	return -1;
