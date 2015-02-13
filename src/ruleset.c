@@ -255,7 +255,8 @@ static int nft_ruleset_parse_tables(struct nft_parse_ctx *ctx,
 #endif
 		break;
 	default:
-		return -1;
+		errno = EOPNOTSUPP;
+		goto err;
 	}
 
 	nft_ruleset_ctx_set_u32(ctx, NFT_RULESET_CTX_TYPE, NFT_RULESET_TABLE);
@@ -292,7 +293,8 @@ static int nft_ruleset_parse_chains(struct nft_parse_ctx *ctx,
 #endif
 		break;
 	default:
-		return -1;
+		errno = EOPNOTSUPP;
+		goto err;
 	}
 
 	nft_ruleset_ctx_set_u32(ctx, NFT_RULESET_CTX_TYPE, NFT_RULESET_CHAIN);
@@ -346,7 +348,8 @@ static int nft_ruleset_parse_set_elems(struct nft_parse_ctx *ctx,
 #endif
 		break;
 	default:
-		return -1;
+		errno = EOPNOTSUPP;
+		goto err;
 	}
 
 	if (nft_ruleset_parse_set(ctx, set, NFT_RULESET_SET_ELEMS, err) < 0)
@@ -381,7 +384,8 @@ static int nft_ruleset_parse_sets(struct nft_parse_ctx *ctx,
 #endif
 		break;
 	default:
-		return -1;
+		errno = EOPNOTSUPP;
+		goto err;
 	}
 
 	if (nft_ruleset_parse_set(ctx, set, NFT_RULESET_SET, err) < 0)
@@ -417,7 +421,8 @@ static int nft_ruleset_parse_rules(struct nft_parse_ctx *ctx,
 #endif
 		break;
 	default:
-		return -1;
+		errno = EOPNOTSUPP;
+		goto err;
 	}
 
 	nft_ruleset_ctx_set_u32(ctx, NFT_RULESET_CTX_TYPE, NFT_RULESET_RULE);
