@@ -20,9 +20,6 @@
 #include <linux/netfilter/nf_tables.h>
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
-#include "data_reg.h"
-#include "expr_ops.h"
-#include <buffer.h>
 
 struct nft_expr_byteorder {
 	enum nft_registers	sreg;

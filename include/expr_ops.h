@@ -1,21 +1,12 @@
 #ifndef _EXPR_OPS_H_
 #define _EXPR_OPS_H_
 
-#include "internal.h"
-#include <stdlib.h>
 #include <stdint.h>
+#include "internal.h"
 
 struct nlattr;
 struct nlmsghdr;
 struct nft_rule_expr;
-
-#ifndef XML_PARSING
-#define mxml_node_t void
-#endif
-
-#ifndef JSON_PARSING
-#define json_t void
-#endif
 
 struct expr_ops {
 	struct list_head head;

@@ -20,9 +20,6 @@
 #include <linux/netfilter/nf_tables.h>
 #include <libnftnl/rule.h>
 #include <libnftnl/expr.h>
-#include "data_reg.h"
-#include "expr_ops.h"
-#include <buffer.h>
 
 #ifndef IFNAMSIZ
 #define IFNAMSIZ	16

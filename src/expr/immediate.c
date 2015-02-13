@@ -19,9 +19,6 @@
 #include <linux/netfilter/nf_tables.h>
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
-#include "expr_ops.h"
-#include "data_reg.h"
-#include <buffer.h>
 
 struct nft_expr_immediate {
 	union nft_data_reg	data;

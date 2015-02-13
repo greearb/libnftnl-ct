@@ -10,7 +10,7 @@
  * This code has been sponsored by Sophos Astaro <http://www.sophos.com>
  */
 #include "internal.h"
-#include "expr_ops.h"
+
 #include <stdint.h>
 #include <limits.h>
 

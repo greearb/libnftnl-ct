@@ -26,9 +26,6 @@
 #include <libnftnl/set.h>
 #include <libnftnl/expr.h>
 
-#include "linux_list.h"
-#include "expr/data_reg.h"
-
 struct nft_set *nft_set_alloc(void)
 {
 	struct nft_set *s;

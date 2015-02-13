@@ -39,7 +39,5 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/target.c	\
 		      expr/masq.c	\
 		      expr/redir.c	\
-		      expr/data_reg.h	\
 		      libnftnl.map	\
-		      expr_ops.h	\
 		      internal.h

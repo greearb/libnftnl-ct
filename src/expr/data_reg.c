@@ -22,8 +22,6 @@
 #include <linux/netfilter/nf_tables.h>
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
-#include "expr_ops.h"
-#include "data_reg.h"
 #include "internal.h"
 
 #ifdef JSON_PARSING
@@ -77,12 +75,10 @@ static int nft_data_reg_value_json_parse(union nft_data_reg *reg, json_t *data,
 
 	return DATA_VALUE;
 }
-#endif
 
 int nft_data_reg_json_parse(union nft_data_reg *reg, json_t *data,
 			    struct nft_parse_err *err)
 {
-#ifdef JSON_PARSING
 
 	const char *type;
 
@@ -97,11 +93,8 @@ int nft_data_reg_json_parse(union nft_data_reg *reg, json_t *data,
 		return nft_data_reg_verdict_json_parse(reg, data, err);
 
 	return DATA_NONE;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
 }
+#endif
 
 #ifdef XML_PARSING
 static int nft_data_reg_verdict_xml_parse(union nft_data_reg *reg,
@@ -160,12 +153,10 @@ static int nft_data_reg_value_xml_parse(union nft_data_reg *reg,
 
 	return DATA_VALUE;
 }
-#endif
 
 int nft_data_reg_xml_parse(union nft_data_reg *reg, mxml_node_t *tree,
 			   struct nft_parse_err *err)
 {
-#ifdef XML_PARSING
 	const char *type;
 	mxml_node_t *node;
 
@@ -190,11 +181,8 @@ err:
 	err->node_name = "reg";
 	err->error = NFT_PARSE_EMISSINGNODE;
 	return DATA_NONE;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
 }
+#endif
 
 static int
 nft_data_reg_value_snprintf_json(char *buf, size_t size,

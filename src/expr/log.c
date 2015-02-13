@@ -20,8 +20,6 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
-#include "expr_ops.h"
-#include <buffer.h>
 
 struct nft_expr_log {
 	uint32_t		snaplen;

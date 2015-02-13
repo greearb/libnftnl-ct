@@ -29,9 +29,6 @@
 #include <libnftnl/set.h>
 #include <libnftnl/expr.h>
 
-#include "linux_list.h"
-#include "expr_ops.h"
-
 struct nft_rule {
 	struct list_head head;
 

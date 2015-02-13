@@ -9,7 +9,6 @@
  * This code has been sponsored by Sophos Astaro <http://www.sophos.com>
  */
 #include "internal.h"
-#include "expr_ops.h"
 
 #include <time.h>
 #include <endian.h>
@@ -23,8 +22,6 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libnftnl/expr.h>
-
-#include "linux_list.h"
 
 struct nft_rule_expr *nft_rule_expr_alloc(const char *name)
 {

@@ -24,9 +24,6 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 
-#include "expr_ops.h"
-#include <buffer.h>
-
 /* From include/linux/netfilter/x_tables.h */
 #define XT_EXTENSION_MAXNAMELEN 29
 

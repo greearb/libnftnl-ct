@@ -20,8 +20,6 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
-#include "expr_ops.h"
-#include <buffer.h>
 
 #ifndef NFT_META_MAX
 #define NFT_META_MAX (NFT_META_CGROUP + 1)

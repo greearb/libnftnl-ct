@@ -16,7 +16,8 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <inttypes.h>
-#include <buffer.h>
+
+#include <libnftnl/common.h>
 
 #include <linux/netfilter.h>
 #include <linux/netfilter/nf_tables.h>

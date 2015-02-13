@@ -24,9 +24,6 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 
-#include "expr_ops.h"
-#include <buffer.h>
-
 #ifndef IPPROTO_MH
 #define IPPROTO_MH 135
 #endif
