@@ -1,4 +1,5 @@
-pkginclude_HEADERS = table.h		\
+pkginclude_HEADERS = batch.h		\
+		     table.h		\
 		     chain.h		\
 		     rule.h		\
 		     expr.h		\
