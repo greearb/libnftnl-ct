@@ -29,6 +29,8 @@ struct nft_set;
 struct nft_set *nft_set_alloc(void);
 void nft_set_free(struct nft_set *s);
 
+struct nft_set *nft_set_clone(const struct nft_set *set);
+
 bool nft_set_attr_is_set(const struct nft_set *s, uint16_t attr);
 void nft_set_attr_unset(struct nft_set *s, uint16_t attr);
 void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data);
@@ -90,6 +92,8 @@ struct nft_set_elem;
 
 struct nft_set_elem *nft_set_elem_alloc(void);
 void nft_set_elem_free(struct nft_set_elem *s);
+
+struct nft_set_elem *nft_set_elem_clone(struct nft_set_elem *elem);
 
 void nft_set_elem_add(struct nft_set *s, struct nft_set_elem *elem);
 

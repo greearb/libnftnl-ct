@@ -161,6 +161,22 @@ uint32_t nft_set_elem_attr_get_u32(struct nft_set_elem *s, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_set_elem_attr_get_u32);
 
+struct nft_set_elem *nft_set_elem_clone(struct nft_set_elem *elem)
+{
+	struct nft_set_elem *newelem;
+
+	newelem = nft_set_elem_alloc();
+	if (newelem == NULL)
+		return NULL;
+
+	memcpy(newelem, elem, sizeof(*elem));
+
+	if (elem->flags & (1 << NFT_SET_ELEM_ATTR_CHAIN))
+		newelem->data.chain = strdup(elem->data.chain);
+
+	return newelem;
+}
+
 void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 				      struct nft_set_elem *e)
 {

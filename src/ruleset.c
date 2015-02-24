@@ -312,8 +312,15 @@ static int nft_ruleset_parse_set(struct nft_parse_ctx *ctx,
 				 struct nft_set *set, uint32_t type,
 				 struct nft_parse_err *err)
 {
+	struct nft_set *newset;
+
 	nft_set_attr_set_u32(set, NFT_SET_ATTR_ID, ctx->set_id++);
-	nft_set_list_add_tail(set, ctx->set_list);
+
+	newset = nft_set_clone(set);
+	if (newset == NULL)
+		goto err;
+
+	nft_set_list_add_tail(newset, ctx->set_list);
 
 	nft_ruleset_ctx_set_u32(ctx, NFT_RULESET_CTX_TYPE, type);
 	nft_ruleset_ctx_set(ctx, NFT_RULESET_CTX_SET, set);

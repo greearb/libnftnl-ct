@@ -246,6 +246,37 @@ uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_set_attr_get_u32);
 
+struct nft_set *nft_set_clone(const struct nft_set *set)
+{
+	struct nft_set *newset;
+	struct nft_set_elem *elem, *newelem;
+
+	newset = nft_set_alloc();
+	if (newset == NULL)
+		return NULL;
+
+	memcpy(newset, set, sizeof(*set));
+
+	if (set->flags & (1 << NFT_SET_ATTR_TABLE))
+		newset->table = strdup(set->table);
+	if (set->flags & (1 << NFT_SET_ATTR_NAME))
+		newset->name = strdup(set->name);
+
+	INIT_LIST_HEAD(&newset->element_list);
+	list_for_each_entry(elem, &set->element_list, head) {
+		newelem = nft_set_elem_clone(elem);
+		if (newelem == NULL)
+			goto err;
+
+		list_add_tail(&newelem->head, &newset->element_list);
+	}
+
+	return newset;
+err:
+	nft_set_free(newset);
+	return NULL;
+}
+
 static void
 nft_set_nlmsg_build_desc_payload(struct nlmsghdr *nlh, struct nft_set *s)
 {
