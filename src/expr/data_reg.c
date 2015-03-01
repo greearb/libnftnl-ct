@@ -467,7 +467,7 @@ __nft_parse_data(union nft_data_reg *data, const struct nlattr *attr)
 	if (data_len == 0)
 		return -1;
 
-	if (data_len > sizeof(uint32_t) * 4)
+	if (data_len > sizeof(data->val))
 		return -1;
 
 	memcpy(data->val, orig, data_len);

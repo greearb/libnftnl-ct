@@ -1,6 +1,7 @@
 #ifndef _DATA_H_
 #define _DATA_H_
 
+#include <linux/netfilter/nf_tables.h>
 #include <stdint.h>
 #include <unistd.h>
 
@@ -13,7 +14,7 @@ enum {
 
 union nft_data_reg {
 	struct {
-		uint32_t	val[4];
+		uint32_t	val[NFT_DATA_VALUE_MAXLEN / sizeof(uint32_t)];
 		uint32_t	len;
 	};
 	struct {
