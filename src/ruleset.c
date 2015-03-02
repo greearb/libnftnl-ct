@@ -542,12 +542,12 @@ static int nft_ruleset_json_parse(const void *json,
 
 	root = nft_jansson_create_root(json, &error, err, input);
 	if (root == NULL)
-		goto err;
+		goto err1;
 
 	array = json_object_get(root, "nftables");
 	if (array == NULL) {
 		errno = EINVAL;
-		goto err;
+		goto err2;
 	}
 
 	len = json_array_size(array);
@@ -555,23 +555,24 @@ static int nft_ruleset_json_parse(const void *json,
 		node = json_array_get(array, i);
 		if (node == NULL) {
 			errno = EINVAL;
-			goto err;
+			goto err2;
 		}
 		ctx.json = node;
 		key = json_object_iter_key(json_object_iter(node));
 		if (key == NULL)
-			goto err;
+			goto err2;
 
 		if (nft_ruleset_json_parse_cmd(key, err, &ctx) < 0)
-			goto err;
+			goto err2;
 	}
 
 	nft_set_list_free(ctx.set_list);
 	nft_jansson_free_root(root);
 	return 0;
-err:
-	nft_set_list_free(ctx.set_list);
+err2:
 	nft_jansson_free_root(root);
+err1:
+	nft_set_list_free(ctx.set_list);
 	return -1;
 #else
 	errno = EOPNOTSUPP;
@@ -672,7 +673,7 @@ static int nft_ruleset_xml_parse(const void *xml, struct nft_parse_err *err,
 
 	tree = nft_mxml_build_tree(xml, "nftables", err, input);
 	if (tree == NULL)
-		goto err;
+		goto err1;
 
 	ctx.xml = tree;
 
@@ -680,16 +681,17 @@ static int nft_ruleset_xml_parse(const void *xml, struct nft_parse_err *err,
 	while (nodecmd != NULL) {
 		cmd = nodecmd->value.opaque;
 		if (nft_ruleset_xml_parse_cmd(cmd, err, &ctx) < 0)
-			goto err;
+			goto err2;
 		nodecmd = mxmlWalkNext(tree, tree, MXML_NO_DESCEND);
 	}
 
 	nft_set_list_free(ctx.set_list);
 	mxmlDelete(tree);
 	return 0;
-err:
-	nft_set_list_free(ctx.set_list);
+err2:
 	mxmlDelete(tree);
+err1:
+	nft_set_list_free(ctx.set_list);
 	return -1;
 #else
 	errno = EOPNOTSUPP;
