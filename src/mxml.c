@@ -43,7 +43,8 @@ mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,
 		goto err;
 	}
 
-	if (strcmp(tree->value.opaque, treename) == 0)
+	if (tree->value.opaque != NULL &&
+	    strcmp(tree->value.opaque, treename) == 0)
 		return tree;
 
 	err->error = NFT_PARSE_EMISSINGNODE;
