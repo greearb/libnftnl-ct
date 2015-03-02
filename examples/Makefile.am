@@ -22,6 +22,7 @@ check_PROGRAMS = nft-table-add		\
 		 nft-set-elem-get	\
 		 nft-set-elem-del	\
 		 nft-ruleset-get	\
+		 nft-ruleset-parse-file	\
 		 nft-compat-get
 
 nft_table_add_SOURCES = nft-table-add.c
@@ -89,6 +90,9 @@ nft_set_elem_get_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_ruleset_get_SOURCES = nft-ruleset-get.c
 nft_ruleset_get_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
+nft_ruleset_parse_file_SOURCES = nft-ruleset-parse-file.c
+nft_ruleset_parse_file_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_compat_get_SOURCES = nft-compat-get.c
 nft_compat_get_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
