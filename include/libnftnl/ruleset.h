@@ -51,6 +51,7 @@ enum {
 };
 
 struct nft_parse_ctx;
+void nft_ruleset_ctx_free(const struct nft_parse_ctx *ctx);
 bool nft_ruleset_ctx_is_set(const struct nft_parse_ctx *ctx, uint16_t attr);
 void *nft_ruleset_ctx_get(const struct nft_parse_ctx *ctx, uint16_t attr);
 uint32_t nft_ruleset_ctx_get_u32(const struct nft_parse_ctx *ctx,

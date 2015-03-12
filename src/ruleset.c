@@ -157,6 +157,29 @@ void *nft_ruleset_attr_get(const struct nft_ruleset *r, uint16_t attr)
 }
 EXPORT_SYMBOL(nft_ruleset_attr_get);
 
+void nft_ruleset_ctx_free(const struct nft_parse_ctx *ctx)
+{
+	switch (ctx->type) {
+	case NFT_RULESET_TABLE:
+		nft_table_free(ctx->table);
+		break;
+	case NFT_RULESET_CHAIN:
+		nft_chain_free(ctx->chain);
+		break;
+	case NFT_RULESET_RULE:
+		nft_rule_free(ctx->rule);
+		break;
+	case NFT_RULESET_SET:
+	case NFT_RULESET_SET_ELEMS:
+		nft_set_free(ctx->set);
+		break;
+	case NFT_RULESET_RULESET:
+	case NFT_RULESET_UNSPEC:
+		break;
+	}
+}
+EXPORT_SYMBOL(nft_ruleset_ctx_free);
+
 bool nft_ruleset_ctx_is_set(const struct nft_parse_ctx *ctx, uint16_t attr)
 {
 	return ctx->flags & (1 << attr);

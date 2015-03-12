@@ -77,10 +77,8 @@ static int nft_ruleset_set_elems(const struct nft_parse_ctx *ctx)
 	mnl_nlmsg_batch_next(batch);
 
 	nft_set_elems_iter_destroy(iter_elems);
-	nft_set_free(set);
 	return 0;
 err:
-	nft_set_free(set);
 	return -1;
 }
 
@@ -125,7 +123,6 @@ static int nft_ruleset_set(const struct nft_parse_ctx *ctx)
 	ret = nft_ruleset_set_elems(ctx);
 	return ret;
 err:
-	nft_set_free(set);
 	return -1;
 }
 
@@ -184,7 +181,6 @@ static int nft_ruleset_rule(const struct nft_parse_ctx *ctx)
 		return -1;
 
 	ret = nft_ruleset_rule_build_msg(ctx, cmd, rule);
-	nft_rule_free(rule);
 
 	return ret;
 }
@@ -273,10 +269,8 @@ static int nft_ruleset_chain(const struct nft_parse_ctx *ctx)
 	nft_chain_nlmsg_build_payload(nlh, chain);
 	mnl_nlmsg_batch_next(batch);
 
-	nft_chain_free(chain);
 	return 0;
 err:
-	nft_chain_free(chain);
 	return -1;
 }
 
@@ -327,7 +321,6 @@ static int nft_ruleset_table(const struct nft_parse_ctx *ctx)
 		return -1;
 
 	ret = nft_ruleset_table_build_msg(ctx, cmd, table);
-	nft_table_free(table);
 
 	return ret;
 }
@@ -377,6 +370,7 @@ static int ruleset_elems_cb(const struct nft_parse_ctx *ctx)
 		return -1;
 	}
 
+	nft_ruleset_ctx_free(ctx);
 	return ret;
 }
 
