@@ -44,7 +44,15 @@ EXPORT_SYMBOL(nft_nlmsg_build_hdr);
 
 struct nft_parse_err *nft_parse_err_alloc(void)
 {
-	return calloc(1, sizeof(struct nft_parse_err));
+	struct nft_parse_err *err;
+
+	err = calloc(1, sizeof(struct nft_parse_err));
+	if (err == NULL)
+		return NULL;
+
+	err->error = NFT_PARSE_EOPNOTSUPP;
+
+	return err;
 }
 EXPORT_SYMBOL(nft_parse_err_alloc);
 
@@ -66,6 +74,8 @@ int nft_parse_perror(const char *msg, struct nft_parse_err *err)
 	case NFT_PARSE_EBADTYPE:
 		return fprintf(stderr, "%s: Invalid type in node \"%s\"\n",
 			       msg, err->node_name);
+	case NFT_PARSE_EOPNOTSUPP:
+		return fprintf(stderr, "%s: Operation not supported\n", msg);
 	default:
 		return fprintf(stderr, "%s: Undefined error\n", msg);
 	}

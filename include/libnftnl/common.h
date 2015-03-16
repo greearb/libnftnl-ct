@@ -7,6 +7,7 @@ enum {
 	NFT_PARSE_EBADINPUT	= 0,
 	NFT_PARSE_EMISSINGNODE,
 	NFT_PARSE_EBADTYPE,
+	NFT_PARSE_EOPNOTSUPP,
 };
 
 enum nft_output_type {
