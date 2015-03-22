@@ -345,8 +345,3 @@ struct expr_ops expr_ops_log = {
 	.xml_parse	= nft_rule_expr_log_xml_parse,
 	.json_parse	= nft_rule_expr_log_json_parse,
 };
-
-static void __init expr_log_init(void)
-{
-	nft_expr_ops_register(&expr_ops_log);
-}

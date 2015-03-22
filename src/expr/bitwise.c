@@ -322,8 +322,3 @@ struct expr_ops expr_ops_bitwise = {
 	.xml_parse	= nft_rule_expr_bitwise_xml_parse,
 	.json_parse	= nft_rule_expr_bitwise_json_parse,
 };
-
-static void __init expr_bitwise(void)
-{
-	nft_expr_ops_register(&expr_ops_bitwise);
-}

@@ -3,21 +3,59 @@
 
 #include "expr_ops.h"
 
-static LIST_HEAD(expr_ops_list);
+/* Unfortunately, __attribute__((constructor)) breaks library static linking */
+extern struct expr_ops expr_ops_bitwise;
+extern struct expr_ops expr_ops_byteorder;
+extern struct expr_ops expr_ops_cmp;
+extern struct expr_ops expr_ops_counter;
+extern struct expr_ops expr_ops_ct;
+extern struct expr_ops expr_ops_exthdr;
+extern struct expr_ops expr_ops_immediate;
+extern struct expr_ops expr_ops_limit;
+extern struct expr_ops expr_ops_log;
+extern struct expr_ops expr_ops_lookup;
+extern struct expr_ops expr_ops_masq;
+extern struct expr_ops expr_ops_match;
+extern struct expr_ops expr_ops_meta;
+extern struct expr_ops expr_ops_nat;
+extern struct expr_ops expr_ops_payload;
+extern struct expr_ops expr_ops_redir;
+extern struct expr_ops expr_ops_reject;
+extern struct expr_ops expr_ops_queue;
+extern struct expr_ops expr_ops_target;
 
-void nft_expr_ops_register(struct expr_ops *ops)
-{
-	list_add_tail(&ops->head, &expr_ops_list);
-}
+static struct expr_ops *expr_ops[] = {
+	&expr_ops_bitwise,
+	&expr_ops_byteorder,
+	&expr_ops_cmp,
+	&expr_ops_counter,
+	&expr_ops_ct,
+	&expr_ops_exthdr,
+	&expr_ops_immediate,
+	&expr_ops_limit,
+	&expr_ops_log,
+	&expr_ops_lookup,
+	&expr_ops_masq,
+	&expr_ops_match,
+	&expr_ops_meta,
+	&expr_ops_nat,
+	&expr_ops_payload,
+	&expr_ops_redir,
+	&expr_ops_reject,
+	&expr_ops_queue,
+	&expr_ops_target,
+	NULL,
+};
 
 struct expr_ops *nft_expr_ops_lookup(const char *name)
 {
-	struct expr_ops *ops;
+	int i = 0;
 
-	list_for_each_entry(ops, &expr_ops_list, head) {
-		if (strcmp(ops->name, name) == 0)
-			return ops;
+	while (expr_ops[i] != NULL) {
+		if (strcmp(expr_ops[i]->name, name) == 0)
+			return expr_ops[i];
+
+		i++;
 	}
-
 	return NULL;
 }

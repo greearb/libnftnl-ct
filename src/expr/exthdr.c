@@ -316,8 +316,3 @@ struct expr_ops expr_ops_exthdr = {
 	.xml_parse	= nft_rule_expr_exthdr_xml_parse,
 	.json_parse	= nft_rule_expr_exthdr_json_parse,
 };
-
-static void __init expr_exthdr_init(void)
-{
-	nft_expr_ops_register(&expr_ops_exthdr);
-}

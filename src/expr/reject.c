@@ -211,8 +211,3 @@ struct expr_ops expr_ops_reject = {
 	.xml_parse	= nft_rule_expr_reject_xml_parse,
 	.json_parse	= nft_rule_expr_reject_json_parse,
 };
-
-static void __init expr_reject_init(void)
-{
-	nft_expr_ops_register(&expr_ops_reject);
-}

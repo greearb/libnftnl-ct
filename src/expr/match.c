@@ -253,8 +253,3 @@ struct expr_ops expr_ops_match = {
 	.xml_parse 	= nft_rule_expr_match_xml_parse,
 	.json_parse 	= nft_rule_expr_match_json_parse,
 };
-
-static void __init expr_match_init(void)
-{
-	nft_expr_ops_register(&expr_ops_match);
-}

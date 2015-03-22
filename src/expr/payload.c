@@ -297,8 +297,3 @@ struct expr_ops expr_ops_payload = {
 	.xml_parse	= nft_rule_expr_payload_xml_parse,
 	.json_parse	= nft_rule_expr_payload_json_parse,
 };
-
-static void __init expr_payload_init(void)
-{
-	nft_expr_ops_register(&expr_ops_payload);
-}

@@ -15,7 +15,6 @@
 #	define EXPORT_SYMBOL
 #endif
 
-#define __init		__attribute__((constructor))
 #define __noreturn	__attribute__((__noreturn__))
 
 #define xfree(ptr)	free((void *)ptr);

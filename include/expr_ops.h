@@ -9,8 +9,6 @@ struct nlmsghdr;
 struct nft_rule_expr;
 
 struct expr_ops {
-	struct list_head head;
-
 	const char *name;
 	uint32_t alloc_len;
 	int	max_attr;
@@ -26,7 +24,6 @@ struct expr_ops {
 			      struct nft_parse_err *err);
 };
 
-void nft_expr_ops_register(struct expr_ops *ops);
 struct expr_ops *nft_expr_ops_lookup(const char *name);
 
 #define nft_expr_data(ops) (void *)ops->data
