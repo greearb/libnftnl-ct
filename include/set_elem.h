@@ -9,6 +9,8 @@ struct nft_set_elem {
 	union nft_data_reg	key;
 	union nft_data_reg	data;
 	uint32_t		flags;
+	uint64_t		timeout;
+	uint64_t		expiration;
 };
 
 #endif

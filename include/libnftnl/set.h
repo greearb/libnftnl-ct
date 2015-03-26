@@ -90,6 +90,8 @@ enum {
 	NFT_SET_ELEM_ATTR_VERDICT,
 	NFT_SET_ELEM_ATTR_CHAIN,
 	NFT_SET_ELEM_ATTR_DATA,
+	NFT_SET_ELEM_ATTR_TIMEOUT,
+	NFT_SET_ELEM_ATTR_EXPIRATION,
 };
 
 struct nft_set_elem;
@@ -104,11 +106,13 @@ void nft_set_elem_add(struct nft_set *s, struct nft_set_elem *elem);
 void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr);
 void nft_set_elem_attr_set(struct nft_set_elem *s, uint16_t attr, const void *data, uint32_t data_len);
 void nft_set_elem_attr_set_u32(struct nft_set_elem *s, uint16_t attr, uint32_t val);
+void nft_set_elem_attr_set_u64(struct nft_set_elem *s, uint16_t attr, uint64_t val);
 void nft_set_elem_attr_set_str(struct nft_set_elem *s, uint16_t attr, const char *str);
 
 const void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, uint32_t *data_len);
 const char *nft_set_elem_attr_get_str(struct nft_set_elem *s, uint16_t attr);
 uint32_t nft_set_elem_attr_get_u32(struct nft_set_elem *s, uint16_t attr);
+uint64_t nft_set_elem_attr_get_u64(struct nft_set_elem *s, uint16_t attr);
 
 bool nft_set_elem_attr_is_set(const struct nft_set_elem *s, uint16_t attr);
 

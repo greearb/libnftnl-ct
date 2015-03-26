@@ -158,10 +158,12 @@ global:
   nft_set_elem_attr_unset;
   nft_set_elem_attr_set;
   nft_set_elem_attr_set_u32;
+  nft_set_elem_attr_set_u64;
   nft_set_elem_attr_set_str;
   nft_set_elem_attr_get;
   nft_set_elem_attr_get_str;
   nft_set_elem_attr_get_u32;
+  nft_set_elem_attr_get_u64;
   nft_set_elem_nlmsg_build_payload;
   nft_set_elem_parse;
   nft_set_elem_parse_file;
