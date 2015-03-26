@@ -20,6 +20,8 @@ enum {
 	NFT_SET_ATTR_ID,
 	NFT_SET_ATTR_POLICY,
 	NFT_SET_ATTR_DESC_SIZE,
+	NFT_SET_ATTR_TIMEOUT,
+	NFT_SET_ATTR_GC_INTERVAL,
 	__NFT_SET_ATTR_MAX
 };
 #define NFT_SET_ATTR_MAX (__NFT_SET_ATTR_MAX - 1)
@@ -37,6 +39,7 @@ void nft_set_attr_set(struct nft_set *s, uint16_t attr, const void *data);
 void nft_set_attr_set_data(struct nft_set *s, uint16_t attr, const void *data,
 			   uint32_t data_len);
 void nft_set_attr_set_u32(struct nft_set *s, uint16_t attr, uint32_t val);
+void nft_set_attr_set_u64(struct nft_set *s, uint16_t attr, uint64_t val);
 void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, const char *str);
 
 const void *nft_set_attr_get(struct nft_set *s, uint16_t attr);
@@ -44,6 +47,7 @@ const void *nft_set_attr_get_data(struct nft_set *s, uint16_t attr,
 				  uint32_t *data_len);
 const char *nft_set_attr_get_str(struct nft_set *s, uint16_t attr);
 uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr);
+uint64_t nft_set_attr_get_u64(struct nft_set *s, uint16_t attr);
 
 struct nlmsghdr;
 

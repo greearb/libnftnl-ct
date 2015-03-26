@@ -88,6 +88,8 @@ void nft_set_attr_unset(struct nft_set *s, uint16_t attr)
 	case NFT_SET_ATTR_ID:
 	case NFT_SET_ATTR_POLICY:
 	case NFT_SET_ATTR_DESC_SIZE:
+	case NFT_SET_ATTR_TIMEOUT:
+	case NFT_SET_ATTR_GC_INTERVAL:
 		break;
 	default:
 		return;
@@ -106,6 +108,8 @@ static uint32_t nft_set_attr_validate[NFT_SET_ATTR_MAX + 1] = {
 	[NFT_SET_ATTR_FAMILY]		= sizeof(uint32_t),
 	[NFT_SET_ATTR_POLICY]		= sizeof(uint32_t),
 	[NFT_SET_ATTR_DESC_SIZE]	= sizeof(uint32_t),
+	[NFT_SET_ATTR_TIMEOUT]		= sizeof(uint64_t),
+	[NFT_SET_ATTR_GC_INTERVAL]	= sizeof(uint32_t),
 };
 
 void nft_set_attr_set_data(struct nft_set *s, uint16_t attr, const void *data,
@@ -156,6 +160,12 @@ void nft_set_attr_set_data(struct nft_set *s, uint16_t attr, const void *data,
 	case NFT_SET_ATTR_DESC_SIZE:
 		s->desc.size = *((uint32_t *)data);
 		break;
+	case NFT_SET_ATTR_TIMEOUT:
+		s->timeout = *((uint64_t *)data);
+		break;
+	case NFT_SET_ATTR_GC_INTERVAL:
+		s->gc_interval = *((uint32_t *)data);
+		break;
 	}
 	s->flags |= (1 << attr);
 }
@@ -172,6 +182,12 @@ void nft_set_attr_set_u32(struct nft_set *s, uint16_t attr, uint32_t val)
 	nft_set_attr_set(s, attr, &val);
 }
 EXPORT_SYMBOL(nft_set_attr_set_u32);
+
+void nft_set_attr_set_u64(struct nft_set *s, uint16_t attr, uint64_t val)
+{
+	nft_set_attr_set(s, attr, &val);
+}
+EXPORT_SYMBOL(nft_set_attr_set_u64);
 
 void nft_set_attr_set_str(struct nft_set *s, uint16_t attr, const char *str)
 {
@@ -217,6 +233,12 @@ const void *nft_set_attr_get_data(struct nft_set *s, uint16_t attr,
 	case NFT_SET_ATTR_DESC_SIZE:
 		*data_len = sizeof(uint32_t);
 		return &s->desc.size;
+	case NFT_SET_ATTR_TIMEOUT:
+		*data_len = sizeof(uint64_t);
+		return &s->timeout;
+	case NFT_SET_ATTR_GC_INTERVAL:
+		*data_len = sizeof(uint32_t);
+		return &s->gc_interval;
 	}
 	return NULL;
 }
@@ -245,6 +267,17 @@ uint32_t nft_set_attr_get_u32(struct nft_set *s, uint16_t attr)
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nft_set_attr_get_u32);
+
+uint64_t nft_set_attr_get_u64(struct nft_set *s, uint16_t attr)
+{
+	uint32_t data_len;
+	const uint64_t *val = nft_set_attr_get_data(s, attr, &data_len);
+
+	nft_assert(val, attr, data_len == sizeof(uint64_t));
+
+	return val ? *val : 0;
+}
+EXPORT_SYMBOL(nft_set_attr_get_u64);
 
 struct nft_set *nft_set_clone(const struct nft_set *set)
 {
@@ -310,6 +343,10 @@ void nft_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nft_set *s)
 		mnl_attr_put_u32(nlh, NFTA_SET_POLICY, htonl(s->policy));
 	if (s->flags & (1 << NFT_SET_ATTR_DESC_SIZE))
 		nft_set_nlmsg_build_desc_payload(nlh, s);
+	if (s->flags & (1 << NFT_SET_ATTR_TIMEOUT))
+		mnl_attr_put_u64(nlh, NFTA_SET_TIMEOUT, htobe64(s->timeout));
+	if (s->flags & (1 << NFT_SET_ATTR_GC_INTERVAL))
+		mnl_attr_put_u32(nlh, NFTA_SET_GC_INTERVAL, htonl(s->gc_interval));
 }
 EXPORT_SYMBOL(nft_set_nlmsg_build_payload);
 
@@ -334,7 +371,12 @@ static int nft_set_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_SET_DATA_LEN:
 	case NFTA_SET_ID:
 	case NFTA_SET_POLICY:
+	case NFTA_SET_GC_INTERVAL:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
+		break;
+	case NFTA_SET_TIMEOUT:
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
 			abi_breakage();
 		break;
 	case NFTA_SET_DESC:
@@ -426,6 +468,14 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 	if (tb[NFTA_SET_POLICY]) {
 		s->policy = ntohl(mnl_attr_get_u32(tb[NFTA_SET_POLICY]));
 		s->flags |= (1 << NFT_SET_ATTR_POLICY);
+	}
+	if (tb[NFTA_SET_TIMEOUT]) {
+		s->timeout = be64toh(mnl_attr_get_u64(tb[NFTA_SET_TIMEOUT]));
+		s->flags |= (1 << NFT_SET_ATTR_TIMEOUT);
+	}
+	if (tb[NFTA_SET_GC_INTERVAL]) {
+		s->gc_interval = ntohl(mnl_attr_get_u32(tb[NFTA_SET_GC_INTERVAL]));
+		s->flags |= (1 << NFT_SET_ATTR_GC_INTERVAL);
 	}
 	if (tb[NFTA_SET_DESC])
 		ret = nft_set_desc_parse(s, tb[NFTA_SET_DESC]);

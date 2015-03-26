@@ -22,6 +22,8 @@ struct nft_set {
 	struct list_head	element_list;
 
 	uint32_t		flags;
+	uint32_t		gc_interval;
+	uint64_t		timeout;
 };
 
 struct nft_set_list;
