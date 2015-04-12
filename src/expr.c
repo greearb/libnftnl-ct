@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <netinet/in.h>
 
 #include <libmnl/libmnl.h>
@@ -205,18 +206,61 @@ EXPORT_SYMBOL(nft_rule_expr_get_str);
 void
 nft_rule_expr_build_payload(struct nlmsghdr *nlh, struct nft_rule_expr *expr)
 {
-	struct nlattr *nest1, *nest2;
+	struct nlattr *nest;
 
-	nest1 = mnl_attr_nest_start(nlh, NFTA_LIST_ELEM);
 	mnl_attr_put_strz(nlh, NFTA_EXPR_NAME, expr->ops->name);
 
-	nest2 = mnl_attr_nest_start(nlh, NFTA_EXPR_DATA);
+	nest = mnl_attr_nest_start(nlh, NFTA_EXPR_DATA);
 	expr->ops->build(nlh, expr);
-	mnl_attr_nest_end(nlh, nest2);
-
-	mnl_attr_nest_end(nlh, nest1);
+	mnl_attr_nest_end(nlh, nest);
 }
-EXPORT_SYMBOL(nft_rule_expr_build_payload);
+
+static int nft_rule_parse_expr_cb(const struct nlattr *attr, void *data)
+{
+	const struct nlattr **tb = data;
+	int type = mnl_attr_get_type(attr);
+
+	if (mnl_attr_type_valid(attr, NFTA_EXPR_MAX) < 0)
+		return MNL_CB_OK;
+
+	switch (type) {
+	case NFTA_EXPR_NAME:
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
+		break;
+	case NFTA_EXPR_DATA:
+		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
+			abi_breakage();
+		break;
+	}
+
+	tb[type] = attr;
+	return MNL_CB_OK;
+}
+
+struct nft_rule_expr *nft_rule_expr_parse(struct nlattr *attr)
+{
+	struct nlattr *tb[NFTA_EXPR_MAX+1] = {};
+	struct nft_rule_expr *expr;
+
+	if (mnl_attr_parse_nested(attr, nft_rule_parse_expr_cb, tb) < 0)
+		goto err1;
+
+	expr = nft_rule_expr_alloc(mnl_attr_get_str(tb[NFTA_EXPR_NAME]));
+	if (expr == NULL)
+		goto err1;
+
+	if (tb[NFTA_EXPR_DATA] &&
+	    expr->ops->parse(expr, tb[NFTA_EXPR_DATA]) < 0)
+		goto err2;
+
+	return expr;
+
+err2:
+	xfree(expr);
+err1:
+	return NULL;
+}
 
 int nft_rule_expr_snprintf(char *buf, size_t size, struct nft_rule_expr *expr,
 			   uint32_t type, uint32_t flags)

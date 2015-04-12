@@ -102,7 +102,6 @@ global:
   nft_rule_expr_get_u32;
   nft_rule_expr_get_u64;
   nft_rule_expr_get_str;
-  nft_rule_expr_build_payload;
   nft_rule_expr_snprintf;
   nft_rule_expr_free;
 

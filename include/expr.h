@@ -10,4 +10,10 @@ struct nft_rule_expr {
 	uint8_t			data[];
 };
 
+struct nlmsghdr;
+
+void nft_rule_expr_build_payload(struct nlmsghdr *nlh, struct nft_rule_expr *expr);
+struct nft_rule_expr *nft_rule_expr_parse(struct nlattr *attr);
+
+
 #endif
