@@ -25,6 +25,7 @@
 
 #include <libnftnl/set.h>
 #include <libnftnl/rule.h>
+#include <libnftnl/expr.h>
 
 struct nft_set_elem *nft_set_elem_alloc(void)
 {
@@ -46,6 +47,10 @@ void nft_set_elem_free(struct nft_set_elem *s)
 			s->data.chain = NULL;
 		}
 	}
+
+	if (s->flags & (1 << NFT_SET_ELEM_ATTR_EXPR))
+		nft_rule_expr_free(s->expr);
+
 	xfree(s);
 }
 EXPORT_SYMBOL(nft_set_elem_free);
@@ -74,6 +79,12 @@ void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr)
 	case NFT_SET_ELEM_ATTR_TIMEOUT:	/* NFTA_SET_ELEM_TIMEOUT */
 	case NFT_SET_ELEM_ATTR_EXPIRATION:	/* NFTA_SET_ELEM_EXPIRATION */
 	case NFT_SET_ELEM_ATTR_USERDATA:	/* NFTA_SET_ELEM_USERDATA */
+		break;
+	case NFT_SET_ELEM_ATTR_EXPR:
+		if (s->flags & (1 << NFT_SET_ELEM_ATTR_EXPR)) {
+			nft_rule_expr_free(s->expr);
+			s->expr = NULL;
+		}
 		break;
 	default:
 		return;
@@ -164,6 +175,8 @@ const void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, uint32_
 	case NFT_SET_ELEM_ATTR_USERDATA:
 		*data_len = s->user.len;
 		return s->user.data;
+	case NFT_SET_ELEM_ATTR_EXPR:
+		return s->expr;
 	}
 	return NULL;
 }
@@ -305,6 +318,7 @@ static int nft_set_elem_parse_attr_cb(const struct nlattr *attr, void *data)
 		break;
 	case NFTA_SET_ELEM_KEY:
 	case NFTA_SET_ELEM_DATA:
+	case NFTA_SET_ELEM_EXPR:
 		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
 			abi_breakage();
 		break;
@@ -365,6 +379,12 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 			break;
 		}
         }
+	if (tb[NFTA_SET_ELEM_EXPR]) {
+		e->expr = nft_rule_expr_parse(tb[NFTA_SET_ELEM_EXPR]);
+		if (e->expr == NULL)
+			goto err;
+		e->flags |= (1 << NFT_SET_ELEM_ATTR_EXPR);
+	}
 	if (tb[NFTA_SET_ELEM_USERDATA]) {
 		const void *udata =
 			mnl_attr_get_payload(tb[NFTA_SET_ELEM_USERDATA]);
