@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 #include <netinet/in.h>
 #include <limits.h>
 #include <errno.h>
@@ -869,6 +870,18 @@ static int nft_set_snprintf_default(char *buf, size_t size, struct nft_set *s,
 	ret = snprintf(buf, len, "%s %s %x",
 			s->name, s->table, s->set_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (s->flags & (1 << NFT_SET_ATTR_TIMEOUT)) {
+		ret = snprintf(buf + offset, len, " timeout %"PRIu64"ms",
+			       s->timeout);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (s->flags & (1 << NFT_SET_ATTR_GC_INTERVAL)) {
+		ret = snprintf(buf + offset, len, " gc_interval %ums",
+			       s->gc_interval);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	if (s->flags & (1 << NFT_SET_ATTR_POLICY)) {
 		ret = snprintf(buf + offset, len, " policy %u", s->policy);
