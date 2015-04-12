@@ -17,6 +17,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -72,6 +73,7 @@ void nft_set_elem_attr_unset(struct nft_set_elem *s, uint16_t attr)
 	case NFT_SET_ELEM_ATTR_DATA:	/* NFTA_SET_ELEM_DATA */
 	case NFT_SET_ELEM_ATTR_TIMEOUT:	/* NFTA_SET_ELEM_TIMEOUT */
 	case NFT_SET_ELEM_ATTR_EXPIRATION:	/* NFTA_SET_ELEM_EXPIRATION */
+	case NFT_SET_ELEM_ATTR_USERDATA:	/* NFTA_SET_ELEM_USERDATA */
 		break;
 	default:
 		return;
@@ -107,6 +109,10 @@ void nft_set_elem_attr_set(struct nft_set_elem *s, uint16_t attr,
 		break;
 	case NFT_SET_ELEM_ATTR_TIMEOUT:	/* NFTA_SET_ELEM_TIMEOUT */
 		s->timeout = *((uint64_t *)data);
+		break;
+	case NFT_SET_ELEM_ATTR_USERDATA: /* NFTA_SET_ELEM_USERDATA */
+		s->user.data = (void *)data;
+		s->user.len  = data_len;
 		break;
 	default:
 		return;
@@ -155,6 +161,9 @@ const void *nft_set_elem_attr_get(struct nft_set_elem *s, uint16_t attr, uint32_
 		return &s->timeout;
 	case NFT_SET_ELEM_ATTR_EXPIRATION:	/* NFTA_SET_ELEM_EXPIRATION */
 		return &s->expiration;
+	case NFT_SET_ELEM_ATTR_USERDATA:
+		*data_len = s->user.len;
+		return s->user.data;
 	}
 	return NULL;
 }
@@ -233,6 +242,8 @@ void nft_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 		mnl_attr_put(nlh, NFTA_DATA_VALUE, e->data.len, e->data.val);
 		mnl_attr_nest_end(nlh, nest1);
 	}
+	if (e->flags & (1 << NFT_SET_ELEM_ATTR_USERDATA))
+		mnl_attr_put(nlh, NFTA_SET_ELEM_USERDATA, e->user.len, e->user.data);
 }
 
 static void nft_set_elem_nlmsg_build_def(struct nlmsghdr *nlh,
@@ -297,6 +308,10 @@ static int nft_set_elem_parse_attr_cb(const struct nlattr *attr, void *data)
 		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
 			abi_breakage();
 		break;
+	case NFTA_SET_ELEM_USERDATA:
+		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0)
+			abi_breakage();
+		break;
 	}
 
 	tb[type] = attr;
@@ -350,7 +365,23 @@ static int nft_set_elems_parse2(struct nft_set *s, const struct nlattr *nest)
 			break;
 		}
         }
+	if (tb[NFTA_SET_ELEM_USERDATA]) {
+		const void *udata =
+			mnl_attr_get_payload(tb[NFTA_SET_ELEM_USERDATA]);
+
+		if (e->user.data)
+			xfree(e->user.data);
+
+		e->user.len  = mnl_attr_get_payload_len(tb[NFTA_SET_ELEM_USERDATA]);
+		e->user.data = malloc(e->user.len);
+		if (e->user.data == NULL)
+			goto err;
+		memcpy(e->user.data, udata, e->user.len);
+		e->flags |= (1 << NFT_RULE_ATTR_USERDATA);
+	}
+
 	if (ret < 0) {
+err:
 		nft_set_elem_free(e);
 		return -1;
 	}
@@ -610,6 +641,22 @@ static int nft_set_elem_snprintf_default(char *buf, size_t size,
 
 	ret = snprintf(buf+offset, len, "%u [end]", e->set_elem_flags);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+	if (e->user.len) {
+		ret = snprintf(buf+offset, len, "  userdata = {");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		for (i = 0; i < e->user.len; i++) {
+			char *c = e->user.data;
+
+			ret = snprintf(buf+offset, len, "%c",
+				       isalnum(c[i]) ? c[i] : 0);
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		}
+
+		ret = snprintf(buf+offset, len, " }\n");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	return offset;
 }
