@@ -187,17 +187,28 @@ nft_rule_expr_dynset_json_parse(struct nft_rule_expr *e, json_t *root,
 {
 #ifdef JSON_PARSING
 	const char *set_name;
-	uint32_t sreg, dreg;
+	uint32_t uval32;
+	uint64_t uval64;
 
 	set_name = nft_jansson_parse_str(root, "set", err);
 	if (set_name != NULL)
-		nft_rule_expr_dynset_str(e, NFT_EXPR_DYNSET_SET, set_name);
+		nft_rule_expr_set_str(e, NFT_EXPR_DYNSET_SET_NAME, set_name);
 
-	if (nft_jansson_parse_reg(root, "sreg", NFT_TYPE_U32, &sreg, err) == 0)
-		nft_rule_expr_dynset_u32(e, NFT_EXPR_DYNSET_SREG, sreg);
+	if (nft_jansson_parse_reg(root, "sreg_key",
+				  NFT_TYPE_U32, &uval32, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_DYNSET_SREG_KEY, uval32);
 
-	if (nft_jansson_parse_reg(root, "dreg", NFT_TYPE_U32, &dreg, err) == 0)
-		nft_rule_expr_dynset_u32(e, NFT_EXPR_DYNSET_DREG, dreg);
+	if (nft_jansson_parse_reg(root, "sreg_data",
+				  NFT_TYPE_U32, &uval32, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_DYNSET_SREG_DATA, uval32);
+
+	if (nft_jansson_parse_val(root, "op", NFT_TYPE_U32, &uval32,
+				  err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_DYNSET_OP, uval32);
+
+	if (nft_jansson_parse_val(root, "timeout", NFT_TYPE_U64, &uval64,
+				  err) == 0)
+		nft_rule_expr_set_u64(e, NFT_EXPR_DYNSET_TIMEOUT, uval64);
 
 	return 0;
 #else
@@ -212,20 +223,29 @@ nft_rule_expr_dynset_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 {
 #ifdef XML_PARSING
 	const char *set_name;
-	uint32_t sreg, dreg;
+	uint32_t uval32;
+	uint64_t uval64;
 
 	set_name = nft_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST,
 				      NFT_XML_MAND, err);
 	if (set_name != NULL)
-		nft_rule_expr_dynset_str(e, NFT_EXPR_DYNSET_SET, set_name);
+		nft_rule_expr_set_str(e, NFT_EXPR_DYNSET_SET_NAME, set_name);
 
-	if (nft_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND, NFT_XML_MAND,
-			       err) == 0)
-		nft_rule_expr_dynset_u32(e, NFT_EXPR_DYNSET_SREG, sreg);
+	if (nft_mxml_reg_parse(tree, "sreg_key", &uval32, MXML_DESCEND,
+			       NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_DYNSET_SREG_KEY, uval32);
 
-	if (nft_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND, NFT_XML_OPT,
-			       err) == 0)
-		nft_rule_expr_dynset_u32(e, NFT_EXPR_DYNSET_DREG, dreg);
+	if (nft_mxml_reg_parse(tree, "sreg_data", &uval32, MXML_DESCEND,
+			       NFT_XML_MAND, err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_DYNSET_SREG_DATA, uval32);
+
+	if (nft_mxml_num_parse(tree, "op", MXML_DESCEND_FIRST, BASE_DEC,
+			       &uval32, NFT_TYPE_U32, NFT_XML_MAND,  err) == 0)
+		nft_rule_expr_set_u32(e, NFT_EXPR_DYNSET_OP, uval32);
+
+	if (nft_mxml_num_parse(tree, "timeout", MXML_DESCEND_FIRST, BASE_DEC,
+			       &uval64, NFT_TYPE_U64, NFT_XML_MAND,  err) == 0)
+		nft_rule_expr_set_u64(e, NFT_EXPR_DYNSET_TIMEOUT, uval64);
 
 	return 0;
 #else
