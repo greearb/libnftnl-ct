@@ -76,6 +76,12 @@ static const char *nft_hooknum2str(int family, int hooknum)
 			return "forward";
 		}
 		break;
+	case NFPROTO_NETDEV:
+		switch (hooknum) {
+		case NF_NETDEV_INGRESS:
+			return "ingress";
+		}
+		break;
 	}
 	return "unknown";
 }

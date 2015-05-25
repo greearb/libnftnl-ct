@@ -41,6 +41,7 @@ int nft_buf_reg(struct nft_buf *b, int type, union nft_data_reg *reg,
 #define CHAIN			"chain"
 #define CODE			"code"
 #define DATA			"data"
+#define DEVICE			"device"
 #define DIR			"dir"
 #define DREG			"dreg"
 #define EXTHDR_TYPE		"exthdr_type"
