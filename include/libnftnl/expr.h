@@ -175,6 +175,11 @@ enum {
 	NFTNL_EXPR_REDIR_FLAGS,
 };
 
+enum {
+	NFTNL_EXPR_DUP_SREG_ADDR = NFTNL_EXPR_BASE,
+	NFTNL_EXPR_DUP_SREG_DEV,
+};
+
 /*
  * Compat
  */

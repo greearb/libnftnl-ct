@@ -9,6 +9,7 @@ extern struct expr_ops expr_ops_byteorder;
 extern struct expr_ops expr_ops_cmp;
 extern struct expr_ops expr_ops_counter;
 extern struct expr_ops expr_ops_ct;
+extern struct expr_ops expr_ops_dup;
 extern struct expr_ops expr_ops_exthdr;
 extern struct expr_ops expr_ops_immediate;
 extern struct expr_ops expr_ops_limit;
@@ -31,6 +32,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_cmp,
 	&expr_ops_counter,
 	&expr_ops_ct,
+	&expr_ops_dup,
 	&expr_ops_exthdr,
 	&expr_ops_immediate,
 	&expr_ops_limit,

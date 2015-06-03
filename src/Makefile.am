@@ -26,6 +26,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/counter.c	\
 		      expr/ct.c		\
 		      expr/data_reg.c	\
+		      expr/dup.c	\
 		      expr/exthdr.c	\
 		      expr/limit.c	\
 		      expr/log.c	\
