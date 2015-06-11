@@ -59,6 +59,9 @@ static void cmp_nft_chain(struct nft_chain *a, struct nft_chain *b)
 	if (strcmp(nft_chain_attr_get_str(a, NFT_CHAIN_ATTR_TYPE),
 		   nft_chain_attr_get_str(b, NFT_CHAIN_ATTR_TYPE)) != 0)
 		print_err("Chain type mismatches");
+	if (strcmp(nft_chain_attr_get_str(a, NFT_CHAIN_ATTR_DEV),
+		   nft_chain_attr_get_str(b, NFT_CHAIN_ATTR_DEV)) != 0)
+		print_err("Chain device mismatches");
 }
 
 int main(int argc, char *argv[])
@@ -83,6 +86,7 @@ int main(int argc, char *argv[])
 	nft_chain_attr_set_u64(a, NFT_CHAIN_ATTR_BYTES, 0x1234567812345678);
 	nft_chain_attr_set_u64(a, NFT_CHAIN_ATTR_HANDLE, 0x1234567812345678);
 	nft_chain_attr_set_str(a, NFT_CHAIN_ATTR_TYPE, "Prueba");
+	nft_chain_attr_set_str(a, NFT_CHAIN_ATTR_DEV, "eth0");
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, AF_INET,

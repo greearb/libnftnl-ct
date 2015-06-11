@@ -35,27 +35,24 @@ static void cmp_nft_table(struct nft_table *a, struct nft_table *b)
 	if (nft_table_attr_get_u32(a, NFT_TABLE_ATTR_FAMILY) !=
 	    nft_table_attr_get_u32(b, NFT_TABLE_ATTR_FAMILY))
 		print_err("tabke family mismatches");
-	if (strcmp(nft_table_attr_get_str(a, NFT_TABLE_ATTR_DEV),
-		   nft_table_attr_get_str(b, NFT_TABLE_ATTR_DEV)) != 0)
-		print_err("table name mismatches");
 }
 
 int main(int argc, char *argv[])
 {
 	char buf[4096];
 	struct nlmsghdr *nlh;
-	struct nft_table *a;
-	struct nft_table *b;
 
+	struct nft_table *a = NULL;
+	struct nft_table *b = NULL;
 	a = nft_table_alloc();
 	b = nft_table_alloc();
+
 	if (a == NULL || b == NULL)
 		print_err("OOM");
 
 	nft_table_attr_set_str(a, NFT_TABLE_ATTR_NAME, "test");
 	nft_table_attr_set_u32(a, NFT_TABLE_ATTR_FAMILY, AF_INET);
 	nft_table_attr_set_u32(a, NFT_TABLE_ATTR_FLAGS, 0);
-	nft_table_attr_set_str(a, NFT_TABLE_ATTR_DEV, "test");
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
 	nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, AF_INET, 0,
