@@ -37,6 +37,9 @@ static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
 	if (nftnl_expr_get_u64(rule_a, NFTNL_EXPR_LIMIT_UNIT) !=
 	    nftnl_expr_get_u64(rule_b, NFTNL_EXPR_LIMIT_UNIT))
 		print_err("Expr CTR_PACKET mismatches");
+	if (nftnl_expr_get_u64(rule_a, NFTNL_EXPR_LIMIT_BURST) !=
+	    nftnl_expr_get_u64(rule_b, NFTNL_EXPR_LIMIT_BURST))
+		print_err("Expr CTR_PACKET mismatches");
 }
 
 int main(int argc, char *argv[])
@@ -58,6 +61,7 @@ int main(int argc, char *argv[])
 
 	nftnl_expr_set_u64(ex, NFTNL_EXPR_LIMIT_RATE, 0x123456789abcdef0);
 	nftnl_expr_set_u64(ex, NFTNL_EXPR_LIMIT_UNIT, 0x123456789abcdef0);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_LIMIT_BURST, 0x89123456);
 
 	nftnl_rule_add_expr(a, ex);
 

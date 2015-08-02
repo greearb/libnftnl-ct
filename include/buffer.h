@@ -38,6 +38,7 @@ int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 
 #define BASE			"base"
 #define BYTES			"bytes"
+#define BURST			"burst"
 #define CHAIN			"chain"
 #define CODE			"code"
 #define DATA			"data"

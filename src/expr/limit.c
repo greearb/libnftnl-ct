@@ -25,6 +25,7 @@
 struct nftnl_expr_limit {
 	uint64_t		rate;
 	uint64_t		unit;
+	uint32_t		burst;
 };
 
 static int
@@ -39,6 +40,9 @@ nftnl_expr_limit_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_LIMIT_UNIT:
 		limit->unit = *((uint64_t *)data);
+		break;
+	case NFTNL_EXPR_LIMIT_BURST:
+		limit->burst = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -59,6 +63,9 @@ nftnl_expr_limit_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_LIMIT_UNIT:
 		*data_len = sizeof(uint64_t);
 		return &limit->unit;
+	case NFTNL_EXPR_LIMIT_BURST:
+		*data_len = sizeof(uint32_t);
+		return &limit->burst;
 	}
 	return NULL;
 }
@@ -77,6 +84,10 @@ static int nftnl_expr_limit_cb(const struct nlattr *attr, void *data)
 		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
 			abi_breakage();
 		break;
+	case NFTA_LIMIT_BURST:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
+		break;
 	}
 
 	tb[type] = attr;
@@ -92,6 +103,8 @@ nftnl_expr_limit_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 		mnl_attr_put_u64(nlh, NFTA_LIMIT_RATE, htobe64(limit->rate));
 	if (e->flags & (1 << NFTNL_EXPR_LIMIT_UNIT))
 		mnl_attr_put_u64(nlh, NFTA_LIMIT_UNIT, htobe64(limit->unit));
+	if (e->flags & (1 << NFTNL_EXPR_LIMIT_BURST))
+		mnl_attr_put_u32(nlh, NFTA_LIMIT_BURST, htonl(limit->burst));
 }
 
 static int
@@ -111,6 +124,10 @@ nftnl_expr_limit_parse(struct nftnl_expr *e, struct nlattr *attr)
 		limit->unit = be64toh(mnl_attr_get_u64(tb[NFTA_LIMIT_UNIT]));
 		e->flags |= (1 << NFTNL_EXPR_LIMIT_UNIT);
 	}
+	if (tb[NFTA_LIMIT_BURST]) {
+		limit->burst = ntohl(mnl_attr_get_u32(tb[NFTA_LIMIT_BURST]));
+		e->flags |= (1 << NFTNL_EXPR_LIMIT_BURST);
+	}
 
 	return 0;
 }
@@ -120,12 +137,15 @@ static int nftnl_expr_limit_json_parse(struct nftnl_expr *e, json_t *root,
 {
 #ifdef JSON_PARSING
 	uint64_t uval64;
+	uint32_t uval32;
 
 	if (nftnl_jansson_parse_val(root, "rate", NFTNL_TYPE_U64, &uval64, err) == 0)
 		nftnl_expr_set_u64(e, NFTNL_EXPR_LIMIT_RATE, uval64);
 
 	if (nftnl_jansson_parse_val(root, "unit", NFTNL_TYPE_U64, &uval64, err) == 0)
 		nftnl_expr_set_u64(e, NFTNL_EXPR_LIMIT_UNIT, uval64);
+	if (nftnl_jansson_parse_val(root, "burst", NFTNL_TYPE_U32, &uval32, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_BURST, uval32);
 
 	return 0;
 #else
@@ -140,6 +160,7 @@ static int nftnl_expr_limit_xml_parse(struct nftnl_expr *e,
 {
 #ifdef XML_PARSING
 	uint64_t rate, unit;
+	uint32_t burst;
 
 	if (nftnl_mxml_num_parse(tree, "rate", MXML_DESCEND_FIRST, BASE_DEC,
 			       &rate, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
@@ -148,6 +169,9 @@ static int nftnl_expr_limit_xml_parse(struct nftnl_expr *e,
 	if (nftnl_mxml_num_parse(tree, "unit", MXML_DESCEND_FIRST, BASE_DEC,
 			       &unit, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
 		nftnl_expr_set_u64(e, NFTNL_EXPR_LIMIT_UNIT, unit);
+	if (nftnl_mxml_num_parse(tree, "burst", MXML_DESCEND_FIRST, BASE_DEC,
+			       &burst, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_BURST, burst);
 
 	return 0;
 #else
@@ -178,6 +202,8 @@ static int nftnl_expr_limit_export(char *buf, size_t size,
 		nftnl_buf_u64(&b, type, limit->rate, RATE);
 	if (e->flags & (1 << NFTNL_EXPR_LIMIT_UNIT))
 		nftnl_buf_u64(&b, type, limit->unit, UNIT);
+	if (e->flags & (1 << NFTNL_EXPR_LIMIT_BURST))
+		nftnl_buf_u32(&b, type, limit->burst, BURST);
 
 	return nftnl_buf_done(&b);
 }
@@ -187,8 +213,8 @@ static int nftnl_expr_limit_snprintf_default(char *buf, size_t len,
 {
 	struct nftnl_expr_limit *limit = nftnl_expr_data(e);
 
-	return snprintf(buf, len, "rate %"PRIu64"/%s ",
-			limit->rate, get_unit(limit->unit));
+	return snprintf(buf, len, "rate %"PRIu64"/%s burst %u ",
+			limit->rate, get_unit(limit->unit), limit->burst);
 }
 
 static int
