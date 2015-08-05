@@ -425,10 +425,12 @@ int nft_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_rule *r)
 		return -1;
 
 	if (tb[NFTA_RULE_TABLE]) {
+		xfree(r->table);
 		r->table = strdup(mnl_attr_get_str(tb[NFTA_RULE_TABLE]));
 		r->flags |= (1 << NFT_RULE_ATTR_TABLE);
 	}
 	if (tb[NFTA_RULE_CHAIN]) {
+		xfree(r->chain);
 		r->chain = strdup(mnl_attr_get_str(tb[NFTA_RULE_CHAIN]));
 		r->flags |= (1 << NFT_RULE_ATTR_CHAIN);
 	}

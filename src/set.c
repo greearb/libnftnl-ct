@@ -435,10 +435,12 @@ int nft_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_set *s)
 		return -1;
 
 	if (tb[NFTA_SET_TABLE]) {
+		xfree(s->table);
 		s->table = strdup(mnl_attr_get_str(tb[NFTA_SET_TABLE]));
 		s->flags |= (1 << NFT_SET_ATTR_TABLE);
 	}
 	if (tb[NFTA_SET_NAME]) {
+		xfree(s->name);
 		s->name = strdup(mnl_attr_get_str(tb[NFTA_SET_NAME]));
 		s->flags |= (1 << NFT_SET_ATTR_NAME);
 	}

@@ -229,6 +229,7 @@ int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t)
 		return -1;
 
 	if (tb[NFTA_TABLE_NAME]) {
+		xfree(t->name);
 		t->name = strdup(mnl_attr_get_str(tb[NFTA_TABLE_NAME]));
 		t->flags |= (1 << NFT_TABLE_ATTR_NAME);
 	}
