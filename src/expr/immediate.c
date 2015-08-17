@@ -309,10 +309,19 @@ nft_rule_expr_immediate_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static void nft_rule_expr_immediate_free(struct nft_rule_expr *e)
+{
+	struct nft_expr_immediate *imm = nft_expr_data(e);
+
+	if (e->flags & (1 << NFT_EXPR_IMM_VERDICT))
+		nft_free_verdict(&imm->data);
+}
+
 struct expr_ops expr_ops_immediate = {
 	.name		= "immediate",
 	.alloc_len	= sizeof(struct nft_expr_immediate),
 	.max_attr	= NFTA_IMMEDIATE_MAX,
+	.free		= nft_rule_expr_immediate_free,
 	.set		= nft_rule_expr_immediate_set,
 	.get		= nft_rule_expr_immediate_get,
 	.parse		= nft_rule_expr_immediate_parse,

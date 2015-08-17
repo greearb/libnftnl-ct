@@ -28,5 +28,6 @@ int nft_data_reg_snprintf(char *buf, size_t size, union nft_data_reg *reg,
 struct nlattr;
 
 int nft_parse_data(union nft_data_reg *data, struct nlattr *attr, int *type);
+void nft_free_verdict(union nft_data_reg *data);
 
 #endif

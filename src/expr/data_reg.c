@@ -499,3 +499,14 @@ int nft_parse_data(union nft_data_reg *data, struct nlattr *attr, int *type)
 	return ret;
 }
 
+void nft_free_verdict(union nft_data_reg *data)
+{
+	switch(data->verdict) {
+	case NFT_JUMP:
+	case NFT_GOTO:
+		xfree(data->chain);
+		break;
+	default:
+		break;
+	}
+}
