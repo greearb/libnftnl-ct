@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, family, flags;
-	struct nft_table *t = NULL;
+	struct nftnl_table *t = NULL;
 	int ret;
 
 	if (argc != 4) {
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	t = nft_table_alloc();
+	t = nftnl_table_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
@@ -63,13 +63,13 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nft_table_attr_set(t, NFT_TABLE_ATTR_NAME, argv[2]);
-	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
+	nftnl_table_attr_set(t, NFTNL_TABLE_ATTR_NAME, argv[2]);
+	nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_FLAGS, flags);
 
-	nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, family,
+	nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, family,
 					NLM_F_ACK, seq);
-	nft_table_nlmsg_build_payload(nlh, t);
-	nft_table_free(t);
+	nftnl_table_nlmsg_build_payload(nlh, t);
+	nftnl_table_free(t);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

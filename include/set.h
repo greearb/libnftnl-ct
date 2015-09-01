@@ -3,7 +3,7 @@
 
 #include <linux/netfilter/nf_tables.h>
 
-struct nft_set {
+struct nftnl_set {
 	struct list_head	head;
 
 	uint32_t		family;
@@ -26,9 +26,9 @@ struct nft_set {
 	uint64_t		timeout;
 };
 
-struct nft_set_list;
-struct nft_rule_expr;
-int nft_set_lookup_id(struct nft_rule_expr *e, struct nft_set_list *set_list,
+struct nftnl_set_list;
+struct nftnl_rule_expr;
+int nftnl_set_lookup_id(struct nftnl_rule_expr *e, struct nftnl_set_list *set_list,
 		      uint32_t *set_id);
 
 #endif

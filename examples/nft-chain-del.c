@@ -20,18 +20,18 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/chain.h>
 
-static struct nft_chain *chain_del_parse(int argc, char *argv[])
+static struct nftnl_chain *chain_del_parse(int argc, char *argv[])
 {
-	struct nft_chain *t;
+	struct nftnl_chain *t;
 
-	t = nft_chain_alloc();
+	t = nftnl_chain_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		return NULL;
 	}
 
-	nft_chain_attr_set(t, NFT_CHAIN_ATTR_TABLE, argv[2]);
-	nft_chain_attr_set(t, NFT_CHAIN_ATTR_NAME, argv[3]);
+	nftnl_chain_attr_set(t, NFTNL_CHAIN_ATTR_TABLE, argv[2]);
+	nftnl_chain_attr_set(t, NFTNL_CHAIN_ATTR_NAME, argv[3]);
 
 	return t;
 }
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, chain_seq;
-	struct nft_chain *t;
+	struct nftnl_chain *t;
 	int ret, family, batching;
 
 	if (argc != 4) {
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	if (t == NULL)
 		exit(EXIT_FAILURE);
 
-	batching = nft_batch_is_supported();
+	batching = nftnl_batch_is_supported();
 	if (batching < 0) {
 		perror("cannot talk to nfnetlink");
 		exit(EXIT_FAILURE);
@@ -79,20 +79,20 @@ int main(int argc, char *argv[])
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
 	if (batching) {
-		nft_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 
 	chain_seq = seq;
-	nlh = nft_chain_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+	nlh = nftnl_chain_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 					NFT_MSG_DELCHAIN, family,
 					NLM_F_ACK, seq++);
-	nft_chain_nlmsg_build_payload(nlh, t);
-	nft_chain_free(t);
+	nftnl_chain_nlmsg_build_payload(nlh, t);
+	nftnl_chain_free(t);
 	mnl_nlmsg_batch_next(batch);
 
 	if (batching) {
-		nft_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 

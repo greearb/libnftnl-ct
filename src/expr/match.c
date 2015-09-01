@@ -27,7 +27,7 @@
 /* From include/linux/netfilter/x_tables.h */
 #define XT_EXTENSION_MAXNAMELEN 29
 
-struct nft_expr_match {
+struct nftnl_expr_match {
 	char		name[XT_EXTENSION_MAXNAMELEN];
 	uint32_t	rev;
 	uint32_t	data_len;
@@ -35,20 +35,20 @@ struct nft_expr_match {
 };
 
 static int
-nft_rule_expr_match_set(struct nft_rule_expr *e, uint16_t type,
+nftnl_rule_expr_match_set(struct nftnl_rule_expr *e, uint16_t type,
 			 const void *data, uint32_t data_len)
 {
-	struct nft_expr_match *mt = nft_expr_data(e);
+	struct nftnl_expr_match *mt = nftnl_expr_data(e);
 
 	switch(type) {
-	case NFT_EXPR_MT_NAME:
+	case NFTNL_EXPR_MT_NAME:
 		snprintf(mt->name, sizeof(mt->name), "%.*s", data_len,
 			 (const char *)data);
 		break;
-	case NFT_EXPR_MT_REV:
+	case NFTNL_EXPR_MT_REV:
 		mt->rev = *((uint32_t *)data);
 		break;
-	case NFT_EXPR_MT_INFO:
+	case NFTNL_EXPR_MT_INFO:
 		if (mt->data)
 			xfree(mt->data);
 
@@ -62,26 +62,26 @@ nft_rule_expr_match_set(struct nft_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nft_rule_expr_match_get(const struct nft_rule_expr *e, uint16_t type,
+nftnl_rule_expr_match_get(const struct nftnl_rule_expr *e, uint16_t type,
 			uint32_t *data_len)
 {
-	struct nft_expr_match *mt = nft_expr_data(e);
+	struct nftnl_expr_match *mt = nftnl_expr_data(e);
 
 	switch(type) {
-	case NFT_EXPR_MT_NAME:
+	case NFTNL_EXPR_MT_NAME:
 		*data_len = sizeof(mt->name);
 		return mt->name;
-	case NFT_EXPR_MT_REV:
+	case NFTNL_EXPR_MT_REV:
 		*data_len = sizeof(mt->rev);
 		return &mt->rev;
-	case NFT_EXPR_MT_INFO:
+	case NFTNL_EXPR_MT_INFO:
 		*data_len = mt->data_len;
 		return mt->data;
 	}
 	return NULL;
 }
 
-static int nft_rule_expr_match_cb(const struct nlattr *attr, void *data)
+static int nftnl_rule_expr_match_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -109,24 +109,24 @@ static int nft_rule_expr_match_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nft_rule_expr_match_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
+nftnl_rule_expr_match_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 {
-	struct nft_expr_match *mt = nft_expr_data(e);
+	struct nftnl_expr_match *mt = nftnl_expr_data(e);
 
-	if (e->flags & (1 << NFT_EXPR_MT_NAME))
+	if (e->flags & (1 << NFTNL_EXPR_MT_NAME))
 		mnl_attr_put_strz(nlh, NFTA_MATCH_NAME, mt->name);
-	if (e->flags & (1 << NFT_EXPR_MT_REV))
+	if (e->flags & (1 << NFTNL_EXPR_MT_REV))
 		mnl_attr_put_u32(nlh, NFTA_MATCH_REV, htonl(mt->rev));
-	if (e->flags & (1 << NFT_EXPR_MT_INFO))
+	if (e->flags & (1 << NFTNL_EXPR_MT_INFO))
 		mnl_attr_put(nlh, NFTA_MATCH_INFO, mt->data_len, mt->data);
 }
 
-static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *attr)
+static int nftnl_rule_expr_match_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
 {
-	struct nft_expr_match *match = nft_expr_data(e);
+	struct nftnl_expr_match *match = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_MATCH_MAX+1] = {};
 
-	if (mnl_attr_parse_nested(attr, nft_rule_expr_match_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_match_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_MATCH_NAME]) {
@@ -134,12 +134,12 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 			 mnl_attr_get_str(tb[NFTA_MATCH_NAME]));
 
 		match->name[XT_EXTENSION_MAXNAMELEN-1] = '\0';
-		e->flags |= (1 << NFT_EXPR_MT_NAME);
+		e->flags |= (1 << NFTNL_EXPR_MT_NAME);
 	}
 
 	if (tb[NFTA_MATCH_REV]) {
 		match->rev = ntohl(mnl_attr_get_u32(tb[NFTA_MATCH_REV]));
-		e->flags |= (1 << NFT_EXPR_MT_REV);
+		e->flags |= (1 << NFTNL_EXPR_MT_REV);
 	}
 
 	if (tb[NFTA_MATCH_INFO]) {
@@ -158,21 +158,21 @@ static int nft_rule_expr_match_parse(struct nft_rule_expr *e, struct nlattr *att
 		match->data = match_data;
 		match->data_len = len;
 
-		e->flags |= (1 << NFT_EXPR_MT_INFO);
+		e->flags |= (1 << NFTNL_EXPR_MT_INFO);
 	}
 
 	return 0;
 }
 
-static int nft_rule_expr_match_json_parse(struct nft_rule_expr *e, json_t *root,
-					  struct nft_parse_err *err)
+static int nftnl_rule_expr_match_json_parse(struct nftnl_rule_expr *e, json_t *root,
+					  struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
 	const char *name;
 
-	name = nft_jansson_parse_str(root, "name", err);
+	name = nftnl_jansson_parse_str(root, "name", err);
 	if (name != NULL)
-		nft_rule_expr_set_str(e, NFT_EXPR_MT_NAME, name);
+		nftnl_rule_expr_set_str(e, NFTNL_EXPR_MT_NAME, name);
 
 	return 0;
 #else
@@ -182,16 +182,16 @@ static int nft_rule_expr_match_json_parse(struct nft_rule_expr *e, json_t *root,
 }
 
 
-static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
-					 struct nft_parse_err *err)
+static int nftnl_rule_expr_match_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+					 struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
 	const char *name;
 
-	name = nft_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
-				  NFT_XML_MAND, err);
+	name = nftnl_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
+				  NFTNL_XML_MAND, err);
 	if (name != NULL)
-		nft_rule_expr_set_str(e, NFT_EXPR_MT_NAME, name);
+		nftnl_rule_expr_set_str(e, NFTNL_EXPR_MT_NAME, name);
 
 	/* mt->info is ignored until other solution is reached */
 
@@ -202,54 +202,54 @@ static int nft_rule_expr_match_xml_parse(struct nft_rule_expr *e, mxml_node_t *t
 #endif
 }
 
-static int nft_rule_expr_match_export(char *buf, size_t size,
-				      struct nft_rule_expr *e, int type)
+static int nftnl_rule_expr_match_export(char *buf, size_t size,
+				      struct nftnl_rule_expr *e, int type)
 {
-	struct nft_expr_match *mt = nft_expr_data(e);
-	NFT_BUF_INIT(b, buf, size);
+	struct nftnl_expr_match *mt = nftnl_expr_data(e);
+	NFTNL_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_MT_NAME))
-		nft_buf_str(&b, type, mt->name, NAME);
+	if (e->flags & (1 << NFTNL_EXPR_MT_NAME))
+		nftnl_buf_str(&b, type, mt->name, NAME);
 
-	return nft_buf_done(&b);
+	return nftnl_buf_done(&b);
 }
 
 static int
-nft_rule_expr_match_snprintf(char *buf, size_t len, uint32_t type,
-			     uint32_t flags, struct nft_rule_expr *e)
+nftnl_rule_expr_match_snprintf(char *buf, size_t len, uint32_t type,
+			     uint32_t flags, struct nftnl_rule_expr *e)
 {
-	struct nft_expr_match *match = nft_expr_data(e);
+	struct nftnl_expr_match *match = nftnl_expr_data(e);
 
 	switch (type) {
-	case NFT_OUTPUT_DEFAULT:
+	case NFTNL_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "name %s rev %u ",
 				match->name, match->rev);
-	case NFT_OUTPUT_XML:
-	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_match_export(buf, len, e, type);
+	case NFTNL_OUTPUT_XML:
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_rule_expr_match_export(buf, len, e, type);
 	default:
 		break;
 	}
 	return -1;
 }
 
-static void nft_rule_expr_match_free(struct nft_rule_expr *e)
+static void nftnl_rule_expr_match_free(struct nftnl_rule_expr *e)
 {
-	struct nft_expr_match *match = nft_expr_data(e);
+	struct nftnl_expr_match *match = nftnl_expr_data(e);
 
 	xfree(match->data);
 }
 
 struct expr_ops expr_ops_match = {
 	.name		= "match",
-	.alloc_len	= sizeof(struct nft_expr_match),
+	.alloc_len	= sizeof(struct nftnl_expr_match),
 	.max_attr	= NFTA_MATCH_MAX,
-	.free		= nft_rule_expr_match_free,
-	.set		= nft_rule_expr_match_set,
-	.get		= nft_rule_expr_match_get,
-	.parse		= nft_rule_expr_match_parse,
-	.build		= nft_rule_expr_match_build,
-	.snprintf	= nft_rule_expr_match_snprintf,
-	.xml_parse 	= nft_rule_expr_match_xml_parse,
-	.json_parse 	= nft_rule_expr_match_json_parse,
+	.free		= nftnl_rule_expr_match_free,
+	.set		= nftnl_rule_expr_match_set,
+	.get		= nftnl_rule_expr_match_get,
+	.parse		= nftnl_rule_expr_match_parse,
+	.build		= nftnl_rule_expr_match_build,
+	.snprintf	= nftnl_rule_expr_match_snprintf,
+	.xml_parse 	= nftnl_rule_expr_match_xml_parse,
+	.json_parse 	= nftnl_rule_expr_match_json_parse,
 };

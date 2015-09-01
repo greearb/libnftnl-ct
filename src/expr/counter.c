@@ -22,22 +22,22 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 
-struct nft_expr_counter {
+struct nftnl_expr_counter {
 	uint64_t	pkts;
 	uint64_t	bytes;
 };
 
 static int
-nft_rule_expr_counter_set(struct nft_rule_expr *e, uint16_t type,
+nftnl_rule_expr_counter_set(struct nftnl_rule_expr *e, uint16_t type,
 			  const void *data, uint32_t data_len)
 {
-	struct nft_expr_counter *ctr = nft_expr_data(e);
+	struct nftnl_expr_counter *ctr = nftnl_expr_data(e);
 
 	switch(type) {
-	case NFT_EXPR_CTR_BYTES:
+	case NFTNL_EXPR_CTR_BYTES:
 		ctr->bytes = *((uint64_t *)data);
 		break;
-	case NFT_EXPR_CTR_PACKETS:
+	case NFTNL_EXPR_CTR_PACKETS:
 		ctr->pkts = *((uint64_t *)data);
 		break;
 	default:
@@ -47,23 +47,23 @@ nft_rule_expr_counter_set(struct nft_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nft_rule_expr_counter_get(const struct nft_rule_expr *e, uint16_t type,
+nftnl_rule_expr_counter_get(const struct nftnl_rule_expr *e, uint16_t type,
 			  uint32_t *data_len)
 {
-	struct nft_expr_counter *ctr = nft_expr_data(e);
+	struct nftnl_expr_counter *ctr = nftnl_expr_data(e);
 
 	switch(type) {
-	case NFT_EXPR_CTR_BYTES:
+	case NFTNL_EXPR_CTR_BYTES:
 		*data_len = sizeof(ctr->bytes);
 		return &ctr->bytes;
-	case NFT_EXPR_CTR_PACKETS:
+	case NFTNL_EXPR_CTR_PACKETS:
 		*data_len = sizeof(ctr->pkts);
 		return &ctr->pkts;
 	}
 	return NULL;
 }
 
-static int nft_rule_expr_counter_cb(const struct nlattr *attr, void *data)
+static int nftnl_rule_expr_counter_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -84,51 +84,51 @@ static int nft_rule_expr_counter_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nft_rule_expr_counter_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
+nftnl_rule_expr_counter_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 {
-	struct nft_expr_counter *ctr = nft_expr_data(e);
+	struct nftnl_expr_counter *ctr = nftnl_expr_data(e);
 
-	if (e->flags & (1 << NFT_EXPR_CTR_BYTES))
+	if (e->flags & (1 << NFTNL_EXPR_CTR_BYTES))
 		mnl_attr_put_u64(nlh, NFTA_COUNTER_BYTES, htobe64(ctr->bytes));
-	if (e->flags & (1 << NFT_EXPR_CTR_PACKETS))
+	if (e->flags & (1 << NFTNL_EXPR_CTR_PACKETS))
 		mnl_attr_put_u64(nlh, NFTA_COUNTER_PACKETS, htobe64(ctr->pkts));
 }
 
 static int
-nft_rule_expr_counter_parse(struct nft_rule_expr *e, struct nlattr *attr)
+nftnl_rule_expr_counter_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
 {
-	struct nft_expr_counter *ctr = nft_expr_data(e);
+	struct nftnl_expr_counter *ctr = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_COUNTER_MAX+1] = {};
 
-	if (mnl_attr_parse_nested(attr, nft_rule_expr_counter_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_counter_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_COUNTER_BYTES]) {
 		ctr->bytes = be64toh(mnl_attr_get_u64(tb[NFTA_COUNTER_BYTES]));
-		e->flags |= (1 << NFT_EXPR_CTR_BYTES);
+		e->flags |= (1 << NFTNL_EXPR_CTR_BYTES);
 	}
 	if (tb[NFTA_COUNTER_PACKETS]) {
 		ctr->pkts = be64toh(mnl_attr_get_u64(tb[NFTA_COUNTER_PACKETS]));
-		e->flags |= (1 << NFT_EXPR_CTR_PACKETS);
+		e->flags |= (1 << NFTNL_EXPR_CTR_PACKETS);
 	}
 
 	return 0;
 }
 
 static int
-nft_rule_expr_counter_json_parse(struct nft_rule_expr *e, json_t *root,
-				 struct nft_parse_err *err)
+nftnl_rule_expr_counter_json_parse(struct nftnl_rule_expr *e, json_t *root,
+				 struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
 	uint64_t uval64;
 
-	if (nft_jansson_parse_val(root, "pkts", NFT_TYPE_U64, &uval64,
+	if (nftnl_jansson_parse_val(root, "pkts", NFTNL_TYPE_U64, &uval64,
 				  err) == 0)
-		nft_rule_expr_set_u64(e, NFT_EXPR_CTR_PACKETS, uval64);
+		nftnl_rule_expr_set_u64(e, NFTNL_EXPR_CTR_PACKETS, uval64);
 
-	if (nft_jansson_parse_val(root, "bytes", NFT_TYPE_U64, &uval64,
+	if (nftnl_jansson_parse_val(root, "bytes", NFTNL_TYPE_U64, &uval64,
 				  err) == 0)
-		nft_rule_expr_set_u64(e, NFT_EXPR_CTR_BYTES, uval64);
+		nftnl_rule_expr_set_u64(e, NFTNL_EXPR_CTR_BYTES, uval64);
 
 	return 0;
 #else
@@ -138,19 +138,19 @@ nft_rule_expr_counter_json_parse(struct nft_rule_expr *e, json_t *root,
 }
 
 static int
-nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
-				struct nft_parse_err *err)
+nftnl_rule_expr_counter_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+				struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
 	uint64_t pkts, bytes;
 
-	if (nft_mxml_num_parse(tree, "pkts", MXML_DESCEND_FIRST, BASE_DEC,
-			       &pkts, NFT_TYPE_U64, NFT_XML_MAND,  err) == 0)
-		nft_rule_expr_set_u64(e, NFT_EXPR_CTR_PACKETS, pkts);
+	if (nftnl_mxml_num_parse(tree, "pkts", MXML_DESCEND_FIRST, BASE_DEC,
+			       &pkts, NFTNL_TYPE_U64, NFTNL_XML_MAND,  err) == 0)
+		nftnl_rule_expr_set_u64(e, NFTNL_EXPR_CTR_PACKETS, pkts);
 
-	if (nft_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
-			       &bytes, NFT_TYPE_U64, NFT_XML_MAND, err) == 0)
-		nft_rule_expr_set_u64(e, NFT_EXPR_CTR_BYTES, bytes);
+	if (nftnl_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
+			       &bytes, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
+		nftnl_rule_expr_set_u64(e, NFTNL_EXPR_CTR_BYTES, bytes);
 
 	return 0;
 #else
@@ -159,39 +159,39 @@ nft_rule_expr_counter_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int nft_rule_expr_counter_export(char *buf, size_t size,
-					struct nft_rule_expr *e, int type)
+static int nftnl_rule_expr_counter_export(char *buf, size_t size,
+					struct nftnl_rule_expr *e, int type)
 {
-	struct nft_expr_counter *ctr = nft_expr_data(e);
-	NFT_BUF_INIT(b, buf, size);
+	struct nftnl_expr_counter *ctr = nftnl_expr_data(e);
+	NFTNL_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_CTR_PACKETS))
-		nft_buf_u64(&b, type, ctr->pkts, PKTS);
-	if (e->flags & (1 << NFT_EXPR_CTR_BYTES))
-		nft_buf_u64(&b, type, ctr->bytes, BYTES);
+	if (e->flags & (1 << NFTNL_EXPR_CTR_PACKETS))
+		nftnl_buf_u64(&b, type, ctr->pkts, PKTS);
+	if (e->flags & (1 << NFTNL_EXPR_CTR_BYTES))
+		nftnl_buf_u64(&b, type, ctr->bytes, BYTES);
 
-	return nft_buf_done(&b);
+	return nftnl_buf_done(&b);
 }
 
-static int nft_rule_expr_counter_snprintf_default(char *buf, size_t len,
-						  struct nft_rule_expr *e)
+static int nftnl_rule_expr_counter_snprintf_default(char *buf, size_t len,
+						  struct nftnl_rule_expr *e)
 {
-	struct nft_expr_counter *ctr = nft_expr_data(e);
+	struct nftnl_expr_counter *ctr = nftnl_expr_data(e);
 
 	return snprintf(buf, len, "pkts %"PRIu64" bytes %"PRIu64" ",
 			ctr->pkts, ctr->bytes);
 }
 
-static int nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
+static int nftnl_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 					  uint32_t flags,
-					  struct nft_rule_expr *e)
+					  struct nftnl_rule_expr *e)
 {
 	switch (type) {
-	case NFT_OUTPUT_DEFAULT:
-		return nft_rule_expr_counter_snprintf_default(buf, len, e);
-	case NFT_OUTPUT_XML:
-	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_counter_export(buf, len, e, type);
+	case NFTNL_OUTPUT_DEFAULT:
+		return nftnl_rule_expr_counter_snprintf_default(buf, len, e);
+	case NFTNL_OUTPUT_XML:
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_rule_expr_counter_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -200,13 +200,13 @@ static int nft_rule_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 
 struct expr_ops expr_ops_counter = {
 	.name		= "counter",
-	.alloc_len	= sizeof(struct nft_expr_counter),
+	.alloc_len	= sizeof(struct nftnl_expr_counter),
 	.max_attr	= NFTA_COUNTER_MAX,
-	.set		= nft_rule_expr_counter_set,
-	.get		= nft_rule_expr_counter_get,
-	.parse		= nft_rule_expr_counter_parse,
-	.build		= nft_rule_expr_counter_build,
-	.snprintf	= nft_rule_expr_counter_snprintf,
-	.xml_parse	= nft_rule_expr_counter_xml_parse,
-	.json_parse	= nft_rule_expr_counter_json_parse,
+	.set		= nftnl_rule_expr_counter_set,
+	.get		= nftnl_rule_expr_counter_get,
+	.parse		= nftnl_rule_expr_counter_parse,
+	.build		= nftnl_rule_expr_counter_build,
+	.snprintf	= nftnl_rule_expr_counter_snprintf,
+	.xml_parse	= nftnl_rule_expr_counter_xml_parse,
+	.json_parse	= nftnl_rule_expr_counter_json_parse,
 };

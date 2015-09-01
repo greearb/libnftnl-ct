@@ -29,77 +29,77 @@
 #include <libnftnl/rule.h>
 #include <libnftnl/expr.h>
 
-static void add_payload(struct nft_rule *r, uint32_t base, uint32_t dreg,
+static void add_payload(struct nftnl_rule *r, uint32_t base, uint32_t dreg,
 			uint32_t offset, uint32_t len)
 {
-	struct nft_rule_expr *e;
+	struct nftnl_rule_expr *e;
 
-	e = nft_rule_expr_alloc("payload");
+	e = nftnl_rule_expr_alloc("payload");
 	if (e == NULL) {
 		perror("expr payload oom");
 		exit(EXIT_FAILURE);
 	}
 
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_BASE, base);
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_DREG, dreg);
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_OFFSET, offset);
-	nft_rule_expr_set_u32(e, NFT_EXPR_PAYLOAD_LEN, len);
+	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
+	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, dreg);
+	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, offset);
+	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, len);
 
-	nft_rule_add_expr(r, e);
+	nftnl_rule_add_expr(r, e);
 }
 
-static void add_cmp(struct nft_rule *r, uint32_t sreg, uint32_t op,
+static void add_cmp(struct nftnl_rule *r, uint32_t sreg, uint32_t op,
 		    const void *data, uint32_t data_len)
 {
-	struct nft_rule_expr *e;
+	struct nftnl_rule_expr *e;
 
-	e = nft_rule_expr_alloc("cmp");
+	e = nftnl_rule_expr_alloc("cmp");
 	if (e == NULL) {
 		perror("expr cmp oom");
 		exit(EXIT_FAILURE);
 	}
 
-	nft_rule_expr_set_u32(e, NFT_EXPR_CMP_SREG, sreg);
-	nft_rule_expr_set_u32(e, NFT_EXPR_CMP_OP, op);
-	nft_rule_expr_set(e, NFT_EXPR_CMP_DATA, data, data_len);
+	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_CMP_SREG, sreg);
+	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_CMP_OP, op);
+	nftnl_rule_expr_set(e, NFTNL_EXPR_CMP_DATA, data, data_len);
 
-	nft_rule_add_expr(r, e);
+	nftnl_rule_add_expr(r, e);
 }
 
-static void add_counter(struct nft_rule *r)
+static void add_counter(struct nftnl_rule *r)
 {
-	struct nft_rule_expr *e;
+	struct nftnl_rule_expr *e;
 
-	e = nft_rule_expr_alloc("counter");
+	e = nftnl_rule_expr_alloc("counter");
 	if (e == NULL) {
 		perror("expr counter oom");
 		exit(EXIT_FAILURE);
 	}
 
-	nft_rule_add_expr(r, e);
+	nftnl_rule_add_expr(r, e);
 }
 
-static struct nft_rule *setup_rule(uint8_t family, const char *table,
+static struct nftnl_rule *setup_rule(uint8_t family, const char *table,
 				   const char *chain, const char *handle)
 {
-	struct nft_rule *r = NULL;
+	struct nftnl_rule *r = NULL;
 	uint8_t proto;
 	uint16_t dport;
 	uint64_t handle_num;
 
-	r = nft_rule_alloc();
+	r = nftnl_rule_alloc();
 	if (r == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
 	}
 
-	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, table);
-	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, chain);
-	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, family);
+	nftnl_rule_attr_set(r, NFTNL_RULE_ATTR_TABLE, table);
+	nftnl_rule_attr_set(r, NFTNL_RULE_ATTR_CHAIN, chain);
+	nftnl_rule_attr_set_u32(r, NFTNL_RULE_ATTR_FAMILY, family);
 
 	if (handle != NULL) {
 		handle_num = atoll(handle);
-		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_POSITION, handle_num);
+		nftnl_rule_attr_set_u64(r, NFTNL_RULE_ATTR_POSITION, handle_num);
 	}
 
 	proto = IPPROTO_TCP;
@@ -117,7 +117,7 @@ static struct nft_rule *setup_rule(uint8_t family, const char *table,
 	return r;
 }
 
-static void nft_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
+static void nftnl_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
 {
 	struct nlmsghdr *nlh;
 	struct nfgenmsg *nfg;
@@ -136,7 +136,7 @@ static void nft_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
 int main(int argc, char *argv[])
 {
 	struct mnl_socket *nl;
-	struct nft_rule *r;
+	struct nftnl_rule *r;
 	struct nlmsghdr *nlh;
 	struct mnl_nlmsg_batch *batch;
 	uint8_t family;
@@ -176,20 +176,20 @@ int main(int argc, char *argv[])
 
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	nft_mnl_batch_put(mnl_nlmsg_batch_current(batch),
+	nftnl_mnl_batch_put(mnl_nlmsg_batch_current(batch),
 			  NFNL_MSG_BATCH_BEGIN, seq++);
 	mnl_nlmsg_batch_next(batch);
 
-	nlh = nft_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 			NFT_MSG_NEWRULE,
-			nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY),
+			nftnl_rule_attr_get_u32(r, NFTNL_RULE_ATTR_FAMILY),
 			NLM_F_APPEND|NLM_F_CREATE|NLM_F_ACK, seq++);
 
-	nft_rule_nlmsg_build_payload(nlh, r);
-	nft_rule_free(r);
+	nftnl_rule_nlmsg_build_payload(nlh, r);
+	nftnl_rule_free(r);
 	mnl_nlmsg_batch_next(batch);
 
-	nft_mnl_batch_put(mnl_nlmsg_batch_current(batch), NFNL_MSG_BATCH_END,
+	nftnl_mnl_batch_put(mnl_nlmsg_batch_current(batch), NFNL_MSG_BATCH_END,
 			 seq++);
 	mnl_nlmsg_batch_next(batch);
 

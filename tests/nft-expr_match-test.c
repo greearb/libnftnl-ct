@@ -34,71 +34,71 @@ static void print_err2(const char *msg, uint32_t a, uint32_t b)
 	printf("\033[31mERROR:\e[0m %s size a: %d b: %d \n", msg, a, b);
 }
 
-static void cmp_nft_rule_expr(struct nft_rule_expr *rule_a,
-			      struct nft_rule_expr *rule_b)
+static void cmp_nftnl_rule_expr(struct nftnl_rule_expr *rule_a,
+			      struct nftnl_rule_expr *rule_b)
 {
 	uint32_t lena, lenb;
 
-	if (strcmp(nft_rule_expr_get_str(rule_a, NFT_EXPR_MT_NAME),
-		   nft_rule_expr_get_str(rule_b, NFT_EXPR_MT_NAME)) != 0)
-		print_err("Expr NFT_EXPR_MT_NAME mismatches");
-	if (nft_rule_expr_get_u32(rule_a, NFT_EXPR_MT_REV) !=
-	    nft_rule_expr_get_u32(rule_b, NFT_EXPR_MT_REV))
-		print_err("Expr NFT_EXPR_MT_REV mismatches");
-	nft_rule_expr_get(rule_a, NFT_EXPR_MT_INFO, &lena);
-	nft_rule_expr_get(rule_b, NFT_EXPR_MT_INFO, &lenb);
+	if (strcmp(nftnl_rule_expr_get_str(rule_a, NFTNL_EXPR_MT_NAME),
+		   nftnl_rule_expr_get_str(rule_b, NFTNL_EXPR_MT_NAME)) != 0)
+		print_err("Expr NFTNL_EXPR_MT_NAME mismatches");
+	if (nftnl_rule_expr_get_u32(rule_a, NFTNL_EXPR_MT_REV) !=
+	    nftnl_rule_expr_get_u32(rule_b, NFTNL_EXPR_MT_REV))
+		print_err("Expr NFTNL_EXPR_MT_REV mismatches");
+	nftnl_rule_expr_get(rule_a, NFTNL_EXPR_MT_INFO, &lena);
+	nftnl_rule_expr_get(rule_b, NFTNL_EXPR_MT_INFO, &lenb);
 	if (lena != lenb)
-		print_err2("Expr NFT_EXPR_MT_INFO size mismatches", lena, lenb);
+		print_err2("Expr NFTNL_EXPR_MT_INFO size mismatches", lena, lenb);
 }
 
 int main(int argc, char *argv[])
 {
-	struct nft_rule *a, *b;
-	struct nft_rule_expr *ex;
+	struct nftnl_rule *a, *b;
+	struct nftnl_rule_expr *ex;
 	struct nlmsghdr *nlh;
 	char buf[4096];
-	struct nft_rule_expr_iter *iter_a, *iter_b;
-	struct nft_rule_expr *rule_a, *rule_b;
+	struct nftnl_rule_expr_iter *iter_a, *iter_b;
+	struct nftnl_rule_expr *rule_a, *rule_b;
 	char data[16] = "0123456789abcdef";
 
-	a = nft_rule_alloc();
-	b = nft_rule_alloc();
+	a = nftnl_rule_alloc();
+	b = nftnl_rule_alloc();
 	if (a == NULL || b == NULL)
 		print_err("OOM");
-	ex = nft_rule_expr_alloc("match");
+	ex = nftnl_rule_expr_alloc("match");
 	if (ex == NULL)
 		print_err("OOM");
 
-	nft_rule_expr_set_str(ex, NFT_EXPR_MT_NAME, "Tests");
-	nft_rule_expr_set_u32(ex, NFT_EXPR_MT_REV, 0x12345678);
-	nft_rule_expr_set(ex, NFT_EXPR_MT_INFO, strdup(data), sizeof(data));
-	nft_rule_add_expr(a, ex);
+	nftnl_rule_expr_set_str(ex, NFTNL_EXPR_MT_NAME, "Tests");
+	nftnl_rule_expr_set_u32(ex, NFTNL_EXPR_MT_REV, 0x12345678);
+	nftnl_rule_expr_set(ex, NFTNL_EXPR_MT_INFO, strdup(data), sizeof(data));
+	nftnl_rule_add_expr(a, ex);
 
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, AF_INET, 0, 1234);
-	nft_rule_nlmsg_build_payload(nlh, a);
+	nlh = nftnl_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, AF_INET, 0, 1234);
+	nftnl_rule_nlmsg_build_payload(nlh, a);
 
-	if (nft_rule_nlmsg_parse(nlh, b) < 0)
+	if (nftnl_rule_nlmsg_parse(nlh, b) < 0)
 		print_err("parsing problems");
-	iter_a = nft_rule_expr_iter_create(a);
-	iter_b = nft_rule_expr_iter_create(b);
+	iter_a = nftnl_rule_expr_iter_create(a);
+	iter_b = nftnl_rule_expr_iter_create(b);
 	if (iter_a == NULL || iter_b == NULL)
 		print_err("OOM");
 
-	rule_a = nft_rule_expr_iter_next(iter_a);
-	rule_b = nft_rule_expr_iter_next(iter_b);
+	rule_a = nftnl_rule_expr_iter_next(iter_a);
+	rule_b = nftnl_rule_expr_iter_next(iter_b);
 	if (rule_a == NULL || rule_b == NULL)
 		print_err("OOM");
 
-	cmp_nft_rule_expr(rule_a, rule_b);
+	cmp_nftnl_rule_expr(rule_a, rule_b);
 
-	if (nft_rule_expr_iter_next(iter_a) != NULL ||
-	    nft_rule_expr_iter_next(iter_b) != NULL)
+	if (nftnl_rule_expr_iter_next(iter_a) != NULL ||
+	    nftnl_rule_expr_iter_next(iter_b) != NULL)
 		print_err("More 1 expr.");
 
-	nft_rule_expr_iter_destroy(iter_a);
-	nft_rule_expr_iter_destroy(iter_b);
-	nft_rule_free(a);
-	nft_rule_free(b);
+	nftnl_rule_expr_iter_destroy(iter_a);
+	nftnl_rule_expr_iter_destroy(iter_b);
+	nftnl_rule_free(a);
+	nftnl_rule_free(b);
 
 	if (!test_ok)
 		exit(EXIT_FAILURE);

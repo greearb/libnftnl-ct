@@ -49,7 +49,7 @@ static struct expr_ops *expr_ops[] = {
 	NULL,
 };
 
-struct expr_ops *nft_expr_ops_lookup(const char *name)
+struct expr_ops *nftnl_expr_ops_lookup(const char *name)
 {
 	int i = 0;
 

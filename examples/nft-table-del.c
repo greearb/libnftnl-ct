@@ -20,9 +20,9 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/table.h>
 
-static struct nft_table *table_del_parse(int argc, char *argv[])
+static struct nftnl_table *table_del_parse(int argc, char *argv[])
 {
-	struct nft_table *t;
+	struct nftnl_table *t;
 	uint16_t family;
 
 	if (strcmp(argv[1], "ip") == 0)
@@ -38,14 +38,14 @@ static struct nft_table *table_del_parse(int argc, char *argv[])
 		return NULL;
 	}
 
-	t = nft_table_alloc();
+	t = nftnl_table_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		return NULL;
 	}
 
-	nft_table_attr_set_str(t, NFT_TABLE_ATTR_NAME, argv[2]);
-	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FAMILY, family);
+	nftnl_table_attr_set_str(t, NFTNL_TABLE_ATTR_NAME, argv[2]);
+	nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_FAMILY, family);
 
 	return t;
 }
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, table_seq, family;
-	struct nft_table *t;
+	struct nftnl_table *t;
 	struct mnl_nlmsg_batch *batch;
 	int ret, batching;
 
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	if (t == NULL)
 		exit(EXIT_FAILURE);
 
-	batching = nft_batch_is_supported();
+	batching = nftnl_batch_is_supported();
 	if (batching < 0) {
 		perror("cannot talk to nfnetlink");
 		exit(EXIT_FAILURE);
@@ -79,21 +79,21 @@ int main(int argc, char *argv[])
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
 	if (batching) {
-		nft_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 
 	table_seq = seq;
-	family = nft_table_attr_get_u32(t, NFT_TABLE_ATTR_FAMILY);
-	nlh = nft_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+	family = nftnl_table_attr_get_u32(t, NFTNL_TABLE_ATTR_FAMILY);
+	nlh = nftnl_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 					NFT_MSG_DELTABLE, family,
 					NLM_F_ACK, seq++);
-	nft_table_nlmsg_build_payload(nlh, t);
+	nftnl_table_nlmsg_build_payload(nlh, t);
 	mnl_nlmsg_batch_next(batch);
-	nft_table_free(t);
+	nftnl_table_free(t);
 
 	if (batching) {
-		nft_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 

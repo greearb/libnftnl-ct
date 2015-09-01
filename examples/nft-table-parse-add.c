@@ -25,14 +25,14 @@
 #include <libnftnl/table.h>
 #include <libnftnl/common.h>
 
-static struct nft_table *table_parse_file(const char *file, uint16_t format)
+static struct nftnl_table *table_parse_file(const char *file, uint16_t format)
 {
 	int fd;
-	struct nft_table *t;
-	struct nft_parse_err *err;
+	struct nftnl_table *t;
+	struct nftnl_parse_err *err;
 	char data[4096];
 
-	t = nft_table_alloc();
+	t = nftnl_table_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		return NULL;
@@ -51,19 +51,19 @@ static struct nft_table *table_parse_file(const char *file, uint16_t format)
 	}
 	close(fd);
 
-	err = nft_parse_err_alloc();
+	err = nftnl_parse_err_alloc();
 	if (err == NULL) {
 		perror("error");
 		return NULL;
 	}
 
-	if (nft_table_parse(t, format, data, err) < 0) {
-		nft_parse_perror("Unable to parse file", err);
-		nft_parse_err_free(err);
+	if (nftnl_table_parse(t, format, data, err) < 0) {
+		nftnl_parse_perror("Unable to parse file", err);
+		nftnl_parse_err_free(err);
 		return NULL;
 	}
 
-	nft_parse_err_free(err);
+	nftnl_parse_err_free(err);
 	return t;
 
 }
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, table_seq;
-	struct nft_table *t = NULL;
+	struct nftnl_table *t = NULL;
 	int ret, batching;
 	uint16_t family, format, outformat;
 	struct mnl_nlmsg_batch *batch;
@@ -85,11 +85,11 @@ int main(int argc, char *argv[])
 	}
 
 	if (strcmp(argv[1], "xml") == 0) {
-		format = NFT_PARSE_XML;
-		outformat = NFT_OUTPUT_XML;
+		format = NFTNL_PARSE_XML;
+		outformat = NFTNL_OUTPUT_XML;
 	} else if (strcmp(argv[1], "json") == 0) {
-		format = NFT_PARSE_JSON;
-		outformat = NFT_OUTPUT_JSON;
+		format = NFTNL_PARSE_JSON;
+		outformat = NFTNL_OUTPUT_JSON;
 	} else {
 		printf("Unknown format: xml, json\n");
 		exit(EXIT_FAILURE);
@@ -99,11 +99,11 @@ int main(int argc, char *argv[])
 	if (t == NULL)
 		exit(EXIT_FAILURE);
 
-	nft_table_fprintf(stdout, t, outformat, 0);
+	nftnl_table_fprintf(stdout, t, outformat, 0);
 	fprintf(stdout, "\n");
 
 	seq = time(NULL);
-	batching = nft_batch_is_supported();
+	batching = nftnl_batch_is_supported();
 	if (batching < 0) {
 		perror("cannot talk to nfnetlink");
 		exit(EXIT_FAILURE);
@@ -112,22 +112,22 @@ int main(int argc, char *argv[])
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
 	if (batching) {
-		nft_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 
-	family = nft_table_attr_get_u32(t, NFT_TABLE_ATTR_FAMILY);
+	family = nftnl_table_attr_get_u32(t, NFTNL_TABLE_ATTR_FAMILY);
 
 	table_seq = seq;
-	nlh = nft_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+	nlh = nftnl_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 					NFT_MSG_NEWTABLE, family,
 					NLM_F_CREATE|NLM_F_ACK, seq++);
-	nft_table_nlmsg_build_payload(nlh, t);
-	nft_table_free(t);
+	nftnl_table_nlmsg_build_payload(nlh, t);
+	nftnl_table_free(t);
 	mnl_nlmsg_batch_next(batch);
 
 	if (batching) {
-		nft_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 

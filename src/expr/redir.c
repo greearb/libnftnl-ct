@@ -20,26 +20,26 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 
-struct nft_expr_redir {
+struct nftnl_expr_redir {
 	enum nft_registers sreg_proto_min;
 	enum nft_registers sreg_proto_max;
 	uint32_t	flags;
 };
 
 static int
-nft_rule_expr_redir_set(struct nft_rule_expr *e, uint16_t type,
+nftnl_rule_expr_redir_set(struct nftnl_rule_expr *e, uint16_t type,
 			const void *data, uint32_t data_len)
 {
-	struct nft_expr_redir *redir = nft_expr_data(e);
+	struct nftnl_expr_redir *redir = nftnl_expr_data(e);
 
 	switch (type) {
-	case NFT_EXPR_REDIR_REG_PROTO_MIN:
+	case NFTNL_EXPR_REDIR_REG_PROTO_MIN:
 		redir->sreg_proto_min = *((uint32_t *)data);
 		break;
-	case NFT_EXPR_REDIR_REG_PROTO_MAX:
+	case NFTNL_EXPR_REDIR_REG_PROTO_MAX:
 		redir->sreg_proto_max = *((uint32_t *)data);
 		break;
-	case NFT_EXPR_REDIR_FLAGS:
+	case NFTNL_EXPR_REDIR_FLAGS:
 		redir->flags = *((uint32_t *)data);
 		break;
 	default:
@@ -49,26 +49,26 @@ nft_rule_expr_redir_set(struct nft_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nft_rule_expr_redir_get(const struct nft_rule_expr *e, uint16_t type,
+nftnl_rule_expr_redir_get(const struct nftnl_rule_expr *e, uint16_t type,
 			uint32_t *data_len)
 {
-	struct nft_expr_redir *redir = nft_expr_data(e);
+	struct nftnl_expr_redir *redir = nftnl_expr_data(e);
 
 	switch (type) {
-	case NFT_EXPR_REDIR_REG_PROTO_MIN:
+	case NFTNL_EXPR_REDIR_REG_PROTO_MIN:
 		*data_len = sizeof(redir->sreg_proto_min);
 		return &redir->sreg_proto_min;
-	case NFT_EXPR_REDIR_REG_PROTO_MAX:
+	case NFTNL_EXPR_REDIR_REG_PROTO_MAX:
 		*data_len = sizeof(redir->sreg_proto_max);
 		return &redir->sreg_proto_max;
-	case NFT_EXPR_REDIR_FLAGS:
+	case NFTNL_EXPR_REDIR_FLAGS:
 		*data_len = sizeof(redir->flags);
 		return &redir->flags;
 	}
 	return NULL;
 }
 
-static int nft_rule_expr_redir_cb(const struct nlattr *attr, void *data)
+static int nftnl_rule_expr_redir_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -90,65 +90,65 @@ static int nft_rule_expr_redir_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nft_rule_expr_redir_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
+nftnl_rule_expr_redir_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 {
-	struct nft_expr_redir *redir = nft_expr_data(e);
+	struct nftnl_expr_redir *redir = nftnl_expr_data(e);
 
-	if (e->flags & (1 << NFT_EXPR_REDIR_REG_PROTO_MIN))
+	if (e->flags & (1 << NFTNL_EXPR_REDIR_REG_PROTO_MIN))
 		mnl_attr_put_u32(nlh, NFTA_REDIR_REG_PROTO_MIN,
 				 htobe32(redir->sreg_proto_min));
-	if (e->flags & (1 << NFT_EXPR_REDIR_REG_PROTO_MAX))
+	if (e->flags & (1 << NFTNL_EXPR_REDIR_REG_PROTO_MAX))
 		mnl_attr_put_u32(nlh, NFTA_REDIR_REG_PROTO_MAX,
 				 htobe32(redir->sreg_proto_max));
-	if (e->flags & (1 << NFT_EXPR_REDIR_FLAGS))
+	if (e->flags & (1 << NFTNL_EXPR_REDIR_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_REDIR_FLAGS, htobe32(redir->flags));
 }
 
 static int
-nft_rule_expr_redir_parse(struct nft_rule_expr *e, struct nlattr *attr)
+nftnl_rule_expr_redir_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
 {
-	struct nft_expr_redir *redir = nft_expr_data(e);
+	struct nftnl_expr_redir *redir = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_REDIR_MAX + 1] = {};
 
-	if (mnl_attr_parse_nested(attr, nft_rule_expr_redir_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_redir_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_REDIR_REG_PROTO_MIN]) {
 		redir->sreg_proto_min =
 			ntohl(mnl_attr_get_u32(tb[NFTA_REDIR_REG_PROTO_MIN]));
-		e->flags |= (1 << NFT_EXPR_REDIR_REG_PROTO_MIN);
+		e->flags |= (1 << NFTNL_EXPR_REDIR_REG_PROTO_MIN);
 	}
 	if (tb[NFTA_REDIR_REG_PROTO_MAX]) {
 		redir->sreg_proto_max =
 			ntohl(mnl_attr_get_u32(tb[NFTA_REDIR_REG_PROTO_MAX]));
-		e->flags |= (1 << NFT_EXPR_REDIR_REG_PROTO_MAX);
+		e->flags |= (1 << NFTNL_EXPR_REDIR_REG_PROTO_MAX);
 	}
 	if (tb[NFTA_REDIR_FLAGS]) {
 		redir->flags = be32toh(mnl_attr_get_u32(tb[NFTA_REDIR_FLAGS]));
-		e->flags |= (1 << NFT_EXPR_REDIR_FLAGS);
+		e->flags |= (1 << NFTNL_EXPR_REDIR_FLAGS);
 	}
 
 	return 0;
 }
 
 static int
-nft_rule_expr_redir_json_parse(struct nft_rule_expr *e, json_t *root,
-			       struct nft_parse_err *err)
+nftnl_rule_expr_redir_json_parse(struct nftnl_rule_expr *e, json_t *root,
+			       struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
 	uint32_t reg, flags;
 
-	if (nft_jansson_parse_reg(root, "sreg_proto_min", NFT_TYPE_U32,
+	if (nftnl_jansson_parse_reg(root, "sreg_proto_min", NFTNL_TYPE_U32,
 				  &reg, err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_REDIR_REG_PROTO_MIN, reg);
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_REDIR_REG_PROTO_MIN, reg);
 
-	if (nft_jansson_parse_reg(root, "sreg_proto_max", NFT_TYPE_U32,
+	if (nftnl_jansson_parse_reg(root, "sreg_proto_max", NFTNL_TYPE_U32,
 				  &reg, err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_REDIR_REG_PROTO_MAX, reg);
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_REDIR_REG_PROTO_MAX, reg);
 
-	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &flags,
+	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
 				  err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_REDIR_FLAGS, flags);
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_REDIR_FLAGS, flags);
 
 	return 0;
 #else
@@ -158,23 +158,23 @@ nft_rule_expr_redir_json_parse(struct nft_rule_expr *e, json_t *root,
 }
 
 static int
-nft_rule_expr_redir_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
-			      struct nft_parse_err *err)
+nftnl_rule_expr_redir_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+			      struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
 	uint32_t reg, flags;
 
-	if (nft_mxml_reg_parse(tree, "sreg_proto_min", &reg,
-			       MXML_DESCEND, NFT_XML_OPT, err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_REDIR_REG_PROTO_MIN, reg);
+	if (nftnl_mxml_reg_parse(tree, "sreg_proto_min", &reg,
+			       MXML_DESCEND, NFTNL_XML_OPT, err) == 0)
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_REDIR_REG_PROTO_MIN, reg);
 
-	if (nft_mxml_reg_parse(tree, "sreg_proto_max", &reg,
-			       MXML_DESCEND, NFT_XML_OPT, err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_REDIR_REG_PROTO_MAX, reg);
+	if (nftnl_mxml_reg_parse(tree, "sreg_proto_max", &reg,
+			       MXML_DESCEND, NFTNL_XML_OPT, err) == 0)
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_REDIR_REG_PROTO_MAX, reg);
 
-	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &flags, NFT_TYPE_U32, NFT_XML_OPT, err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_REDIR_FLAGS, flags);
+	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
+			       &flags, NFTNL_TYPE_U32, NFTNL_XML_OPT, err) == 0)
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_REDIR_FLAGS, flags);
 
 	return 0;
 #else
@@ -183,41 +183,41 @@ nft_rule_expr_redir_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int nft_rule_expr_redir_export(char *buf, size_t size,
-				      struct nft_rule_expr *e, int type)
+static int nftnl_rule_expr_redir_export(char *buf, size_t size,
+				      struct nftnl_rule_expr *e, int type)
 {
-	struct nft_expr_redir *redir = nft_expr_data(e);
-        NFT_BUF_INIT(b, buf, size);
+	struct nftnl_expr_redir *redir = nftnl_expr_data(e);
+        NFTNL_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_REDIR_REG_PROTO_MIN))
-		nft_buf_u32(&b, type, redir->sreg_proto_min, SREG_PROTO_MIN);
-	if (e->flags & (1 << NFT_EXPR_REDIR_REG_PROTO_MAX))
-		nft_buf_u32(&b, type, redir->sreg_proto_max, SREG_PROTO_MAX);
-	if (e->flags & (1 << NFT_EXPR_REDIR_FLAGS))
-		nft_buf_u32(&b, type, redir->flags, FLAGS);
+	if (e->flags & (1 << NFTNL_EXPR_REDIR_REG_PROTO_MIN))
+		nftnl_buf_u32(&b, type, redir->sreg_proto_min, SREG_PROTO_MIN);
+	if (e->flags & (1 << NFTNL_EXPR_REDIR_REG_PROTO_MAX))
+		nftnl_buf_u32(&b, type, redir->sreg_proto_max, SREG_PROTO_MAX);
+	if (e->flags & (1 << NFTNL_EXPR_REDIR_FLAGS))
+		nftnl_buf_u32(&b, type, redir->flags, FLAGS);
 
-	return nft_buf_done(&b);
+	return nftnl_buf_done(&b);
 }
 
-static int nft_rule_expr_redir_snprintf_default(char *buf, size_t len,
-						struct nft_rule_expr *e)
+static int nftnl_rule_expr_redir_snprintf_default(char *buf, size_t len,
+						struct nftnl_rule_expr *e)
 {
 	int ret, size = len, offset = 0;
-	struct nft_expr_redir *redir = nft_expr_data(e);
+	struct nftnl_expr_redir *redir = nftnl_expr_data(e);
 
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_REG_PROTO_MIN)) {
+	if (nftnl_rule_expr_is_set(e, NFTNL_EXPR_REDIR_REG_PROTO_MIN)) {
 		ret = snprintf(buf + offset, len, "proto_min reg %u ",
 			       redir->sreg_proto_min);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_REG_PROTO_MAX)) {
+	if (nftnl_rule_expr_is_set(e, NFTNL_EXPR_REDIR_REG_PROTO_MAX)) {
 		ret = snprintf(buf + offset, len, "proto_max reg %u ",
 			       redir->sreg_proto_max);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	if (nft_rule_expr_is_set(e, NFT_EXPR_REDIR_FLAGS)) {
+	if (nftnl_rule_expr_is_set(e, NFTNL_EXPR_REDIR_FLAGS)) {
 		ret = snprintf(buf + offset , len, "flags 0x%x ",
 			       redir->flags);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
@@ -227,15 +227,15 @@ static int nft_rule_expr_redir_snprintf_default(char *buf, size_t len,
 }
 
 static int
-nft_rule_expr_redir_snprintf(char *buf, size_t len, uint32_t type,
-			     uint32_t flags, struct nft_rule_expr *e)
+nftnl_rule_expr_redir_snprintf(char *buf, size_t len, uint32_t type,
+			     uint32_t flags, struct nftnl_rule_expr *e)
 {
 	switch (type) {
-	case NFT_OUTPUT_DEFAULT:
-		return nft_rule_expr_redir_snprintf_default(buf, len, e);
-	case NFT_OUTPUT_XML:
-	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_redir_export(buf, len, e, type);
+	case NFTNL_OUTPUT_DEFAULT:
+		return nftnl_rule_expr_redir_snprintf_default(buf, len, e);
+	case NFTNL_OUTPUT_XML:
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_rule_expr_redir_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -244,13 +244,13 @@ nft_rule_expr_redir_snprintf(char *buf, size_t len, uint32_t type,
 
 struct expr_ops expr_ops_redir = {
 	.name		= "redir",
-	.alloc_len	= sizeof(struct nft_expr_redir),
+	.alloc_len	= sizeof(struct nftnl_expr_redir),
 	.max_attr	= NFTA_REDIR_MAX,
-	.set		= nft_rule_expr_redir_set,
-	.get		= nft_rule_expr_redir_get,
-	.parse		= nft_rule_expr_redir_parse,
-	.build		= nft_rule_expr_redir_build,
-	.snprintf	= nft_rule_expr_redir_snprintf,
-	.xml_parse	= nft_rule_expr_redir_xml_parse,
-	.json_parse	= nft_rule_expr_redir_json_parse,
+	.set		= nftnl_rule_expr_redir_set,
+	.get		= nftnl_rule_expr_redir_get,
+	.parse		= nftnl_rule_expr_redir_parse,
+	.build		= nftnl_rule_expr_redir_build,
+	.snprintf	= nftnl_rule_expr_redir_snprintf,
+	.xml_parse	= nftnl_rule_expr_redir_xml_parse,
+	.json_parse	= nftnl_rule_expr_redir_json_parse,
 };

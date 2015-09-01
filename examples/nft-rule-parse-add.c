@@ -27,11 +27,11 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/rule.h>
 
-static struct nft_rule *rule_parse_file(const char *file, uint16_t format)
+static struct nftnl_rule *rule_parse_file(const char *file, uint16_t format)
 {
 	int fd;
-	struct nft_rule *r;
-	struct nft_parse_err *err;
+	struct nftnl_rule *r;
+	struct nftnl_parse_err *err;
 	char data[4096];
 
 	fd = open(file, O_RDONLY);
@@ -47,28 +47,28 @@ static struct nft_rule *rule_parse_file(const char *file, uint16_t format)
 	}
 	close(fd);
 
-	r = nft_rule_alloc();
+	r = nftnl_rule_alloc();
 	if (r == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
 	}
 
-	err = nft_parse_err_alloc();
+	err = nftnl_parse_err_alloc();
 	if (err == NULL) {
 		perror("error");
 		exit(EXIT_FAILURE);
 	}
 
-	if (nft_rule_parse(r, format, data, err) < 0) {
-		nft_parse_perror("Unable to parse file", err);
-		nft_parse_err_free(err);
-		nft_rule_free(r);
+	if (nftnl_rule_parse(r, format, data, err) < 0) {
+		nftnl_parse_perror("Unable to parse file", err);
+		nftnl_parse_err_free(err);
+		nftnl_rule_free(r);
 		return NULL;
 	}
 
-	nft_rule_attr_unset(r, NFT_RULE_ATTR_HANDLE);
+	nftnl_rule_attr_unset(r, NFTNL_RULE_ATTR_HANDLE);
 
-	nft_parse_err_free(err);
+	nftnl_parse_err_free(err);
 	return r;
 }
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, rule_seq;
-	struct nft_rule *r;
+	struct nftnl_rule *r;
 	int ret, batching;
 	uint16_t family, format, outformat;
 
@@ -89,11 +89,11 @@ int main(int argc, char *argv[])
 	}
 
 	if (strcmp(argv[1], "xml") == 0) {
-		format = NFT_PARSE_XML;
-		outformat = NFT_OUTPUT_XML;
+		format = NFTNL_PARSE_XML;
+		outformat = NFTNL_OUTPUT_XML;
 	} else if (strcmp(argv[1], "json") == 0) {
-		format = NFT_PARSE_JSON;
-		outformat = NFT_OUTPUT_JSON;
+		format = NFTNL_PARSE_JSON;
+		outformat = NFTNL_OUTPUT_JSON;
 	} else {
 		printf("Unknown format: xml, json\n");
 		exit(EXIT_FAILURE);
@@ -103,10 +103,10 @@ int main(int argc, char *argv[])
 	if (r == NULL)
 		exit(EXIT_FAILURE);
 
-	nft_rule_fprintf(stdout, r, outformat, 0);
+	nftnl_rule_fprintf(stdout, r, outformat, 0);
 	fprintf(stdout, "\n");
 
-	batching = nft_batch_is_supported();
+	batching = nftnl_batch_is_supported();
 	if (batching < 0) {
 		perror("Cannot talk to nfnetlink");
 		exit(EXIT_FAILURE);
@@ -116,22 +116,22 @@ int main(int argc, char *argv[])
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
 	if (batching) {
-		nft_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 
 	rule_seq = seq;
-	family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
-	nlh = nft_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+	family = nftnl_rule_attr_get_u32(r, NFTNL_RULE_ATTR_FAMILY);
+	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				       NFT_MSG_NEWRULE, family,
 				       NLM_F_CREATE|NLM_F_APPEND|NLM_F_ACK,
 				       seq++);
-	nft_rule_nlmsg_build_payload(nlh, r);
-	nft_rule_free(r);
+	nftnl_rule_nlmsg_build_payload(nlh, r);
+	nftnl_rule_free(r);
 	mnl_nlmsg_batch_next(batch);
 
 	if (batching) {
-		nft_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 

@@ -67,37 +67,37 @@ out:
  */
 static int rule_cb(const struct nlmsghdr *nlh, void *data)
 {
-	struct nft_rule_list *nlr_list = data;
-	struct nft_rule *r;
+	struct nftnl_rule_list *nlr_list = data;
+	struct nftnl_rule *r;
 
-	r = nft_rule_alloc();
+	r = nftnl_rule_alloc();
 	if (r == NULL)
 		memory_allocation_error();
 
-	if (nft_rule_nlmsg_parse(nlh, r) < 0)
+	if (nftnl_rule_nlmsg_parse(nlh, r) < 0)
 		goto err_free;
 
-	nft_rule_list_add_tail(r, nlr_list);
+	nftnl_rule_list_add_tail(r, nlr_list);
 	return MNL_CB_OK;
 
 err_free:
-	nft_rule_free(r);
+	nftnl_rule_free(r);
 	return MNL_CB_OK;
 }
 
-static struct nft_rule_list *mnl_rule_dump(struct mnl_socket *nf_sock,
+static struct nftnl_rule_list *mnl_rule_dump(struct mnl_socket *nf_sock,
 					   int family)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	struct nft_rule_list *nlr_list;
+	struct nftnl_rule_list *nlr_list;
 	int ret;
 
-	nlr_list = nft_rule_list_alloc();
+	nlr_list = nftnl_rule_list_alloc();
 	if (nlr_list == NULL)
 		memory_allocation_error();
 
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
+	nlh = nftnl_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
 				       NLM_F_DUMP, seq);
 
 	ret = mnl_talk(nf_sock, nlh, nlh->nlmsg_len, rule_cb, nlr_list);
@@ -106,7 +106,7 @@ static struct nft_rule_list *mnl_rule_dump(struct mnl_socket *nf_sock,
 
 	return nlr_list;
 err:
-	nft_rule_list_free(nlr_list);
+	nftnl_rule_list_free(nlr_list);
 	return NULL;
 }
 
@@ -115,37 +115,37 @@ err:
  */
 static int chain_cb(const struct nlmsghdr *nlh, void *data)
 {
-	struct nft_chain_list *nlc_list = data;
-	struct nft_chain *c;
+	struct nftnl_chain_list *nlc_list = data;
+	struct nftnl_chain *c;
 
-	c = nft_chain_alloc();
+	c = nftnl_chain_alloc();
 	if (c == NULL)
 		memory_allocation_error();
 
-	if (nft_chain_nlmsg_parse(nlh, c) < 0)
+	if (nftnl_chain_nlmsg_parse(nlh, c) < 0)
 		goto err_free;
 
-	nft_chain_list_add_tail(c, nlc_list);
+	nftnl_chain_list_add_tail(c, nlc_list);
 	return MNL_CB_OK;
 
 err_free:
-	nft_chain_free(c);
+	nftnl_chain_free(c);
 	return MNL_CB_OK;
 }
 
-static struct nft_chain_list *mnl_chain_dump(struct mnl_socket *nf_sock,
+static struct nftnl_chain_list *mnl_chain_dump(struct mnl_socket *nf_sock,
 					     int family)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	struct nft_chain_list *nlc_list;
+	struct nftnl_chain_list *nlc_list;
 	int ret;
 
-	nlc_list = nft_chain_list_alloc();
+	nlc_list = nftnl_chain_list_alloc();
 	if (nlc_list == NULL)
 		memory_allocation_error();
 
-	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
+	nlh = nftnl_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
 					NLM_F_DUMP, seq);
 
 	ret = mnl_talk(nf_sock, nlh, nlh->nlmsg_len, chain_cb, nlc_list);
@@ -154,7 +154,7 @@ static struct nft_chain_list *mnl_chain_dump(struct mnl_socket *nf_sock,
 
 	return nlc_list;
 err:
-	nft_chain_list_free(nlc_list);
+	nftnl_chain_list_free(nlc_list);
 	return NULL;
 }
 
@@ -163,37 +163,37 @@ err:
  */
 static int table_cb(const struct nlmsghdr *nlh, void *data)
 {
-	struct nft_table_list *nlt_list = data;
-	struct nft_table *t;
+	struct nftnl_table_list *nlt_list = data;
+	struct nftnl_table *t;
 
-	t = nft_table_alloc();
+	t = nftnl_table_alloc();
 	if (t == NULL)
 		memory_allocation_error();
 
-	if (nft_table_nlmsg_parse(nlh, t) < 0)
+	if (nftnl_table_nlmsg_parse(nlh, t) < 0)
 		goto err_free;
 
-	nft_table_list_add_tail(t, nlt_list);
+	nftnl_table_list_add_tail(t, nlt_list);
 	return MNL_CB_OK;
 
 err_free:
-	nft_table_free(t);
+	nftnl_table_free(t);
 	return MNL_CB_OK;
 }
 
-static struct nft_table_list *mnl_table_dump(struct mnl_socket *nf_sock,
+static struct nftnl_table_list *mnl_table_dump(struct mnl_socket *nf_sock,
 					     int family)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	struct nft_table_list *nlt_list;
+	struct nftnl_table_list *nlt_list;
 	int ret;
 
-	nlt_list = nft_table_list_alloc();
+	nlt_list = nftnl_table_list_alloc();
 	if (nlt_list == NULL)
 		memory_allocation_error();
 
-	nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
+	nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
 					NLM_F_DUMP, seq);
 
 	ret = mnl_talk(nf_sock, nlh, nlh->nlmsg_len, table_cb, nlt_list);
@@ -202,7 +202,7 @@ static struct nft_table_list *mnl_table_dump(struct mnl_socket *nf_sock,
 
 	return nlt_list;
 err:
-	nft_table_list_free(nlt_list);
+	nftnl_table_list_free(nlt_list);
 	return NULL;
 }
 
@@ -211,19 +211,19 @@ err:
  */
 static int set_elem_cb(const struct nlmsghdr *nlh, void *data)
 {
-	nft_set_elems_nlmsg_parse(nlh, data);
+	nftnl_set_elems_nlmsg_parse(nlh, data);
 	return MNL_CB_OK;
 }
 
-static int mnl_setelem_get(struct mnl_socket *nf_sock, struct nft_set *nls)
+static int mnl_setelem_get(struct mnl_socket *nf_sock, struct nftnl_set *nls)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t family = nft_set_attr_get_u32(nls, NFT_SET_ATTR_FAMILY);
+	uint32_t family = nftnl_set_attr_get_u32(nls, NFTNL_SET_ATTR_FAMILY);
 
-	nlh = nft_set_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
+	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
 				      NLM_F_DUMP|NLM_F_ACK, seq);
-	nft_set_nlmsg_build_payload(nlh, nls);
+	nftnl_set_nlmsg_build_payload(nlh, nls);
 
 	return mnl_talk(nf_sock, nlh, nlh->nlmsg_len, set_elem_cb, nls);
 }
@@ -233,45 +233,45 @@ static int mnl_setelem_get(struct mnl_socket *nf_sock, struct nft_set *nls)
  */
 static int set_cb(const struct nlmsghdr *nlh, void *data)
 {
-	struct nft_set_list *nls_list = data;
-	struct nft_set *s;
+	struct nftnl_set_list *nls_list = data;
+	struct nftnl_set *s;
 
-	s = nft_set_alloc();
+	s = nftnl_set_alloc();
 	if (s == NULL)
 		memory_allocation_error();
 
-	if (nft_set_nlmsg_parse(nlh, s) < 0)
+	if (nftnl_set_nlmsg_parse(nlh, s) < 0)
 		goto err_free;
 
-	nft_set_list_add_tail(s, nls_list);
+	nftnl_set_list_add_tail(s, nls_list);
 	return MNL_CB_OK;
 
 err_free:
-	nft_set_free(s);
+	nftnl_set_free(s);
 	return MNL_CB_OK;
 }
 
-static struct nft_set_list *
+static struct nftnl_set_list *
 mnl_set_dump(struct mnl_socket *nf_sock, int family)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	struct nft_set *s;
-	struct nft_set_list *nls_list;
-	struct nft_set *si;
-	struct nft_set_list_iter *i;
+	struct nftnl_set *s;
+	struct nftnl_set_list *nls_list;
+	struct nftnl_set *si;
+	struct nftnl_set_list_iter *i;
 	int ret;
 
-	s = nft_set_alloc();
+	s = nftnl_set_alloc();
 	if (s == NULL)
 		memory_allocation_error();
 
-	nlh = nft_set_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
+	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
 				      NLM_F_DUMP|NLM_F_ACK, seq);
-	nft_set_nlmsg_build_payload(nlh, s);
-	nft_set_free(s);
+	nftnl_set_nlmsg_build_payload(nlh, s);
+	nftnl_set_free(s);
 
-	nls_list = nft_set_list_alloc();
+	nls_list = nftnl_set_list_alloc();
 	if (nls_list == NULL)
 		memory_allocation_error();
 
@@ -279,25 +279,25 @@ mnl_set_dump(struct mnl_socket *nf_sock, int family)
 	if (ret < 0)
 		goto err;
 
-	i = nft_set_list_iter_create(nls_list);
+	i = nftnl_set_list_iter_create(nls_list);
 	if (i == NULL)
 		memory_allocation_error();
 
-	si = nft_set_list_iter_next(i);
+	si = nftnl_set_list_iter_next(i);
 	while (si != NULL) {
 		if (mnl_setelem_get(nf_sock, si) != 0) {
 			perror("E: Unable to get set elements");
-			nft_set_list_iter_destroy(i);
+			nftnl_set_list_iter_destroy(i);
 			goto err;
 		}
-		si = nft_set_list_iter_next(i);
+		si = nftnl_set_list_iter_next(i);
 	}
 
-	nft_set_list_iter_destroy(i);
+	nftnl_set_list_iter_destroy(i);
 
 	return nls_list;
 err:
-	nft_set_list_free(nls_list);
+	nftnl_set_list_free(nls_list);
 	return NULL;
 }
 
@@ -305,33 +305,33 @@ err:
  * ruleset
  */
 
-static struct nft_ruleset *mnl_ruleset_dump(struct mnl_socket *nf_sock)
+static struct nftnl_ruleset *mnl_ruleset_dump(struct mnl_socket *nf_sock)
 {
-	struct nft_ruleset *rs;
-	struct nft_table_list *t;
-	struct nft_chain_list *c;
-	struct nft_set_list *s;
-	struct nft_rule_list *r;
+	struct nftnl_ruleset *rs;
+	struct nftnl_table_list *t;
+	struct nftnl_chain_list *c;
+	struct nftnl_set_list *s;
+	struct nftnl_rule_list *r;
 
-	rs = nft_ruleset_alloc();
+	rs = nftnl_ruleset_alloc();
 	if (rs == NULL)
 		memory_allocation_error();
 
 	t = mnl_table_dump(nf_sock, NFPROTO_UNSPEC);
 	if (t != NULL)
-		nft_ruleset_attr_set(rs, NFT_RULESET_ATTR_TABLELIST, t);
+		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_ATTR_TABLELIST, t);
 
 	c = mnl_chain_dump(nf_sock, NFPROTO_UNSPEC);
 	if (c != NULL)
-		nft_ruleset_attr_set(rs, NFT_RULESET_ATTR_CHAINLIST, c);
+		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_ATTR_CHAINLIST, c);
 
 	s = mnl_set_dump(nf_sock, NFPROTO_UNSPEC);
 	if (s != NULL)
-		nft_ruleset_attr_set(rs, NFT_RULESET_ATTR_SETLIST, s);
+		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_ATTR_SETLIST, s);
 
 	r = mnl_rule_dump(nf_sock, NFPROTO_UNSPEC);
 	if (r != NULL)
-		nft_ruleset_attr_set(rs, NFT_RULESET_ATTR_RULELIST, r);
+		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_ATTR_RULELIST, r);
 
 	return rs;
 }
@@ -339,8 +339,8 @@ static struct nft_ruleset *mnl_ruleset_dump(struct mnl_socket *nf_sock)
 int main(int argc, char *argv[])
 {
 	struct mnl_socket *nl;
-	uint32_t type = NFT_OUTPUT_DEFAULT;
-	struct nft_ruleset *rs;
+	uint32_t type = NFTNL_OUTPUT_DEFAULT;
+	struct nftnl_ruleset *rs;
 	int ret;
 
 	if (argc > 2) {
@@ -351,9 +351,9 @@ int main(int argc, char *argv[])
 
 	if (argc == 2) {
 		if (strcmp(argv[1], "xml") == 0)
-			type = NFT_OUTPUT_XML;
+			type = NFTNL_OUTPUT_XML;
 		else if (strcmp(argv[1], "json") == 0)
-			type = NFT_OUTPUT_JSON;
+			type = NFTNL_OUTPUT_JSON;
 		else {
 			fprintf(stderr, "Unknown type: {xml|json}\n");
 			exit(EXIT_FAILURE);
@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	ret = nft_ruleset_fprintf(stdout, rs, type, 0);
+	ret = nftnl_ruleset_fprintf(stdout, rs, type, 0);
 	fprintf(stdout, "\n");
 
 	if (ret == -1)

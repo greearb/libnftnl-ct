@@ -22,26 +22,26 @@
 
 static int table_cb(const struct nlmsghdr *nlh, void *data)
 {
-	struct nft_table *t;
+	struct nftnl_table *t;
 	char buf[4096];
 	uint32_t *type = data;
 
-	t = nft_table_alloc();
+	t = nftnl_table_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_table_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_table_nlmsg_parse");
+	if (nftnl_table_nlmsg_parse(nlh, t) < 0) {
+		perror("nftnl_table_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_table_snprintf(buf, sizeof(buf), t, *type, 0);
+	nftnl_table_snprintf(buf, sizeof(buf), t, *type, 0);
 	printf("%s\n", buf);
 
 err_free:
-	nft_table_free(t);
+	nftnl_table_free(t);
 err:
 	return MNL_CB_OK;
 }
@@ -52,9 +52,9 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, family;
-	struct nft_table *t = NULL;
+	struct nftnl_table *t = NULL;
 	int ret;
-	uint32_t type = NFT_OUTPUT_DEFAULT;
+	uint32_t type = NFTNL_OUTPUT_DEFAULT;
 
 	if (argc < 2 || argc > 4) {
 		fprintf(stderr, "%s <family> [<table>] [<default|xml|json>]\n",
@@ -78,11 +78,11 @@ int main(int argc, char *argv[])
 	}
 
 	if (strcmp(argv[argc-1], "xml") == 0) {
-		type = NFT_OUTPUT_XML;
+		type = NFTNL_OUTPUT_XML;
 		argv[argc-1] = NULL;
 		argc--;
 	}else if (strcmp(argv[argc-1], "json") == 0) {
-		type = NFT_OUTPUT_JSON;
+		type = NFTNL_OUTPUT_JSON;
 		argv[argc-1] = NULL;
 		argc--;
 	} else if (strcmp(argv[argc - 1], "default") == 0) {
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (argc == 3) {
-		t = nft_table_alloc();
+		t = nftnl_table_alloc();
 		if (t == NULL) {
 			perror("OOM");
 			exit(EXIT_FAILURE);
@@ -99,14 +99,14 @@ int main(int argc, char *argv[])
 
 	seq = time(NULL);
 	if (t == NULL) {
-		nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
+		nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
 						NLM_F_DUMP, seq);
 	} else {
-		nlh = nft_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
+		nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
 						NLM_F_ACK, seq);
-		nft_table_attr_set(t, NFT_TABLE_ATTR_NAME, argv[2]);
-		nft_table_nlmsg_build_payload(nlh, t);
-		nft_table_free(t);
+		nftnl_table_attr_set(t, NFTNL_TABLE_ATTR_NAME, argv[2]);
+		nftnl_table_nlmsg_build_payload(nlh, t);
+		nftnl_table_free(t);
 	}
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);

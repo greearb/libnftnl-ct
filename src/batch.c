@@ -11,25 +11,25 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/batch.h>
 
-struct nft_batch {
+struct nftnl_batch {
 	uint32_t		num_pages;
-	struct nft_batch_page	*current_page;
+	struct nftnl_batch_page	*current_page;
 	uint32_t		page_size;
 	uint32_t		page_overrun_size;
 	struct list_head	page_list;
 };
 
-struct nft_batch_page {
+struct nftnl_batch_page {
 	struct list_head	head;
 	struct mnl_nlmsg_batch	*batch;
 };
 
-static struct nft_batch_page *nft_batch_page_alloc(struct nft_batch *batch)
+static struct nftnl_batch_page *nftnl_batch_page_alloc(struct nftnl_batch *batch)
 {
-	struct nft_batch_page *page;
+	struct nftnl_batch_page *page;
 	char *buf;
 
-	page = malloc(sizeof(struct nft_batch_page));
+	page = malloc(sizeof(struct nftnl_batch_page));
 	if (page == NULL)
 		return NULL;
 
@@ -49,20 +49,20 @@ err1:
 	return NULL;
 }
 
-static void nft_batch_add_page(struct nft_batch_page *page,
-			       struct nft_batch *batch)
+static void nftnl_batch_add_page(struct nftnl_batch_page *page,
+			       struct nftnl_batch *batch)
 {
 	batch->current_page = page;
 	batch->num_pages++;
 	list_add_tail(&page->head, &batch->page_list);
 }
 
-struct nft_batch *nft_batch_alloc(uint32_t pg_size, uint32_t pg_overrun_size)
+struct nftnl_batch *nftnl_batch_alloc(uint32_t pg_size, uint32_t pg_overrun_size)
 {
-	struct nft_batch *batch;
-	struct nft_batch_page *page;
+	struct nftnl_batch *batch;
+	struct nftnl_batch_page *page;
 
-	batch = calloc(1, sizeof(struct nft_batch));
+	batch = calloc(1, sizeof(struct nftnl_batch));
 	if (batch == NULL)
 		return NULL;
 
@@ -70,11 +70,11 @@ struct nft_batch *nft_batch_alloc(uint32_t pg_size, uint32_t pg_overrun_size)
 	batch->page_overrun_size = pg_overrun_size;
 	INIT_LIST_HEAD(&batch->page_list);
 
-	page = nft_batch_page_alloc(batch);
+	page = nftnl_batch_page_alloc(batch);
 	if (page == NULL)
 		goto err1;
 
-	nft_batch_add_page(page, batch);
+	nftnl_batch_add_page(page, batch);
 	return batch;
 err1:
 	free(batch);
@@ -82,9 +82,9 @@ err1:
 }
 EXPORT_SYMBOL(nftnl_batch_alloc, nft_batch_alloc);
 
-void nft_batch_free(struct nft_batch *batch)
+void nftnl_batch_free(struct nftnl_batch *batch)
 {
-	struct nft_batch_page *page, *next;
+	struct nftnl_batch_page *page, *next;
 
 	list_for_each_entry_safe(page, next, &batch->page_list, head) {
 		free(mnl_nlmsg_batch_head(page->batch));
@@ -96,23 +96,23 @@ void nft_batch_free(struct nft_batch *batch)
 }
 EXPORT_SYMBOL(nftnl_batch_free, nft_batch_free);
 
-int nft_batch_update(struct nft_batch *batch)
+int nftnl_batch_update(struct nftnl_batch *batch)
 {
-	struct nft_batch_page *page;
+	struct nftnl_batch_page *page;
 	struct nlmsghdr *last_nlh;
 
 	if (mnl_nlmsg_batch_next(batch->current_page->batch))
 		return 0;
 
-	last_nlh = nft_batch_buffer(batch);
+	last_nlh = nftnl_batch_buffer(batch);
 
-	page = nft_batch_page_alloc(batch);
+	page = nftnl_batch_page_alloc(batch);
 	if (page == NULL)
 		goto err1;
 
-	nft_batch_add_page(page, batch);
+	nftnl_batch_add_page(page, batch);
 
-	memcpy(nft_batch_buffer(batch), last_nlh, last_nlh->nlmsg_len);
+	memcpy(nftnl_batch_buffer(batch), last_nlh, last_nlh->nlmsg_len);
 	mnl_nlmsg_batch_next(batch->current_page->batch);
 
 	return 0;
@@ -121,19 +121,19 @@ err1:
 }
 EXPORT_SYMBOL(nftnl_batch_update, nft_batch_update);
 
-void *nft_batch_buffer(struct nft_batch *batch)
+void *nftnl_batch_buffer(struct nftnl_batch *batch)
 {
 	return mnl_nlmsg_batch_current(batch->current_page->batch);
 }
 EXPORT_SYMBOL(nftnl_batch_buffer, nft_batch_buffer);
 
-uint32_t nft_batch_buffer_len(struct nft_batch *batch)
+uint32_t nftnl_batch_buffer_len(struct nftnl_batch *batch)
 {
 	return mnl_nlmsg_batch_size(batch->current_page->batch);
 }
 EXPORT_SYMBOL(nftnl_batch_buffer_len, nft_batch_buffer_len);
 
-int nft_batch_iovec_len(struct nft_batch *batch)
+int nftnl_batch_iovec_len(struct nftnl_batch *batch)
 {
 	int num_pages = batch->num_pages;
 
@@ -145,9 +145,10 @@ int nft_batch_iovec_len(struct nft_batch *batch)
 }
 EXPORT_SYMBOL(nftnl_batch_iovec_len, nft_batch_iovec_len);
 
-void nft_batch_iovec(struct nft_batch *batch, struct iovec *iov, uint32_t iovlen)
+void nftnl_batch_iovec(struct nftnl_batch *batch, struct iovec *iov,
+		       uint32_t iovlen)
 {
-	struct nft_batch_page *page;
+	struct nftnl_batch_page *page;
 	int i = 0;
 
 	list_for_each_entry(page, &batch->page_list, head) {

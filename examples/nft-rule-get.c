@@ -22,26 +22,26 @@
 
 static int table_cb(const struct nlmsghdr *nlh, void *data)
 {
-	struct nft_rule *t;
+	struct nftnl_rule *t;
 	char buf[4096];
 	uint32_t *type = data;
 
-	t = nft_rule_alloc();
+	t = nftnl_rule_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_rule_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_rule_nlmsg_parse");
+	if (nftnl_rule_nlmsg_parse(nlh, t) < 0) {
+		perror("nftnl_rule_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_rule_snprintf(buf, sizeof(buf), t, *type, 0);
+	nftnl_rule_snprintf(buf, sizeof(buf), t, *type, 0);
 	printf("%s\n", buf);
 
 err_free:
-	nft_rule_free(t);
+	nftnl_rule_free(t);
 err:
 	return MNL_CB_OK;
 }
@@ -51,8 +51,8 @@ int main(int argc, char *argv[])
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t portid, seq, type = NFT_OUTPUT_DEFAULT;
-	struct nft_rule *t = NULL;
+	uint32_t portid, seq, type = NFTNL_OUTPUT_DEFAULT;
+	struct nftnl_rule *t = NULL;
 	int ret, family;
 
 	if (argc < 2 || argc > 3) {
@@ -78,21 +78,21 @@ int main(int argc, char *argv[])
 
 	if (argc == 3) {
 		if (strcmp(argv[2], "xml") == 0)
-			type = NFT_OUTPUT_XML;
+			type = NFTNL_OUTPUT_XML;
 		else if (strcmp(argv[2], "json") == 0)
-			type = NFT_OUTPUT_JSON;
+			type = NFTNL_OUTPUT_JSON;
 	}
 
 	/* XXX requires table, chain and handle attributes for selective get */
 
-	t = nft_rule_alloc();
+	t = nftnl_rule_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
 	}
 
 	seq = time(NULL);
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
+	nlh = nftnl_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
 					NLM_F_DUMP, seq);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);

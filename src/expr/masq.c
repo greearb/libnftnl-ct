@@ -20,18 +20,18 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 
-struct nft_expr_masq {
+struct nftnl_expr_masq {
 	uint32_t	flags;
 };
 
 static int
-nft_rule_expr_masq_set(struct nft_rule_expr *e, uint16_t type,
+nftnl_rule_expr_masq_set(struct nftnl_rule_expr *e, uint16_t type,
 		       const void *data, uint32_t data_len)
 {
-	struct nft_expr_masq *masq = nft_expr_data(e);
+	struct nftnl_expr_masq *masq = nftnl_expr_data(e);
 
 	switch (type) {
-	case NFT_EXPR_MASQ_FLAGS:
+	case NFTNL_EXPR_MASQ_FLAGS:
 		masq->flags = *((uint32_t *)data);
 		break;
 	default:
@@ -41,20 +41,20 @@ nft_rule_expr_masq_set(struct nft_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nft_rule_expr_masq_get(const struct nft_rule_expr *e, uint16_t type,
+nftnl_rule_expr_masq_get(const struct nftnl_rule_expr *e, uint16_t type,
 		       uint32_t *data_len)
 {
-	struct nft_expr_masq *masq = nft_expr_data(e);
+	struct nftnl_expr_masq *masq = nftnl_expr_data(e);
 
 	switch (type) {
-	case NFT_EXPR_MASQ_FLAGS:
+	case NFTNL_EXPR_MASQ_FLAGS:
 		*data_len = sizeof(masq->flags);
 		return &masq->flags;
 	}
 	return NULL;
 }
 
-static int nft_rule_expr_masq_cb(const struct nlattr *attr, void *data)
+static int nftnl_rule_expr_masq_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -74,41 +74,41 @@ static int nft_rule_expr_masq_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nft_rule_expr_masq_build(struct nlmsghdr *nlh, struct nft_rule_expr *e)
+nftnl_rule_expr_masq_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 {
-	struct nft_expr_masq *masq = nft_expr_data(e);
+	struct nftnl_expr_masq *masq = nftnl_expr_data(e);
 
-	if (e->flags & (1 << NFT_EXPR_MASQ_FLAGS))
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_MASQ_FLAGS, htobe32(masq->flags));
 }
 
 static int
-nft_rule_expr_masq_parse(struct nft_rule_expr *e, struct nlattr *attr)
+nftnl_rule_expr_masq_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
 {
-	struct nft_expr_masq *masq = nft_expr_data(e);
+	struct nftnl_expr_masq *masq = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_MASQ_MAX+1] = {};
 
-	if (mnl_attr_parse_nested(attr, nft_rule_expr_masq_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_masq_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_MASQ_FLAGS]) {
 		masq->flags = be32toh(mnl_attr_get_u32(tb[NFTA_MASQ_FLAGS]));
-		e->flags |= (1 << NFT_EXPR_MASQ_FLAGS);
+		e->flags |= (1 << NFTNL_EXPR_MASQ_FLAGS);
 	}
 
 	return 0;
 }
 
 static int
-nft_rule_expr_masq_json_parse(struct nft_rule_expr *e, json_t *root,
-			      struct nft_parse_err *err)
+nftnl_rule_expr_masq_json_parse(struct nftnl_rule_expr *e, json_t *root,
+			      struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
 	uint32_t flags;
 
-	if (nft_jansson_parse_val(root, "flags", NFT_TYPE_U32, &flags,
+	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
 				  err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_MASQ_FLAGS, flags);
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_MASQ_FLAGS, flags);
 
 	return 0;
 #else
@@ -118,15 +118,15 @@ nft_rule_expr_masq_json_parse(struct nft_rule_expr *e, json_t *root,
 }
 
 static int
-nft_rule_expr_masq_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
-			     struct nft_parse_err *err)
+nftnl_rule_expr_masq_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+			     struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
 	uint32_t flags;
 
-	if (nft_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &flags, NFT_TYPE_U32, NFT_XML_MAND, err) == 0)
-		nft_rule_expr_set_u32(e, NFT_EXPR_MASQ_FLAGS, flags);
+	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
+			       &flags, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_MASQ_FLAGS, flags);
 
 	return 0;
 #else
@@ -134,38 +134,38 @@ nft_rule_expr_masq_xml_parse(struct nft_rule_expr *e, mxml_node_t *tree,
 	return -1;
 #endif
 }
-static int nft_rule_expr_masq_export(char *buf, size_t size,
-				     struct nft_rule_expr *e, int type)
+static int nftnl_rule_expr_masq_export(char *buf, size_t size,
+				     struct nftnl_rule_expr *e, int type)
 {
-	struct nft_expr_masq *masq = nft_expr_data(e);
-	NFT_BUF_INIT(b, buf, size);
+	struct nftnl_expr_masq *masq = nftnl_expr_data(e);
+	NFTNL_BUF_INIT(b, buf, size);
 
-	if (e->flags & (1 << NFT_EXPR_MASQ_FLAGS))
-		nft_buf_u32(&b, type, masq->flags, FLAGS);
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS))
+		nftnl_buf_u32(&b, type, masq->flags, FLAGS);
 
-	return nft_buf_done(&b);
+	return nftnl_buf_done(&b);
 }
 
-static int nft_rule_expr_masq_snprintf_default(char *buf, size_t len,
-					       struct nft_rule_expr *e)
+static int nftnl_rule_expr_masq_snprintf_default(char *buf, size_t len,
+					       struct nftnl_rule_expr *e)
 {
-	struct nft_expr_masq *masq = nft_expr_data(e);
+	struct nftnl_expr_masq *masq = nftnl_expr_data(e);
 
-	if (e->flags & (1 << NFT_EXPR_MASQ_FLAGS))
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS))
 		return snprintf(buf, len, "flags 0x%x ", masq->flags);
 
 	return 0;
 }
 
-static int nft_rule_expr_masq_snprintf(char *buf, size_t len, uint32_t type,
-				       uint32_t flags, struct nft_rule_expr *e)
+static int nftnl_rule_expr_masq_snprintf(char *buf, size_t len, uint32_t type,
+				       uint32_t flags, struct nftnl_rule_expr *e)
 {
 	switch (type) {
-	case NFT_OUTPUT_DEFAULT:
-		return nft_rule_expr_masq_snprintf_default(buf, len, e);
-	case NFT_OUTPUT_XML:
-	case NFT_OUTPUT_JSON:
-		return nft_rule_expr_masq_export(buf, len, e, type);
+	case NFTNL_OUTPUT_DEFAULT:
+		return nftnl_rule_expr_masq_snprintf_default(buf, len, e);
+	case NFTNL_OUTPUT_XML:
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_rule_expr_masq_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -174,13 +174,13 @@ static int nft_rule_expr_masq_snprintf(char *buf, size_t len, uint32_t type,
 
 struct expr_ops expr_ops_masq = {
 	.name		= "masq",
-	.alloc_len	= sizeof(struct nft_expr_masq),
+	.alloc_len	= sizeof(struct nftnl_expr_masq),
 	.max_attr	= NFTA_MASQ_MAX,
-	.set		= nft_rule_expr_masq_set,
-	.get		= nft_rule_expr_masq_get,
-	.parse		= nft_rule_expr_masq_parse,
-	.build		= nft_rule_expr_masq_build,
-	.snprintf	= nft_rule_expr_masq_snprintf,
-	.xml_parse	= nft_rule_expr_masq_xml_parse,
-	.json_parse	= nft_rule_expr_masq_json_parse,
+	.set		= nftnl_rule_expr_masq_set,
+	.get		= nftnl_rule_expr_masq_get,
+	.parse		= nftnl_rule_expr_masq_parse,
+	.build		= nftnl_rule_expr_masq_build,
+	.snprintf	= nftnl_rule_expr_masq_snprintf,
+	.xml_parse	= nftnl_rule_expr_masq_xml_parse,
+	.json_parse	= nftnl_rule_expr_masq_json_parse,
 };

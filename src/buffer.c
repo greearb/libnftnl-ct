@@ -16,7 +16,7 @@
 #include <libnftnl/common.h>
 #include "internal.h"
 
-int nft_buf_update(struct nft_buf *b, int ret)
+int nftnl_buf_update(struct nftnl_buf *b, int ret)
 {
 	if (ret < 0) {
 		b->fail = true;
@@ -31,7 +31,7 @@ int nft_buf_update(struct nft_buf *b, int ret)
 	return ret;
 }
 
-int nft_buf_done(struct nft_buf *b)
+int nftnl_buf_done(struct nftnl_buf *b)
 {
 	if (b->fail)
 		return -1;
@@ -46,37 +46,37 @@ int nft_buf_done(struct nft_buf *b)
 	return b->off;
 }
 
-static int nft_buf_put(struct nft_buf *b, const char *fmt, ...)
+static int nftnl_buf_put(struct nftnl_buf *b, const char *fmt, ...)
 {
 	int ret;
 	va_list ap;
 
 	va_start(ap, fmt);
 	ret = vsnprintf(b->buf + b->off, b->len, fmt, ap);
-	ret = nft_buf_update(b, ret);
+	ret = nftnl_buf_update(b, ret);
 	va_end(ap);
 
 	return ret;
 }
 
-int nft_buf_open(struct nft_buf *b, int type, const char *tag)
+int nftnl_buf_open(struct nftnl_buf *b, int type, const char *tag)
 {
 	switch (type) {
-	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "<%s>", tag);
-	case NFT_OUTPUT_JSON:
-		return nft_buf_put(b, "{\"%s\":{", tag);
+	case NFTNL_OUTPUT_XML:
+		return nftnl_buf_put(b, "<%s>", tag);
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_buf_put(b, "{\"%s\":{", tag);
 	default:
 		return 0;
 	}
 }
 
-int nft_buf_close(struct nft_buf *b, int type, const char *tag)
+int nftnl_buf_close(struct nftnl_buf *b, int type, const char *tag)
 {
 	switch (type) {
-	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "</%s>", tag);
-	case NFT_OUTPUT_JSON:
+	case NFTNL_OUTPUT_XML:
+		return nftnl_buf_put(b, "</%s>", tag);
+	case NFTNL_OUTPUT_JSON:
 		/* Remove trailing comma in json */
 		if (b->size > 0 && b->buf[b->size - 1] == ',') {
 			b->off--;
@@ -84,102 +84,102 @@ int nft_buf_close(struct nft_buf *b, int type, const char *tag)
 			b->len++;
 		}
 
-		return nft_buf_put(b, "}}");
+		return nftnl_buf_put(b, "}}");
 	default:
 		return 0;
 	}
 }
 
-int nft_buf_open_array(struct nft_buf *b, int type, const char *tag)
+int nftnl_buf_open_array(struct nftnl_buf *b, int type, const char *tag)
 {
 	switch (type) {
-	case NFT_OUTPUT_JSON:
-		return nft_buf_put(b, "{\"%s\":[", tag);
-	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "<%s>", tag);
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_buf_put(b, "{\"%s\":[", tag);
+	case NFTNL_OUTPUT_XML:
+		return nftnl_buf_put(b, "<%s>", tag);
 	default:
 		return 0;
 	}
 }
 
-int nft_buf_close_array(struct nft_buf *b, int type, const char *tag)
+int nftnl_buf_close_array(struct nftnl_buf *b, int type, const char *tag)
 {
 	switch (type) {
-	case NFT_OUTPUT_JSON:
-		return nft_buf_put(b, "]}");
-	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "</%s>", tag);
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_buf_put(b, "]}");
+	case NFTNL_OUTPUT_XML:
+		return nftnl_buf_put(b, "</%s>", tag);
 	default:
 		return 0;
 	}
 }
 
-int nft_buf_u32(struct nft_buf *b, int type, uint32_t value, const char *tag)
+int nftnl_buf_u32(struct nftnl_buf *b, int type, uint32_t value, const char *tag)
 {
 	switch (type) {
-	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "<%s>%u</%s>", tag, value, tag);
-	case NFT_OUTPUT_JSON:
-		return nft_buf_put(b, "\"%s\":%u,", tag, value);
+	case NFTNL_OUTPUT_XML:
+		return nftnl_buf_put(b, "<%s>%u</%s>", tag, value, tag);
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_buf_put(b, "\"%s\":%u,", tag, value);
 	default:
 		return 0;
 	}
 }
 
-int nft_buf_s32(struct nft_buf *b, int type, uint32_t value, const char *tag)
+int nftnl_buf_s32(struct nftnl_buf *b, int type, uint32_t value, const char *tag)
 {
 	switch (type) {
-	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "<%s>%d</%s>", tag, value, tag);
-	case NFT_OUTPUT_JSON:
-		return nft_buf_put(b, "\"%s\":%d,", tag, value);
+	case NFTNL_OUTPUT_XML:
+		return nftnl_buf_put(b, "<%s>%d</%s>", tag, value, tag);
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_buf_put(b, "\"%s\":%d,", tag, value);
 	default:
 		return 0;
 	}
 }
 
-int nft_buf_u64(struct nft_buf *b, int type, uint64_t value, const char *tag)
+int nftnl_buf_u64(struct nftnl_buf *b, int type, uint64_t value, const char *tag)
 {
 	switch (type) {
-	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "<%s>%"PRIu64"</%s>", tag, value, tag);
-	case NFT_OUTPUT_JSON:
-		return nft_buf_put(b, "\"%s\":%"PRIu64",", tag, value);
+	case NFTNL_OUTPUT_XML:
+		return nftnl_buf_put(b, "<%s>%"PRIu64"</%s>", tag, value, tag);
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_buf_put(b, "\"%s\":%"PRIu64",", tag, value);
 	default:
 		return 0;
 	}
 }
 
-int nft_buf_str(struct nft_buf *b, int type, const char *str, const char *tag)
+int nftnl_buf_str(struct nftnl_buf *b, int type, const char *str, const char *tag)
 {
 	switch (type) {
-	case NFT_OUTPUT_XML:
-		return nft_buf_put(b, "<%s>%s</%s>", tag, str, tag);
-	case NFT_OUTPUT_JSON:
-		return nft_buf_put(b, "\"%s\":\"%s\",", tag, str);
+	case NFTNL_OUTPUT_XML:
+		return nftnl_buf_put(b, "<%s>%s</%s>", tag, str, tag);
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_buf_put(b, "\"%s\":\"%s\",", tag, str);
 	default:
 		return 0;
 	}
 }
 
-int nft_buf_reg(struct nft_buf *b, int type, union nft_data_reg *reg,
+int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 		int reg_type, const char *tag)
 {
 	int ret;
 
 	switch (type) {
-	case NFT_OUTPUT_XML:
-		ret = nft_buf_put(b, "<%s>", tag);
-		ret = nft_data_reg_snprintf(b->buf + b->off, b->len, reg,
-                                    NFT_OUTPUT_XML, 0, reg_type);
-		nft_buf_update(b, ret);
-		return nft_buf_put(b, "</%s>", tag);
-	case NFT_OUTPUT_JSON:
-		nft_buf_put(b, "\"%s\":{", tag);
-		ret = nft_data_reg_snprintf(b->buf + b->off, b->len, reg,
-					    NFT_OUTPUT_JSON, 0, reg_type);
-		nft_buf_update(b, ret);
-		return nft_buf_put(b, "},");
+	case NFTNL_OUTPUT_XML:
+		ret = nftnl_buf_put(b, "<%s>", tag);
+		ret = nftnl_data_reg_snprintf(b->buf + b->off, b->len, reg,
+                                    NFTNL_OUTPUT_XML, 0, reg_type);
+		nftnl_buf_update(b, ret);
+		return nftnl_buf_put(b, "</%s>", tag);
+	case NFTNL_OUTPUT_JSON:
+		nftnl_buf_put(b, "\"%s\":{", tag);
+		ret = nftnl_data_reg_snprintf(b->buf + b->off, b->len, reg,
+					    NFTNL_OUTPUT_JSON, 0, reg_type);
+		nftnl_buf_update(b, ret);
+		return nftnl_buf_put(b, "},");
 	}
 	return 0;
 }

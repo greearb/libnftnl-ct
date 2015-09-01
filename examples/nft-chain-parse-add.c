@@ -26,14 +26,14 @@
 #include <libnftnl/chain.h>
 #include <libnftnl/rule.h>
 
-static struct nft_chain *chain_parse_file(const char *file, uint16_t format)
+static struct nftnl_chain *chain_parse_file(const char *file, uint16_t format)
 {
 	int fd;
-	struct nft_chain *c;
-	struct nft_parse_err *err;
+	struct nftnl_chain *c;
+	struct nftnl_parse_err *err;
 	char data[4096];
 
-	c = nft_chain_alloc();
+	c = nftnl_chain_alloc();
 	if (c == NULL) {
 		perror("OOM");
 		return NULL;
@@ -53,19 +53,19 @@ static struct nft_chain *chain_parse_file(const char *file, uint16_t format)
 
 	close(fd);
 
-	err = nft_parse_err_alloc();
+	err = nftnl_parse_err_alloc();
 	if (err == NULL) {
 		perror("OOM");
 		return NULL;
 	}
 
-	if (nft_chain_parse(c, format, data, err) < 0) {
-		nft_parse_perror("Unable to parse file", err);
-		nft_parse_err_free(err);
+	if (nftnl_chain_parse(c, format, data, err) < 0) {
+		nftnl_parse_perror("Unable to parse file", err);
+		nftnl_parse_err_free(err);
 		return NULL;
 	}
 
-	nft_parse_err_free(err);
+	nftnl_parse_err_free(err);
 	return c;
 }
 
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, chain_seq;
-	struct nft_chain *c;
+	struct nftnl_chain *c;
 	uint16_t family, format, outformat;
 	int ret, batching;
 	struct mnl_nlmsg_batch *batch;
@@ -86,11 +86,11 @@ int main(int argc, char *argv[])
 	}
 
 	if (strcmp(argv[1], "xml") == 0) {
-		format = NFT_PARSE_XML;
-		outformat = NFT_OUTPUT_XML;
+		format = NFTNL_PARSE_XML;
+		outformat = NFTNL_OUTPUT_XML;
 	} else if (strcmp(argv[1], "json") == 0) {
-		format = NFT_PARSE_JSON;
-		outformat = NFT_OUTPUT_JSON;
+		format = NFTNL_PARSE_JSON;
+		outformat = NFTNL_OUTPUT_JSON;
 	} else {
 		printf("Unknown format: xml, json\n");
 		exit(EXIT_FAILURE);
@@ -100,14 +100,14 @@ int main(int argc, char *argv[])
 	if (c == NULL)
 		exit(EXIT_FAILURE);
 
-	nft_chain_fprintf(stdout, c, outformat, 0);
+	nftnl_chain_fprintf(stdout, c, outformat, 0);
 	fprintf(stdout, "\n");
 
-	nft_chain_attr_unset(c, NFT_CHAIN_ATTR_HANDLE);
-	family = nft_chain_attr_get_u32(c, NFT_CHAIN_ATTR_FAMILY);
+	nftnl_chain_attr_unset(c, NFTNL_CHAIN_ATTR_HANDLE);
+	family = nftnl_chain_attr_get_u32(c, NFTNL_CHAIN_ATTR_FAMILY);
 
 	seq = time(NULL);
-	batching = nft_batch_is_supported();
+	batching = nftnl_batch_is_supported();
 	if (batching < 0) {
 		perror("cannot talk to nfnetlink");
 		exit(EXIT_FAILURE);
@@ -116,20 +116,20 @@ int main(int argc, char *argv[])
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
 	if (batching) {
-		nft_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 
 	chain_seq = seq;
-	nlh = nft_chain_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+	nlh = nftnl_chain_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 					NFT_MSG_NEWCHAIN, family,
 					NLM_F_ACK, seq++);
-	nft_chain_nlmsg_build_payload(nlh, c);
-	nft_chain_free(c);
+	nftnl_chain_nlmsg_build_payload(nlh, c);
+	nftnl_chain_free(c);
 	mnl_nlmsg_batch_next(batch);
 
 	if (batching) {
-		nft_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
 		mnl_nlmsg_batch_next(batch);
 	}
 

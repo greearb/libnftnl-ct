@@ -22,26 +22,26 @@
 
 static int set_cb(const struct nlmsghdr *nlh, void *data)
 {
-	struct nft_set *t;
+	struct nftnl_set *t;
 	char buf[4096];
 	uint32_t *type = data;
 
-	t = nft_set_alloc();
+	t = nftnl_set_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_set_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_set_nlmsg_parse");
+	if (nftnl_set_nlmsg_parse(nlh, t) < 0) {
+		perror("nftnl_set_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_set_snprintf(buf, sizeof(buf), t, *type, 0);
+	nftnl_set_snprintf(buf, sizeof(buf), t, *type, 0);
 	printf("%s\n", buf);
 
 err_free:
-	nft_set_free(t);
+	nftnl_set_free(t);
 err:
 	return MNL_CB_OK;
 }
@@ -52,15 +52,15 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, family;
-	uint32_t type = NFT_OUTPUT_DEFAULT;
-	struct nft_set *t = NULL;
+	uint32_t type = NFTNL_OUTPUT_DEFAULT;
+	struct nftnl_set *t = NULL;
 	int ret;
 
 	if (argc < 2 || argc > 3) {
 		fprintf(stderr, "%s <family> [<json|xml>]\n", argv[0]);
 		return EXIT_FAILURE;
 	}
-	t = nft_set_alloc();
+	t = nftnl_set_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
@@ -82,16 +82,16 @@ int main(int argc, char *argv[])
 	}
 
 	if (argc == 3 && strcmp(argv[2], "json") == 0)
-		type = NFT_OUTPUT_JSON;
+		type = NFTNL_OUTPUT_JSON;
 	else if (argc == 3 && strcmp(argv[2], "xml") == 0)
-		type = NFT_OUTPUT_XML;
+		type = NFTNL_OUTPUT_XML;
 
-	nlh = nft_set_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
+	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
 					NLM_F_DUMP|NLM_F_ACK, seq);
 	/* Use this below if you want to obtain sets per table */
-/*	nft_set_attr_set(t, NFT_SET_ATTR_TABLE, argv[2]); */
-	nft_set_nlmsg_build_payload(nlh, t);
-	nft_set_free(t);
+/*	nftnl_set_attr_set(t, NFT_SET_ATTR_TABLE, argv[2]); */
+	nftnl_set_nlmsg_build_payload(nlh, t);
+	nftnl_set_free(t);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

@@ -28,28 +28,28 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/set.h>
 
-static struct nft_set *setup_set(uint8_t family, const char *table,
+static struct nftnl_set *setup_set(uint8_t family, const char *table,
 				 const char *name)
 {
-	struct nft_set *s = NULL;
+	struct nftnl_set *s = NULL;
 
-	s = nft_set_alloc();
+	s = nftnl_set_alloc();
 	if (s == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
 	}
 
-	nft_set_attr_set_str(s, NFT_SET_ATTR_TABLE, table);
-	nft_set_attr_set_str(s, NFT_SET_ATTR_NAME, name);
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_FAMILY, family);
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_KEY_LEN, 2);
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_ID, 1);
-	nft_set_attr_set_u32(s, NFT_SET_ATTR_FLAGS, NFT_SET_CONSTANT);
+	nftnl_set_attr_set_str(s, NFTNL_SET_ATTR_TABLE, table);
+	nftnl_set_attr_set_str(s, NFTNL_SET_ATTR_NAME, name);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_FAMILY, family);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_KEY_LEN, 2);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_ID, 1);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_FLAGS, NFT_SET_CONSTANT);
 
 	return s;
 }
 
-static void nft_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
+static void nftnl_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
 {
 	struct nlmsghdr *nlh;
 	struct nfgenmsg *nfg;
@@ -68,7 +68,7 @@ static void nft_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
 int main(int argc, char *argv[])
 {
 	struct mnl_socket *nl;
-	struct nft_set *s;
+	struct nftnl_set *s;
 	struct nlmsghdr *nlh;
 	struct mnl_nlmsg_batch *batch;
 	uint8_t family;
@@ -109,19 +109,19 @@ int main(int argc, char *argv[])
 
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	nft_mnl_batch_put(mnl_nlmsg_batch_current(batch),
+	nftnl_mnl_batch_put(mnl_nlmsg_batch_current(batch),
 			  NFNL_MSG_BATCH_BEGIN, seq++);
 	mnl_nlmsg_batch_next(batch);
 
-	nlh = nft_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+	nlh = nftnl_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				      NFT_MSG_NEWSET, family,
 				      NLM_F_CREATE|NLM_F_ACK, seq++);
 
-	nft_set_nlmsg_build_payload(nlh, s);
-	nft_set_free(s);
+	nftnl_set_nlmsg_build_payload(nlh, s);
+	nftnl_set_free(s);
 	mnl_nlmsg_batch_next(batch);
 
-	nft_mnl_batch_put(mnl_nlmsg_batch_current(batch), NFNL_MSG_BATCH_END,
+	nftnl_mnl_batch_put(mnl_nlmsg_batch_current(batch), NFNL_MSG_BATCH_END,
 			 seq++);
 	mnl_nlmsg_batch_next(batch);
 

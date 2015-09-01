@@ -22,26 +22,26 @@
 
 static int table_cb(const struct nlmsghdr *nlh, void *data)
 {
-	struct nft_chain *t;
+	struct nftnl_chain *t;
 	char buf[4096];
 	uint32_t *type = data;
 
-	t = nft_chain_alloc();
+	t = nftnl_chain_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_chain_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_chain_nlmsg_parse");
+	if (nftnl_chain_nlmsg_parse(nlh, t) < 0) {
+		perror("nftnl_chain_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_chain_snprintf(buf, sizeof(buf), t, *type, 0);
+	nftnl_chain_snprintf(buf, sizeof(buf), t, *type, 0);
 	printf("%s\n", buf);
 
 err_free:
-	nft_chain_free(t);
+	nftnl_chain_free(t);
 err:
 	return MNL_CB_OK;
 }
@@ -51,8 +51,8 @@ int main(int argc, char *argv[])
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t portid, seq, type = NFT_OUTPUT_DEFAULT;
-	struct nft_chain *t = NULL;
+	uint32_t portid, seq, type = NFTNL_OUTPUT_DEFAULT;
+	struct nftnl_chain *t = NULL;
 	int ret, family;
 
 	seq = time(NULL);
@@ -79,26 +79,26 @@ int main(int argc, char *argv[])
 	}
 
 	if (argc >= 4) {
-		t = nft_chain_alloc();
+		t = nftnl_chain_alloc();
 		if (t == NULL) {
 			perror("OOM");
 			exit(EXIT_FAILURE);
 		}
-		nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
+		nlh = nftnl_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
 						NLM_F_ACK, seq);
-		nft_chain_attr_set(t, NFT_CHAIN_ATTR_TABLE, argv[2]);
-		nft_chain_attr_set(t, NFT_CHAIN_ATTR_NAME, argv[3]);
-		nft_chain_nlmsg_build_payload(nlh, t);
-		nft_chain_free(t);
+		nftnl_chain_attr_set(t, NFTNL_CHAIN_ATTR_TABLE, argv[2]);
+		nftnl_chain_attr_set(t, NFTNL_CHAIN_ATTR_NAME, argv[3]);
+		nftnl_chain_nlmsg_build_payload(nlh, t);
+		nftnl_chain_free(t);
 	} else if (argc >= 2) {
-		nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
+		nlh = nftnl_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
 						NLM_F_DUMP, seq);
 	}
 
 	if (strcmp(argv[argc-1], "xml") == 0){
-		type = NFT_OUTPUT_XML;
+		type = NFTNL_OUTPUT_XML;
 	}else if (strcmp(argv[argc-1], "json") == 0){
-		type = NFT_OUTPUT_JSON;
+		type = NFTNL_OUTPUT_JSON;
 	}
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);

@@ -22,16 +22,16 @@
 #include <libnftnl/set.h>
 
 #ifdef XML_PARSING
-mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,
-				 struct nft_parse_err *err, enum nft_parse_input input)
+mxml_node_t *nftnl_mxml_build_tree(const void *data, const char *treename,
+				 struct nftnl_parse_err *err, enum nftnl_parse_input input)
 {
 	mxml_node_t *tree;
 
 	switch (input) {
-	case NFT_PARSE_BUFFER:
+	case NFTNL_PARSE_BUFFER:
 		tree = mxmlLoadString(NULL, data, MXML_OPAQUE_CALLBACK);
 		break;
-	case NFT_PARSE_FILE:
+	case NFTNL_PARSE_FILE:
 		tree = mxmlLoadFile(NULL, (FILE *)data, MXML_OPAQUE_CALLBACK);
 		break;
 	default:
@@ -39,7 +39,7 @@ mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,
 	}
 
 	if (tree == NULL) {
-		err->error = NFT_PARSE_EBADINPUT;
+		err->error = NFTNL_PARSE_EBADINPUT;
 		goto err;
 	}
 
@@ -47,7 +47,7 @@ mxml_node_t *nft_mxml_build_tree(const void *data, const char *treename,
 	    strcmp(tree->value.opaque, treename) == 0)
 		return tree;
 
-	err->error = NFT_PARSE_EMISSINGNODE;
+	err->error = NFTNL_PARSE_EMISSINGNODE;
 	err->node_name = treename;
 
 	mxmlDelete(tree);
@@ -58,12 +58,12 @@ err:
 	return NULL;
 }
 
-struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node,
-					  struct nft_parse_err *err,
-					  struct nft_set_list *set_list)
+struct nftnl_rule_expr *nftnl_mxml_expr_parse(mxml_node_t *node,
+					  struct nftnl_parse_err *err,
+					  struct nftnl_set_list *set_list)
 {
 	mxml_node_t *tree;
-	struct nft_rule_expr *e;
+	struct nftnl_rule_expr *e;
 	const char *expr_name;
 	char *xml_text;
 	uint32_t set_id;
@@ -72,11 +72,11 @@ struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node,
 	expr_name = mxmlElementGetAttr(node, "type");
 	if (expr_name == NULL) {
 		err->node_name = "type";
-		err->error = NFT_PARSE_EMISSINGNODE;
+		err->error = NFTNL_PARSE_EMISSINGNODE;
 		goto err;
 	}
 
-	e = nft_rule_expr_alloc(expr_name);
+	e = nftnl_rule_expr_alloc(expr_name);
 	if (e == NULL)
 		goto err;
 
@@ -95,37 +95,37 @@ struct nft_rule_expr *nft_mxml_expr_parse(mxml_node_t *node,
 
 	if (set_list != NULL &&
 	    strcmp(expr_name, "lookup") == 0 &&
-	    nft_set_lookup_id(e, set_list, &set_id))
-		nft_rule_expr_set_u32(e, NFT_EXPR_LOOKUP_SET_ID, set_id);
+	    nftnl_set_lookup_id(e, set_list, &set_id))
+		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SET_ID, set_id);
 
 	return ret < 0 ? NULL : e;
 err_expr:
-	nft_rule_expr_free(e);
+	nftnl_rule_expr_free(e);
 err:
 	mxmlDelete(tree);
 	errno = EINVAL;
 	return NULL;
 }
 
-int nft_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t *reg,
+int nftnl_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t *reg,
 		       uint32_t mxmlflags, uint32_t flags,
-		       struct nft_parse_err *err)
+		       struct nftnl_parse_err *err)
 {
 	mxml_node_t *node;
 
 	node = mxmlFindElement(tree, tree, reg_name, NULL, NULL, mxmlflags);
 	if (node == NULL) {
-		if (!(flags & NFT_XML_OPT)) {
-			err->error = NFT_PARSE_EMISSINGNODE;
+		if (!(flags & NFTNL_XML_OPT)) {
+			err->error = NFTNL_PARSE_EMISSINGNODE;
 			errno = EINVAL;
 			goto err;
 		}
 		return -1;
 	}
 
-	if (nft_strtoi(node->child->value.opaque, BASE_DEC, reg,
-		       NFT_TYPE_U32) != 0) {
-		err->error = NFT_PARSE_EBADTYPE;
+	if (nftnl_strtoi(node->child->value.opaque, BASE_DEC, reg,
+		       NFTNL_TYPE_U32) != 0) {
+		err->error = NFTNL_PARSE_EBADTYPE;
 		goto err;
 	}
 
@@ -140,9 +140,9 @@ err:
 	return -1;
 }
 
-int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
-			    union nft_data_reg *data_reg, uint16_t flags,
-			    struct nft_parse_err *err)
+int nftnl_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
+			    union nftnl_data_reg *data_reg, uint16_t flags,
+			    struct nftnl_parse_err *err)
 {
 	mxml_node_t *node;
 
@@ -153,50 +153,50 @@ int nft_mxml_data_reg_parse(mxml_node_t *tree, const char *node_name,
 	if (node == NULL || node->child == NULL)
 		node = tree;
 
-	return nft_data_reg_xml_parse(data_reg, node, err);
+	return nftnl_data_reg_xml_parse(data_reg, node, err);
 }
 
 int
-nft_mxml_num_parse(mxml_node_t *tree, const char *node_name,
+nftnl_mxml_num_parse(mxml_node_t *tree, const char *node_name,
 		   uint32_t mxml_flags, int base, void *number,
-		   enum nft_type type, uint16_t flags,
-		   struct nft_parse_err *err)
+		   enum nftnl_type type, uint16_t flags,
+		   struct nftnl_parse_err *err)
 {
 	mxml_node_t *node = NULL;
 	int ret;
 
 	node = mxmlFindElement(tree, tree, node_name, NULL, NULL, mxml_flags);
 	if (node == NULL || node->child == NULL) {
-		if (!(flags & NFT_XML_OPT)) {
+		if (!(flags & NFTNL_XML_OPT)) {
 			errno = EINVAL;
 			err->node_name = node_name;
-			err->error = NFT_PARSE_EMISSINGNODE;
+			err->error = NFTNL_PARSE_EMISSINGNODE;
 		}
 		return -1;
 	}
 
-	ret = nft_strtoi(node->child->value.opaque, base, number, type);
+	ret = nftnl_strtoi(node->child->value.opaque, base, number, type);
 
 	if (ret != 0) {
-		err->error = NFT_PARSE_EBADTYPE;
+		err->error = NFTNL_PARSE_EBADTYPE;
 		err->node_name = node_name;
 	}
 	return ret;
 }
 
-const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
+const char *nftnl_mxml_str_parse(mxml_node_t *tree, const char *node_name,
 			       uint32_t mxml_flags, uint16_t flags,
-			       struct nft_parse_err *err)
+			       struct nftnl_parse_err *err)
 {
 	mxml_node_t *node;
 	const char *ret;
 
 	node = mxmlFindElement(tree, tree, node_name, NULL, NULL, mxml_flags);
 	if (node == NULL || node->child == NULL) {
-		if (!(flags & NFT_XML_OPT)) {
+		if (!(flags & NFTNL_XML_OPT)) {
 			errno = EINVAL;
 			err->node_name = node_name;
-			err->error = NFT_PARSE_EMISSINGNODE;
+			err->error = NFTNL_PARSE_EMISSINGNODE;
 		}
 		return NULL;
 	}
@@ -204,24 +204,24 @@ const char *nft_mxml_str_parse(mxml_node_t *tree, const char *node_name,
 	ret = node->child->value.opaque;
 	if (ret == NULL) {
 		err->node_name = node_name;
-		err->error = NFT_PARSE_EBADTYPE;
+		err->error = NFTNL_PARSE_EBADTYPE;
 	}
 	return ret;
 }
 
-int nft_mxml_family_parse(mxml_node_t *tree, const char *node_name,
+int nftnl_mxml_family_parse(mxml_node_t *tree, const char *node_name,
 			  uint32_t mxml_flags, uint16_t flags,
-			  struct nft_parse_err *err)
+			  struct nftnl_parse_err *err)
 {
 	const char *family_str;
 	int family;
 
-	family_str = nft_mxml_str_parse(tree, node_name, mxml_flags,
+	family_str = nftnl_mxml_str_parse(tree, node_name, mxml_flags,
 					flags, err);
 	if (family_str == NULL)
 		return -1;
 
-	family = nft_str2family(family_str);
+	family = nftnl_str2family(family_str);
 	if (family < 0) {
 		err->node_name = node_name;
 		errno = EAFNOSUPPORT;

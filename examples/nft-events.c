@@ -34,13 +34,13 @@ static uint32_t event2flag(uint32_t event)
 	case NFT_MSG_NEWSET:
 	case NFT_MSG_NEWSETELEM:
 	case NFT_MSG_NEWGEN:
-		return NFT_OF_EVENT_NEW;
+		return NFTNL_OF_EVENT_NEW;
 	case NFT_MSG_DELTABLE:
 	case NFT_MSG_DELCHAIN:
 	case NFT_MSG_DELRULE:
 	case NFT_MSG_DELSET:
 	case NFT_MSG_DELSETELEM:
-		return NFT_OF_EVENT_DEL;
+		return NFTNL_OF_EVENT_DEL;
 	}
 
 	return 0;
@@ -48,96 +48,96 @@ static uint32_t event2flag(uint32_t event)
 
 static int table_cb(const struct nlmsghdr *nlh, int event, int type)
 {
-	struct nft_table *t;
+	struct nftnl_table *t;
 
-	t = nft_table_alloc();
+	t = nftnl_table_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_table_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_table_nlmsg_parse");
+	if (nftnl_table_nlmsg_parse(nlh, t) < 0) {
+		perror("nftnl_table_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_table_fprintf(stdout, t, type, event2flag(event));
+	nftnl_table_fprintf(stdout, t, type, event2flag(event));
 	fprintf(stdout, "\n");
 
 err_free:
-	nft_table_free(t);
+	nftnl_table_free(t);
 err:
 	return MNL_CB_OK;
 }
 
 static int rule_cb(const struct nlmsghdr *nlh, int event, int type)
 {
-	struct nft_rule *t;
+	struct nftnl_rule *t;
 
-	t = nft_rule_alloc();
+	t = nftnl_rule_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_rule_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_rule_nlmsg_parse");
+	if (nftnl_rule_nlmsg_parse(nlh, t) < 0) {
+		perror("nftnl_rule_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_rule_fprintf(stdout, t, type, event2flag(event));
+	nftnl_rule_fprintf(stdout, t, type, event2flag(event));
 	fprintf(stdout, "\n");
 
 err_free:
-	nft_rule_free(t);
+	nftnl_rule_free(t);
 err:
 	return MNL_CB_OK;
 }
 
 static int chain_cb(const struct nlmsghdr *nlh, int event, int type)
 {
-	struct nft_chain *t;
+	struct nftnl_chain *t;
 
-	t = nft_chain_alloc();
+	t = nftnl_chain_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_chain_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_chain_nlmsg_parse");
+	if (nftnl_chain_nlmsg_parse(nlh, t) < 0) {
+		perror("nftnl_chain_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_chain_fprintf(stdout, t, type, event2flag(event));
+	nftnl_chain_fprintf(stdout, t, type, event2flag(event));
 	fprintf(stdout, "\n");
 
 err_free:
-	nft_chain_free(t);
+	nftnl_chain_free(t);
 err:
 	return MNL_CB_OK;
 }
 
 static int set_cb(const struct nlmsghdr *nlh, int event, int type)
 {
-	struct nft_set *t;
+	struct nftnl_set *t;
 
-	t = nft_set_alloc();
+	t = nftnl_set_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_set_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_set_nlmsg_parse");
+	if (nftnl_set_nlmsg_parse(nlh, t) < 0) {
+		perror("nftnl_set_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_set_fprintf(stdout, t, type, event2flag(event));
+	nftnl_set_fprintf(stdout, t, type, event2flag(event));
 	fprintf(stdout, "\n");
 
 err_free:
-	nft_set_free(t);
+	nftnl_set_free(t);
 err:
 	return MNL_CB_OK;
 }
@@ -145,47 +145,47 @@ err:
 static int setelem_cb(const struct nlmsghdr *nlh, int event, int type)
 {
 
-	struct nft_set *s;
+	struct nftnl_set *s;
 
-	s = nft_set_alloc();
+	s = nftnl_set_alloc();
 	if (s == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_set_elems_nlmsg_parse(nlh, s) < 0) {
-		perror("nft_set_nlmsg_parse");
+	if (nftnl_set_elems_nlmsg_parse(nlh, s) < 0) {
+		perror("nftnl_set_nlmsg_parse");
 		goto err_free;
 	}
 
-	nft_set_fprintf(stdout, s, type, event2flag(event));
+	nftnl_set_fprintf(stdout, s, type, event2flag(event));
 	fprintf(stdout, "\n");
 
 err_free:
-	nft_set_free(s);
+	nftnl_set_free(s);
 err:
 	return MNL_CB_OK;
 }
 
 static int gen_cb(const struct nlmsghdr *nlh, int event, int type)
 {
-	struct nft_gen *gen;
+	struct nftnl_gen *gen;
 
-	gen = nft_gen_alloc();
+	gen = nftnl_gen_alloc();
 	if (gen == NULL) {
 		perror("OOM");
 		goto err;
 	}
 
-	if (nft_gen_nlmsg_parse(nlh, gen) < 0) {
-		perror("nft_gen_parse");
+	if (nftnl_gen_nlmsg_parse(nlh, gen) < 0) {
+		perror("nftnl_gen_parse");
 		goto err_free;
 	}
 
-	nft_gen_fprintf(stdout, gen, type, event2flag(event));
+	nftnl_gen_fprintf(stdout, gen, type, event2flag(event));
 	fprintf(stdout, "\n");
 err_free:
-	nft_gen_free(gen);
+	nftnl_gen_free(gen);
 err:
 	return MNL_CB_OK;
 }
@@ -233,15 +233,15 @@ int main(int argc, char *argv[])
 
 	switch (argc) {
 	case 1:
-		type = NFT_OUTPUT_DEFAULT;
+		type = NFTNL_OUTPUT_DEFAULT;
 		break;
 	case 2:
 		if (strcmp(argv[1], "xml") == 0) {
-			type = NFT_OUTPUT_XML;
+			type = NFTNL_OUTPUT_XML;
 		} else if (strcmp(argv[1], "json") == 0) {
-			type = NFT_OUTPUT_JSON;
+			type = NFTNL_OUTPUT_JSON;
 		} else if (strcmp(argv[1], "default") == 0) {
-			type = NFT_OUTPUT_DEFAULT;
+			type = NFTNL_OUTPUT_DEFAULT;
 		} else {
 			fprintf(stderr, "unknown format type `%s'\n", argv[1]);
 			return EXIT_FAILURE;

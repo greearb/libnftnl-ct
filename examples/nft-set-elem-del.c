@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, family, data;
-	struct nft_set *s;
-	struct nft_set_elem *e;
+	struct nftnl_set *s;
+	struct nftnl_set_elem *e;
 	int ret;
 
 	if (argc != 4) {
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	s = nft_set_alloc();
+	s = nftnl_set_alloc();
 	if (s == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
@@ -55,33 +55,33 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nft_set_attr_set(s, NFT_SET_ATTR_TABLE, argv[2]);
-	nft_set_attr_set(s, NFT_SET_ATTR_NAME, argv[3]);
+	nftnl_set_attr_set(s, NFTNL_SET_ATTR_TABLE, argv[2]);
+	nftnl_set_attr_set(s, NFTNL_SET_ATTR_NAME, argv[3]);
 
 	/* Add to dummy elements to set */
-	e = nft_set_elem_alloc();
+	e = nftnl_set_elem_alloc();
 	if (e == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
 	}
 
 	data = 0x1;
-	nft_set_elem_attr_set(e, NFT_SET_ELEM_ATTR_KEY, &data, sizeof(data));
-	nft_set_elem_add(s, e);
+	nftnl_set_elem_attr_set(e, NFTNL_SET_ELEM_ATTR_KEY, &data, sizeof(data));
+	nftnl_set_elem_add(s, e);
 
-	e = nft_set_elem_alloc();
+	e = nftnl_set_elem_alloc();
 	if (e == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
 	}
 	data = 0x2;
-	nft_set_elem_attr_set(e, NFT_SET_ELEM_ATTR_KEY, &data, sizeof(data));
-	nft_set_elem_add(s, e);
+	nftnl_set_elem_attr_set(e, NFTNL_SET_ELEM_ATTR_KEY, &data, sizeof(data));
+	nftnl_set_elem_add(s, e);
 
-	nlh = nft_set_nlmsg_build_hdr(buf, NFT_MSG_DELSETELEM, family,
+	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_DELSETELEM, family,
 				      NLM_F_ACK, seq);
-	nft_set_elems_nlmsg_build_payload(nlh, s);
-	nft_set_free(s);
+	nftnl_set_elems_nlmsg_build_payload(nlh, s);
+	nftnl_set_free(s);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

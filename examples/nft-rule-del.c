@@ -22,7 +22,7 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/rule.h>
 
-static void nft_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
+static void nftnl_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
 {
 	struct nlmsghdr *nlh;
 	struct nfgenmsg *nfg;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	struct mnl_nlmsg_batch *batch;
 	uint32_t portid, seq;
-	struct nft_rule *r = NULL;
+	struct nftnl_rule *r = NULL;
 	int ret, family;
 
 	if (argc < 4 || argc > 5) {
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	r = nft_rule_alloc();
+	r = nftnl_rule_alloc();
 	if (r == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
@@ -74,29 +74,29 @@ int main(int argc, char *argv[])
 	}
 
 	seq = time(NULL);
-	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, argv[2]);
-	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, argv[3]);
+	nftnl_rule_attr_set(r, NFTNL_RULE_ATTR_TABLE, argv[2]);
+	nftnl_rule_attr_set(r, NFTNL_RULE_ATTR_CHAIN, argv[3]);
 
 	/* If no handle is specified, delete all rules in the chain */
 	if (argc == 5)
-		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_HANDLE, atoi(argv[4]));
+		nftnl_rule_attr_set_u64(r, NFTNL_RULE_ATTR_HANDLE, atoi(argv[4]));
 
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	nft_mnl_batch_put(mnl_nlmsg_batch_current(batch),
+	nftnl_mnl_batch_put(mnl_nlmsg_batch_current(batch),
 			  NFNL_MSG_BATCH_BEGIN, seq++);
 	mnl_nlmsg_batch_next(batch);
 
-	nlh = nft_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				NFT_MSG_DELRULE,
 				family,
 				NLM_F_ACK, seq++);
 
-	nft_rule_nlmsg_build_payload(nlh, r);
-	nft_rule_free(r);
+	nftnl_rule_nlmsg_build_payload(nlh, r);
+	nftnl_rule_free(r);
 	mnl_nlmsg_batch_next(batch);
 
-	nft_mnl_batch_put(mnl_nlmsg_batch_current(batch), NFNL_MSG_BATCH_END,
+	nftnl_mnl_batch_put(mnl_nlmsg_batch_current(batch), NFNL_MSG_BATCH_END,
 			  seq++);
 	mnl_nlmsg_batch_next(batch);
 

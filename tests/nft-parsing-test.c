@@ -59,7 +59,7 @@ static void print_detail_error(char *a, char *b)
 	}
 }
 
-static int compare_test(uint32_t type, struct nft_ruleset *rs,
+static int compare_test(uint32_t type, struct nftnl_ruleset *rs,
 			const char *filename, FILE *fp)
 {
 	char orig[4096];
@@ -67,12 +67,12 @@ static int compare_test(uint32_t type, struct nft_ruleset *rs,
 
 	switch (type) {
 	case TEST_XML_RULESET:
-		nft_ruleset_snprintf(out, sizeof(out), rs,
-				     NFT_OUTPUT_XML, NFT_OF_EVENT_NEW);
+		nftnl_ruleset_snprintf(out, sizeof(out), rs,
+				     NFTNL_OUTPUT_XML, NFTNL_OF_EVENT_NEW);
 		break;
 	case TEST_JSON_RULESET:
-		nft_ruleset_snprintf(out, sizeof(out), rs,
-				     NFT_OUTPUT_JSON, NFT_OF_EVENT_NEW);
+		nftnl_ruleset_snprintf(out, sizeof(out), rs,
+				     NFTNL_OUTPUT_JSON, NFTNL_OF_EVENT_NEW);
 		break;
 	default:
 		errno = EINVAL;
@@ -107,10 +107,10 @@ static int compare_test(uint32_t type, struct nft_ruleset *rs,
 	return -1;
 }
 
-static int test_json(const char *filename, struct nft_parse_err *err)
+static int test_json(const char *filename, struct nftnl_parse_err *err)
 {
 	int ret = -1;
-	struct nft_ruleset *rs;
+	struct nftnl_ruleset *rs;
 	FILE *fp;
 
 	fp = fopen(filename, "r");
@@ -120,18 +120,18 @@ static int test_json(const char *filename, struct nft_parse_err *err)
 		return -1;
 	}
 
-	rs = nft_ruleset_alloc();
+	rs = nftnl_ruleset_alloc();
 	if (rs == NULL) {
-		perror("nft_ruleset_alloc");
+		perror("nftnl_ruleset_alloc");
 		return -1;
 	}
 
-	if (nft_ruleset_parse_file(rs, NFT_PARSE_JSON, fp, err) == 0)
+	if (nftnl_ruleset_parse_file(rs, NFTNL_PARSE_JSON, fp, err) == 0)
 		ret = compare_test(TEST_JSON_RULESET, rs, filename, fp);
 	else
 		goto failparsing;
 
-	nft_ruleset_free(rs);
+	nftnl_ruleset_free(rs);
 	fclose(fp);
 
 	return ret;
@@ -140,14 +140,14 @@ failparsing:
 	fclose(fp);
 	printf("parsing %s: ", filename);
 	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
-	nft_parse_perror("Reason", err);
+	nftnl_parse_perror("Reason", err);
 	return -1;
 }
 
-static int test_xml(const char *filename, struct nft_parse_err *err)
+static int test_xml(const char *filename, struct nftnl_parse_err *err)
 {
 	int ret = -1;
-	struct nft_ruleset *rs;
+	struct nftnl_ruleset *rs;
 	FILE *fp;
 
 	fp = fopen(filename, "r");
@@ -157,18 +157,18 @@ static int test_xml(const char *filename, struct nft_parse_err *err)
 		return -1;
 	}
 
-	rs = nft_ruleset_alloc();
+	rs = nftnl_ruleset_alloc();
 	if (rs == NULL) {
-		perror("nft_ruleset_alloc");
+		perror("nftnl_ruleset_alloc");
 		return -1;
 	}
 
-	if (nft_ruleset_parse_file(rs, NFT_PARSE_XML, fp, err) == 0)
+	if (nftnl_ruleset_parse_file(rs, NFTNL_PARSE_XML, fp, err) == 0)
 		ret = compare_test(TEST_XML_RULESET, rs, filename, fp);
 	else
 		goto failparsing;
 
-	nft_ruleset_free(rs);
+	nftnl_ruleset_free(rs);
 	fclose(fp);
 
 	return ret;
@@ -177,7 +177,7 @@ failparsing:
 	fclose(fp);
 	printf("parsing %s: ", filename);
 	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
-	nft_parse_perror("Reason", err);
+	nftnl_parse_perror("Reason", err);
 	return -1;
 }
 
@@ -187,7 +187,7 @@ static int execute_test(const char *dir_name)
 	struct dirent *dent;
 	char path[PATH_MAX];
 	int ret = 0, exit_code = 0;
-	struct nft_parse_err *err;
+	struct nftnl_parse_err *err;
 
 	d = opendir(dir_name);
 	if (d == NULL) {
@@ -195,7 +195,7 @@ static int execute_test(const char *dir_name)
 		exit(EXIT_FAILURE);
 	}
 
-	err = nft_parse_err_alloc();
+	err = nftnl_parse_err_alloc();
 	if (err == NULL) {
 		perror("error");
 		exit(EXIT_FAILURE);
@@ -233,7 +233,7 @@ static int execute_test(const char *dir_name)
 	}
 
 	closedir(d);
-	nft_parse_err_free(err);
+	nftnl_parse_err_free(err);
 
 	if (exit_code != 0)
 		exit(EXIT_FAILURE);
@@ -245,9 +245,9 @@ static int execute_test_file(const char *filename)
 {
 	char path[PATH_MAX];
 	int ret = 0;
-	struct nft_parse_err *err;
+	struct nftnl_parse_err *err;
 
-	err = nft_parse_err_alloc();
+	err = nftnl_parse_err_alloc();
 	if (err == NULL) {
 		perror("error");
 		exit(EXIT_FAILURE);
@@ -264,7 +264,7 @@ static int execute_test_file(const char *filename)
 				printf("\033[32mOK\e[0m\n");
 			}
 		}
-		nft_parse_err_free(err);
+		nftnl_parse_err_free(err);
 		exit(EXIT_FAILURE);
 	}
 	if (strcmp(&filename[len-5], ".json") == 0) {
@@ -275,11 +275,11 @@ static int execute_test_file(const char *filename)
 				printf("\033[32mOK\e[0m\n");
 			}
 		}
-		nft_parse_err_free(err);
+		nftnl_parse_err_free(err);
 		exit(EXIT_FAILURE);
 	}
 
-	nft_parse_err_free(err);
+	nftnl_parse_err_free(err);
 
 	return 0;
 }
