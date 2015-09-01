@@ -196,6 +196,207 @@ global:
   nft_parse_err_free;
   nft_parse_perror;
 
+#
+# aliases
+#
+
+  nftnl_table_alloc;
+  nftnl_table_free;
+  nftnl_table_attr_is_set;
+  nftnl_table_attr_unset;
+  nftnl_table_attr_set;
+  nftnl_table_attr_get;
+  nftnl_table_attr_set_u8;
+  nftnl_table_attr_set_u32;
+  nftnl_table_attr_set_str;
+  nftnl_table_attr_get_u8;
+  nftnl_table_attr_get_u32;
+  nftnl_table_attr_get_str;
+  nftnl_table_parse;
+  nftnl_table_parse_file;
+  nftnl_table_snprintf;
+  nftnl_table_fprintf;
+  nftnl_table_nlmsg_build_payload;
+  nftnl_table_nlmsg_parse;
+  nftnl_table_list_alloc;
+  nftnl_table_list_free;
+  nftnl_table_list_is_empty;
+  nftnl_table_list_foreach;
+  nftnl_table_list_add;
+  nftnl_table_list_add_tail;
+  nftnl_table_list_del;
+  nftnl_table_list_iter_create;
+  nftnl_table_list_iter_next;
+  nftnl_table_list_iter_destroy;
+
+  nftnl_chain_alloc;
+  nftnl_chain_free;
+  nftnl_chain_attr_is_set;
+  nftnl_chain_attr_unset;
+  nftnl_chain_attr_set;
+  nftnl_chain_attr_set_u8;
+  nftnl_chain_attr_set_u32;
+  nftnl_chain_attr_set_s32;
+  nftnl_chain_attr_set_u64;
+  nftnl_chain_attr_set_str;
+  nftnl_chain_attr_get;
+  nftnl_chain_attr_get_u8;
+  nftnl_chain_attr_get_u32;
+  nftnl_chain_attr_get_s32;
+  nftnl_chain_attr_get_u64;
+  nftnl_chain_attr_get_str;
+  nftnl_chain_parse;
+  nftnl_chain_parse_file;
+  nftnl_chain_snprintf;
+  nftnl_chain_fprintf;
+  nftnl_chain_nlmsg_build_payload;
+  nftnl_chain_nlmsg_parse;
+  nftnl_chain_list_alloc;
+  nftnl_chain_list_free;
+  nftnl_chain_list_is_empty;
+  nftnl_chain_list_add;
+  nftnl_chain_list_add_tail;
+  nftnl_chain_list_del;
+  nftnl_chain_list_foreach;
+  nftnl_chain_list_iter_create;
+  nftnl_chain_list_iter_next;
+  nftnl_chain_list_iter_destroy;
+
+  nftnl_rule_alloc;
+  nftnl_rule_free;
+  nftnl_rule_attr_is_set;
+  nftnl_rule_attr_unset;
+  nftnl_rule_attr_set;
+  nftnl_rule_attr_set_u32;
+  nftnl_rule_attr_set_u64;
+  nftnl_rule_attr_set_str;
+  nftnl_rule_attr_get;
+  nftnl_rule_attr_get_u8;
+  nftnl_rule_attr_get_u32;
+  nftnl_rule_attr_get_u64;
+  nftnl_rule_attr_get_str;
+  nftnl_rule_parse;
+  nftnl_rule_parse_file;
+  nftnl_rule_snprintf;
+  nftnl_rule_fprintf;
+  nftnl_rule_nlmsg_build_payload;
+  nftnl_rule_nlmsg_parse;
+  nftnl_rule_add_expr;
+
+  nftnl_rule_expr_foreach;
+  nftnl_rule_expr_iter_create;
+  nftnl_rule_expr_iter_next;
+  nftnl_rule_expr_iter_destroy;
+
+  nftnl_rule_expr_alloc;
+  nftnl_rule_expr_is_set;
+  nftnl_rule_expr_set;
+  nftnl_rule_expr_set_u8;
+  nftnl_rule_expr_set_u16;
+  nftnl_rule_expr_set_u32;
+  nftnl_rule_expr_set_u64;
+  nftnl_rule_expr_set_str;
+  nftnl_rule_expr_get;
+  nftnl_rule_expr_get_u8;
+  nftnl_rule_expr_get_u16;
+  nftnl_rule_expr_get_u32;
+  nftnl_rule_expr_get_u64;
+  nftnl_rule_expr_get_str;
+  nftnl_rule_expr_snprintf;
+  nftnl_rule_expr_free;
+
+  nftnl_rule_list_alloc;
+  nftnl_rule_list_free;
+  nftnl_rule_list_is_empty;
+  nftnl_rule_list_add;
+  nftnl_rule_list_add_tail;
+  nftnl_rule_list_del;
+  nftnl_rule_list_foreach;
+  nftnl_rule_list_iter_create;
+  nftnl_rule_list_iter_cur;
+  nftnl_rule_list_iter_next;
+  nftnl_rule_list_iter_destroy;
+
+  nftnl_set_alloc;
+  nftnl_set_free;
+  nftnl_set_attr_unset;
+  nftnl_set_attr_is_set;
+  nftnl_set_attr_set;
+  nftnl_set_attr_set_u32;
+  nftnl_set_attr_set_u64;
+  nftnl_set_attr_set_str;
+  nftnl_set_attr_get;
+  nftnl_set_attr_get_str;
+  nftnl_set_attr_get_u32;
+  nftnl_set_attr_get_u64;
+  nftnl_set_nlmsg_build_payload;
+  nftnl_set_nlmsg_parse;
+  nftnl_set_parse;
+  nftnl_set_parse_file;
+  nftnl_set_snprintf;
+  nftnl_set_fprintf;
+
+  nftnl_set_list_alloc;
+  nftnl_set_list_free;
+  nftnl_set_list_add;
+  nftnl_set_list_add_tail;
+  nftnl_set_list_del;
+  nftnl_set_list_is_empty;
+  nftnl_set_list_foreach;
+
+  nftnl_set_list_iter_create;
+  nftnl_set_list_iter_cur;
+  nftnl_set_list_iter_next;
+  nftnl_set_list_iter_destroy;
+
+  nftnl_set_elem_alloc;
+  nftnl_set_elem_free;
+  nftnl_set_elem_add;
+  nftnl_set_elem_foreach;
+  nftnl_set_elem_attr_is_set;
+  nftnl_set_elem_attr_unset;
+  nftnl_set_elem_attr_set;
+  nftnl_set_elem_attr_set_u32;
+  nftnl_set_elem_attr_set_u64;
+  nftnl_set_elem_attr_set_str;
+  nftnl_set_elem_attr_get;
+  nftnl_set_elem_attr_get_str;
+  nftnl_set_elem_attr_get_u32;
+  nftnl_set_elem_attr_get_u64;
+  nftnl_set_elem_nlmsg_build_payload;
+  nftnl_set_elem_parse;
+  nftnl_set_elem_parse_file;
+  nftnl_set_elem_snprintf;
+  nftnl_set_elem_fprinf;
+
+  nftnl_set_elems_nlmsg_build_payload;
+  nftnl_set_elems_nlmsg_parse;
+
+  nftnl_set_elems_foreach;
+
+  nftnl_set_elems_iter_create;
+  nftnl_set_elems_iter_cur;
+  nftnl_set_elems_iter_next;
+  nftnl_set_elems_iter_destroy;
+
+  nftnl_ruleset_alloc;
+  nftnl_ruleset_free;
+  nftnl_ruleset_attr_is_set;
+  nftnl_ruleset_attr_unset;
+  nftnl_ruleset_attr_set;
+  nftnl_ruleset_attr_get;
+  nftnl_ruleset_parse;
+  nftnl_ruleset_parse_file;
+  nftnl_ruleset_snprintf;
+  nftnl_ruleset_fprintf;
+
+  nftnl_nlmsg_build_hdr;
+
+  nftnl_parse_err_alloc;
+  nftnl_parse_err_free;
+  nftnl_parse_perror;
+
+
 local: *;
 };
 
@@ -208,6 +409,20 @@ LIBNFTNL_1.1 {
   nft_rule_attr_get_data;
   nft_set_attr_set_data;
   nft_set_attr_get_data;
+
+#
+# aliases
+#
+
+  nftnl_table_attr_set_data;
+  nftnl_table_attr_get_data;
+  nftnl_chain_attr_set_data;
+  nftnl_chain_attr_get_data;
+  nftnl_rule_attr_set_data;
+  nftnl_rule_attr_get_data;
+  nftnl_set_attr_set_data;
+  nftnl_set_attr_get_data;
+
 } LIBNFTNL_1.0;
 
 LIBNFTNL_1.2 {
@@ -229,6 +444,31 @@ LIBNFTNL_1.2 {
   nft_gen_nlmsg_parse;
   nft_gen_snprintf;
   nft_gen_fprintf;
+
+#
+# aliases
+#
+
+  nftnl_set_elems_nlmsg_build_payload_iter;
+  nftnl_batch_is_supported;
+  nftnl_batch_begin;
+  nftnl_batch_end;
+
+  nftnl_gen_alloc;
+  nftnl_gen_free;
+  nftnl_gen_attr_is_set;
+  nftnl_gen_attr_unset;
+  nftnl_gen_attr_set_data;
+  nftnl_gen_attr_set;
+  nftnl_gen_attr_set_u32;
+  nftnl_gen_attr_get_data;
+  nftnl_gen_attr_get;
+  nftnl_gen_attr_get_u32;
+  nftnl_gen_nlmsg_parse;
+  nftnl_gen_snprintf;
+  nftnl_gen_fprintf;
+
+
 } LIBNFTNL_1.1;
 
 LIBNFTNL_1.2.0 {
@@ -246,4 +486,24 @@ LIBNFTNL_1.2.0 {
   nft_batch_buffer_len;
   nft_batch_iovec_len;
   nft_batch_iovec;
+
+#
+# aliases
+#
+
+  nftnl_ruleset_ctx_is_set;
+  nftnl_ruleset_ctx_get;
+  nftnl_ruleset_ctx_get_u32;
+  nftnl_ruleset_parse_file_cb;
+  nftnl_ruleset_parse_buffer_cb;
+  nftnl_ruleset_ctx_free;
+
+  nftnl_batch_alloc;
+  nftnl_batch_update;
+  nftnl_batch_free;
+  nftnl_batch_buffer;
+  nftnl_batch_buffer_len;
+  nftnl_batch_iovec_len;
+  nftnl_batch_iovec;
+
 } LIBNFTNL_1.2;

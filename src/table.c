@@ -40,7 +40,7 @@ struct nft_table *nft_table_alloc(void)
 {
 	return calloc(1, sizeof(struct nft_table));
 }
-EXPORT_SYMBOL(nft_table_alloc);
+EXPORT_SYMBOL(nftnl_table_alloc, nft_table_alloc);
 
 void nft_table_free(struct nft_table *t)
 {
@@ -49,13 +49,13 @@ void nft_table_free(struct nft_table *t)
 
 	xfree(t);
 }
-EXPORT_SYMBOL(nft_table_free);
+EXPORT_SYMBOL(nftnl_table_free, nft_table_free);
 
 bool nft_table_attr_is_set(const struct nft_table *t, uint16_t attr)
 {
 	return t->flags & (1 << attr);
 }
-EXPORT_SYMBOL(nft_table_attr_is_set);
+EXPORT_SYMBOL(nftnl_table_attr_is_set, nft_table_attr_is_set);
 
 void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
 {
@@ -77,7 +77,7 @@ void nft_table_attr_unset(struct nft_table *t, uint16_t attr)
 	}
 	t->flags &= ~(1 << attr);
 }
-EXPORT_SYMBOL(nft_table_attr_unset);
+EXPORT_SYMBOL(nftnl_table_attr_unset, nft_table_attr_unset);
 
 static uint32_t nft_table_attr_validate[NFT_TABLE_ATTR_MAX + 1] = {
 	[NFT_TABLE_ATTR_FLAGS]	= sizeof(uint32_t),
@@ -111,31 +111,31 @@ void nft_table_attr_set_data(struct nft_table *t, uint16_t attr,
 	}
 	t->flags |= (1 << attr);
 }
-EXPORT_SYMBOL(nft_table_attr_set_data);
+EXPORT_SYMBOL(nftnl_table_attr_set_data, nft_table_attr_set_data);
 
 void nft_table_attr_set(struct nft_table *t, uint16_t attr, const void *data)
 {
 	nft_table_attr_set_data(t, attr, data, nft_table_attr_validate[attr]);
 }
-EXPORT_SYMBOL(nft_table_attr_set);
+EXPORT_SYMBOL(nftnl_table_attr_set, nft_table_attr_set);
 
 void nft_table_attr_set_u32(struct nft_table *t, uint16_t attr, uint32_t val)
 {
 	nft_table_attr_set_data(t, attr, &val, sizeof(uint32_t));
 }
-EXPORT_SYMBOL(nft_table_attr_set_u32);
+EXPORT_SYMBOL(nftnl_table_attr_set_u32, nft_table_attr_set_u32);
 
 void nft_table_attr_set_u8(struct nft_table *t, uint16_t attr, uint8_t val)
 {
 	nft_table_attr_set_data(t, attr, &val, sizeof(uint8_t));
 }
-EXPORT_SYMBOL(nft_table_attr_set_u8);
+EXPORT_SYMBOL(nftnl_table_attr_set_u8, nft_table_attr_set_u8);
 
 void nft_table_attr_set_str(struct nft_table *t, uint16_t attr, const char *str)
 {
 	nft_table_attr_set_data(t, attr, str, 0);
 }
-EXPORT_SYMBOL(nft_table_attr_set_str);
+EXPORT_SYMBOL(nftnl_table_attr_set_str, nft_table_attr_set_str);
 
 const void *nft_table_attr_get_data(struct nft_table *t, uint16_t attr,
 				    uint32_t *data_len)
@@ -158,34 +158,34 @@ const void *nft_table_attr_get_data(struct nft_table *t, uint16_t attr,
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(nft_table_attr_get_data);
+EXPORT_SYMBOL(nftnl_table_attr_get_data, nft_table_attr_get_data);
 
 const void *nft_table_attr_get(struct nft_table *t, uint16_t attr)
 {
 	uint32_t data_len;
 	return nft_table_attr_get_data(t, attr, &data_len);
 }
-EXPORT_SYMBOL(nft_table_attr_get);
+EXPORT_SYMBOL(nftnl_table_attr_get, nft_table_attr_get);
 
 uint32_t nft_table_attr_get_u32(struct nft_table *t, uint16_t attr)
 {
 	const void *ret = nft_table_attr_get(t, attr);
 	return ret == NULL ? 0 : *((uint32_t *)ret);
 }
-EXPORT_SYMBOL(nft_table_attr_get_u32);
+EXPORT_SYMBOL(nftnl_table_attr_get_u32, nft_table_attr_get_u32);
 
 uint8_t nft_table_attr_get_u8(struct nft_table *t, uint16_t attr)
 {
 	const void *ret = nft_table_attr_get(t, attr);
 	return ret == NULL ? 0 : *((uint8_t *)ret);
 }
-EXPORT_SYMBOL(nft_table_attr_get_u8);
+EXPORT_SYMBOL(nftnl_table_attr_get_u8, nft_table_attr_get_u8);
 
 const char *nft_table_attr_get_str(struct nft_table *t, uint16_t attr)
 {
 	return nft_table_attr_get(t, attr);
 }
-EXPORT_SYMBOL(nft_table_attr_get_str);
+EXPORT_SYMBOL(nftnl_table_attr_get_str, nft_table_attr_get_str);
 
 void nft_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_table *t)
 {
@@ -194,7 +194,7 @@ void nft_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_table 
 	if (t->flags & (1 << NFT_TABLE_ATTR_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_TABLE_FLAGS, htonl(t->table_flags));
 }
-EXPORT_SYMBOL(nft_table_nlmsg_build_payload);
+EXPORT_SYMBOL(nftnl_table_nlmsg_build_payload, nft_table_nlmsg_build_payload);
 
 static int nft_table_parse_attr_cb(const struct nlattr *attr, void *data)
 {
@@ -247,7 +247,7 @@ int nft_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_table *t)
 
 	return 0;
 }
-EXPORT_SYMBOL(nft_table_nlmsg_parse);
+EXPORT_SYMBOL(nftnl_table_nlmsg_parse, nft_table_nlmsg_parse);
 
 #ifdef XML_PARSING
 int nft_mxml_table_parse(mxml_node_t *tree, struct nft_table *t,
@@ -384,14 +384,14 @@ int nft_table_parse(struct nft_table *t, enum nft_parse_type type,
 {
 	return nft_table_do_parse(t, type, data, err, NFT_PARSE_BUFFER);
 }
-EXPORT_SYMBOL(nft_table_parse);
+EXPORT_SYMBOL(nftnl_table_parse, nft_table_parse);
 
 int nft_table_parse_file(struct nft_table *t, enum nft_parse_type type,
 			 FILE *fp, struct nft_parse_err *err)
 {
 	return nft_table_do_parse(t, type, fp, err, NFT_PARSE_FILE);
 }
-EXPORT_SYMBOL(nft_table_parse_file);
+EXPORT_SYMBOL(nftnl_table_parse_file, nft_table_parse_file);
 
 static int nft_table_export(char *buf, size_t size, struct nft_table *t,
 			    int type)
@@ -453,7 +453,7 @@ int nft_table_snprintf(char *buf, size_t size, struct nft_table *t,
 	return nft_table_cmd_snprintf(buf, size, t, nft_flag2cmd(flags), type,
 				      flags);
 }
-EXPORT_SYMBOL(nft_table_snprintf);
+EXPORT_SYMBOL(nftnl_table_snprintf, nft_table_snprintf);
 
 static inline int nft_table_do_snprintf(char *buf, size_t size, void *t,
 					uint32_t cmd, uint32_t type,
@@ -468,7 +468,7 @@ int nft_table_fprintf(FILE *fp, struct nft_table *t, uint32_t type,
 	return nft_fprintf(fp, t, NFT_CMD_UNSPEC, type, flags,
 			   nft_table_do_snprintf);
 }
-EXPORT_SYMBOL(nft_table_fprintf);
+EXPORT_SYMBOL(nftnl_table_fprintf, nft_table_fprintf);
 
 struct nft_table_list {
 	struct list_head list;
@@ -486,7 +486,7 @@ struct nft_table_list *nft_table_list_alloc(void)
 
 	return list;
 }
-EXPORT_SYMBOL(nft_table_list_alloc);
+EXPORT_SYMBOL(nftnl_table_list_alloc, nft_table_list_alloc);
 
 void nft_table_list_free(struct nft_table_list *list)
 {
@@ -498,31 +498,31 @@ void nft_table_list_free(struct nft_table_list *list)
 	}
 	xfree(list);
 }
-EXPORT_SYMBOL(nft_table_list_free);
+EXPORT_SYMBOL(nftnl_table_list_free, nft_table_list_free);
 
 int nft_table_list_is_empty(struct nft_table_list *list)
 {
 	return list_empty(&list->list);
 }
-EXPORT_SYMBOL(nft_table_list_is_empty);
+EXPORT_SYMBOL(nftnl_table_list_is_empty, nft_table_list_is_empty);
 
 void nft_table_list_add(struct nft_table *r, struct nft_table_list *list)
 {
 	list_add(&r->head, &list->list);
 }
-EXPORT_SYMBOL(nft_table_list_add);
+EXPORT_SYMBOL(nftnl_table_list_add, nft_table_list_add);
 
 void nft_table_list_add_tail(struct nft_table *r, struct nft_table_list *list)
 {
 	list_add_tail(&r->head, &list->list);
 }
-EXPORT_SYMBOL(nft_table_list_add_tail);
+EXPORT_SYMBOL(nftnl_table_list_add_tail, nft_table_list_add_tail);
 
 void nft_table_list_del(struct nft_table *t)
 {
 	list_del(&t->head);
 }
-EXPORT_SYMBOL(nft_table_list_del);
+EXPORT_SYMBOL(nftnl_table_list_del, nft_table_list_del);
 
 int nft_table_list_foreach(struct nft_table_list *table_list,
 			   int (*cb)(struct nft_table *t, void *data),
@@ -538,7 +538,7 @@ int nft_table_list_foreach(struct nft_table_list *table_list,
 	}
 	return 0;
 }
-EXPORT_SYMBOL(nft_table_list_foreach);
+EXPORT_SYMBOL(nftnl_table_list_foreach, nft_table_list_foreach);
 
 struct nft_table_list_iter {
 	struct nft_table_list	*list;
@@ -561,7 +561,7 @@ struct nft_table_list_iter *nft_table_list_iter_create(struct nft_table_list *l)
 
 	return iter;
 }
-EXPORT_SYMBOL(nft_table_list_iter_create);
+EXPORT_SYMBOL(nftnl_table_list_iter_create, nft_table_list_iter_create);
 
 struct nft_table *nft_table_list_iter_next(struct nft_table_list_iter *iter)
 {
@@ -577,10 +577,10 @@ struct nft_table *nft_table_list_iter_next(struct nft_table_list_iter *iter)
 
 	return r;
 }
-EXPORT_SYMBOL(nft_table_list_iter_next);
+EXPORT_SYMBOL(nftnl_table_list_iter_next, nft_table_list_iter_next);
 
 void nft_table_list_iter_destroy(struct nft_table_list_iter *iter)
 {
 	xfree(iter);
 }
-EXPORT_SYMBOL(nft_table_list_iter_destroy);
+EXPORT_SYMBOL(nftnl_table_list_iter_destroy, nft_table_list_iter_destroy);

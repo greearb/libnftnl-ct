@@ -80,7 +80,7 @@ err1:
 	free(batch);
 	return NULL;
 }
-EXPORT_SYMBOL(nft_batch_alloc);
+EXPORT_SYMBOL(nftnl_batch_alloc, nft_batch_alloc);
 
 void nft_batch_free(struct nft_batch *batch)
 {
@@ -94,7 +94,7 @@ void nft_batch_free(struct nft_batch *batch)
 
 	free(batch);
 }
-EXPORT_SYMBOL(nft_batch_free);
+EXPORT_SYMBOL(nftnl_batch_free, nft_batch_free);
 
 int nft_batch_update(struct nft_batch *batch)
 {
@@ -119,19 +119,19 @@ int nft_batch_update(struct nft_batch *batch)
 err1:
 	return -1;
 }
-EXPORT_SYMBOL(nft_batch_update);
+EXPORT_SYMBOL(nftnl_batch_update, nft_batch_update);
 
 void *nft_batch_buffer(struct nft_batch *batch)
 {
 	return mnl_nlmsg_batch_current(batch->current_page->batch);
 }
-EXPORT_SYMBOL(nft_batch_buffer);
+EXPORT_SYMBOL(nftnl_batch_buffer, nft_batch_buffer);
 
 uint32_t nft_batch_buffer_len(struct nft_batch *batch)
 {
 	return mnl_nlmsg_batch_size(batch->current_page->batch);
 }
-EXPORT_SYMBOL(nft_batch_buffer_len);
+EXPORT_SYMBOL(nftnl_batch_buffer_len, nft_batch_buffer_len);
 
 int nft_batch_iovec_len(struct nft_batch *batch)
 {
@@ -143,7 +143,7 @@ int nft_batch_iovec_len(struct nft_batch *batch)
 
 	return num_pages;
 }
-EXPORT_SYMBOL(nft_batch_iovec_len);
+EXPORT_SYMBOL(nftnl_batch_iovec_len, nft_batch_iovec_len);
 
 void nft_batch_iovec(struct nft_batch *batch, struct iovec *iov, uint32_t iovlen)
 {
@@ -159,4 +159,4 @@ void nft_batch_iovec(struct nft_batch *batch, struct iovec *iov, uint32_t iovlen
 		i++;
 	}
 }
-EXPORT_SYMBOL(nft_batch_iovec);
+EXPORT_SYMBOL(nftnl_batch_iovec, nft_batch_iovec);

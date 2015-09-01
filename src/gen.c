@@ -33,19 +33,19 @@ struct nft_gen *nft_gen_alloc(void)
 {
 	return calloc(1, sizeof(struct nft_gen));
 }
-EXPORT_SYMBOL(nft_gen_alloc);
+EXPORT_SYMBOL(nftnl_gen_alloc, nft_gen_alloc);
 
 void nft_gen_free(struct nft_gen *gen)
 {
 	xfree(gen);
 }
-EXPORT_SYMBOL(nft_gen_free);
+EXPORT_SYMBOL(nftnl_gen_free, nft_gen_free);
 
 bool nft_gen_attr_is_set(const struct nft_gen *gen, uint16_t attr)
 {
 	return gen->flags & (1 << attr);
 }
-EXPORT_SYMBOL(nft_gen_attr_is_set);
+EXPORT_SYMBOL(nftnl_gen_attr_is_set, nft_gen_attr_is_set);
 
 void nft_gen_attr_unset(struct nft_gen *gen, uint16_t attr)
 {
@@ -58,7 +58,7 @@ void nft_gen_attr_unset(struct nft_gen *gen, uint16_t attr)
 	}
 	gen->flags &= ~(1 << attr);
 }
-EXPORT_SYMBOL(nft_gen_attr_unset);
+EXPORT_SYMBOL(nftnl_gen_attr_unset, nft_gen_attr_unset);
 
 static uint32_t nft_gen_attr_validate[NFT_GEN_MAX + 1] = {
 	[NFT_GEN_ID]	= sizeof(uint32_t),
@@ -79,19 +79,19 @@ void nft_gen_attr_set_data(struct nft_gen *gen, uint16_t attr,
 	}
 	gen->flags |= (1 << attr);
 }
-EXPORT_SYMBOL(nft_gen_attr_set_data);
+EXPORT_SYMBOL(nftnl_gen_attr_set_data, nft_gen_attr_set_data);
 
 void nft_gen_attr_set(struct nft_gen *gen, uint16_t attr, const void *data)
 {
 	nft_gen_attr_set_data(gen, attr, data, nft_gen_attr_validate[attr]);
 }
-EXPORT_SYMBOL(nft_gen_attr_set);
+EXPORT_SYMBOL(nftnl_gen_attr_set, nft_gen_attr_set);
 
 void nft_gen_attr_set_u32(struct nft_gen *gen, uint16_t attr, uint32_t val)
 {
 	nft_gen_attr_set_data(gen, attr, &val, sizeof(uint32_t));
 }
-EXPORT_SYMBOL(nft_gen_attr_set_u32);
+EXPORT_SYMBOL(nftnl_gen_attr_set_u32, nft_gen_attr_set_u32);
 
 const void *nft_gen_attr_get_data(struct nft_gen *gen, uint16_t attr,
 				  uint32_t *data_len)
@@ -105,21 +105,21 @@ const void *nft_gen_attr_get_data(struct nft_gen *gen, uint16_t attr,
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(nft_gen_attr_get_data);
+EXPORT_SYMBOL(nftnl_gen_attr_get_data, nft_gen_attr_get_data);
 
 const void *nft_gen_attr_get(struct nft_gen *gen, uint16_t attr)
 {
 	uint32_t data_len;
 	return nft_gen_attr_get_data(gen, attr, &data_len);
 }
-EXPORT_SYMBOL(nft_gen_attr_get);
+EXPORT_SYMBOL(nftnl_gen_attr_get, nft_gen_attr_get);
 
 uint32_t nft_gen_attr_get_u32(struct nft_gen *gen, uint16_t attr)
 {
 	const void *ret = nft_gen_attr_get(gen, attr);
 	return ret == NULL ? 0 : *((uint32_t *)ret);
 }
-EXPORT_SYMBOL(nft_gen_attr_get_u32);
+EXPORT_SYMBOL(nftnl_gen_attr_get_u32, nft_gen_attr_get_u32);
 
 static int nft_gen_parse_attr_cb(const struct nlattr *attr, void *data)
 {
@@ -154,7 +154,7 @@ int nft_gen_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_gen *gen)
 	}
 	return 0;
 }
-EXPORT_SYMBOL(nft_gen_nlmsg_parse);
+EXPORT_SYMBOL(nftnl_gen_nlmsg_parse, nft_gen_nlmsg_parse);
 
 static int nft_gen_snprintf_default(char *buf, size_t size, struct nft_gen *gen)
 {
@@ -190,7 +190,7 @@ int nft_gen_snprintf(char *buf, size_t size, struct nft_gen *gen, uint32_t type,
 	return nft_gen_cmd_snprintf(buf, size, gen, nft_flag2cmd(flags), type,
 				    flags);
 }
-EXPORT_SYMBOL(nft_gen_snprintf);
+EXPORT_SYMBOL(nftnl_gen_snprintf, nft_gen_snprintf);
 
 static inline int nft_gen_do_snprintf(char *buf, size_t size, void *gen,
 				      uint32_t cmd, uint32_t type,
@@ -205,4 +205,4 @@ int nft_gen_fprintf(FILE *fp, struct nft_gen *gen, uint32_t type,
 	return nft_fprintf(fp, gen, NFT_CMD_UNSPEC, type, flags,
 			   nft_gen_do_snprintf);
 }
-EXPORT_SYMBOL(nft_gen_fprintf);
+EXPORT_SYMBOL(nftnl_gen_fprintf, nft_gen_fprintf);

@@ -91,7 +91,7 @@ struct nft_chain *nft_chain_alloc(void)
 {
 	return calloc(1, sizeof(struct nft_chain));
 }
-EXPORT_SYMBOL(nft_chain_alloc);
+EXPORT_SYMBOL(nftnl_chain_alloc, nft_chain_alloc);
 
 void nft_chain_free(struct nft_chain *c)
 {
@@ -104,13 +104,13 @@ void nft_chain_free(struct nft_chain *c)
 
 	xfree(c);
 }
-EXPORT_SYMBOL(nft_chain_free);
+EXPORT_SYMBOL(nftnl_chain_free, nft_chain_free);
 
 bool nft_chain_attr_is_set(const struct nft_chain *c, uint16_t attr)
 {
 	return c->flags & (1 << attr);
 }
-EXPORT_SYMBOL(nft_chain_attr_is_set);
+EXPORT_SYMBOL(nftnl_chain_attr_is_set, nft_chain_attr_is_set);
 
 void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr)
 {
@@ -153,7 +153,7 @@ void nft_chain_attr_unset(struct nft_chain *c, uint16_t attr)
 
 	c->flags &= ~(1 << attr);
 }
-EXPORT_SYMBOL(nft_chain_attr_unset);
+EXPORT_SYMBOL(nftnl_chain_attr_unset, nft_chain_attr_unset);
 
 static uint32_t nft_chain_attr_validate[NFT_CHAIN_ATTR_MAX + 1] = {
 	[NFT_CHAIN_ATTR_HOOKNUM]	= sizeof(uint32_t),
@@ -222,43 +222,43 @@ void nft_chain_attr_set_data(struct nft_chain *c, uint16_t attr,
 	}
 	c->flags |= (1 << attr);
 }
-EXPORT_SYMBOL(nft_chain_attr_set_data);
+EXPORT_SYMBOL(nftnl_chain_attr_set_data, nft_chain_attr_set_data);
 
 void nft_chain_attr_set(struct nft_chain *c, uint16_t attr, const void *data)
 {
 	nft_chain_attr_set_data(c, attr, data, nft_chain_attr_validate[attr]);
 }
-EXPORT_SYMBOL(nft_chain_attr_set);
+EXPORT_SYMBOL(nftnl_chain_attr_set, nft_chain_attr_set);
 
 void nft_chain_attr_set_u32(struct nft_chain *c, uint16_t attr, uint32_t data)
 {
 	nft_chain_attr_set_data(c, attr, &data, sizeof(uint32_t));
 }
-EXPORT_SYMBOL(nft_chain_attr_set_u32);
+EXPORT_SYMBOL(nftnl_chain_attr_set_u32, nft_chain_attr_set_u32);
 
 void nft_chain_attr_set_s32(struct nft_chain *c, uint16_t attr, int32_t data)
 {
 	nft_chain_attr_set_data(c, attr, &data, sizeof(int32_t));
 }
-EXPORT_SYMBOL(nft_chain_attr_set_s32);
+EXPORT_SYMBOL(nftnl_chain_attr_set_s32, nft_chain_attr_set_s32);
 
 void nft_chain_attr_set_u64(struct nft_chain *c, uint16_t attr, uint64_t data)
 {
 	nft_chain_attr_set_data(c, attr, &data, sizeof(uint64_t));
 }
-EXPORT_SYMBOL(nft_chain_attr_set_u64);
+EXPORT_SYMBOL(nftnl_chain_attr_set_u64, nft_chain_attr_set_u64);
 
 void nft_chain_attr_set_u8(struct nft_chain *c, uint16_t attr, uint8_t data)
 {
 	nft_chain_attr_set_data(c, attr, &data, sizeof(uint8_t));
 }
-EXPORT_SYMBOL(nft_chain_attr_set_u8);
+EXPORT_SYMBOL(nftnl_chain_attr_set_u8, nft_chain_attr_set_u8);
 
 void nft_chain_attr_set_str(struct nft_chain *c, uint16_t attr, const char *str)
 {
 	nft_chain_attr_set_data(c, attr, str, strlen(str));
 }
-EXPORT_SYMBOL(nft_chain_attr_set_str);
+EXPORT_SYMBOL(nftnl_chain_attr_set_str, nft_chain_attr_set_str);
 
 const void *nft_chain_attr_get_data(struct nft_chain *c, uint16_t attr,
 				    uint32_t *data_len)
@@ -303,20 +303,20 @@ const void *nft_chain_attr_get_data(struct nft_chain *c, uint16_t attr,
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(nft_chain_attr_get_data);
+EXPORT_SYMBOL(nftnl_chain_attr_get_data, nft_chain_attr_get_data);
 
 const void *nft_chain_attr_get(struct nft_chain *c, uint16_t attr)
 {
 	uint32_t data_len;
 	return nft_chain_attr_get_data(c, attr, &data_len);
 }
-EXPORT_SYMBOL(nft_chain_attr_get);
+EXPORT_SYMBOL(nftnl_chain_attr_get, nft_chain_attr_get);
 
 const char *nft_chain_attr_get_str(struct nft_chain *c, uint16_t attr)
 {
 	return nft_chain_attr_get(c, attr);
 }
-EXPORT_SYMBOL(nft_chain_attr_get_str);
+EXPORT_SYMBOL(nftnl_chain_attr_get_str, nft_chain_attr_get_str);
 
 uint32_t nft_chain_attr_get_u32(struct nft_chain *c, uint16_t attr)
 {
@@ -327,7 +327,7 @@ uint32_t nft_chain_attr_get_u32(struct nft_chain *c, uint16_t attr)
 
 	return val ? *val : 0;
 }
-EXPORT_SYMBOL(nft_chain_attr_get_u32);
+EXPORT_SYMBOL(nftnl_chain_attr_get_u32, nft_chain_attr_get_u32);
 
 int32_t nft_chain_attr_get_s32(struct nft_chain *c, uint16_t attr)
 {
@@ -338,7 +338,7 @@ int32_t nft_chain_attr_get_s32(struct nft_chain *c, uint16_t attr)
 
 	return val ? *val : 0;
 }
-EXPORT_SYMBOL(nft_chain_attr_get_s32);
+EXPORT_SYMBOL(nftnl_chain_attr_get_s32, nft_chain_attr_get_s32);
 
 uint64_t nft_chain_attr_get_u64(struct nft_chain *c, uint16_t attr)
 {
@@ -349,7 +349,7 @@ uint64_t nft_chain_attr_get_u64(struct nft_chain *c, uint16_t attr)
 
 	return val ? *val : 0;
 }
-EXPORT_SYMBOL(nft_chain_attr_get_u64);
+EXPORT_SYMBOL(nftnl_chain_attr_get_u64, nft_chain_attr_get_u64);
 
 uint8_t nft_chain_attr_get_u8(struct nft_chain *c, uint16_t attr)
 {
@@ -360,7 +360,7 @@ uint8_t nft_chain_attr_get_u8(struct nft_chain *c, uint16_t attr)
 
 	return val ? *val : 0;
 }
-EXPORT_SYMBOL(nft_chain_attr_get_u8);
+EXPORT_SYMBOL(nftnl_chain_attr_get_u8, nft_chain_attr_get_u8);
 
 void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain *c)
 {
@@ -397,7 +397,7 @@ void nft_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nft_chain 
 	if (c->flags & (1 << NFT_CHAIN_ATTR_TYPE))
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_TYPE, c->type);
 }
-EXPORT_SYMBOL(nft_chain_nlmsg_build_payload);
+EXPORT_SYMBOL(nftnl_chain_nlmsg_build_payload, nft_chain_nlmsg_build_payload);
 
 static int nft_chain_parse_attr_cb(const struct nlattr *attr, void *data)
 {
@@ -571,7 +571,7 @@ int nft_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nft_chain *c)
 
 	return ret;
 }
-EXPORT_SYMBOL(nft_chain_nlmsg_parse);
+EXPORT_SYMBOL(nftnl_chain_nlmsg_parse, nft_chain_nlmsg_parse);
 
 static inline int nft_str2hooknum(int family, const char *hook)
 {
@@ -823,14 +823,14 @@ int nft_chain_parse(struct nft_chain *c, enum nft_parse_type type,
 {
 	return nft_chain_do_parse(c, type, data, err, NFT_PARSE_BUFFER);
 }
-EXPORT_SYMBOL(nft_chain_parse);
+EXPORT_SYMBOL(nftnl_chain_parse, nft_chain_parse);
 
 int nft_chain_parse_file(struct nft_chain *c, enum nft_parse_type type,
 			 FILE *fp, struct nft_parse_err *err)
 {
 	return nft_chain_do_parse(c, type, fp, err, NFT_PARSE_FILE);
 }
-EXPORT_SYMBOL(nft_chain_parse_file);
+EXPORT_SYMBOL(nftnl_chain_parse_file, nft_chain_parse_file);
 
 static int nft_chain_export(char *buf, size_t size, struct nft_chain *c,
 			    int type)
@@ -932,7 +932,7 @@ int nft_chain_snprintf(char *buf, size_t size, struct nft_chain *c,
 	return nft_chain_cmd_snprintf(buf, size, c, nft_flag2cmd(flags), type,
 				      flags);
 }
-EXPORT_SYMBOL(nft_chain_snprintf);
+EXPORT_SYMBOL(nftnl_chain_snprintf, nft_chain_snprintf);
 
 static inline int nft_chain_do_snprintf(char *buf, size_t size, void *c,
 					uint32_t cmd, uint32_t type,
@@ -947,7 +947,7 @@ int nft_chain_fprintf(FILE *fp, struct nft_chain *c, uint32_t type,
 	return nft_fprintf(fp, c, NFT_CMD_UNSPEC, type, flags,
 			   nft_chain_do_snprintf);
 }
-EXPORT_SYMBOL(nft_chain_fprintf);
+EXPORT_SYMBOL(nftnl_chain_fprintf, nft_chain_fprintf);
 
 struct nft_chain_list {
 	struct list_head list;
@@ -965,7 +965,7 @@ struct nft_chain_list *nft_chain_list_alloc(void)
 
 	return list;
 }
-EXPORT_SYMBOL(nft_chain_list_alloc);
+EXPORT_SYMBOL(nftnl_chain_list_alloc, nft_chain_list_alloc);
 
 void nft_chain_list_free(struct nft_chain_list *list)
 {
@@ -977,31 +977,31 @@ void nft_chain_list_free(struct nft_chain_list *list)
 	}
 	xfree(list);
 }
-EXPORT_SYMBOL(nft_chain_list_free);
+EXPORT_SYMBOL(nftnl_chain_list_free, nft_chain_list_free);
 
 int nft_chain_list_is_empty(struct nft_chain_list *list)
 {
 	return list_empty(&list->list);
 }
-EXPORT_SYMBOL(nft_chain_list_is_empty);
+EXPORT_SYMBOL(nftnl_chain_list_is_empty, nft_chain_list_is_empty);
 
 void nft_chain_list_add(struct nft_chain *r, struct nft_chain_list *list)
 {
 	list_add(&r->head, &list->list);
 }
-EXPORT_SYMBOL(nft_chain_list_add);
+EXPORT_SYMBOL(nftnl_chain_list_add, nft_chain_list_add);
 
 void nft_chain_list_add_tail(struct nft_chain *r, struct nft_chain_list *list)
 {
 	list_add_tail(&r->head, &list->list);
 }
-EXPORT_SYMBOL(nft_chain_list_add_tail);
+EXPORT_SYMBOL(nftnl_chain_list_add_tail, nft_chain_list_add_tail);
 
 void nft_chain_list_del(struct nft_chain *r)
 {
 	list_del(&r->head);
 }
-EXPORT_SYMBOL(nft_chain_list_del);
+EXPORT_SYMBOL(nftnl_chain_list_del, nft_chain_list_del);
 
 int nft_chain_list_foreach(struct nft_chain_list *chain_list,
 			   int (*cb)(struct nft_chain *r, void *data),
@@ -1017,7 +1017,7 @@ int nft_chain_list_foreach(struct nft_chain_list *chain_list,
 	}
 	return 0;
 }
-EXPORT_SYMBOL(nft_chain_list_foreach);
+EXPORT_SYMBOL(nftnl_chain_list_foreach, nft_chain_list_foreach);
 
 struct nft_chain_list_iter {
 	struct nft_chain_list	*list;
@@ -1040,7 +1040,7 @@ struct nft_chain_list_iter *nft_chain_list_iter_create(struct nft_chain_list *l)
 
 	return iter;
 }
-EXPORT_SYMBOL(nft_chain_list_iter_create);
+EXPORT_SYMBOL(nftnl_chain_list_iter_create, nft_chain_list_iter_create);
 
 struct nft_chain *nft_chain_list_iter_next(struct nft_chain_list_iter *iter)
 {
@@ -1056,10 +1056,10 @@ struct nft_chain *nft_chain_list_iter_next(struct nft_chain_list_iter *iter)
 
 	return r;
 }
-EXPORT_SYMBOL(nft_chain_list_iter_next);
+EXPORT_SYMBOL(nftnl_chain_list_iter_next, nft_chain_list_iter_next);
 
 void nft_chain_list_iter_destroy(struct nft_chain_list_iter *iter)
 {
 	xfree(iter);
 }
-EXPORT_SYMBOL(nft_chain_list_iter_destroy);
+EXPORT_SYMBOL(nftnl_chain_list_iter_destroy, nft_chain_list_iter_destroy);
