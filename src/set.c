@@ -1203,13 +1203,13 @@ static struct nftnl_set *nftnl_set_lookup(const char *this_set_name,
 	return s;
 }
 
-int nftnl_set_lookup_id(struct nftnl_rule_expr *e,
+int nftnl_set_lookup_id(struct nftnl_expr *e,
 		      struct nftnl_set_list *set_list, uint32_t *set_id)
 {
 	const char *set_name;
 	struct nftnl_set *s;
 
-	set_name = nftnl_rule_expr_get_str(e, NFTNL_EXPR_LOOKUP_SET);
+	set_name = nftnl_expr_get_str(e, NFTNL_EXPR_LOOKUP_SET);
 	if (set_name == NULL)
 		return 0;
 

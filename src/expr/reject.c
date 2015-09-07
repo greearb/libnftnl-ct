@@ -26,7 +26,7 @@ struct nftnl_expr_reject {
 	uint8_t			icmp_code;
 };
 
-static int nftnl_rule_expr_reject_set(struct nftnl_rule_expr *e, uint16_t type,
+static int nftnl_expr_reject_set(struct nftnl_expr *e, uint16_t type,
 				    const void *data, uint32_t data_len)
 {
 	struct nftnl_expr_reject *reject = nftnl_expr_data(e);
@@ -45,7 +45,7 @@ static int nftnl_rule_expr_reject_set(struct nftnl_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nftnl_rule_expr_reject_get(const struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_reject_get(const struct nftnl_expr *e, uint16_t type,
 			 uint32_t *data_len)
 {
 	struct nftnl_expr_reject *reject = nftnl_expr_data(e);
@@ -61,7 +61,7 @@ nftnl_rule_expr_reject_get(const struct nftnl_rule_expr *e, uint16_t type,
 	return NULL;
 }
 
-static int nftnl_rule_expr_reject_cb(const struct nlattr *attr, void *data)
+static int nftnl_expr_reject_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -85,7 +85,7 @@ static int nftnl_rule_expr_reject_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_rule_expr_reject_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
+nftnl_expr_reject_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 {
 	struct nftnl_expr_reject *reject = nftnl_expr_data(e);
 
@@ -96,12 +96,12 @@ nftnl_rule_expr_reject_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 }
 
 static int
-nftnl_rule_expr_reject_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
+nftnl_expr_reject_parse(struct nftnl_expr *e, struct nlattr *attr)
 {
 	struct nftnl_expr_reject *reject = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_REJECT_MAX+1] = {};
 
-	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_reject_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_expr_reject_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_REJECT_TYPE]) {
@@ -117,7 +117,7 @@ nftnl_rule_expr_reject_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_rule_expr_reject_json_parse(struct nftnl_rule_expr *e, json_t *root,
+nftnl_expr_reject_json_parse(struct nftnl_expr *e, json_t *root,
 				struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
@@ -125,10 +125,10 @@ nftnl_rule_expr_reject_json_parse(struct nftnl_rule_expr *e, json_t *root,
 	uint8_t code;
 
 	if (nftnl_jansson_parse_val(root, "type", NFTNL_TYPE_U32, &type, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_REJECT_TYPE, type);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_REJECT_TYPE, type);
 
 	if (nftnl_jansson_parse_val(root, "code", NFTNL_TYPE_U8, &code, err) == 0)
-		nftnl_rule_expr_set_u8(e, NFTNL_EXPR_REJECT_CODE, code);
+		nftnl_expr_set_u8(e, NFTNL_EXPR_REJECT_CODE, code);
 
 	return 0;
 #else
@@ -138,7 +138,7 @@ nftnl_rule_expr_reject_json_parse(struct nftnl_rule_expr *e, json_t *root,
 }
 
 static int
-nftnl_rule_expr_reject_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+nftnl_expr_reject_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 			       struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
@@ -147,11 +147,11 @@ nftnl_rule_expr_reject_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 
 	if (nftnl_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
 			       &type, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_REJECT_TYPE, type);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_REJECT_TYPE, type);
 
 	if (nftnl_mxml_num_parse(tree, "code", MXML_DESCEND_FIRST, BASE_DEC,
 			       &code, NFTNL_TYPE_U8, NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u8(e, NFTNL_EXPR_REJECT_CODE, code);
+		nftnl_expr_set_u8(e, NFTNL_EXPR_REJECT_CODE, code);
 
 	return 0;
 #else
@@ -160,8 +160,8 @@ nftnl_rule_expr_reject_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int nftnl_rule_expr_reject_snprintf_default(char *buf, size_t len,
-						 struct nftnl_rule_expr *e)
+static int nftnl_expr_reject_snprintf_default(char *buf, size_t len,
+						 struct nftnl_expr *e)
 {
 	struct nftnl_expr_reject *reject = nftnl_expr_data(e);
 
@@ -169,8 +169,8 @@ static int nftnl_rule_expr_reject_snprintf_default(char *buf, size_t len,
 			reject->type, reject->icmp_code);
 }
 
-static int nftnl_rule_expr_reject_export(char *buf, size_t size,
-				       struct nftnl_rule_expr *e, int type)
+static int nftnl_expr_reject_export(char *buf, size_t size,
+				       struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_reject *reject = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -184,15 +184,15 @@ static int nftnl_rule_expr_reject_export(char *buf, size_t size,
 }
 
 static int
-nftnl_rule_expr_reject_snprintf(char *buf, size_t len, uint32_t type,
-			      uint32_t flags, struct nftnl_rule_expr *e)
+nftnl_expr_reject_snprintf(char *buf, size_t len, uint32_t type,
+			      uint32_t flags, struct nftnl_expr *e)
 {
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_rule_expr_reject_snprintf_default(buf, len, e);
+		return nftnl_expr_reject_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_rule_expr_reject_export(buf, len, e, type);
+		return nftnl_expr_reject_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -203,11 +203,11 @@ struct expr_ops expr_ops_reject = {
 	.name		= "reject",
 	.alloc_len	= sizeof(struct nftnl_expr_reject),
 	.max_attr	= NFTA_REJECT_MAX,
-	.set		= nftnl_rule_expr_reject_set,
-	.get		= nftnl_rule_expr_reject_get,
-	.parse		= nftnl_rule_expr_reject_parse,
-	.build		= nftnl_rule_expr_reject_build,
-	.snprintf	= nftnl_rule_expr_reject_snprintf,
-	.xml_parse	= nftnl_rule_expr_reject_xml_parse,
-	.json_parse	= nftnl_rule_expr_reject_json_parse,
+	.set		= nftnl_expr_reject_set,
+	.get		= nftnl_expr_reject_get,
+	.parse		= nftnl_expr_reject_parse,
+	.build		= nftnl_expr_reject_build,
+	.snprintf	= nftnl_expr_reject_snprintf,
+	.xml_parse	= nftnl_expr_reject_xml_parse,
+	.json_parse	= nftnl_expr_reject_json_parse,
 };

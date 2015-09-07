@@ -27,8 +27,8 @@ struct nftnl_set {
 };
 
 struct nftnl_set_list;
-struct nftnl_rule_expr;
-int nftnl_set_lookup_id(struct nftnl_rule_expr *e, struct nftnl_set_list *set_list,
+struct nftnl_expr;
+int nftnl_set_lookup_id(struct nftnl_expr *e, struct nftnl_set_list *set_list,
 		      uint32_t *set_id);
 
 #endif

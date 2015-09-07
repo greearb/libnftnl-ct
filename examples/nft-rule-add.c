@@ -32,18 +32,18 @@
 static void add_payload(struct nftnl_rule *r, uint32_t base, uint32_t dreg,
 			uint32_t offset, uint32_t len)
 {
-	struct nftnl_rule_expr *e;
+	struct nftnl_expr *e;
 
-	e = nftnl_rule_expr_alloc("payload");
+	e = nftnl_expr_alloc("payload");
 	if (e == NULL) {
 		perror("expr payload oom");
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
-	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, dreg);
-	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, offset);
-	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, len);
+	nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
+	nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, dreg);
+	nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, offset);
+	nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, len);
 
 	nftnl_rule_add_expr(r, e);
 }
@@ -51,26 +51,26 @@ static void add_payload(struct nftnl_rule *r, uint32_t base, uint32_t dreg,
 static void add_cmp(struct nftnl_rule *r, uint32_t sreg, uint32_t op,
 		    const void *data, uint32_t data_len)
 {
-	struct nftnl_rule_expr *e;
+	struct nftnl_expr *e;
 
-	e = nftnl_rule_expr_alloc("cmp");
+	e = nftnl_expr_alloc("cmp");
 	if (e == NULL) {
 		perror("expr cmp oom");
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_CMP_SREG, sreg);
-	nftnl_rule_expr_set_u32(e, NFTNL_EXPR_CMP_OP, op);
-	nftnl_rule_expr_set(e, NFTNL_EXPR_CMP_DATA, data, data_len);
+	nftnl_expr_set_u32(e, NFTNL_EXPR_CMP_SREG, sreg);
+	nftnl_expr_set_u32(e, NFTNL_EXPR_CMP_OP, op);
+	nftnl_expr_set(e, NFTNL_EXPR_CMP_DATA, data, data_len);
 
 	nftnl_rule_add_expr(r, e);
 }
 
 static void add_counter(struct nftnl_rule *r)
 {
-	struct nftnl_rule_expr *e;
+	struct nftnl_expr *e;
 
-	e = nftnl_rule_expr_alloc("counter");
+	e = nftnl_expr_alloc("counter");
 	if (e == NULL) {
 		perror("expr counter oom");
 		exit(EXIT_FAILURE);

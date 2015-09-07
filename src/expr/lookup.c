@@ -33,7 +33,7 @@ struct nftnl_expr_lookup {
 };
 
 static int
-nftnl_rule_expr_lookup_set(struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_lookup_set(struct nftnl_expr *e, uint16_t type,
 			  const void *data, uint32_t data_len)
 {
 	struct nftnl_expr_lookup *lookup = nftnl_expr_data(e);
@@ -59,7 +59,7 @@ nftnl_rule_expr_lookup_set(struct nftnl_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nftnl_rule_expr_lookup_get(const struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_lookup_get(const struct nftnl_expr *e, uint16_t type,
 			 uint32_t *data_len)
 {
 	struct nftnl_expr_lookup *lookup = nftnl_expr_data(e);
@@ -79,7 +79,7 @@ nftnl_rule_expr_lookup_get(const struct nftnl_rule_expr *e, uint16_t type,
 	return NULL;
 }
 
-static int nftnl_rule_expr_lookup_cb(const struct nlattr *attr, void *data)
+static int nftnl_expr_lookup_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -105,7 +105,7 @@ static int nftnl_rule_expr_lookup_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_rule_expr_lookup_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
+nftnl_expr_lookup_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 {
 	struct nftnl_expr_lookup *lookup = nftnl_expr_data(e);
 
@@ -122,13 +122,13 @@ nftnl_rule_expr_lookup_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 }
 
 static int
-nftnl_rule_expr_lookup_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
+nftnl_expr_lookup_parse(struct nftnl_expr *e, struct nlattr *attr)
 {
 	struct nftnl_expr_lookup *lookup = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_LOOKUP_MAX+1] = {};
 	int ret = 0;
 
-	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_lookup_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_expr_lookup_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_LOOKUP_SREG]) {
@@ -153,7 +153,7 @@ nftnl_rule_expr_lookup_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_rule_expr_lookup_json_parse(struct nftnl_rule_expr *e, json_t *root,
+nftnl_expr_lookup_json_parse(struct nftnl_expr *e, json_t *root,
 				struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
@@ -162,13 +162,13 @@ nftnl_rule_expr_lookup_json_parse(struct nftnl_rule_expr *e, json_t *root,
 
 	set_name = nftnl_jansson_parse_str(root, "set", err);
 	if (set_name != NULL)
-		nftnl_rule_expr_set_str(e, NFTNL_EXPR_LOOKUP_SET, set_name);
+		nftnl_expr_set_str(e, NFTNL_EXPR_LOOKUP_SET, set_name);
 
 	if (nftnl_jansson_parse_reg(root, "sreg", NFTNL_TYPE_U32, &sreg, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SREG, sreg);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SREG, sreg);
 
 	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &dreg, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOOKUP_DREG, dreg);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_DREG, dreg);
 
 	return 0;
 #else
@@ -178,7 +178,7 @@ nftnl_rule_expr_lookup_json_parse(struct nftnl_rule_expr *e, json_t *root,
 }
 
 static int
-nftnl_rule_expr_lookup_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+nftnl_expr_lookup_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 			       struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
@@ -188,15 +188,15 @@ nftnl_rule_expr_lookup_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 	set_name = nftnl_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST,
 				      NFTNL_XML_MAND, err);
 	if (set_name != NULL)
-		nftnl_rule_expr_set_str(e, NFTNL_EXPR_LOOKUP_SET, set_name);
+		nftnl_expr_set_str(e, NFTNL_EXPR_LOOKUP_SET, set_name);
 
 	if (nftnl_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND, NFTNL_XML_MAND,
 			       err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SREG, sreg);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SREG, sreg);
 
 	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND, NFTNL_XML_OPT,
 			       err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOOKUP_DREG, dreg);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_DREG, dreg);
 
 	return 0;
 #else
@@ -206,8 +206,8 @@ nftnl_rule_expr_lookup_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 }
 
 static int
-nftnl_rule_expr_lookup_export(char *buf, size_t size,
-			    struct nftnl_rule_expr *e, int type)
+nftnl_expr_lookup_export(char *buf, size_t size,
+			    struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_lookup *l = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -223,8 +223,8 @@ nftnl_rule_expr_lookup_export(char *buf, size_t size,
 }
 
 static int
-nftnl_rule_expr_lookup_snprintf_default(char *buf, size_t size,
-				      struct nftnl_rule_expr *e)
+nftnl_expr_lookup_snprintf_default(char *buf, size_t size,
+				      struct nftnl_expr *e)
 {
 	int len = size, offset = 0, ret;
 	struct nftnl_expr_lookup *l = nftnl_expr_data(e);
@@ -242,16 +242,16 @@ nftnl_rule_expr_lookup_snprintf_default(char *buf, size_t size,
 }
 
 static int
-nftnl_rule_expr_lookup_snprintf(char *buf, size_t size, uint32_t type,
-			       uint32_t flags, struct nftnl_rule_expr *e)
+nftnl_expr_lookup_snprintf(char *buf, size_t size, uint32_t type,
+			       uint32_t flags, struct nftnl_expr *e)
 {
 
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_rule_expr_lookup_snprintf_default(buf, size, e);
+		return nftnl_expr_lookup_snprintf_default(buf, size, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_rule_expr_lookup_export(buf, size, e, type);
+		return nftnl_expr_lookup_export(buf, size, e, type);
 	default:
 		break;
 	}
@@ -262,11 +262,11 @@ struct expr_ops expr_ops_lookup = {
 	.name		= "lookup",
 	.alloc_len	= sizeof(struct nftnl_expr_lookup),
 	.max_attr	= NFTA_LOOKUP_MAX,
-	.set		= nftnl_rule_expr_lookup_set,
-	.get		= nftnl_rule_expr_lookup_get,
-	.parse		= nftnl_rule_expr_lookup_parse,
-	.build		= nftnl_rule_expr_lookup_build,
-	.snprintf	= nftnl_rule_expr_lookup_snprintf,
-	.xml_parse	= nftnl_rule_expr_lookup_xml_parse,
-	.json_parse	= nftnl_rule_expr_lookup_json_parse,
+	.set		= nftnl_expr_lookup_set,
+	.get		= nftnl_expr_lookup_get,
+	.parse		= nftnl_expr_lookup_parse,
+	.build		= nftnl_expr_lookup_build,
+	.snprintf	= nftnl_expr_lookup_snprintf,
+	.xml_parse	= nftnl_expr_lookup_xml_parse,
+	.json_parse	= nftnl_expr_lookup_json_parse,
 };

@@ -32,7 +32,7 @@ struct nftnl_expr_payload {
 };
 
 static int
-nftnl_rule_expr_payload_set(struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_payload_set(struct nftnl_expr *e, uint16_t type,
 			  const void *data, uint32_t data_len)
 {
 	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
@@ -57,7 +57,7 @@ nftnl_rule_expr_payload_set(struct nftnl_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nftnl_rule_expr_payload_get(const struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_payload_get(const struct nftnl_expr *e, uint16_t type,
 			  uint32_t *data_len)
 {
 	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
@@ -79,7 +79,7 @@ nftnl_rule_expr_payload_get(const struct nftnl_rule_expr *e, uint16_t type,
 	return NULL;
 }
 
-static int nftnl_rule_expr_payload_cb(const struct nlattr *attr, void *data)
+static int nftnl_expr_payload_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -102,7 +102,7 @@ static int nftnl_rule_expr_payload_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_rule_expr_payload_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
+nftnl_expr_payload_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 {
 	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
 
@@ -117,12 +117,12 @@ nftnl_rule_expr_payload_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 }
 
 static int
-nftnl_rule_expr_payload_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
+nftnl_expr_payload_parse(struct nftnl_expr *e, struct nlattr *attr)
 {
 	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_PAYLOAD_MAX+1] = {};
 
-	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_payload_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_expr_payload_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_PAYLOAD_DREG]) {
@@ -174,7 +174,7 @@ static inline int nftnl_str2base(const char *base)
 }
 
 static int
-nftnl_rule_expr_payload_json_parse(struct nftnl_rule_expr *e, json_t *root,
+nftnl_expr_payload_json_parse(struct nftnl_expr *e, json_t *root,
 				 struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
@@ -183,7 +183,7 @@ nftnl_rule_expr_payload_json_parse(struct nftnl_rule_expr *e, json_t *root,
 	int base;
 
 	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &reg, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, reg);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, reg);
 
 	base_str = nftnl_jansson_parse_str(root, "base", err);
 	if (base_str != NULL) {
@@ -191,15 +191,15 @@ nftnl_rule_expr_payload_json_parse(struct nftnl_rule_expr *e, json_t *root,
 		if (base < 0)
 			return -1;
 
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
 	}
 
 	if (nftnl_jansson_parse_val(root, "offset", NFTNL_TYPE_U32, &uval32,
 				  err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, uval32);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, uval32);
 
 	if (nftnl_jansson_parse_val(root, "len", NFTNL_TYPE_U32, &uval32, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, uval32);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, uval32);
 
 	return 0;
 #else
@@ -209,7 +209,7 @@ nftnl_rule_expr_payload_json_parse(struct nftnl_rule_expr *e, json_t *root,
 }
 
 static int
-nftnl_rule_expr_payload_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+nftnl_expr_payload_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 				struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
@@ -219,7 +219,7 @@ nftnl_rule_expr_payload_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 
 	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
 			       NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, dreg);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, dreg);
 
 	base_str = nftnl_mxml_str_parse(tree, "base", MXML_DESCEND_FIRST,
 				      NFTNL_XML_MAND, err);
@@ -228,17 +228,17 @@ nftnl_rule_expr_payload_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 		if (base < 0)
 			return -1;
 
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
 	}
 
 	if (nftnl_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
 			       &offset, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, offset);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, offset);
 
 
 	if (nftnl_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
 			       &len, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, len);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, len);
 
 	return 0;
 #else
@@ -247,8 +247,8 @@ nftnl_rule_expr_payload_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int nftnl_rule_expr_payload_export(char *buf, size_t size, uint32_t flags,
-					struct nftnl_rule_expr *e, int type)
+static int nftnl_expr_payload_export(char *buf, size_t size, uint32_t flags,
+					struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -266,8 +266,8 @@ static int nftnl_rule_expr_payload_export(char *buf, size_t size, uint32_t flags
 }
 
 static int
-nftnl_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
-			       uint32_t flags, struct nftnl_rule_expr *e)
+nftnl_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
+			       uint32_t flags, struct nftnl_expr *e)
 {
 	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
 
@@ -278,7 +278,7 @@ nftnl_rule_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 				payload->offset, payload->dreg);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_rule_expr_payload_export(buf, len, flags, e, type);
+		return nftnl_expr_payload_export(buf, len, flags, e, type);
 	default:
 		break;
 	}
@@ -289,11 +289,11 @@ struct expr_ops expr_ops_payload = {
 	.name		= "payload",
 	.alloc_len	= sizeof(struct nftnl_expr_payload),
 	.max_attr	= NFTA_PAYLOAD_MAX,
-	.set		= nftnl_rule_expr_payload_set,
-	.get		= nftnl_rule_expr_payload_get,
-	.parse		= nftnl_rule_expr_payload_parse,
-	.build		= nftnl_rule_expr_payload_build,
-	.snprintf	= nftnl_rule_expr_payload_snprintf,
-	.xml_parse	= nftnl_rule_expr_payload_xml_parse,
-	.json_parse	= nftnl_rule_expr_payload_json_parse,
+	.set		= nftnl_expr_payload_set,
+	.get		= nftnl_expr_payload_get,
+	.parse		= nftnl_expr_payload_parse,
+	.build		= nftnl_expr_payload_build,
+	.snprintf	= nftnl_expr_payload_snprintf,
+	.xml_parse	= nftnl_expr_payload_xml_parse,
+	.json_parse	= nftnl_expr_payload_json_parse,
 };

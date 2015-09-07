@@ -18,7 +18,7 @@ union nftnl_data_reg;
 
 mxml_node_t *nftnl_mxml_build_tree(const void *data, const char *treename,
 				 struct nftnl_parse_err *err, enum nftnl_parse_input input);
-struct nftnl_rule_expr *nftnl_mxml_expr_parse(mxml_node_t *node,
+struct nftnl_expr *nftnl_mxml_expr_parse(mxml_node_t *node,
 					  struct nftnl_parse_err *err,
 					  struct nftnl_set_list *set_list);
 int nftnl_mxml_reg_parse(mxml_node_t *tree, const char *reg_name, uint32_t *reg,

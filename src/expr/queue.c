@@ -26,7 +26,7 @@ struct nftnl_expr_queue {
 	uint16_t		flags;
 };
 
-static int nftnl_rule_expr_queue_set(struct nftnl_rule_expr *e, uint16_t type,
+static int nftnl_expr_queue_set(struct nftnl_expr *e, uint16_t type,
 				    const void *data, uint32_t data_len)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
@@ -48,7 +48,7 @@ static int nftnl_rule_expr_queue_set(struct nftnl_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nftnl_rule_expr_queue_get(const struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_queue_get(const struct nftnl_expr *e, uint16_t type,
 			 uint32_t *data_len)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
@@ -67,7 +67,7 @@ nftnl_rule_expr_queue_get(const struct nftnl_rule_expr *e, uint16_t type,
 	return NULL;
 }
 
-static int nftnl_rule_expr_queue_cb(const struct nlattr *attr, void *data)
+static int nftnl_expr_queue_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -89,7 +89,7 @@ static int nftnl_rule_expr_queue_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_rule_expr_queue_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
+nftnl_expr_queue_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
 
@@ -102,12 +102,12 @@ nftnl_rule_expr_queue_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 }
 
 static int
-nftnl_rule_expr_queue_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
+nftnl_expr_queue_parse(struct nftnl_expr *e, struct nlattr *attr)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_QUEUE_MAX+1] = {};
 
-	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_queue_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_expr_queue_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_QUEUE_NUM]) {
@@ -127,7 +127,7 @@ nftnl_rule_expr_queue_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_rule_expr_queue_json_parse(struct nftnl_rule_expr *e, json_t *root,
+nftnl_expr_queue_json_parse(struct nftnl_expr *e, json_t *root,
 			       struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
@@ -135,14 +135,14 @@ nftnl_rule_expr_queue_json_parse(struct nftnl_rule_expr *e, json_t *root,
 	uint16_t code;
 
 	if (nftnl_jansson_parse_val(root, "num", NFTNL_TYPE_U16, &type, err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, type);
-	nftnl_rule_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, type);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, type);
+	nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, type);
 
 	if (nftnl_jansson_parse_val(root, "total", NFTNL_TYPE_U16, &code, err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_QUEUE_TOTAL, code);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_TOTAL, code);
 
 	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U16, &code, err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_QUEUE_FLAGS, code);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_FLAGS, code);
 
 	return 0;
 #else
@@ -152,7 +152,7 @@ nftnl_rule_expr_queue_json_parse(struct nftnl_rule_expr *e, json_t *root,
 }
 
 static int
-nftnl_rule_expr_queue_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+nftnl_expr_queue_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 			      struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
@@ -161,17 +161,17 @@ nftnl_rule_expr_queue_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 	if (nftnl_mxml_num_parse(tree, "num", MXML_DESCEND_FIRST, BASE_DEC,
 			       &queue_num, NFTNL_TYPE_U16, NFTNL_XML_MAND,
 			       err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, queue_num);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, queue_num);
 
 	if (nftnl_mxml_num_parse(tree, "total", MXML_DESCEND_FIRST, BASE_DEC,
 			       &queue_total, NFTNL_TYPE_U16,
 			       NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_QUEUE_TOTAL, queue_total);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_TOTAL, queue_total);
 
 	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
 			       &flags, NFTNL_TYPE_U16,
 			       NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_QUEUE_FLAGS, flags);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_FLAGS, flags);
 
 	return 0;
 #else
@@ -180,8 +180,8 @@ nftnl_rule_expr_queue_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int nftnl_rule_expr_queue_snprintf_default(char *buf, size_t len,
-						struct nftnl_rule_expr *e)
+static int nftnl_expr_queue_snprintf_default(char *buf, size_t len,
+						struct nftnl_expr *e)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
 	int ret, size = len, offset = 0;
@@ -210,8 +210,8 @@ static int nftnl_rule_expr_queue_snprintf_default(char *buf, size_t len,
 	return offset;
 }
 
-static int nftnl_rule_expr_queue_export(char *buf, size_t size,
-				      struct nftnl_rule_expr *e, int type)
+static int nftnl_expr_queue_export(char *buf, size_t size,
+				      struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -227,16 +227,16 @@ static int nftnl_rule_expr_queue_export(char *buf, size_t size,
 }
 
 static int
-nftnl_rule_expr_queue_snprintf(char *buf, size_t len, uint32_t type,
-			      uint32_t flags, struct nftnl_rule_expr *e)
+nftnl_expr_queue_snprintf(char *buf, size_t len, uint32_t type,
+			      uint32_t flags, struct nftnl_expr *e)
 {
 
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_rule_expr_queue_snprintf_default(buf, len, e);
+		return nftnl_expr_queue_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_rule_expr_queue_export(buf, len, e, type);
+		return nftnl_expr_queue_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -247,11 +247,11 @@ struct expr_ops expr_ops_queue = {
 	.name		= "queue",
 	.alloc_len	= sizeof(struct nftnl_expr_queue),
 	.max_attr	= NFTA_QUEUE_MAX,
-	.set		= nftnl_rule_expr_queue_set,
-	.get		= nftnl_rule_expr_queue_get,
-	.parse		= nftnl_rule_expr_queue_parse,
-	.build		= nftnl_rule_expr_queue_build,
-	.snprintf	= nftnl_rule_expr_queue_snprintf,
-	.xml_parse	= nftnl_rule_expr_queue_xml_parse,
-	.json_parse	= nftnl_rule_expr_queue_json_parse,
+	.set		= nftnl_expr_queue_set,
+	.get		= nftnl_expr_queue_get,
+	.parse		= nftnl_expr_queue_parse,
+	.build		= nftnl_expr_queue_build,
+	.snprintf	= nftnl_expr_queue_snprintf,
+	.xml_parse	= nftnl_expr_queue_xml_parse,
+	.json_parse	= nftnl_expr_queue_json_parse,
 };

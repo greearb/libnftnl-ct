@@ -28,56 +28,56 @@ static void print_err(const char *msg)
 	printf("\033[31mERROR:\e[0m %s\n", msg);
 }
 
-static void cmp_nftnl_rule_expr(struct nftnl_rule_expr *rule_a,
-			      struct nftnl_rule_expr *rule_b)
+static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
+			      struct nftnl_expr *rule_b)
 {
-	if (nftnl_rule_expr_get_u32(rule_a, NFTNL_EXPR_NAT_TYPE) !=
-	    nftnl_rule_expr_get_u32(rule_b, NFTNL_EXPR_NAT_TYPE))
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NAT_TYPE) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NAT_TYPE))
 		print_err("Expr NFTNL_EXPR_NAT_TYPE mismatches");
-	if (nftnl_rule_expr_get_u32(rule_a, NFTNL_EXPR_NAT_FAMILY) !=
-	    nftnl_rule_expr_get_u32(rule_b, NFTNL_EXPR_NAT_FAMILY))
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NAT_FAMILY) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NAT_FAMILY))
 		print_err("Expr NFTNL_EXPR_NAT_FAMILY mismatches");
-	if (nftnl_rule_expr_get_u32(rule_a, NFTNL_EXPR_NAT_REG_ADDR_MIN) !=
-	    nftnl_rule_expr_get_u32(rule_b, NFTNL_EXPR_NAT_REG_ADDR_MIN))
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NAT_REG_ADDR_MIN) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NAT_REG_ADDR_MIN))
 		print_err("Expr NFTNL_EXPR_NAT_REG_ADDR_MIN mismatches");
-	if (nftnl_rule_expr_get_u32(rule_a, NFTNL_EXPR_NAT_REG_ADDR_MAX) !=
-	    nftnl_rule_expr_get_u32(rule_b, NFTNL_EXPR_NAT_REG_ADDR_MAX))
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NAT_REG_ADDR_MAX) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NAT_REG_ADDR_MAX))
 		print_err("Expr NFTNL_EXPR_NAT_REG_ADDR_MAX mismatches");
-	if (nftnl_rule_expr_get_u32(rule_a, NFTNL_EXPR_NAT_REG_PROTO_MIN) !=
-	    nftnl_rule_expr_get_u32(rule_b, NFTNL_EXPR_NAT_REG_PROTO_MIN))
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NAT_REG_PROTO_MIN) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NAT_REG_PROTO_MIN))
 		print_err("Expr NFTNL_EXPR_NAT_REG_PROTO_MIN mismatches");
-	if (nftnl_rule_expr_get_u32(rule_a, NFTNL_EXPR_NAT_REG_PROTO_MAX) !=
-	    nftnl_rule_expr_get_u32(rule_b, NFTNL_EXPR_NAT_REG_PROTO_MAX))
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NAT_REG_PROTO_MAX) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NAT_REG_PROTO_MAX))
 		print_err("Expr NFTNL_EXPR_NAT_REG_PROTO_MAX mismatches");
-	if (nftnl_rule_expr_get_u32(rule_a, NFTNL_EXPR_NAT_FLAGS) !=
-	    nftnl_rule_expr_get_u32(rule_b, NFTNL_EXPR_NAT_FLAGS))
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NAT_FLAGS) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NAT_FLAGS))
 		print_err("Expr NFTNL_EXPR_NAT_FLAGS mismatches");
 }
 
 int main(int argc, char *argv[])
 {
 	struct nftnl_rule *a, *b;
-	struct nftnl_rule_expr *ex;
+	struct nftnl_expr *ex;
 	struct nlmsghdr *nlh;
 	char buf[4096];
-	struct nftnl_rule_expr_iter *iter_a, *iter_b;
-	struct nftnl_rule_expr *rule_a, *rule_b;
+	struct nftnl_expr_iter *iter_a, *iter_b;
+	struct nftnl_expr *rule_a, *rule_b;
 
 	a = nftnl_rule_alloc();
 	b = nftnl_rule_alloc();
 	if (a == NULL || b == NULL)
 		print_err("OOM");
-	ex = nftnl_rule_expr_alloc("nat");
+	ex = nftnl_expr_alloc("nat");
 	if (ex == NULL)
 		print_err("OOM");
 
-	nftnl_rule_expr_set_u32(ex, NFTNL_EXPR_NAT_TYPE, 0x1234568);
-	nftnl_rule_expr_set_u32(ex, NFTNL_EXPR_NAT_FAMILY, 0x1234568);
-	nftnl_rule_expr_set_u32(ex, NFTNL_EXPR_NAT_REG_ADDR_MIN, 0x1234568);
-	nftnl_rule_expr_set_u32(ex, NFTNL_EXPR_NAT_REG_ADDR_MAX, 0x1234568);
-	nftnl_rule_expr_set_u32(ex, NFTNL_EXPR_NAT_REG_PROTO_MIN, 0x1234568);
-	nftnl_rule_expr_set_u32(ex, NFTNL_EXPR_NAT_REG_PROTO_MAX, 0x1234568);
-	nftnl_rule_expr_set_u32(ex, NFTNL_EXPR_NAT_FLAGS, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_NAT_TYPE, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_NAT_FAMILY, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_NAT_REG_ADDR_MIN, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_NAT_REG_ADDR_MAX, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_NAT_REG_PROTO_MIN, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_NAT_REG_PROTO_MAX, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_NAT_FLAGS, 0x1234568);
 
 	nftnl_rule_add_expr(a, ex);
 
@@ -87,24 +87,24 @@ int main(int argc, char *argv[])
 	if (nftnl_rule_nlmsg_parse(nlh, b) < 0)
 		print_err("parsing problems");
 
-	iter_a = nftnl_rule_expr_iter_create(a);
-	iter_b = nftnl_rule_expr_iter_create(b);
+	iter_a = nftnl_expr_iter_create(a);
+	iter_b = nftnl_expr_iter_create(b);
 	if (iter_a == NULL || iter_b == NULL)
 		print_err("OOM");
 
-	rule_a = nftnl_rule_expr_iter_next(iter_a);
-	rule_b = nftnl_rule_expr_iter_next(iter_b);
+	rule_a = nftnl_expr_iter_next(iter_a);
+	rule_b = nftnl_expr_iter_next(iter_b);
 	if (rule_a == NULL || rule_b == NULL)
 		print_err("OOM");
 
-	cmp_nftnl_rule_expr(rule_a, rule_b);
+	cmp_nftnl_expr(rule_a, rule_b);
 
-	if (nftnl_rule_expr_iter_next(iter_a) != NULL ||
-	    nftnl_rule_expr_iter_next(iter_b) != NULL)
+	if (nftnl_expr_iter_next(iter_a) != NULL ||
+	    nftnl_expr_iter_next(iter_b) != NULL)
 		print_err("More 1 expr.");
 
-	nftnl_rule_expr_iter_destroy(iter_a);
-	nftnl_rule_expr_iter_destroy(iter_b);
+	nftnl_expr_iter_destroy(iter_a);
+	nftnl_expr_iter_destroy(iter_b);
 	nftnl_rule_free(a);
 	nftnl_rule_free(b);
 

@@ -9,34 +9,34 @@
 extern "C" {
 #endif
 
-struct nftnl_rule_expr;
+struct nftnl_expr;
 
 enum {
 	NFTNL_RULE_EXPR_ATTR_NAME = 0,
 	NFTNL_RULE_EXPR_ATTR_BASE,
 };
 
-struct nftnl_rule_expr *nftnl_rule_expr_alloc(const char *name);
-void nftnl_rule_expr_free(struct nftnl_rule_expr *expr);
+struct nftnl_expr *nftnl_expr_alloc(const char *name);
+void nftnl_expr_free(struct nftnl_expr *expr);
 
-bool nftnl_rule_expr_is_set(const struct nftnl_rule_expr *expr, uint16_t type);
-void nftnl_rule_expr_set(struct nftnl_rule_expr *expr, uint16_t type, const void *data, uint32_t data_len);
-#define nftnl_rule_expr_set_data nftnl_rule_expr_set
-void nftnl_rule_expr_set_u8(struct nftnl_rule_expr *expr, uint16_t type, uint8_t data);
-void nftnl_rule_expr_set_u16(struct nftnl_rule_expr *expr, uint16_t type, uint16_t data);
-void nftnl_rule_expr_set_u32(struct nftnl_rule_expr *expr, uint16_t type, uint32_t data);
-void nftnl_rule_expr_set_u64(struct nftnl_rule_expr *expr, uint16_t type, uint64_t data);
-void nftnl_rule_expr_set_str(struct nftnl_rule_expr *expr, uint16_t type, const char *str);
+bool nftnl_expr_is_set(const struct nftnl_expr *expr, uint16_t type);
+void nftnl_expr_set(struct nftnl_expr *expr, uint16_t type, const void *data, uint32_t data_len);
+#define nftnl_expr_set_data nftnl_expr_set
+void nftnl_expr_set_u8(struct nftnl_expr *expr, uint16_t type, uint8_t data);
+void nftnl_expr_set_u16(struct nftnl_expr *expr, uint16_t type, uint16_t data);
+void nftnl_expr_set_u32(struct nftnl_expr *expr, uint16_t type, uint32_t data);
+void nftnl_expr_set_u64(struct nftnl_expr *expr, uint16_t type, uint64_t data);
+void nftnl_expr_set_str(struct nftnl_expr *expr, uint16_t type, const char *str);
 
-const void *nftnl_rule_expr_get(const struct nftnl_rule_expr *expr, uint16_t type, uint32_t *data_len);
-#define nftnl_rule_expr_get_data nftnl_rule_expr_get
-uint8_t nftnl_rule_expr_get_u8(const struct nftnl_rule_expr *expr, uint16_t type);
-uint16_t nftnl_rule_expr_get_u16(const struct nftnl_rule_expr *expr, uint16_t type);
-uint32_t nftnl_rule_expr_get_u32(const struct nftnl_rule_expr *expr, uint16_t type);
-uint64_t nftnl_rule_expr_get_u64(const struct nftnl_rule_expr *expr, uint16_t type);
-const char *nftnl_rule_expr_get_str(const struct nftnl_rule_expr *expr, uint16_t type);
+const void *nftnl_expr_get(const struct nftnl_expr *expr, uint16_t type, uint32_t *data_len);
+#define nftnl_expr_get_data nftnl_expr_get
+uint8_t nftnl_expr_get_u8(const struct nftnl_expr *expr, uint16_t type);
+uint16_t nftnl_expr_get_u16(const struct nftnl_expr *expr, uint16_t type);
+uint32_t nftnl_expr_get_u32(const struct nftnl_expr *expr, uint16_t type);
+uint64_t nftnl_expr_get_u64(const struct nftnl_expr *expr, uint16_t type);
+const char *nftnl_expr_get_str(const struct nftnl_expr *expr, uint16_t type);
 
-int nftnl_rule_expr_snprintf(char *buf, size_t buflen, struct nftnl_rule_expr *expr, uint32_t type, uint32_t flags);
+int nftnl_expr_snprintf(char *buf, size_t buflen, struct nftnl_expr *expr, uint32_t type, uint32_t flags);
 
 enum {
 	NFTNL_EXPR_PAYLOAD_DREG	= NFTNL_RULE_EXPR_ATTR_BASE,

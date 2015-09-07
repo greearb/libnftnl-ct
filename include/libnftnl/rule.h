@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 struct nftnl_rule;
-struct nftnl_rule_expr;
+struct nftnl_expr;
 
 struct nftnl_rule *nftnl_rule_alloc(void);
 void nftnl_rule_free(struct nftnl_rule *);
@@ -48,7 +48,7 @@ uint8_t nftnl_rule_attr_get_u8(const struct nftnl_rule *r, uint16_t attr);
 uint32_t nftnl_rule_attr_get_u32(const struct nftnl_rule *r, uint16_t attr);
 uint64_t nftnl_rule_attr_get_u64(const struct nftnl_rule *r, uint16_t attr);
 
-void nftnl_rule_add_expr(struct nftnl_rule *r, struct nftnl_rule_expr *expr);
+void nftnl_rule_add_expr(struct nftnl_rule *r, struct nftnl_expr *expr);
 
 struct nlmsghdr;
 
@@ -64,15 +64,15 @@ int nftnl_rule_fprintf(FILE *fp, struct nftnl_rule *r, uint32_t type, uint32_t f
 #define nftnl_rule_nlmsg_build_hdr	nftnl_nlmsg_build_hdr
 int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *t);
 
-int nftnl_rule_expr_foreach(struct nftnl_rule *r,
-			  int (*cb)(struct nftnl_rule_expr *e, void *data),
+int nftnl_expr_foreach(struct nftnl_rule *r,
+			  int (*cb)(struct nftnl_expr *e, void *data),
 			  void *data);
 
-struct nftnl_rule_expr_iter;
+struct nftnl_expr_iter;
 
-struct nftnl_rule_expr_iter *nftnl_rule_expr_iter_create(struct nftnl_rule *r);
-struct nftnl_rule_expr *nftnl_rule_expr_iter_next(struct nftnl_rule_expr_iter *iter);
-void nftnl_rule_expr_iter_destroy(struct nftnl_rule_expr_iter *iter);
+struct nftnl_expr_iter *nftnl_expr_iter_create(struct nftnl_rule *r);
+struct nftnl_expr *nftnl_expr_iter_next(struct nftnl_expr_iter *iter);
+void nftnl_expr_iter_destroy(struct nftnl_expr_iter *iter);
 
 struct nftnl_rule_list;
 

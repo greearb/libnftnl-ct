@@ -36,7 +36,7 @@ struct nftnl_expr_exthdr {
 };
 
 static int
-nftnl_rule_expr_exthdr_set(struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_exthdr_set(struct nftnl_expr *e, uint16_t type,
 			  const void *data, uint32_t data_len)
 {
 	struct nftnl_expr_exthdr *exthdr = nftnl_expr_data(e);
@@ -61,7 +61,7 @@ nftnl_rule_expr_exthdr_set(struct nftnl_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nftnl_rule_expr_exthdr_get(const struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_exthdr_get(const struct nftnl_expr *e, uint16_t type,
 			 uint32_t *data_len)
 {
 	struct nftnl_expr_exthdr *exthdr = nftnl_expr_data(e);
@@ -83,7 +83,7 @@ nftnl_rule_expr_exthdr_get(const struct nftnl_rule_expr *e, uint16_t type,
 	return NULL;
 }
 
-static int nftnl_rule_expr_exthdr_cb(const struct nlattr *attr, void *data)
+static int nftnl_expr_exthdr_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -109,7 +109,7 @@ static int nftnl_rule_expr_exthdr_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_rule_expr_exthdr_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
+nftnl_expr_exthdr_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 {
 	struct nftnl_expr_exthdr *exthdr = nftnl_expr_data(e);
 
@@ -124,12 +124,12 @@ nftnl_rule_expr_exthdr_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 }
 
 static int
-nftnl_rule_expr_exthdr_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
+nftnl_expr_exthdr_parse(struct nftnl_expr *e, struct nlattr *attr)
 {
 	struct nftnl_expr_exthdr *exthdr = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_EXTHDR_MAX+1] = {};
 
-	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_exthdr_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_expr_exthdr_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_EXTHDR_DREG]) {
@@ -187,7 +187,7 @@ static inline int str2exthdr_type(const char *str)
 }
 
 static int
-nftnl_rule_expr_exthdr_json_parse(struct nftnl_rule_expr *e, json_t *root,
+nftnl_expr_exthdr_json_parse(struct nftnl_expr *e, json_t *root,
 				struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
@@ -197,22 +197,22 @@ nftnl_rule_expr_exthdr_json_parse(struct nftnl_rule_expr *e, json_t *root,
 
 	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &uval32,
 				  err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_EXTHDR_DREG, uval32);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_DREG, uval32);
 
 	exthdr_type = nftnl_jansson_parse_str(root, "exthdr_type", err);
 	if (exthdr_type != NULL) {
 		type = str2exthdr_type(exthdr_type);
 		if (type < 0)
 			return -1;
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_EXTHDR_TYPE, type);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_TYPE, type);
 	}
 
 	if (nftnl_jansson_parse_val(root, "offset", NFTNL_TYPE_U32, &uval32,
 				  err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_EXTHDR_OFFSET, uval32);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_OFFSET, uval32);
 
 	if (nftnl_jansson_parse_val(root, "len", NFTNL_TYPE_U32, &uval32, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_EXTHDR_LEN, uval32);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_LEN, uval32);
 
 	return 0;
 #else
@@ -222,7 +222,7 @@ nftnl_rule_expr_exthdr_json_parse(struct nftnl_rule_expr *e, json_t *root,
 }
 
 static int
-nftnl_rule_expr_exthdr_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
+nftnl_expr_exthdr_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 			       struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
@@ -232,7 +232,7 @@ nftnl_rule_expr_exthdr_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 
 	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
 			       NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_EXTHDR_DREG, dreg);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_DREG, dreg);
 
 	exthdr_type = nftnl_mxml_str_parse(tree, "exthdr_type",
 					 MXML_DESCEND_FIRST, NFTNL_XML_MAND, err);
@@ -240,18 +240,18 @@ nftnl_rule_expr_exthdr_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 		type = str2exthdr_type(exthdr_type);
 		if (type < 0)
 			return -1;
-		nftnl_rule_expr_set_u8(e, NFTNL_EXPR_EXTHDR_TYPE, type);
+		nftnl_expr_set_u8(e, NFTNL_EXPR_EXTHDR_TYPE, type);
 	}
 
 	/* Get and set <offset> */
 	if (nftnl_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
 			       &offset, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_EXTHDR_OFFSET, offset);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_OFFSET, offset);
 
 	/* Get and set <len> */
 	if (nftnl_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
 			       &len, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_EXTHDR_LEN, len);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_LEN, len);
 
 	return 0;
 #else
@@ -260,8 +260,8 @@ nftnl_rule_expr_exthdr_xml_parse(struct nftnl_rule_expr *e, mxml_node_t *tree,
 #endif
 }
 
-static int nftnl_rule_expr_exthdr_export(char *buf, size_t len,
-				       struct nftnl_rule_expr *e, int type)
+static int nftnl_expr_exthdr_export(char *buf, size_t len,
+				       struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_exthdr *exthdr = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, len);
@@ -278,8 +278,8 @@ static int nftnl_rule_expr_exthdr_export(char *buf, size_t len,
 	return nftnl_buf_done(&b);
 }
 
-static int nftnl_rule_expr_exthdr_snprintf_default(char *buf, size_t len,
-						 struct nftnl_rule_expr *e)
+static int nftnl_expr_exthdr_snprintf_default(char *buf, size_t len,
+						 struct nftnl_expr *e)
 {
 	struct nftnl_expr_exthdr *exthdr = nftnl_expr_data(e);
 
@@ -289,15 +289,15 @@ static int nftnl_rule_expr_exthdr_snprintf_default(char *buf, size_t len,
 }
 
 static int
-nftnl_rule_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
-			       uint32_t flags, struct nftnl_rule_expr *e)
+nftnl_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
+			       uint32_t flags, struct nftnl_expr *e)
 {
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_rule_expr_exthdr_snprintf_default(buf, len, e);
+		return nftnl_expr_exthdr_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_rule_expr_exthdr_export(buf, len, e, type);
+		return nftnl_expr_exthdr_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -308,11 +308,11 @@ struct expr_ops expr_ops_exthdr = {
 	.name		= "exthdr",
 	.alloc_len	= sizeof(struct nftnl_expr_exthdr),
 	.max_attr	= NFTA_EXTHDR_MAX,
-	.set		= nftnl_rule_expr_exthdr_set,
-	.get		= nftnl_rule_expr_exthdr_get,
-	.parse		= nftnl_rule_expr_exthdr_parse,
-	.build		= nftnl_rule_expr_exthdr_build,
-	.snprintf	= nftnl_rule_expr_exthdr_snprintf,
-	.xml_parse	= nftnl_rule_expr_exthdr_xml_parse,
-	.json_parse	= nftnl_rule_expr_exthdr_json_parse,
+	.set		= nftnl_expr_exthdr_set,
+	.get		= nftnl_expr_exthdr_get,
+	.parse		= nftnl_expr_exthdr_parse,
+	.build		= nftnl_expr_exthdr_build,
+	.snprintf	= nftnl_expr_exthdr_snprintf,
+	.xml_parse	= nftnl_expr_exthdr_xml_parse,
+	.json_parse	= nftnl_expr_exthdr_json_parse,
 };

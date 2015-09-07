@@ -49,7 +49,7 @@ void nftnl_set_elem_free(struct nftnl_set_elem *s)
 	}
 
 	if (s->flags & (1 << NFTNL_SET_ELEM_ATTR_EXPR))
-		nftnl_rule_expr_free(s->expr);
+		nftnl_expr_free(s->expr);
 
 	xfree(s);
 }
@@ -82,7 +82,7 @@ void nftnl_set_elem_attr_unset(struct nftnl_set_elem *s, uint16_t attr)
 		break;
 	case NFTNL_SET_ELEM_ATTR_EXPR:
 		if (s->flags & (1 << NFTNL_SET_ELEM_ATTR_EXPR)) {
-			nftnl_rule_expr_free(s->expr);
+			nftnl_expr_free(s->expr);
 			s->expr = NULL;
 		}
 		break;
@@ -380,7 +380,7 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 		}
         }
 	if (tb[NFTA_SET_ELEM_EXPR]) {
-		e->expr = nftnl_rule_expr_parse(tb[NFTA_SET_ELEM_EXPR]);
+		e->expr = nftnl_expr_parse(tb[NFTA_SET_ELEM_EXPR]);
 		if (e->expr == NULL)
 			goto err;
 		e->flags |= (1 << NFTNL_SET_ELEM_ATTR_EXPR);

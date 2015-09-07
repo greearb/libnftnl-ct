@@ -186,11 +186,11 @@ int nftnl_jansson_str2num(json_t *root, const char *node_name, int base,
 	return nftnl_strtoi(str, base, out, type);
 }
 
-struct nftnl_rule_expr *nftnl_jansson_expr_parse(json_t *root,
+struct nftnl_expr *nftnl_jansson_expr_parse(json_t *root,
 					     struct nftnl_parse_err *err,
 					     struct nftnl_set_list *set_list)
 {
-	struct nftnl_rule_expr *e;
+	struct nftnl_expr *e;
 	const char *type;
 	uint32_t set_id;
 	int ret;
@@ -199,7 +199,7 @@ struct nftnl_rule_expr *nftnl_jansson_expr_parse(json_t *root,
 	if (type == NULL)
 		return NULL;
 
-	e = nftnl_rule_expr_alloc(type);
+	e = nftnl_expr_alloc(type);
 	if (e == NULL) {
 		err->node_name = "type";
 		return NULL;
@@ -210,7 +210,7 @@ struct nftnl_rule_expr *nftnl_jansson_expr_parse(json_t *root,
 	if (set_list != NULL &&
 	    strcmp(type, "lookup") == 0 &&
 	    nftnl_set_lookup_id(e, set_list, &set_id))
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SET_ID, set_id);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SET_ID, set_id);
 
 	return ret < 0 ? NULL : e;
 }

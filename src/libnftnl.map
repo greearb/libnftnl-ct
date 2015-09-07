@@ -283,27 +283,27 @@ global:
   nftnl_rule_nlmsg_parse;
   nftnl_rule_add_expr;
 
-  nftnl_rule_expr_foreach;
-  nftnl_rule_expr_iter_create;
-  nftnl_rule_expr_iter_next;
-  nftnl_rule_expr_iter_destroy;
+  nftnl_expr_foreach;
+  nftnl_expr_iter_create;
+  nftnl_expr_iter_next;
+  nftnl_expr_iter_destroy;
 
-  nftnl_rule_expr_alloc;
-  nftnl_rule_expr_is_set;
-  nftnl_rule_expr_set;
-  nftnl_rule_expr_set_u8;
-  nftnl_rule_expr_set_u16;
-  nftnl_rule_expr_set_u32;
-  nftnl_rule_expr_set_u64;
-  nftnl_rule_expr_set_str;
-  nftnl_rule_expr_get;
-  nftnl_rule_expr_get_u8;
-  nftnl_rule_expr_get_u16;
-  nftnl_rule_expr_get_u32;
-  nftnl_rule_expr_get_u64;
-  nftnl_rule_expr_get_str;
-  nftnl_rule_expr_snprintf;
-  nftnl_rule_expr_free;
+  nftnl_expr_alloc;
+  nftnl_expr_is_set;
+  nftnl_expr_set;
+  nftnl_expr_set_u8;
+  nftnl_expr_set_u16;
+  nftnl_expr_set_u32;
+  nftnl_expr_set_u64;
+  nftnl_expr_set_str;
+  nftnl_expr_get;
+  nftnl_expr_get_u8;
+  nftnl_expr_get_u16;
+  nftnl_expr_get_u32;
+  nftnl_expr_get_u64;
+  nftnl_expr_get_str;
+  nftnl_expr_snprintf;
+  nftnl_expr_free;
 
   nftnl_rule_list_alloc;
   nftnl_rule_list_free;

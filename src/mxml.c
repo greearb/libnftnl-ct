@@ -58,12 +58,12 @@ err:
 	return NULL;
 }
 
-struct nftnl_rule_expr *nftnl_mxml_expr_parse(mxml_node_t *node,
+struct nftnl_expr *nftnl_mxml_expr_parse(mxml_node_t *node,
 					  struct nftnl_parse_err *err,
 					  struct nftnl_set_list *set_list)
 {
 	mxml_node_t *tree;
-	struct nftnl_rule_expr *e;
+	struct nftnl_expr *e;
 	const char *expr_name;
 	char *xml_text;
 	uint32_t set_id;
@@ -76,7 +76,7 @@ struct nftnl_rule_expr *nftnl_mxml_expr_parse(mxml_node_t *node,
 		goto err;
 	}
 
-	e = nftnl_rule_expr_alloc(expr_name);
+	e = nftnl_expr_alloc(expr_name);
 	if (e == NULL)
 		goto err;
 
@@ -96,11 +96,11 @@ struct nftnl_rule_expr *nftnl_mxml_expr_parse(mxml_node_t *node,
 	if (set_list != NULL &&
 	    strcmp(expr_name, "lookup") == 0 &&
 	    nftnl_set_lookup_id(e, set_list, &set_id))
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SET_ID, set_id);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SET_ID, set_id);
 
 	return ret < 0 ? NULL : e;
 err_expr:
-	nftnl_rule_expr_free(e);
+	nftnl_expr_free(e);
 err:
 	mxmlDelete(tree);
 	errno = EINVAL;

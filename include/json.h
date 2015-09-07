@@ -29,7 +29,7 @@ int nftnl_jansson_str2num(json_t *root, const char *node_name, int base, void *o
 			enum nftnl_type type, struct nftnl_parse_err *err);
 int nftnl_jansson_parse_reg(json_t *root, const char *node_name, int type,
 			  void *out, struct nftnl_parse_err *err);
-struct nftnl_rule_expr *nftnl_jansson_expr_parse(json_t *root,
+struct nftnl_expr *nftnl_jansson_expr_parse(json_t *root,
 					     struct nftnl_parse_err *err,
 					     struct nftnl_set_list *set_list);
 int nftnl_jansson_data_reg_parse(json_t *root, const char *node_name,

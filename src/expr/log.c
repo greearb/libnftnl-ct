@@ -30,7 +30,7 @@ struct nftnl_expr_log {
 	const char		*prefix;
 };
 
-static int nftnl_rule_expr_log_set(struct nftnl_rule_expr *e, uint16_t type,
+static int nftnl_expr_log_set(struct nftnl_expr *e, uint16_t type,
 				 const void *data, uint32_t data_len)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
@@ -64,7 +64,7 @@ static int nftnl_rule_expr_log_set(struct nftnl_rule_expr *e, uint16_t type,
 }
 
 static const void *
-nftnl_rule_expr_log_get(const struct nftnl_rule_expr *e, uint16_t type,
+nftnl_expr_log_get(const struct nftnl_expr *e, uint16_t type,
 		      uint32_t *data_len)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
@@ -92,7 +92,7 @@ nftnl_rule_expr_log_get(const struct nftnl_rule_expr *e, uint16_t type,
 	return NULL;
 }
 
-static int nftnl_rule_expr_log_cb(const struct nlattr *attr, void *data)
+static int nftnl_expr_log_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
@@ -123,7 +123,7 @@ static int nftnl_rule_expr_log_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_rule_expr_log_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
+nftnl_expr_log_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 
@@ -142,12 +142,12 @@ nftnl_rule_expr_log_build(struct nlmsghdr *nlh, struct nftnl_rule_expr *e)
 }
 
 static int
-nftnl_rule_expr_log_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
+nftnl_expr_log_parse(struct nftnl_expr *e, struct nlattr *attr)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_LOG_MAX+1] = {};
 
-	if (mnl_attr_parse_nested(attr, nftnl_rule_expr_log_cb, tb) < 0)
+	if (mnl_attr_parse_nested(attr, nftnl_expr_log_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_LOG_PREFIX]) {
@@ -181,7 +181,7 @@ nftnl_rule_expr_log_parse(struct nftnl_rule_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_rule_expr_log_json_parse(struct nftnl_rule_expr *e, json_t *root,
+static int nftnl_expr_log_json_parse(struct nftnl_expr *e, json_t *root,
 					struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
@@ -191,27 +191,27 @@ static int nftnl_rule_expr_log_json_parse(struct nftnl_rule_expr *e, json_t *roo
 
 	prefix = nftnl_jansson_parse_str(root, "prefix", err);
 	if (prefix != NULL)
-		nftnl_rule_expr_set_str(e, NFTNL_EXPR_LOG_PREFIX, prefix);
+		nftnl_expr_set_str(e, NFTNL_EXPR_LOG_PREFIX, prefix);
 
 	if (nftnl_jansson_parse_val(root, "group", NFTNL_TYPE_U16, &group,
 				  err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_LOG_GROUP, group);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_LOG_GROUP, group);
 
 	if (nftnl_jansson_parse_val(root, "snaplen", NFTNL_TYPE_U32, &snaplen,
 				  err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOG_SNAPLEN, snaplen);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_SNAPLEN, snaplen);
 
 	if (nftnl_jansson_parse_val(root, "qthreshold", NFTNL_TYPE_U16,
 				  &qthreshold, err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_LOG_QTHRESHOLD, qthreshold);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_LOG_QTHRESHOLD, qthreshold);
 
 	if (nftnl_jansson_parse_val(root, "level", NFTNL_TYPE_U32, &level,
 				  err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOG_LEVEL, level);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_LEVEL, level);
 
 	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
 				  err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOG_FLAGS, flags);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_FLAGS, flags);
 
 	return 0;
 #else
@@ -220,7 +220,7 @@ static int nftnl_rule_expr_log_json_parse(struct nftnl_rule_expr *e, json_t *roo
 #endif
 }
 
-static int nftnl_rule_expr_log_xml_parse(struct nftnl_rule_expr *e,
+static int nftnl_expr_log_xml_parse(struct nftnl_expr *e,
 				       mxml_node_t *tree,
 				       struct nftnl_parse_err *err)
 {
@@ -232,30 +232,30 @@ static int nftnl_rule_expr_log_xml_parse(struct nftnl_rule_expr *e,
 	prefix = nftnl_mxml_str_parse(tree, "prefix", MXML_DESCEND_FIRST,
 				    NFTNL_XML_MAND, err);
 	if (prefix != NULL)
-		nftnl_rule_expr_set_str(e, NFTNL_EXPR_LOG_PREFIX, prefix);
+		nftnl_expr_set_str(e, NFTNL_EXPR_LOG_PREFIX, prefix);
 
 	if (nftnl_mxml_num_parse(tree, "group", MXML_DESCEND_FIRST, BASE_DEC,
 			       &group, NFTNL_TYPE_U16, NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_LOG_GROUP, group);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_LOG_GROUP, group);
 
 	if (nftnl_mxml_num_parse(tree, "snaplen", MXML_DESCEND_FIRST, BASE_DEC,
 			       &snaplen, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOG_SNAPLEN, snaplen);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_SNAPLEN, snaplen);
 
 	if (nftnl_mxml_num_parse(tree, "qthreshold", MXML_DESCEND_FIRST, BASE_DEC,
 			       &qthreshold, NFTNL_TYPE_U16, NFTNL_XML_MAND,
 			       err) == 0)
-		nftnl_rule_expr_set_u16(e, NFTNL_EXPR_LOG_QTHRESHOLD, qthreshold);
+		nftnl_expr_set_u16(e, NFTNL_EXPR_LOG_QTHRESHOLD, qthreshold);
 
 	if (nftnl_mxml_num_parse(tree, "level", MXML_DESCEND_FIRST, BASE_DEC,
 			       &level, NFTNL_TYPE_U16, NFTNL_XML_MAND,
 			       err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOG_LEVEL, level);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_LEVEL, level);
 
 	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
 			       &flags, NFTNL_TYPE_U16, NFTNL_XML_MAND,
 			       err) == 0)
-		nftnl_rule_expr_set_u32(e, NFTNL_EXPR_LOG_FLAGS, flags);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_FLAGS, flags);
 
 	return 0;
 #else
@@ -264,8 +264,8 @@ static int nftnl_rule_expr_log_xml_parse(struct nftnl_rule_expr *e,
 #endif
 }
 
-static int nftnl_rule_expr_log_snprintf_default(char *buf, size_t size,
-					      struct nftnl_rule_expr *e)
+static int nftnl_expr_log_snprintf_default(char *buf, size_t size,
+					      struct nftnl_expr *e)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 	int ret, offset = 0, len = size;
@@ -287,8 +287,8 @@ static int nftnl_rule_expr_log_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_rule_expr_log_export(char *buf, size_t size,
-				    struct nftnl_rule_expr *e, int type)
+static int nftnl_expr_log_export(char *buf, size_t size,
+				    struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -310,22 +310,22 @@ static int nftnl_rule_expr_log_export(char *buf, size_t size,
 }
 
 static int
-nftnl_rule_expr_log_snprintf(char *buf, size_t len, uint32_t type,
-			    uint32_t flags, struct nftnl_rule_expr *e)
+nftnl_expr_log_snprintf(char *buf, size_t len, uint32_t type,
+			    uint32_t flags, struct nftnl_expr *e)
 {
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_rule_expr_log_snprintf_default(buf, len, e);
+		return nftnl_expr_log_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_rule_expr_log_export(buf, len, e, type);
+		return nftnl_expr_log_export(buf, len, e, type);
 	default:
 		break;
 	}
 	return -1;
 }
 
-static void nftnl_rule_expr_log_free(struct nftnl_rule_expr *e)
+static void nftnl_expr_log_free(struct nftnl_expr *e)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 
@@ -336,12 +336,12 @@ struct expr_ops expr_ops_log = {
 	.name		= "log",
 	.alloc_len	= sizeof(struct nftnl_expr_log),
 	.max_attr	= NFTA_LOG_MAX,
-	.free		= nftnl_rule_expr_log_free,
-	.set		= nftnl_rule_expr_log_set,
-	.get		= nftnl_rule_expr_log_get,
-	.parse		= nftnl_rule_expr_log_parse,
-	.build		= nftnl_rule_expr_log_build,
-	.snprintf	= nftnl_rule_expr_log_snprintf,
-	.xml_parse	= nftnl_rule_expr_log_xml_parse,
-	.json_parse	= nftnl_rule_expr_log_json_parse,
+	.free		= nftnl_expr_log_free,
+	.set		= nftnl_expr_log_set,
+	.get		= nftnl_expr_log_get,
+	.parse		= nftnl_expr_log_parse,
+	.build		= nftnl_expr_log_build,
+	.snprintf	= nftnl_expr_log_snprintf,
+	.xml_parse	= nftnl_expr_log_xml_parse,
+	.json_parse	= nftnl_expr_log_json_parse,
 };
