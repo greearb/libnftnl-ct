@@ -93,13 +93,13 @@ static struct nftnl_rule *setup_rule(uint8_t family, const char *table,
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_rule_attr_set(r, NFTNL_RULE_ATTR_TABLE, table);
-	nftnl_rule_attr_set(r, NFTNL_RULE_ATTR_CHAIN, chain);
-	nftnl_rule_attr_set_u32(r, NFTNL_RULE_ATTR_FAMILY, family);
+	nftnl_rule_attr_set(r, NFTNL_RULE_TABLE, table);
+	nftnl_rule_attr_set(r, NFTNL_RULE_CHAIN, chain);
+	nftnl_rule_attr_set_u32(r, NFTNL_RULE_FAMILY, family);
 
 	if (handle != NULL) {
 		handle_num = atoll(handle);
-		nftnl_rule_attr_set_u64(r, NFTNL_RULE_ATTR_POSITION, handle_num);
+		nftnl_rule_attr_set_u64(r, NFTNL_RULE_POSITION, handle_num);
 	}
 
 	proto = IPPROTO_TCP;
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 
 	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 			NFT_MSG_NEWRULE,
-			nftnl_rule_attr_get_u32(r, NFTNL_RULE_ATTR_FAMILY),
+			nftnl_rule_attr_get_u32(r, NFTNL_RULE_FAMILY),
 			NLM_F_APPEND|NLM_F_CREATE|NLM_F_ACK, seq++);
 
 	nftnl_rule_nlmsg_build_payload(nlh, r);

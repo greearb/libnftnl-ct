@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 		mnl_nlmsg_batch_next(batch);
 	}
 
-	family = nftnl_table_attr_get_u32(t, NFTNL_TABLE_ATTR_FAMILY);
+	family = nftnl_table_attr_get_u32(t, NFTNL_TABLE_FAMILY);
 
 	table_seq = seq;
 	nlh = nftnl_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),

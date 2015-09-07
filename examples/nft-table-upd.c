@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_table_attr_set(t, NFTNL_TABLE_ATTR_NAME, argv[2]);
-	nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_FLAGS, flags);
+	nftnl_table_attr_set(t, NFTNL_TABLE_NAME, argv[2]);
+	nftnl_table_attr_set_u32(t, NFTNL_TABLE_FLAGS, flags);
 
 	nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, family,
 					NLM_F_ACK, seq);

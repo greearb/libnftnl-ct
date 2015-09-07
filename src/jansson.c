@@ -251,22 +251,22 @@ int nftnl_jansson_set_elem_parse(struct nftnl_set_elem *e, json_t *root,
 	uint32_t flags;
 
 	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags, err) == 0)
-		nftnl_set_elem_attr_set_u32(e, NFTNL_SET_ELEM_ATTR_FLAGS, flags);
+		nftnl_set_elem_attr_set_u32(e, NFTNL_SET_ELEM_FLAGS, flags);
 
 	if (nftnl_jansson_data_reg_parse(root, "key", &e->key, err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_SET_ELEM_ATTR_KEY);
+		e->flags |= (1 << NFTNL_SET_ELEM_KEY);
 
 	if (nftnl_jansson_node_exist(root, "data")) {
 		set_elem_data = nftnl_jansson_data_reg_parse(root, "data",
 							   &e->data, err);
 		switch (set_elem_data) {
 		case DATA_VALUE:
-			e->flags |= (1 << NFTNL_SET_ELEM_ATTR_DATA);
+			e->flags |= (1 << NFTNL_SET_ELEM_DATA);
 			break;
 		case DATA_VERDICT:
-			e->flags |= (1 << NFTNL_SET_ELEM_ATTR_VERDICT);
+			e->flags |= (1 << NFTNL_SET_ELEM_VERDICT);
 			if (e->data.chain != NULL)
-				e->flags |= (1 << NFTNL_SET_ELEM_ATTR_CHAIN);
+				e->flags |= (1 << NFTNL_SET_ELEM_CHAIN);
 			break;
 		case DATA_NONE:
 		default:

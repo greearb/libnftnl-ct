@@ -44,7 +44,7 @@ EXPORT_SYMBOL(nftnl_table_alloc, nft_table_alloc);
 
 void nftnl_table_free(struct nftnl_table *t)
 {
-	if (t->flags & (1 << NFTNL_TABLE_ATTR_NAME))
+	if (t->flags & (1 << NFTNL_TABLE_NAME))
 		xfree(t->name);
 
 	xfree(t);
@@ -63,49 +63,49 @@ void nftnl_table_attr_unset(struct nftnl_table *t, uint16_t attr)
 		return;
 
 	switch (attr) {
-	case NFTNL_TABLE_ATTR_NAME:
+	case NFTNL_TABLE_NAME:
 		if (t->name) {
 			xfree(t->name);
 			t->name = NULL;
 		}
 		break;
-	case NFTNL_TABLE_ATTR_FLAGS:
-	case NFTNL_TABLE_ATTR_FAMILY:
+	case NFTNL_TABLE_FLAGS:
+	case NFTNL_TABLE_FAMILY:
 		break;
-	case NFTNL_TABLE_ATTR_USE:
+	case NFTNL_TABLE_USE:
 		break;
 	}
 	t->flags &= ~(1 << attr);
 }
 EXPORT_SYMBOL(nftnl_table_attr_unset, nft_table_attr_unset);
 
-static uint32_t nftnl_table_attr_validate[NFTNL_TABLE_ATTR_MAX + 1] = {
-	[NFTNL_TABLE_ATTR_FLAGS]	= sizeof(uint32_t),
-	[NFTNL_TABLE_ATTR_FAMILY]	= sizeof(uint32_t),
+static uint32_t nftnl_table_attr_validate[NFTNL_TABLE_MAX + 1] = {
+	[NFTNL_TABLE_FLAGS]	= sizeof(uint32_t),
+	[NFTNL_TABLE_FAMILY]	= sizeof(uint32_t),
 };
 
 void nftnl_table_attr_set_data(struct nftnl_table *t, uint16_t attr,
 			     const void *data, uint32_t data_len)
 {
-	if (attr > NFTNL_TABLE_ATTR_MAX)
+	if (attr > NFTNL_TABLE_MAX)
 		return;
 
 	nftnl_assert_validate(data, nftnl_table_attr_validate, attr, data_len);
 
 	switch (attr) {
-	case NFTNL_TABLE_ATTR_NAME:
+	case NFTNL_TABLE_NAME:
 		if (t->name)
 			xfree(t->name);
 
 		t->name = strdup(data);
 		break;
-	case NFTNL_TABLE_ATTR_FLAGS:
+	case NFTNL_TABLE_FLAGS:
 		t->table_flags = *((uint32_t *)data);
 		break;
-	case NFTNL_TABLE_ATTR_FAMILY:
+	case NFTNL_TABLE_FAMILY:
 		t->family = *((uint32_t *)data);
 		break;
-	case NFTNL_TABLE_ATTR_USE:
+	case NFTNL_TABLE_USE:
 		t->use = *((uint32_t *)data);
 		break;
 	}
@@ -144,15 +144,15 @@ const void *nftnl_table_attr_get_data(struct nftnl_table *t, uint16_t attr,
 		return NULL;
 
 	switch(attr) {
-	case NFTNL_TABLE_ATTR_NAME:
+	case NFTNL_TABLE_NAME:
 		return t->name;
-	case NFTNL_TABLE_ATTR_FLAGS:
+	case NFTNL_TABLE_FLAGS:
 		*data_len = sizeof(uint32_t);
 		return &t->table_flags;
-	case NFTNL_TABLE_ATTR_FAMILY:
+	case NFTNL_TABLE_FAMILY:
 		*data_len = sizeof(uint32_t);
 		return &t->family;
-	case NFTNL_TABLE_ATTR_USE:
+	case NFTNL_TABLE_USE:
 		*data_len = sizeof(uint32_t);
 		return &t->use;
 	}
@@ -189,9 +189,9 @@ EXPORT_SYMBOL(nftnl_table_attr_get_str, nft_table_attr_get_str);
 
 void nftnl_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_table *t)
 {
-	if (t->flags & (1 << NFTNL_TABLE_ATTR_NAME))
+	if (t->flags & (1 << NFTNL_TABLE_NAME))
 		mnl_attr_put_strz(nlh, NFTA_TABLE_NAME, t->name);
-	if (t->flags & (1 << NFTNL_TABLE_ATTR_FLAGS))
+	if (t->flags & (1 << NFTNL_TABLE_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_TABLE_FLAGS, htonl(t->table_flags));
 }
 EXPORT_SYMBOL(nftnl_table_nlmsg_build_payload, nft_table_nlmsg_build_payload);
@@ -231,19 +231,19 @@ int nftnl_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_table *t)
 	if (tb[NFTA_TABLE_NAME]) {
 		xfree(t->name);
 		t->name = strdup(mnl_attr_get_str(tb[NFTA_TABLE_NAME]));
-		t->flags |= (1 << NFTNL_TABLE_ATTR_NAME);
+		t->flags |= (1 << NFTNL_TABLE_NAME);
 	}
 	if (tb[NFTA_TABLE_FLAGS]) {
 		t->table_flags = ntohl(mnl_attr_get_u32(tb[NFTA_TABLE_FLAGS]));
-		t->flags |= (1 << NFTNL_TABLE_ATTR_FLAGS);
+		t->flags |= (1 << NFTNL_TABLE_FLAGS);
 	}
 	if (tb[NFTA_TABLE_USE]) {
 		t->use = ntohl(mnl_attr_get_u32(tb[NFTA_TABLE_USE]));
-		t->flags |= (1 << NFTNL_TABLE_ATTR_USE);
+		t->flags |= (1 << NFTNL_TABLE_USE);
 	}
 
 	t->family = nfg->nfgen_family;
-	t->flags |= (1 << NFTNL_TABLE_ATTR_FAMILY);
+	t->flags |= (1 << NFTNL_TABLE_FAMILY);
 
 	return 0;
 }
@@ -260,20 +260,20 @@ int nftnl_mxml_table_parse(mxml_node_t *tree, struct nftnl_table *t,
 	name = nftnl_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFTNL_XML_MAND, err);
 	if (name != NULL)
-		nftnl_table_attr_set_str(t, NFTNL_TABLE_ATTR_NAME, name);
+		nftnl_table_attr_set_str(t, NFTNL_TABLE_NAME, name);
 
 	family = nftnl_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFTNL_XML_MAND, err);
 	if (family >= 0)
-		nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_FAMILY, family);
+		nftnl_table_attr_set_u32(t, NFTNL_TABLE_FAMILY, family);
 
 	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND, BASE_DEC,
 			       &flags, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_FLAGS, flags);
+		nftnl_table_attr_set_u32(t, NFTNL_TABLE_FLAGS, flags);
 
 	if (nftnl_mxml_num_parse(tree, "use", MXML_DESCEND, BASE_DEC,
 			       &use, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_USE, use);
+		nftnl_table_attr_set_u32(t, NFTNL_TABLE_USE, use);
 
 	return 0;
 }
@@ -313,17 +313,17 @@ int nftnl_jansson_parse_table(struct nftnl_table *t, json_t *tree,
 
 	str = nftnl_jansson_parse_str(root, "name", err);
 	if (str != NULL)
-		nftnl_table_attr_set_str(t, NFTNL_TABLE_ATTR_NAME, str);
+		nftnl_table_attr_set_str(t, NFTNL_TABLE_NAME, str);
 
 	if (nftnl_jansson_parse_family(root, &family, err) == 0)
-		nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_FAMILY, family);
+		nftnl_table_attr_set_u32(t, NFTNL_TABLE_FAMILY, family);
 
 	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
 				  err) == 0)
-		nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_FLAGS, flags);
+		nftnl_table_attr_set_u32(t, NFTNL_TABLE_FLAGS, flags);
 
 	if (nftnl_jansson_parse_val(root, "use", NFTNL_TYPE_U32, &use, err) == 0)
-		nftnl_table_attr_set_u32(t, NFTNL_TABLE_ATTR_USE, use);
+		nftnl_table_attr_set_u32(t, NFTNL_TABLE_USE, use);
 
 	return 0;
 }
@@ -399,13 +399,13 @@ static int nftnl_table_export(char *buf, size_t size, struct nftnl_table *t,
 	NFTNL_BUF_INIT(b, buf, size);
 
 	nftnl_buf_open(&b, type, TABLE);
-	if (t->flags & (1 << NFTNL_TABLE_ATTR_NAME))
+	if (t->flags & (1 << NFTNL_TABLE_NAME))
 		nftnl_buf_str(&b, type, t->name, NAME);
-	if (t->flags & (1 << NFTNL_TABLE_ATTR_FAMILY))
+	if (t->flags & (1 << NFTNL_TABLE_FAMILY))
 		nftnl_buf_str(&b, type, nftnl_family2str(t->family), FAMILY);
-	if (t->flags & (1 << NFTNL_TABLE_ATTR_FLAGS))
+	if (t->flags & (1 << NFTNL_TABLE_FLAGS))
 		nftnl_buf_u32(&b, type, t->table_flags, FLAGS);
-	if (t->flags & (1 << NFTNL_TABLE_ATTR_USE))
+	if (t->flags & (1 << NFTNL_TABLE_USE))
 		nftnl_buf_u32(&b, type, t->use, USE);
 
 	nftnl_buf_close(&b, type, TABLE);

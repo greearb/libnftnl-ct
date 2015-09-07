@@ -219,7 +219,7 @@ static int mnl_setelem_get(struct mnl_socket *nf_sock, struct nftnl_set *nls)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t family = nftnl_set_attr_get_u32(nls, NFTNL_SET_ATTR_FAMILY);
+	uint32_t family = nftnl_set_attr_get_u32(nls, NFTNL_SET_FAMILY);
 
 	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
 				      NLM_F_DUMP|NLM_F_ACK, seq);
@@ -319,19 +319,19 @@ static struct nftnl_ruleset *mnl_ruleset_dump(struct mnl_socket *nf_sock)
 
 	t = mnl_table_dump(nf_sock, NFPROTO_UNSPEC);
 	if (t != NULL)
-		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_ATTR_TABLELIST, t);
+		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_TABLELIST, t);
 
 	c = mnl_chain_dump(nf_sock, NFPROTO_UNSPEC);
 	if (c != NULL)
-		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_ATTR_CHAINLIST, c);
+		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_CHAINLIST, c);
 
 	s = mnl_set_dump(nf_sock, NFPROTO_UNSPEC);
 	if (s != NULL)
-		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_ATTR_SETLIST, s);
+		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_SETLIST, s);
 
 	r = mnl_rule_dump(nf_sock, NFPROTO_UNSPEC);
 	if (r != NULL)
-		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_ATTR_RULELIST, r);
+		nftnl_ruleset_attr_set(rs, NFTNL_RULESET_RULELIST, r);
 
 	return rs;
 }

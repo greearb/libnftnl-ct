@@ -39,12 +39,12 @@ static struct nftnl_set *setup_set(uint8_t family, const char *table,
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_set_attr_set_str(s, NFTNL_SET_ATTR_TABLE, table);
-	nftnl_set_attr_set_str(s, NFTNL_SET_ATTR_NAME, name);
-	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_FAMILY, family);
-	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_KEY_LEN, 2);
-	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_ID, 1);
-	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_FLAGS, NFT_SET_CONSTANT);
+	nftnl_set_attr_set_str(s, NFTNL_SET_TABLE, table);
+	nftnl_set_attr_set_str(s, NFTNL_SET_NAME, name);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_FAMILY, family);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_KEY_LEN, 2);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_ID, 1);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_FLAGS, NFT_SET_CONSTANT);
 
 	return s;
 }

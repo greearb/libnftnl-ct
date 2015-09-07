@@ -74,12 +74,12 @@ int main(int argc, char *argv[])
 	}
 
 	seq = time(NULL);
-	nftnl_rule_attr_set(r, NFTNL_RULE_ATTR_TABLE, argv[2]);
-	nftnl_rule_attr_set(r, NFTNL_RULE_ATTR_CHAIN, argv[3]);
+	nftnl_rule_attr_set(r, NFTNL_RULE_TABLE, argv[2]);
+	nftnl_rule_attr_set(r, NFTNL_RULE_CHAIN, argv[3]);
 
 	/* If no handle is specified, delete all rules in the chain */
 	if (argc == 5)
-		nftnl_rule_attr_set_u64(r, NFTNL_RULE_ATTR_HANDLE, atoi(argv[4]));
+		nftnl_rule_attr_set_u64(r, NFTNL_RULE_HANDLE, atoi(argv[4]));
 
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 

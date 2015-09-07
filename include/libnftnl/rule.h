@@ -18,18 +18,18 @@ struct nftnl_expr;
 struct nftnl_rule *nftnl_rule_alloc(void);
 void nftnl_rule_free(struct nftnl_rule *);
 
-enum {
-	NFTNL_RULE_ATTR_FAMILY	= 0,
-	NFTNL_RULE_ATTR_TABLE,
-	NFTNL_RULE_ATTR_CHAIN,
-	NFTNL_RULE_ATTR_HANDLE,
-	NFTNL_RULE_ATTR_COMPAT_PROTO,
-	NFTNL_RULE_ATTR_COMPAT_FLAGS,
-	NFTNL_RULE_ATTR_POSITION,
-	NFTNL_RULE_ATTR_USERDATA,
-	__NFTNL_RULE_ATTR_MAX
+enum nftnl_rule_attr {
+	NFTNL_RULE_FAMILY	= 0,
+	NFTNL_RULE_TABLE,
+	NFTNL_RULE_CHAIN,
+	NFTNL_RULE_HANDLE,
+	NFTNL_RULE_COMPAT_PROTO,
+	NFTNL_RULE_COMPAT_FLAGS,
+	NFTNL_RULE_POSITION,
+	NFTNL_RULE_USERDATA,
+	__NFTNL_RULE_MAX
 };
-#define NFTNL_RULE_ATTR_MAX (__NFTNL_RULE_ATTR_MAX - 1)
+#define NFTNL_RULE_MAX (__NFTNL_RULE_MAX - 1)
 
 void nftnl_rule_attr_unset(struct nftnl_rule *r, uint16_t attr);
 bool nftnl_rule_attr_is_set(const struct nftnl_rule *r, uint16_t attr);

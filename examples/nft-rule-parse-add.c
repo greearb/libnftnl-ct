@@ -66,7 +66,7 @@ static struct nftnl_rule *rule_parse_file(const char *file, uint16_t format)
 		return NULL;
 	}
 
-	nftnl_rule_attr_unset(r, NFTNL_RULE_ATTR_HANDLE);
+	nftnl_rule_attr_unset(r, NFTNL_RULE_HANDLE);
 
 	nftnl_parse_err_free(err);
 	return r;
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 	}
 
 	rule_seq = seq;
-	family = nftnl_rule_attr_get_u32(r, NFTNL_RULE_ATTR_FAMILY);
+	family = nftnl_rule_attr_get_u32(r, NFTNL_RULE_FAMILY);
 	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				       NFT_MSG_NEWRULE, family,
 				       NLM_F_CREATE|NLM_F_APPEND|NLM_F_ACK,

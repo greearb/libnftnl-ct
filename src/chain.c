@@ -118,30 +118,30 @@ void nftnl_chain_attr_unset(struct nftnl_chain *c, uint16_t attr)
 		return;
 
 	switch (attr) {
-	case NFTNL_CHAIN_ATTR_TABLE:
+	case NFTNL_CHAIN_TABLE:
 		if (c->table) {
 			xfree(c->table);
 			c->table = NULL;
 		}
 		break;
-	case NFTNL_CHAIN_ATTR_USE:
+	case NFTNL_CHAIN_USE:
 		break;
-	case NFTNL_CHAIN_ATTR_TYPE:
+	case NFTNL_CHAIN_TYPE:
 		if (c->type) {
 			xfree(c->type);
 			c->type = NULL;
 		}
 		break;
-	case NFTNL_CHAIN_ATTR_NAME:
-	case NFTNL_CHAIN_ATTR_HOOKNUM:
-	case NFTNL_CHAIN_ATTR_PRIO:
-	case NFTNL_CHAIN_ATTR_POLICY:
-	case NFTNL_CHAIN_ATTR_BYTES:
-	case NFTNL_CHAIN_ATTR_PACKETS:
-	case NFTNL_CHAIN_ATTR_HANDLE:
-	case NFTNL_CHAIN_ATTR_FAMILY:
+	case NFTNL_CHAIN_NAME:
+	case NFTNL_CHAIN_HOOKNUM:
+	case NFTNL_CHAIN_PRIO:
+	case NFTNL_CHAIN_POLICY:
+	case NFTNL_CHAIN_BYTES:
+	case NFTNL_CHAIN_PACKETS:
+	case NFTNL_CHAIN_HANDLE:
+	case NFTNL_CHAIN_FAMILY:
 		break;
-	case NFTNL_CHAIN_ATTR_DEV:
+	case NFTNL_CHAIN_DEV:
 		if (c->dev) {
 			xfree(c->dev);
 			c->dev = NULL;
@@ -155,65 +155,65 @@ void nftnl_chain_attr_unset(struct nftnl_chain *c, uint16_t attr)
 }
 EXPORT_SYMBOL(nftnl_chain_attr_unset, nft_chain_attr_unset);
 
-static uint32_t nftnl_chain_attr_validate[NFTNL_CHAIN_ATTR_MAX + 1] = {
-	[NFTNL_CHAIN_ATTR_HOOKNUM]	= sizeof(uint32_t),
-	[NFTNL_CHAIN_ATTR_PRIO]		= sizeof(int32_t),
-	[NFTNL_CHAIN_ATTR_POLICY]		= sizeof(uint32_t),
-	[NFTNL_CHAIN_ATTR_BYTES]		= sizeof(uint64_t),
-	[NFTNL_CHAIN_ATTR_PACKETS]	= sizeof(uint64_t),
-	[NFTNL_CHAIN_ATTR_HANDLE]		= sizeof(uint64_t),
-	[NFTNL_CHAIN_ATTR_FAMILY]		= sizeof(uint32_t),
+static uint32_t nftnl_chain_attr_validate[NFTNL_CHAIN_MAX + 1] = {
+	[NFTNL_CHAIN_HOOKNUM]	= sizeof(uint32_t),
+	[NFTNL_CHAIN_PRIO]		= sizeof(int32_t),
+	[NFTNL_CHAIN_POLICY]		= sizeof(uint32_t),
+	[NFTNL_CHAIN_BYTES]		= sizeof(uint64_t),
+	[NFTNL_CHAIN_PACKETS]	= sizeof(uint64_t),
+	[NFTNL_CHAIN_HANDLE]		= sizeof(uint64_t),
+	[NFTNL_CHAIN_FAMILY]		= sizeof(uint32_t),
 };
 
 void nftnl_chain_attr_set_data(struct nftnl_chain *c, uint16_t attr,
 			     const void *data, uint32_t data_len)
 {
-	if (attr > NFTNL_CHAIN_ATTR_MAX)
+	if (attr > NFTNL_CHAIN_MAX)
 		return;
 
 	nftnl_assert_validate(data, nftnl_chain_attr_validate, attr, data_len);
 
 	switch(attr) {
-	case NFTNL_CHAIN_ATTR_NAME:
+	case NFTNL_CHAIN_NAME:
 		strncpy(c->name, data, NFT_CHAIN_MAXNAMELEN);
 		break;
-	case NFTNL_CHAIN_ATTR_TABLE:
+	case NFTNL_CHAIN_TABLE:
 		if (c->table)
 			xfree(c->table);
 
 		c->table = strdup(data);
 		break;
-	case NFTNL_CHAIN_ATTR_HOOKNUM:
+	case NFTNL_CHAIN_HOOKNUM:
 		memcpy(&c->hooknum, data, sizeof(c->hooknum));
 		break;
-	case NFTNL_CHAIN_ATTR_PRIO:
+	case NFTNL_CHAIN_PRIO:
 		memcpy(&c->prio, data, sizeof(c->prio));
 		break;
-	case NFTNL_CHAIN_ATTR_POLICY:
+	case NFTNL_CHAIN_POLICY:
 		c->policy = *((uint32_t *)data);
 		break;
-	case NFTNL_CHAIN_ATTR_USE:
+	case NFTNL_CHAIN_USE:
 		c->use = *((uint32_t *)data);
 		break;
-	case NFTNL_CHAIN_ATTR_BYTES:
+	case NFTNL_CHAIN_BYTES:
 		c->bytes = *((uint64_t *)data);
 		break;
-	case NFTNL_CHAIN_ATTR_PACKETS:
+	case NFTNL_CHAIN_PACKETS:
 		c->packets = *((uint64_t *)data);
 		break;
-	case NFTNL_CHAIN_ATTR_HANDLE:
+	case NFTNL_CHAIN_HANDLE:
 		c->handle = *((uint64_t *)data);
 		break;
-	case NFTNL_CHAIN_ATTR_FAMILY:
+	case NFTNL_CHAIN_FAMILY:
 		c->family = *((uint32_t *)data);
 		break;
-	case NFTNL_CHAIN_ATTR_TYPE:
+	case NFTNL_CHAIN_TYPE:
 		if (c->type)
 			xfree(c->type);
 
 		c->type = strdup(data);
 		break;
-	case NFTNL_CHAIN_ATTR_DEV:
+	case NFTNL_CHAIN_DEV:
 		if (c->dev)
 			xfree(c->dev);
 
@@ -267,38 +267,38 @@ const void *nftnl_chain_attr_get_data(struct nftnl_chain *c, uint16_t attr,
 		return NULL;
 
 	switch(attr) {
-	case NFTNL_CHAIN_ATTR_NAME:
+	case NFTNL_CHAIN_NAME:
 		return c->name;
-	case NFTNL_CHAIN_ATTR_TABLE:
+	case NFTNL_CHAIN_TABLE:
 		return c->table;
-	case NFTNL_CHAIN_ATTR_HOOKNUM:
+	case NFTNL_CHAIN_HOOKNUM:
 		*data_len = sizeof(uint32_t);
 		return &c->hooknum;
-	case NFTNL_CHAIN_ATTR_PRIO:
+	case NFTNL_CHAIN_PRIO:
 		*data_len = sizeof(int32_t);
 		return &c->prio;
-	case NFTNL_CHAIN_ATTR_POLICY:
+	case NFTNL_CHAIN_POLICY:
 		*data_len = sizeof(uint32_t);
 		return &c->policy;
-	case NFTNL_CHAIN_ATTR_USE:
+	case NFTNL_CHAIN_USE:
 		*data_len = sizeof(uint32_t);
 		return &c->use;
-	case NFTNL_CHAIN_ATTR_BYTES:
+	case NFTNL_CHAIN_BYTES:
 		*data_len = sizeof(uint64_t);
 		return &c->bytes;
-	case NFTNL_CHAIN_ATTR_PACKETS:
+	case NFTNL_CHAIN_PACKETS:
 		*data_len = sizeof(uint64_t);
 		return &c->packets;
-	case NFTNL_CHAIN_ATTR_HANDLE:
+	case NFTNL_CHAIN_HANDLE:
 		*data_len = sizeof(uint64_t);
 		return &c->handle;
-	case NFTNL_CHAIN_ATTR_FAMILY:
+	case NFTNL_CHAIN_FAMILY:
 		*data_len = sizeof(uint32_t);
 		return &c->family;
-	case NFTNL_CHAIN_ATTR_TYPE:
+	case NFTNL_CHAIN_TYPE:
 		*data_len = sizeof(uint32_t);
 		return c->type;
-	case NFTNL_CHAIN_ATTR_DEV:
+	case NFTNL_CHAIN_DEV:
 		return c->dev;
 	}
 	return NULL;
@@ -364,27 +364,27 @@ EXPORT_SYMBOL(nftnl_chain_attr_get_u8, nft_chain_attr_get_u8);
 
 void nftnl_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_chain *c)
 {
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_TABLE))
+	if (c->flags & (1 << NFTNL_CHAIN_TABLE))
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_TABLE, c->table);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_NAME))
+	if (c->flags & (1 << NFTNL_CHAIN_NAME))
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_NAME, c->name);
-	if ((c->flags & (1 << NFTNL_CHAIN_ATTR_HOOKNUM)) &&
-	    (c->flags & (1 << NFTNL_CHAIN_ATTR_PRIO))) {
+	if ((c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) &&
+	    (c->flags & (1 << NFTNL_CHAIN_PRIO))) {
 		struct nlattr *nest;
 
 		nest = mnl_attr_nest_start(nlh, NFTA_CHAIN_HOOK);
 		mnl_attr_put_u32(nlh, NFTA_HOOK_HOOKNUM, htonl(c->hooknum));
 		mnl_attr_put_u32(nlh, NFTA_HOOK_PRIORITY, htonl(c->prio));
-		if (c->flags & (1 << NFTNL_CHAIN_ATTR_DEV))
+		if (c->flags & (1 << NFTNL_CHAIN_DEV))
 			mnl_attr_put_strz(nlh, NFTA_HOOK_DEV, c->dev);
 		mnl_attr_nest_end(nlh, nest);
 	}
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_POLICY))
+	if (c->flags & (1 << NFTNL_CHAIN_POLICY))
 		mnl_attr_put_u32(nlh, NFTA_CHAIN_POLICY, htonl(c->policy));
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_USE))
+	if (c->flags & (1 << NFTNL_CHAIN_USE))
 		mnl_attr_put_u32(nlh, NFTA_CHAIN_USE, htonl(c->use));
-	if ((c->flags & (1 << NFTNL_CHAIN_ATTR_PACKETS)) &&
-	    (c->flags & (1 << NFTNL_CHAIN_ATTR_BYTES))) {
+	if ((c->flags & (1 << NFTNL_CHAIN_PACKETS)) &&
+	    (c->flags & (1 << NFTNL_CHAIN_BYTES))) {
 		struct nlattr *nest;
 
 		nest = mnl_attr_nest_start(nlh, NFTA_CHAIN_COUNTERS);
@@ -392,9 +392,9 @@ void nftnl_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_ch
 		mnl_attr_put_u64(nlh, NFTA_COUNTER_BYTES, be64toh(c->bytes));
 		mnl_attr_nest_end(nlh, nest);
 	}
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_HANDLE))
+	if (c->flags & (1 << NFTNL_CHAIN_HANDLE))
 		mnl_attr_put_u64(nlh, NFTA_CHAIN_HANDLE, be64toh(c->handle));
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_TYPE))
+	if (c->flags & (1 << NFTNL_CHAIN_TYPE))
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_TYPE, c->type);
 }
 EXPORT_SYMBOL(nftnl_chain_nlmsg_build_payload, nft_chain_nlmsg_build_payload);
@@ -463,11 +463,11 @@ static int nftnl_chain_parse_counters(struct nlattr *attr, struct nftnl_chain *c
 
 	if (tb[NFTA_COUNTER_PACKETS]) {
 		c->packets = be64toh(mnl_attr_get_u64(tb[NFTA_COUNTER_PACKETS]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_PACKETS);
+		c->flags |= (1 << NFTNL_CHAIN_PACKETS);
 	}
 	if (tb[NFTA_COUNTER_BYTES]) {
 		c->bytes = be64toh(mnl_attr_get_u64(tb[NFTA_COUNTER_BYTES]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_BYTES);
+		c->flags |= (1 << NFTNL_CHAIN_BYTES);
 	}
 
 	return 0;
@@ -506,15 +506,15 @@ static int nftnl_chain_parse_hook(struct nlattr *attr, struct nftnl_chain *c)
 
 	if (tb[NFTA_HOOK_HOOKNUM]) {
 		c->hooknum = ntohl(mnl_attr_get_u32(tb[NFTA_HOOK_HOOKNUM]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_HOOKNUM);
+		c->flags |= (1 << NFTNL_CHAIN_HOOKNUM);
 	}
 	if (tb[NFTA_HOOK_PRIORITY]) {
 		c->prio = ntohl(mnl_attr_get_u32(tb[NFTA_HOOK_PRIORITY]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_PRIO);
+		c->flags |= (1 << NFTNL_CHAIN_PRIO);
 	}
 	if (tb[NFTA_HOOK_DEV]) {
 		c->dev = strdup(mnl_attr_get_str(tb[NFTA_HOOK_DEV]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_DEV);
+		c->flags |= (1 << NFTNL_CHAIN_DEV);
 	}
 
 	return 0;
@@ -532,12 +532,12 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 	if (tb[NFTA_CHAIN_NAME]) {
 		strncpy(c->name, mnl_attr_get_str(tb[NFTA_CHAIN_NAME]),
 			NFT_CHAIN_MAXNAMELEN);
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_NAME);
+		c->flags |= (1 << NFTNL_CHAIN_NAME);
 	}
 	if (tb[NFTA_CHAIN_TABLE]) {
 		xfree(c->table);
 		c->table = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_TABLE]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_TABLE);
+		c->flags |= (1 << NFTNL_CHAIN_TABLE);
 	}
 	if (tb[NFTA_CHAIN_HOOK]) {
 		ret = nftnl_chain_parse_hook(tb[NFTA_CHAIN_HOOK], c);
@@ -546,11 +546,11 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 	}
 	if (tb[NFTA_CHAIN_POLICY]) {
 		c->policy = ntohl(mnl_attr_get_u32(tb[NFTA_CHAIN_POLICY]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_POLICY);
+		c->flags |= (1 << NFTNL_CHAIN_POLICY);
 	}
 	if (tb[NFTA_CHAIN_USE]) {
 		c->use = ntohl(mnl_attr_get_u32(tb[NFTA_CHAIN_USE]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_USE);
+		c->flags |= (1 << NFTNL_CHAIN_USE);
 	}
 	if (tb[NFTA_CHAIN_COUNTERS]) {
 		ret = nftnl_chain_parse_counters(tb[NFTA_CHAIN_COUNTERS], c);
@@ -559,16 +559,16 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 	}
 	if (tb[NFTA_CHAIN_HANDLE]) {
 		c->handle = be64toh(mnl_attr_get_u64(tb[NFTA_CHAIN_HANDLE]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_HANDLE);
+		c->flags |= (1 << NFTNL_CHAIN_HANDLE);
 	}
 	if (tb[NFTA_CHAIN_TYPE]) {
 		xfree(c->type);
 		c->type = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_TYPE]));
-		c->flags |= (1 << NFTNL_CHAIN_ATTR_TYPE);
+		c->flags |= (1 << NFTNL_CHAIN_TYPE);
 	}
 
 	c->family = nfg->nfgen_family;
-	c->flags |= (1 << NFTNL_CHAIN_ATTR_FAMILY);
+	c->flags |= (1 << NFTNL_CHAIN_FAMILY);
 
 	return ret;
 }
@@ -601,47 +601,47 @@ int nftnl_jansson_parse_chain(struct nftnl_chain *c, json_t *tree,
 
 	name = nftnl_jansson_parse_str(root, "name", err);
 	if (name != NULL)
-		nftnl_chain_attr_set_str(c, NFTNL_CHAIN_ATTR_NAME, name);
+		nftnl_chain_attr_set_str(c, NFTNL_CHAIN_NAME, name);
 
 	if (nftnl_jansson_parse_val(root, "handle", NFTNL_TYPE_U64, &handle,
 				  err) == 0)
-		nftnl_chain_attr_set_u64(c,NFTNL_CHAIN_ATTR_HANDLE, handle);
+		nftnl_chain_attr_set_u64(c,NFTNL_CHAIN_HANDLE, handle);
 
 	if (nftnl_jansson_parse_val(root, "bytes", NFTNL_TYPE_U64, &bytes,
 				  err) == 0)
-		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_ATTR_BYTES, bytes);
+		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_BYTES, bytes);
 
 	if (nftnl_jansson_parse_val(root, "packets", NFTNL_TYPE_U64, &packets,
 				  err) == 0)
-		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_ATTR_PACKETS, packets);
+		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_PACKETS, packets);
 
 	if (nftnl_jansson_parse_family(root, &family, err) == 0)
-		nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_ATTR_FAMILY, family);
+		nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_FAMILY, family);
 
 	table = nftnl_jansson_parse_str(root, "table", err);
 
 	if (table != NULL)
-		nftnl_chain_attr_set_str(c, NFTNL_CHAIN_ATTR_TABLE, table);
+		nftnl_chain_attr_set_str(c, NFTNL_CHAIN_TABLE, table);
 
 	if (nftnl_jansson_parse_val(root, "use", NFTNL_TYPE_U32, &use, err) == 0)
-		nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_ATTR_USE, use);
+		nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_USE, use);
 
 	if (nftnl_jansson_node_exist(root, "hooknum")) {
 		type = nftnl_jansson_parse_str(root, "type", err);
 
 		if (type != NULL)
-			nftnl_chain_attr_set_str(c, NFTNL_CHAIN_ATTR_TYPE, type);
+			nftnl_chain_attr_set_str(c, NFTNL_CHAIN_TYPE, type);
 
 		if (nftnl_jansson_parse_val(root, "prio", NFTNL_TYPE_S32,
 					  &prio, err) == 0)
-			nftnl_chain_attr_set_s32(c, NFTNL_CHAIN_ATTR_PRIO, prio);
+			nftnl_chain_attr_set_s32(c, NFTNL_CHAIN_PRIO, prio);
 
 		hooknum_str = nftnl_jansson_parse_str(root, "hooknum", err);
 		if (hooknum_str != NULL) {
 			hooknum = nftnl_str2hooknum(c->family, hooknum_str);
 			if (hooknum == -1)
 				return -1;
-			nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_ATTR_HOOKNUM,
+			nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_HOOKNUM,
 					       hooknum);
 		}
 
@@ -653,13 +653,13 @@ int nftnl_jansson_parse_chain(struct nftnl_chain *c, json_t *tree,
 				err->error = NFTNL_PARSE_EBADTYPE;
 				return -1;
 			}
-			nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_ATTR_POLICY,
+			nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_POLICY,
 					       policy_num);
 		}
 
 		dev = nftnl_jansson_parse_str(root, "device", err);
 		if (dev != NULL)
-			nftnl_chain_attr_set_str(c, NFTNL_CHAIN_ATTR_DEV, dev);
+			nftnl_chain_attr_set_str(c, NFTNL_CHAIN_DEV, dev);
 	}
 
 	return 0;
@@ -701,35 +701,35 @@ int nftnl_mxml_chain_parse(mxml_node_t *tree, struct nftnl_chain *c,
 	name = nftnl_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
 				  NFTNL_XML_MAND, err);
 	if (name != NULL)
-		nftnl_chain_attr_set_str(c, NFTNL_CHAIN_ATTR_NAME, name);
+		nftnl_chain_attr_set_str(c, NFTNL_CHAIN_NAME, name);
 
 	if (nftnl_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
 			       &handle, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_ATTR_HANDLE, handle);
+		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_HANDLE, handle);
 
 	if (nftnl_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
 			       &bytes, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_ATTR_BYTES, bytes);
+		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_BYTES, bytes);
 
 
 	if (nftnl_mxml_num_parse(tree, "packets", MXML_DESCEND_FIRST, BASE_DEC,
 			       &packets, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_ATTR_PACKETS, packets);
+		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_PACKETS, packets);
 
 	table = nftnl_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
 				   NFTNL_XML_MAND, err);
 
 	if (table != NULL)
-		nftnl_chain_attr_set_str(c, NFTNL_CHAIN_ATTR_TABLE, table);
+		nftnl_chain_attr_set_str(c, NFTNL_CHAIN_TABLE, table);
 
 	if (nftnl_mxml_num_parse(tree, "use", MXML_DESCEND_FIRST, BASE_DEC,
 			       &use, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_ATTR_PACKETS, use);
+		nftnl_chain_attr_set_u64(c, NFTNL_CHAIN_PACKETS, use);
 
 	family = nftnl_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
 				       NFTNL_XML_MAND, err);
 	if (family >= 0)
-		nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_ATTR_FAMILY, family);
+		nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_FAMILY, family);
 
 	hooknum_str = nftnl_mxml_str_parse(tree, "hooknum", MXML_DESCEND_FIRST,
 					 NFTNL_XML_OPT, err);
@@ -737,18 +737,18 @@ int nftnl_mxml_chain_parse(mxml_node_t *tree, struct nftnl_chain *c,
 		hooknum = nftnl_str2hooknum(c->family, hooknum_str);
 		if (hooknum < 0)
 			return -1;
-		nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_ATTR_HOOKNUM, hooknum);
+		nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_HOOKNUM, hooknum);
 
 		type = nftnl_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST,
 					  NFTNL_XML_MAND, err);
 
 		if (type != NULL)
-			nftnl_chain_attr_set_str(c, NFTNL_CHAIN_ATTR_TYPE, type);
+			nftnl_chain_attr_set_str(c, NFTNL_CHAIN_TYPE, type);
 
 		if (nftnl_mxml_num_parse(tree, "prio", MXML_DESCEND, BASE_DEC,
 				       &prio, NFTNL_TYPE_S32, NFTNL_XML_MAND,
 				       err) == 0)
-			nftnl_chain_attr_set_s32(c, NFTNL_CHAIN_ATTR_PRIO, prio);
+			nftnl_chain_attr_set_s32(c, NFTNL_CHAIN_PRIO, prio);
 
 		policy_str = nftnl_mxml_str_parse(tree, "policy",
 						MXML_DESCEND_FIRST,
@@ -760,14 +760,14 @@ int nftnl_mxml_chain_parse(mxml_node_t *tree, struct nftnl_chain *c,
 				err->error = NFTNL_PARSE_EBADTYPE;
 				return -1;
 			}
-			nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_ATTR_POLICY,
+			nftnl_chain_attr_set_u32(c, NFTNL_CHAIN_POLICY,
 					       policy);
 		}
 		dev = nftnl_mxml_str_parse(tree, "device", MXML_DESCEND_FIRST,
 					 NFTNL_XML_MAND, err);
 
 		if (table != NULL)
-			nftnl_chain_attr_set_str(c, NFTNL_CHAIN_ATTR_DEV, dev);
+			nftnl_chain_attr_set_str(c, NFTNL_CHAIN_DEV, dev);
 	}
 
 	return 0;
@@ -839,31 +839,31 @@ static int nftnl_chain_export(char *buf, size_t size, struct nftnl_chain *c,
 	NFTNL_BUF_INIT(b, buf, size);
 
 	nftnl_buf_open(&b, type, CHAIN);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_NAME))
+	if (c->flags & (1 << NFTNL_CHAIN_NAME))
 		nftnl_buf_str(&b, type, c->name, NAME);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_HANDLE))
+	if (c->flags & (1 << NFTNL_CHAIN_HANDLE))
 		nftnl_buf_u64(&b, type, c->handle, HANDLE);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_BYTES))
+	if (c->flags & (1 << NFTNL_CHAIN_BYTES))
 		nftnl_buf_u64(&b, type, c->bytes, BYTES);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_PACKETS))
+	if (c->flags & (1 << NFTNL_CHAIN_PACKETS))
 		nftnl_buf_u64(&b, type, c->packets, PACKETS);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_TABLE))
+	if (c->flags & (1 << NFTNL_CHAIN_TABLE))
 		nftnl_buf_str(&b, type, c->table, TABLE);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_FAMILY))
+	if (c->flags & (1 << NFTNL_CHAIN_FAMILY))
 		nftnl_buf_str(&b, type, nftnl_family2str(c->family), FAMILY);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_USE))
+	if (c->flags & (1 << NFTNL_CHAIN_USE))
 		nftnl_buf_u32(&b, type, c->use, USE);
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_HOOKNUM)) {
-		if (c->flags & (1 << NFTNL_CHAIN_ATTR_TYPE))
+	if (c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) {
+		if (c->flags & (1 << NFTNL_CHAIN_TYPE))
 			nftnl_buf_str(&b, type, c->type, TYPE);
-		if (c->flags & (1 << NFTNL_CHAIN_ATTR_HOOKNUM))
+		if (c->flags & (1 << NFTNL_CHAIN_HOOKNUM))
 			nftnl_buf_str(&b, type, nftnl_hooknum2str(c->family,
 					 c->hooknum), HOOKNUM);
-		if (c->flags & (1 << NFTNL_CHAIN_ATTR_PRIO))
+		if (c->flags & (1 << NFTNL_CHAIN_PRIO))
 			nftnl_buf_s32(&b, type, c->prio, PRIO);
-		if (c->flags & (1 << NFTNL_CHAIN_ATTR_POLICY))
+		if (c->flags & (1 << NFTNL_CHAIN_POLICY))
 			nftnl_buf_str(&b, type, nftnl_verdict2str(c->policy), POLICY);
-		if (c->flags & (1 << NFTNL_CHAIN_ATTR_DEV))
+		if (c->flags & (1 << NFTNL_CHAIN_DEV))
 			nftnl_buf_str(&b, type, c->dev, DEVICE);
 	}
 
@@ -881,7 +881,7 @@ static int nftnl_chain_snprintf_default(char *buf, size_t size,
 		       nftnl_family2str(c->family), c->table, c->name, c->use);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	if (c->flags & (1 << NFTNL_CHAIN_ATTR_HOOKNUM)) {
+	if (c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) {
 		ret = snprintf(buf+offset, len,
 			       " type %s hook %s prio %d policy %s "
 			       "packets %"PRIu64" bytes %"PRIu64"",
@@ -890,7 +890,7 @@ static int nftnl_chain_snprintf_default(char *buf, size_t size,
 			       c->packets, c->bytes);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-		if (c->flags & (1 << NFTNL_CHAIN_ATTR_DEV)) {
+		if (c->flags & (1 << NFTNL_CHAIN_DEV)) {
 			ret = snprintf(buf+offset, len, " dev %s ", c->dev);
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}

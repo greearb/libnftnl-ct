@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_set_attr_set(s, NFTNL_SET_ATTR_TABLE, argv[2]);
-	nftnl_set_attr_set(s, NFTNL_SET_ATTR_NAME, argv[3]);
+	nftnl_set_attr_set(s, NFTNL_SET_TABLE, argv[2]);
+	nftnl_set_attr_set(s, NFTNL_SET_NAME, argv[3]);
 
 	/* Add to dummy elements to set */
 	e = nftnl_set_elem_alloc();
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 	}
 
 	data = 0x1;
-	nftnl_set_elem_attr_set(e, NFTNL_SET_ELEM_ATTR_KEY, &data, sizeof(data));
+	nftnl_set_elem_attr_set(e, NFTNL_SET_ELEM_KEY, &data, sizeof(data));
 	nftnl_set_elem_add(s, e);
 
 	e = nftnl_set_elem_alloc();
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	data = 0x2;
-	nftnl_set_elem_attr_set(e, NFTNL_SET_ELEM_ATTR_KEY, &data, sizeof(data));
+	nftnl_set_elem_attr_set(e, NFTNL_SET_ELEM_KEY, &data, sizeof(data));
 	nftnl_set_elem_add(s, e);
 
 	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_DELSETELEM, family,

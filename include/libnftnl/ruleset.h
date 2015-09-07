@@ -19,10 +19,10 @@ struct nftnl_ruleset *nftnl_ruleset_alloc(void);
 void nftnl_ruleset_free(struct nftnl_ruleset *r);
 
 enum {
-	NFTNL_RULESET_ATTR_TABLELIST = 0,
-	NFTNL_RULESET_ATTR_CHAINLIST,
-	NFTNL_RULESET_ATTR_SETLIST,
-	NFTNL_RULESET_ATTR_RULELIST,
+	NFTNL_RULESET_TABLELIST = 0,
+	NFTNL_RULESET_CHAINLIST,
+	NFTNL_RULESET_SETLIST,
+	NFTNL_RULESET_RULELIST,
 };
 
 enum nftnl_ruleset_type {

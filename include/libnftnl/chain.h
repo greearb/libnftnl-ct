@@ -17,22 +17,22 @@ struct nftnl_chain;
 struct nftnl_chain *nftnl_chain_alloc(void);
 void nftnl_chain_free(struct nftnl_chain *);
 
-enum {
-	NFTNL_CHAIN_ATTR_NAME	= 0,
-	NFTNL_CHAIN_ATTR_FAMILY,
-	NFTNL_CHAIN_ATTR_TABLE,
-	NFTNL_CHAIN_ATTR_HOOKNUM,
-	NFTNL_CHAIN_ATTR_PRIO	= 4,
-	NFTNL_CHAIN_ATTR_POLICY,
-	NFTNL_CHAIN_ATTR_USE,
-	NFTNL_CHAIN_ATTR_BYTES,
-	NFTNL_CHAIN_ATTR_PACKETS	= 8,
-	NFTNL_CHAIN_ATTR_HANDLE,
-	NFTNL_CHAIN_ATTR_TYPE,
-	NFTNL_CHAIN_ATTR_DEV,
-	__NFTNL_CHAIN_ATTR_MAX
+enum nftnl_chain_attr {
+	NFTNL_CHAIN_NAME	= 0,
+	NFTNL_CHAIN_FAMILY,
+	NFTNL_CHAIN_TABLE,
+	NFTNL_CHAIN_HOOKNUM,
+	NFTNL_CHAIN_PRIO	= 4,
+	NFTNL_CHAIN_POLICY,
+	NFTNL_CHAIN_USE,
+	NFTNL_CHAIN_BYTES,
+	NFTNL_CHAIN_PACKETS	= 8,
+	NFTNL_CHAIN_HANDLE,
+	NFTNL_CHAIN_TYPE,
+	NFTNL_CHAIN_DEV,
+	__NFTNL_CHAIN_MAX
 };
-#define NFTNL_CHAIN_ATTR_MAX (__NFTNL_CHAIN_ATTR_MAX - 1)
+#define NFTNL_CHAIN_MAX (__NFTNL_CHAIN_MAX - 1)
 
 bool nftnl_chain_attr_is_set(const struct nftnl_chain *c, uint16_t attr);
 void nftnl_chain_attr_unset(struct nftnl_chain *c, uint16_t attr);

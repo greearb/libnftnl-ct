@@ -17,14 +17,14 @@ struct nftnl_table;
 struct nftnl_table *nftnl_table_alloc(void);
 void nftnl_table_free(struct nftnl_table *);
 
-enum {
-	NFTNL_TABLE_ATTR_NAME	= 0,
-	NFTNL_TABLE_ATTR_FAMILY,
-	NFTNL_TABLE_ATTR_FLAGS,
-	NFTNL_TABLE_ATTR_USE,
-	__NFTNL_TABLE_ATTR_MAX
+enum nftnl_table_attr {
+	NFTNL_TABLE_NAME	= 0,
+	NFTNL_TABLE_FAMILY,
+	NFTNL_TABLE_FLAGS,
+	NFTNL_TABLE_USE,
+	__NFTNL_TABLE_MAX
 };
-#define NFTNL_TABLE_ATTR_MAX (__NFTNL_TABLE_ATTR_MAX - 1)
+#define NFTNL_TABLE_MAX (__NFTNL_TABLE_MAX - 1)
 
 bool nftnl_table_attr_is_set(const struct nftnl_table *t, uint16_t attr);
 void nftnl_table_attr_unset(struct nftnl_table *t, uint16_t attr);

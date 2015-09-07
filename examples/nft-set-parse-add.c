@@ -68,7 +68,7 @@ static struct nftnl_set *set_parse_file(const char *file, uint16_t format)
 
 	nftnl_parse_err_free(err);
 
-	nftnl_set_attr_set_u32(s, NFTNL_SET_ATTR_ID, 1);
+	nftnl_set_attr_set_u32(s, NFTNL_SET_ID, 1);
 	return s;
 
 }
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 		mnl_nlmsg_batch_next(batch);
 	}
 
-	family = nftnl_set_attr_get_u32(s, NFTNL_SET_ATTR_FAMILY);
+	family = nftnl_set_attr_get_u32(s, NFTNL_SET_FAMILY);
 
 	set_seq = seq;
 	nlh = nftnl_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
