@@ -87,8 +87,8 @@ int main(int argc, char *argv[])
 
 	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
 					NLM_F_DUMP|NLM_F_ACK, seq);
-	nftnl_set_attr_set(t, NFTNL_SET_NAME, argv[3]);
-	nftnl_set_attr_set(t, NFTNL_SET_TABLE, argv[2]);
+	nftnl_set_set(t, NFTNL_SET_NAME, argv[3]);
+	nftnl_set_set(t, NFTNL_SET_TABLE, argv[2]);
 	nftnl_set_elems_nlmsg_build_payload(nlh, t);
 	nftnl_set_free(t);
 

@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
 		}
 		nlh = nftnl_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
 						NLM_F_ACK, seq);
-		nftnl_chain_attr_set(t, NFTNL_CHAIN_TABLE, argv[2]);
-		nftnl_chain_attr_set(t, NFTNL_CHAIN_NAME, argv[3]);
+		nftnl_chain_set(t, NFTNL_CHAIN_TABLE, argv[2]);
+		nftnl_chain_set(t, NFTNL_CHAIN_NAME, argv[3]);
 		nftnl_chain_nlmsg_build_payload(nlh, t);
 		nftnl_chain_free(t);
 	} else if (argc >= 2) {

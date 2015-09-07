@@ -26,14 +26,14 @@ static void print_err(const char *msg)
 
 static void cmp_nftnl_table(struct nftnl_table *a, struct nftnl_table *b)
 {
-	if (strcmp(nftnl_table_attr_get_str(a, NFTNL_TABLE_NAME),
-		   nftnl_table_attr_get_str(b, NFTNL_TABLE_NAME)) != 0)
+	if (strcmp(nftnl_table_get_str(a, NFTNL_TABLE_NAME),
+		   nftnl_table_get_str(b, NFTNL_TABLE_NAME)) != 0)
 		print_err("table name mismatches");
-	if (nftnl_table_attr_get_u32(a, NFTNL_TABLE_FLAGS) !=
-	    nftnl_table_attr_get_u32(b, NFTNL_TABLE_FLAGS))
+	if (nftnl_table_get_u32(a, NFTNL_TABLE_FLAGS) !=
+	    nftnl_table_get_u32(b, NFTNL_TABLE_FLAGS))
 		print_err("table flags mismatches");
-	if (nftnl_table_attr_get_u32(a, NFTNL_TABLE_FAMILY) !=
-	    nftnl_table_attr_get_u32(b, NFTNL_TABLE_FAMILY))
+	if (nftnl_table_get_u32(a, NFTNL_TABLE_FAMILY) !=
+	    nftnl_table_get_u32(b, NFTNL_TABLE_FAMILY))
 		print_err("tabke family mismatches");
 }
 
@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
 	if (a == NULL || b == NULL)
 		print_err("OOM");
 
-	nftnl_table_attr_set_str(a, NFTNL_TABLE_NAME, "test");
-	nftnl_table_attr_set_u32(a, NFTNL_TABLE_FAMILY, AF_INET);
-	nftnl_table_attr_set_u32(a, NFTNL_TABLE_FLAGS, 0);
+	nftnl_table_set_str(a, NFTNL_TABLE_NAME, "test");
+	nftnl_table_set_u32(a, NFTNL_TABLE_FAMILY, AF_INET);
+	nftnl_table_set_u32(a, NFTNL_TABLE_FLAGS, 0);
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
 	nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, AF_INET, 0,

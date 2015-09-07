@@ -31,22 +31,22 @@ enum nftnl_rule_attr {
 };
 #define NFTNL_RULE_MAX (__NFTNL_RULE_MAX - 1)
 
-void nftnl_rule_attr_unset(struct nftnl_rule *r, uint16_t attr);
-bool nftnl_rule_attr_is_set(const struct nftnl_rule *r, uint16_t attr);
-void nftnl_rule_attr_set(struct nftnl_rule *r, uint16_t attr, const void *data);
-void nftnl_rule_attr_set_data(struct nftnl_rule *r, uint16_t attr,
+void nftnl_rule_unset(struct nftnl_rule *r, uint16_t attr);
+bool nftnl_rule_is_set(const struct nftnl_rule *r, uint16_t attr);
+void nftnl_rule_set(struct nftnl_rule *r, uint16_t attr, const void *data);
+void nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 			    const void *data, uint32_t data_len);
-void nftnl_rule_attr_set_u32(struct nftnl_rule *r, uint16_t attr, uint32_t val);
-void nftnl_rule_attr_set_u64(struct nftnl_rule *r, uint16_t attr, uint64_t val);
-void nftnl_rule_attr_set_str(struct nftnl_rule *r, uint16_t attr, const char *str);
+void nftnl_rule_set_u32(struct nftnl_rule *r, uint16_t attr, uint32_t val);
+void nftnl_rule_set_u64(struct nftnl_rule *r, uint16_t attr, uint64_t val);
+void nftnl_rule_set_str(struct nftnl_rule *r, uint16_t attr, const char *str);
 
-const void *nftnl_rule_attr_get(const struct nftnl_rule *r, uint16_t attr);
-const void *nftnl_rule_attr_get_data(const struct nftnl_rule *r, uint16_t attr,
+const void *nftnl_rule_get(const struct nftnl_rule *r, uint16_t attr);
+const void *nftnl_rule_get_data(const struct nftnl_rule *r, uint16_t attr,
 				   uint32_t *data_len);
-const char *nftnl_rule_attr_get_str(const struct nftnl_rule *r, uint16_t attr);
-uint8_t nftnl_rule_attr_get_u8(const struct nftnl_rule *r, uint16_t attr);
-uint32_t nftnl_rule_attr_get_u32(const struct nftnl_rule *r, uint16_t attr);
-uint64_t nftnl_rule_attr_get_u64(const struct nftnl_rule *r, uint16_t attr);
+const char *nftnl_rule_get_str(const struct nftnl_rule *r, uint16_t attr);
+uint8_t nftnl_rule_get_u8(const struct nftnl_rule *r, uint16_t attr);
+uint32_t nftnl_rule_get_u32(const struct nftnl_rule *r, uint16_t attr);
+uint64_t nftnl_rule_get_u64(const struct nftnl_rule *r, uint16_t attr);
 
 void nftnl_rule_add_expr(struct nftnl_rule *r, struct nftnl_expr *expr);
 

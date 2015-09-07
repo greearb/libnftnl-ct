@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 	} else {
 		nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
 						NLM_F_ACK, seq);
-		nftnl_table_attr_set(t, NFTNL_TABLE_NAME, argv[2]);
+		nftnl_table_set(t, NFTNL_TABLE_NAME, argv[2]);
 		nftnl_table_nlmsg_build_payload(nlh, t);
 		nftnl_table_free(t);
 	}

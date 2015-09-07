@@ -41,13 +41,13 @@ void nftnl_gen_free(struct nftnl_gen *gen)
 }
 EXPORT_SYMBOL(nftnl_gen_free, nft_gen_free);
 
-bool nftnl_gen_attr_is_set(const struct nftnl_gen *gen, uint16_t attr)
+bool nftnl_gen_is_set(const struct nftnl_gen *gen, uint16_t attr)
 {
 	return gen->flags & (1 << attr);
 }
-EXPORT_SYMBOL(nftnl_gen_attr_is_set, nft_gen_attr_is_set);
+EXPORT_SYMBOL(nftnl_gen_is_set, nft_gen_attr_is_set);
 
-void nftnl_gen_attr_unset(struct nftnl_gen *gen, uint16_t attr)
+void nftnl_gen_unset(struct nftnl_gen *gen, uint16_t attr)
 {
 	if (!(gen->flags & (1 << attr)))
 		return;
@@ -58,19 +58,19 @@ void nftnl_gen_attr_unset(struct nftnl_gen *gen, uint16_t attr)
 	}
 	gen->flags &= ~(1 << attr);
 }
-EXPORT_SYMBOL(nftnl_gen_attr_unset, nft_gen_attr_unset);
+EXPORT_SYMBOL(nftnl_gen_unset, nft_gen_attr_unset);
 
-static uint32_t nftnl_gen_attr_validate[NFTNL_GEN_MAX + 1] = {
+static uint32_t nftnl_gen_validate[NFTNL_GEN_MAX + 1] = {
 	[NFTNL_GEN_ID]	= sizeof(uint32_t),
 };
 
-void nftnl_gen_attr_set_data(struct nftnl_gen *gen, uint16_t attr,
+void nftnl_gen_set_data(struct nftnl_gen *gen, uint16_t attr,
 			   const void *data, uint32_t data_len)
 {
 	if (attr > NFTNL_GEN_MAX)
 		return;
 
-	nftnl_assert_validate(data, nftnl_gen_attr_validate, attr, data_len);
+	nftnl_assert_validate(data, nftnl_gen_validate, attr, data_len);
 
 	switch (attr) {
 	case NFTNL_GEN_ID:
@@ -79,21 +79,21 @@ void nftnl_gen_attr_set_data(struct nftnl_gen *gen, uint16_t attr,
 	}
 	gen->flags |= (1 << attr);
 }
-EXPORT_SYMBOL(nftnl_gen_attr_set_data, nft_gen_attr_set_data);
+EXPORT_SYMBOL(nftnl_gen_set_data, nft_gen_attr_set_data);
 
-void nftnl_gen_attr_set(struct nftnl_gen *gen, uint16_t attr, const void *data)
+void nftnl_gen_set(struct nftnl_gen *gen, uint16_t attr, const void *data)
 {
-	nftnl_gen_attr_set_data(gen, attr, data, nftnl_gen_attr_validate[attr]);
+	nftnl_gen_set_data(gen, attr, data, nftnl_gen_validate[attr]);
 }
-EXPORT_SYMBOL(nftnl_gen_attr_set, nft_gen_attr_set);
+EXPORT_SYMBOL(nftnl_gen_set, nft_gen_attr_set);
 
-void nftnl_gen_attr_set_u32(struct nftnl_gen *gen, uint16_t attr, uint32_t val)
+void nftnl_gen_set_u32(struct nftnl_gen *gen, uint16_t attr, uint32_t val)
 {
-	nftnl_gen_attr_set_data(gen, attr, &val, sizeof(uint32_t));
+	nftnl_gen_set_data(gen, attr, &val, sizeof(uint32_t));
 }
-EXPORT_SYMBOL(nftnl_gen_attr_set_u32, nft_gen_attr_set_u32);
+EXPORT_SYMBOL(nftnl_gen_set_u32, nft_gen_attr_set_u32);
 
-const void *nftnl_gen_attr_get_data(struct nftnl_gen *gen, uint16_t attr,
+const void *nftnl_gen_get_data(struct nftnl_gen *gen, uint16_t attr,
 				  uint32_t *data_len)
 {
 	if (!(gen->flags & (1 << attr)))
@@ -105,21 +105,21 @@ const void *nftnl_gen_attr_get_data(struct nftnl_gen *gen, uint16_t attr,
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(nftnl_gen_attr_get_data, nft_gen_attr_get_data);
+EXPORT_SYMBOL(nftnl_gen_get_data, nft_gen_attr_get_data);
 
-const void *nftnl_gen_attr_get(struct nftnl_gen *gen, uint16_t attr)
+const void *nftnl_gen_get(struct nftnl_gen *gen, uint16_t attr)
 {
 	uint32_t data_len;
-	return nftnl_gen_attr_get_data(gen, attr, &data_len);
+	return nftnl_gen_get_data(gen, attr, &data_len);
 }
-EXPORT_SYMBOL(nftnl_gen_attr_get, nft_gen_attr_get);
+EXPORT_SYMBOL(nftnl_gen_get, nft_gen_attr_get);
 
-uint32_t nftnl_gen_attr_get_u32(struct nftnl_gen *gen, uint16_t attr)
+uint32_t nftnl_gen_get_u32(struct nftnl_gen *gen, uint16_t attr)
 {
-	const void *ret = nftnl_gen_attr_get(gen, attr);
+	const void *ret = nftnl_gen_get(gen, attr);
 	return ret == NULL ? 0 : *((uint32_t *)ret);
 }
-EXPORT_SYMBOL(nftnl_gen_attr_get_u32, nft_gen_attr_get_u32);
+EXPORT_SYMBOL(nftnl_gen_get_u32, nft_gen_attr_get_u32);
 
 static int nftnl_gen_parse_attr_cb(const struct nlattr *attr, void *data)
 {

@@ -30,8 +30,8 @@ static struct nftnl_chain *chain_del_parse(int argc, char *argv[])
 		return NULL;
 	}
 
-	nftnl_chain_attr_set(t, NFTNL_CHAIN_TABLE, argv[2]);
-	nftnl_chain_attr_set(t, NFTNL_CHAIN_NAME, argv[3]);
+	nftnl_chain_set(t, NFTNL_CHAIN_TABLE, argv[2]);
+	nftnl_chain_set(t, NFTNL_CHAIN_NAME, argv[3]);
 
 	return t;
 }

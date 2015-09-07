@@ -251,7 +251,7 @@ int nftnl_jansson_set_elem_parse(struct nftnl_set_elem *e, json_t *root,
 	uint32_t flags;
 
 	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags, err) == 0)
-		nftnl_set_elem_attr_set_u32(e, NFTNL_SET_ELEM_FLAGS, flags);
+		nftnl_set_elem_set_u32(e, NFTNL_SET_ELEM_FLAGS, flags);
 
 	if (nftnl_jansson_data_reg_parse(root, "key", &e->key, err) == DATA_VALUE)
 		e->flags |= (1 << NFTNL_SET_ELEM_KEY);

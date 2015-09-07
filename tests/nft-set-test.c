@@ -26,26 +26,26 @@ static void print_err(const char *msg)
 
 static void cmp_nftnl_set(struct nftnl_set *a, struct nftnl_set *b)
 {
-	if (strcmp(nftnl_set_attr_get_str(a, NFTNL_SET_TABLE),
-		   nftnl_set_attr_get_str(b, NFTNL_SET_TABLE)) != 0)
+	if (strcmp(nftnl_set_get_str(a, NFTNL_SET_TABLE),
+		   nftnl_set_get_str(b, NFTNL_SET_TABLE)) != 0)
 		print_err("Set table mismatches");
-	if (strcmp(nftnl_set_attr_get_str(a, NFTNL_SET_NAME),
-		   nftnl_set_attr_get_str(b, NFTNL_SET_NAME)) != 0)
+	if (strcmp(nftnl_set_get_str(a, NFTNL_SET_NAME),
+		   nftnl_set_get_str(b, NFTNL_SET_NAME)) != 0)
 		print_err("Set name mismatches");
-	if (nftnl_set_attr_get_u32(a, NFTNL_SET_FLAGS) !=
-	    nftnl_set_attr_get_u32(b, NFTNL_SET_FLAGS))
+	if (nftnl_set_get_u32(a, NFTNL_SET_FLAGS) !=
+	    nftnl_set_get_u32(b, NFTNL_SET_FLAGS))
 		print_err("Set flags mismatches");
-	if (nftnl_set_attr_get_u32(a, NFTNL_SET_KEY_TYPE) !=
-	    nftnl_set_attr_get_u32(b, NFTNL_SET_KEY_TYPE))
+	if (nftnl_set_get_u32(a, NFTNL_SET_KEY_TYPE) !=
+	    nftnl_set_get_u32(b, NFTNL_SET_KEY_TYPE))
 		print_err("Set key-type mismatches");
-	if (nftnl_set_attr_get_u32(a, NFTNL_SET_KEY_LEN) !=
-	    nftnl_set_attr_get_u32(b, NFTNL_SET_KEY_LEN))
+	if (nftnl_set_get_u32(a, NFTNL_SET_KEY_LEN) !=
+	    nftnl_set_get_u32(b, NFTNL_SET_KEY_LEN))
 		print_err("Set key-len mismatches");
-	if (nftnl_set_attr_get_u32(a, NFTNL_SET_DATA_TYPE) !=
-	    nftnl_set_attr_get_u32(b, NFTNL_SET_DATA_TYPE))
+	if (nftnl_set_get_u32(a, NFTNL_SET_DATA_TYPE) !=
+	    nftnl_set_get_u32(b, NFTNL_SET_DATA_TYPE))
 		print_err("Set data-type mismatches");
-	if (nftnl_set_attr_get_u32(a, NFTNL_SET_DATA_LEN) !=
-	    nftnl_set_attr_get_u32(b, NFTNL_SET_DATA_LEN))
+	if (nftnl_set_get_u32(a, NFTNL_SET_DATA_LEN) !=
+	    nftnl_set_get_u32(b, NFTNL_SET_DATA_LEN))
 		print_err("Set data-len mismatches");
 }
 
@@ -60,14 +60,14 @@ int main(int argc, char *argv[])
 	if (a == NULL || b == NULL)
 		print_err("OOM");
 
-	nftnl_set_attr_set_str(a, NFTNL_SET_TABLE, "test-table");
-	nftnl_set_attr_set_str(a, NFTNL_SET_NAME, "test-name");
-	nftnl_set_attr_set_u32(a, NFTNL_SET_FLAGS, 0x12345678);
-	nftnl_set_attr_set_u32(a, NFTNL_SET_KEY_TYPE, 0x12345678);
-	nftnl_set_attr_set_u32(a, NFTNL_SET_KEY_LEN, 0x12345678);
-	nftnl_set_attr_set_u32(a, NFTNL_SET_DATA_TYPE, 0x12345678);
-	nftnl_set_attr_set_u32(a, NFTNL_SET_DATA_LEN, 0x12345678);
-	nftnl_set_attr_set_u32(a, NFTNL_SET_FAMILY, 0x12345678);
+	nftnl_set_set_str(a, NFTNL_SET_TABLE, "test-table");
+	nftnl_set_set_str(a, NFTNL_SET_NAME, "test-name");
+	nftnl_set_set_u32(a, NFTNL_SET_FLAGS, 0x12345678);
+	nftnl_set_set_u32(a, NFTNL_SET_KEY_TYPE, 0x12345678);
+	nftnl_set_set_u32(a, NFTNL_SET_KEY_LEN, 0x12345678);
+	nftnl_set_set_u32(a, NFTNL_SET_DATA_TYPE, 0x12345678);
+	nftnl_set_set_u32(a, NFTNL_SET_DATA_LEN, 0x12345678);
+	nftnl_set_set_u32(a, NFTNL_SET_FAMILY, 0x12345678);
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
 	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_NEWSET, AF_INET, 0, 1234);

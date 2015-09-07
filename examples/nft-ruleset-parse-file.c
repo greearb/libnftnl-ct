@@ -69,7 +69,7 @@ static int nftnl_ruleset_set_elems(const struct nftnl_parse_ctx *ctx)
 		goto err;
 
 	nlh = nftnl_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch), nl_type,
-				      nftnl_set_attr_get_u32(set,
+				      nftnl_set_get_u32(set,
 							   NFTNL_SET_FAMILY),
 				      nl_flags, seq++);
 
@@ -82,7 +82,7 @@ err:
 	return -1;
 }
 
-static int nftnl_ruleset_set(const struct nftnl_parse_ctx *ctx)
+static int nftnl_ruleset_parse_set(const struct nftnl_parse_ctx *ctx)
 {
 
 	struct nlmsghdr *nlh;
@@ -112,7 +112,7 @@ static int nftnl_ruleset_set(const struct nftnl_parse_ctx *ctx)
 
 	nlh = nftnl_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				      nl_type,
-				      nftnl_set_attr_get_u32(set,
+				      nftnl_set_get_u32(set,
 							   NFTNL_SET_FAMILY),
 				      nl_flags,
 				      seq++);
@@ -136,7 +136,7 @@ static int nftnl_ruleset_rule_build_msg(const struct nftnl_parse_ctx *ctx,
 	case NFTNL_CMD_ADD:
 		nl_type = NFT_MSG_NEWRULE;
 		nl_flags = NLM_F_APPEND|NLM_F_CREATE|NLM_F_ACK;
-		nftnl_rule_attr_unset(rule, NFTNL_RULE_HANDLE);
+		nftnl_rule_unset(rule, NFTNL_RULE_HANDLE);
 		break;
 	case NFTNL_CMD_DELETE:
 		nl_type = NFT_MSG_DELRULE;
@@ -149,7 +149,7 @@ static int nftnl_ruleset_rule_build_msg(const struct nftnl_parse_ctx *ctx,
 	case NFTNL_CMD_INSERT:
 		nl_type = NFT_MSG_NEWRULE;
 		nl_flags = NLM_F_CREATE|NLM_F_ACK;
-		nftnl_rule_attr_unset(rule, NFTNL_RULE_HANDLE);
+		nftnl_rule_unset(rule, NFTNL_RULE_HANDLE);
 		break;
 	default:
 		return -1;
@@ -157,7 +157,7 @@ static int nftnl_ruleset_rule_build_msg(const struct nftnl_parse_ctx *ctx,
 
 	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				       nl_type,
-				       nftnl_rule_attr_get_u32(rule,
+				       nftnl_rule_get_u32(rule,
 							  NFTNL_RULE_FAMILY),
 				       nl_flags,
 				       seq++);
@@ -201,21 +201,21 @@ static int nftnl_ruleset_flush_rules(const struct nftnl_parse_ctx *ctx)
 	switch (type) {
 	case NFTNL_RULESET_TABLE:
 		nlt = nftnl_ruleset_ctx_get(ctx, NFTNL_RULESET_CTX_TABLE);
-		nftnl_rule_attr_set(nlr, NFTNL_RULE_TABLE,
-				  nftnl_table_attr_get(nlt, NFTNL_TABLE_NAME));
-		nftnl_rule_attr_set(nlr, NFTNL_RULE_FAMILY,
-				nftnl_table_attr_get(nlt, NFTNL_TABLE_FAMILY));
+		nftnl_rule_set(nlr, NFTNL_RULE_TABLE,
+				  nftnl_table_get(nlt, NFTNL_TABLE_NAME));
+		nftnl_rule_set(nlr, NFTNL_RULE_FAMILY,
+				nftnl_table_get(nlt, NFTNL_TABLE_FAMILY));
 		break;
 	case NFTNL_RULESET_CHAIN:
 		nlc = nftnl_ruleset_ctx_get(ctx, NFTNL_RULESET_CTX_CHAIN);
-		nftnl_rule_attr_set(nlr, NFTNL_RULE_TABLE,
-				  nftnl_chain_attr_get(nlc,
+		nftnl_rule_set(nlr, NFTNL_RULE_TABLE,
+				  nftnl_chain_get(nlc,
 						     NFTNL_CHAIN_TABLE));
-		nftnl_rule_attr_set(nlr, NFTNL_RULE_CHAIN,
-				  nftnl_chain_attr_get(nlc,
+		nftnl_rule_set(nlr, NFTNL_RULE_CHAIN,
+				  nftnl_chain_get(nlc,
 						     NFTNL_CHAIN_NAME));
-		nftnl_rule_attr_set(nlr, NFTNL_RULE_FAMILY,
-				nftnl_chain_attr_get(nlc, NFTNL_TABLE_FAMILY));
+		nftnl_rule_set(nlr, NFTNL_RULE_FAMILY,
+				nftnl_chain_get(nlc, NFTNL_TABLE_FAMILY));
 		break;
 	default:
 		goto err;
@@ -258,10 +258,10 @@ static int nftnl_ruleset_chain(const struct nftnl_parse_ctx *ctx)
 		goto err;
 	}
 
-	nftnl_chain_attr_unset(chain, NFTNL_CHAIN_HANDLE);
+	nftnl_chain_unset(chain, NFTNL_CHAIN_HANDLE);
 	nlh = nftnl_chain_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 					nl_type,
-					nftnl_chain_attr_get_u32(chain,
+					nftnl_chain_get_u32(chain,
 							 NFTNL_CHAIN_FAMILY),
 					nl_flags,
 					seq++);
@@ -297,7 +297,7 @@ static int nftnl_ruleset_table_build_msg(const struct nftnl_parse_ctx *ctx,
 
 	nlh = nftnl_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 					nl_type,
-					nftnl_table_attr_get_u32(table,
+					nftnl_table_get_u32(table,
 							 NFTNL_TABLE_FAMILY),
 					nl_flags,
 					seq++);
@@ -358,7 +358,7 @@ static int ruleset_elems_cb(const struct nftnl_parse_ctx *ctx)
 		ret = nftnl_ruleset_rule(ctx);
 		break;
 	case NFTNL_RULESET_SET:
-		ret = nftnl_ruleset_set(ctx);
+		ret = nftnl_ruleset_parse_set(ctx);
 		break;
 	case NFTNL_RULESET_SET_ELEMS:
 		ret = nftnl_ruleset_set_elems(ctx);

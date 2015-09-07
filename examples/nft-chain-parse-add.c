@@ -103,8 +103,8 @@ int main(int argc, char *argv[])
 	nftnl_chain_fprintf(stdout, c, outformat, 0);
 	fprintf(stdout, "\n");
 
-	nftnl_chain_attr_unset(c, NFTNL_CHAIN_HANDLE);
-	family = nftnl_chain_attr_get_u32(c, NFTNL_CHAIN_FAMILY);
+	nftnl_chain_unset(c, NFTNL_CHAIN_HANDLE);
+	family = nftnl_chain_get_u32(c, NFTNL_CHAIN_FAMILY);
 
 	seq = time(NULL);
 	batching = nftnl_batch_is_supported();

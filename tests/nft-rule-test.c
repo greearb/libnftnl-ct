@@ -26,26 +26,26 @@ static void print_err(const char *msg)
 
 static void cmp_nftnl_rule(struct nftnl_rule *a, struct nftnl_rule *b)
 {
-	if (nftnl_rule_attr_get_u32(a, NFTNL_RULE_FAMILY) !=
-	    nftnl_rule_attr_get_u32(b, NFTNL_RULE_FAMILY))
+	if (nftnl_rule_get_u32(a, NFTNL_RULE_FAMILY) !=
+	    nftnl_rule_get_u32(b, NFTNL_RULE_FAMILY))
 		print_err("Rule family mismatches");
-	if (strcmp(nftnl_rule_attr_get_str(a, NFTNL_RULE_TABLE),
-		   nftnl_rule_attr_get_str(b, NFTNL_RULE_TABLE)) != 0)
+	if (strcmp(nftnl_rule_get_str(a, NFTNL_RULE_TABLE),
+		   nftnl_rule_get_str(b, NFTNL_RULE_TABLE)) != 0)
 		print_err("Rule table mismatches");
-	if (strcmp(nftnl_rule_attr_get_str(a, NFTNL_RULE_CHAIN),
-		   nftnl_rule_attr_get_str(b, NFTNL_RULE_CHAIN)) != 0)
+	if (strcmp(nftnl_rule_get_str(a, NFTNL_RULE_CHAIN),
+		   nftnl_rule_get_str(b, NFTNL_RULE_CHAIN)) != 0)
 		print_err("Rule table mismatches");
-	if (nftnl_rule_attr_get_u64(a, NFTNL_RULE_HANDLE) !=
-	    nftnl_rule_attr_get_u64(b, NFTNL_RULE_HANDLE))
+	if (nftnl_rule_get_u64(a, NFTNL_RULE_HANDLE) !=
+	    nftnl_rule_get_u64(b, NFTNL_RULE_HANDLE))
 		print_err("Rule handle mismatches");
-	if (nftnl_rule_attr_get_u32(a, NFTNL_RULE_COMPAT_PROTO) !=
-	    nftnl_rule_attr_get_u32(b, NFTNL_RULE_COMPAT_PROTO))
+	if (nftnl_rule_get_u32(a, NFTNL_RULE_COMPAT_PROTO) !=
+	    nftnl_rule_get_u32(b, NFTNL_RULE_COMPAT_PROTO))
 		print_err("Rule compat_proto mismatches");
-	if (nftnl_rule_attr_get_u32(a, NFTNL_RULE_COMPAT_FLAGS) !=
-	    nftnl_rule_attr_get_u32(b, NFTNL_RULE_COMPAT_FLAGS))
+	if (nftnl_rule_get_u32(a, NFTNL_RULE_COMPAT_FLAGS) !=
+	    nftnl_rule_get_u32(b, NFTNL_RULE_COMPAT_FLAGS))
 		print_err("Rule compat_flags mismatches");
-	if (nftnl_rule_attr_get_u64(a, NFTNL_RULE_POSITION) !=
-	    nftnl_rule_attr_get_u64(b, NFTNL_RULE_POSITION))
+	if (nftnl_rule_get_u64(a, NFTNL_RULE_POSITION) !=
+	    nftnl_rule_get_u64(b, NFTNL_RULE_POSITION))
 		print_err("Rule compat_position mismatches");
 }
 
@@ -60,13 +60,13 @@ int main(int argc, char *argv[])
 	if (a == NULL || b == NULL)
 		print_err("OOM");
 
-	nftnl_rule_attr_set_u32(a, NFTNL_RULE_FAMILY, AF_INET);
-	nftnl_rule_attr_set_str(a, NFTNL_RULE_TABLE, "table");
-	nftnl_rule_attr_set_str(a, NFTNL_RULE_CHAIN, "chain");
-	nftnl_rule_attr_set_u64(a, NFTNL_RULE_HANDLE, 0x1234567812345678);
-	nftnl_rule_attr_set_u32(a, NFTNL_RULE_COMPAT_PROTO, 0x12345678);
-	nftnl_rule_attr_set_u32(a, NFTNL_RULE_COMPAT_FLAGS, 0x12345678);
-	nftnl_rule_attr_set_u64(a, NFTNL_RULE_POSITION, 0x1234567812345678);
+	nftnl_rule_set_u32(a, NFTNL_RULE_FAMILY, AF_INET);
+	nftnl_rule_set_str(a, NFTNL_RULE_TABLE, "table");
+	nftnl_rule_set_str(a, NFTNL_RULE_CHAIN, "chain");
+	nftnl_rule_set_u64(a, NFTNL_RULE_HANDLE, 0x1234567812345678);
+	nftnl_rule_set_u32(a, NFTNL_RULE_COMPAT_PROTO, 0x12345678);
+	nftnl_rule_set_u32(a, NFTNL_RULE_COMPAT_FLAGS, 0x12345678);
+	nftnl_rule_set_u64(a, NFTNL_RULE_POSITION, 0x1234567812345678);
 
 	nlh = nftnl_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, AF_INET, 0, 1234);
 	nftnl_rule_nlmsg_build_payload(nlh, a);

@@ -35,10 +35,10 @@ enum nftnl_ruleset_type {
 	NFTNL_RULESET_SET_ELEMS,
 };
 
-bool nftnl_ruleset_attr_is_set(const struct nftnl_ruleset *r, uint16_t attr);
-void nftnl_ruleset_attr_unset(struct nftnl_ruleset *r, uint16_t attr);
-void nftnl_ruleset_attr_set(struct nftnl_ruleset *r, uint16_t attr, void *data);
-void *nftnl_ruleset_attr_get(const struct nftnl_ruleset *r, uint16_t attr);
+bool nftnl_ruleset_is_set(const struct nftnl_ruleset *r, uint16_t attr);
+void nftnl_ruleset_unset(struct nftnl_ruleset *r, uint16_t attr);
+void nftnl_ruleset_set(struct nftnl_ruleset *r, uint16_t attr, void *data);
+void *nftnl_ruleset_get(const struct nftnl_ruleset *r, uint16_t attr);
 
 enum {
 	NFTNL_RULESET_CTX_CMD = 0,

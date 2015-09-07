@@ -44,8 +44,8 @@ static struct nftnl_table *table_add_parse(int argc, char *argv[])
 		return NULL;
 	}
 
-	nftnl_table_attr_set_u32(t, NFTNL_TABLE_FAMILY, family);
-	nftnl_table_attr_set_str(t, NFTNL_TABLE_NAME, argv[2]);
+	nftnl_table_set_u32(t, NFTNL_TABLE_FAMILY, family);
+	nftnl_table_set_str(t, NFTNL_TABLE_NAME, argv[2]);
 
 	return t;
 }
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 	}
 
 	table_seq = seq;
-	family = nftnl_table_attr_get_u32(t, NFTNL_TABLE_FAMILY);
+	family = nftnl_table_get_u32(t, NFTNL_TABLE_FAMILY);
 	nlh = nftnl_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 					NFT_MSG_NEWTABLE, family,
 					NLM_F_ACK, seq++);

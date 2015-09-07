@@ -55,13 +55,13 @@ void nftnl_set_elem_free(struct nftnl_set_elem *s)
 }
 EXPORT_SYMBOL(nftnl_set_elem_free, nft_set_elem_free);
 
-bool nftnl_set_elem_attr_is_set(const struct nftnl_set_elem *s, uint16_t attr)
+bool nftnl_set_elem_is_set(const struct nftnl_set_elem *s, uint16_t attr)
 {
 	return s->flags & (1 << attr);
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_is_set, nft_set_elem_attr_is_set);
+EXPORT_SYMBOL(nftnl_set_elem_is_set, nft_set_elem_attr_is_set);
 
-void nftnl_set_elem_attr_unset(struct nftnl_set_elem *s, uint16_t attr)
+void nftnl_set_elem_unset(struct nftnl_set_elem *s, uint16_t attr)
 {
 	switch (attr) {
 	case NFTNL_SET_ELEM_CHAIN:
@@ -92,9 +92,9 @@ void nftnl_set_elem_attr_unset(struct nftnl_set_elem *s, uint16_t attr)
 
 	s->flags &= ~(1 << attr);
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_unset, nft_set_elem_attr_unset);
+EXPORT_SYMBOL(nftnl_set_elem_unset, nft_set_elem_attr_unset);
 
-void nftnl_set_elem_attr_set(struct nftnl_set_elem *s, uint16_t attr,
+void nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 			   const void *data, uint32_t data_len)
 {
 	switch(attr) {
@@ -130,27 +130,27 @@ void nftnl_set_elem_attr_set(struct nftnl_set_elem *s, uint16_t attr,
 	}
 	s->flags |= (1 << attr);
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_set, nft_set_elem_attr_set);
+EXPORT_SYMBOL(nftnl_set_elem_set, nft_set_elem_attr_set);
 
-void nftnl_set_elem_attr_set_u32(struct nftnl_set_elem *s, uint16_t attr, uint32_t val)
+void nftnl_set_elem_set_u32(struct nftnl_set_elem *s, uint16_t attr, uint32_t val)
 {
-	nftnl_set_elem_attr_set(s, attr, &val, sizeof(uint32_t));
+	nftnl_set_elem_set(s, attr, &val, sizeof(uint32_t));
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_set_u32, nft_set_elem_attr_set_u32);
+EXPORT_SYMBOL(nftnl_set_elem_set_u32, nft_set_elem_attr_set_u32);
 
-void nftnl_set_elem_attr_set_u64(struct nftnl_set_elem *s, uint16_t attr, uint64_t val)
+void nftnl_set_elem_set_u64(struct nftnl_set_elem *s, uint16_t attr, uint64_t val)
 {
-	nftnl_set_elem_attr_set(s, attr, &val, sizeof(uint64_t));
+	nftnl_set_elem_set(s, attr, &val, sizeof(uint64_t));
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_set_u64, nft_set_elem_attr_set_u64);
+EXPORT_SYMBOL(nftnl_set_elem_set_u64, nft_set_elem_attr_set_u64);
 
-void nftnl_set_elem_attr_set_str(struct nftnl_set_elem *s, uint16_t attr, const char *str)
+void nftnl_set_elem_set_str(struct nftnl_set_elem *s, uint16_t attr, const char *str)
 {
-	nftnl_set_elem_attr_set(s, attr, str, strlen(str));
+	nftnl_set_elem_set(s, attr, str, strlen(str));
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_set_str, nft_set_elem_attr_set_str);
+EXPORT_SYMBOL(nftnl_set_elem_set_str, nft_set_elem_attr_set_str);
 
-const void *nftnl_set_elem_attr_get(struct nftnl_set_elem *s, uint16_t attr, uint32_t *data_len)
+const void *nftnl_set_elem_get(struct nftnl_set_elem *s, uint16_t attr, uint32_t *data_len)
 {
 	if (!(s->flags & (1 << attr)))
 		return NULL;
@@ -180,31 +180,31 @@ const void *nftnl_set_elem_attr_get(struct nftnl_set_elem *s, uint16_t attr, uin
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_get, nft_set_elem_attr_get);
+EXPORT_SYMBOL(nftnl_set_elem_get, nft_set_elem_attr_get);
 
-const char *nftnl_set_elem_attr_get_str(struct nftnl_set_elem *s, uint16_t attr)
+const char *nftnl_set_elem_get_str(struct nftnl_set_elem *s, uint16_t attr)
 {
 	uint32_t size;
 
-	return nftnl_set_elem_attr_get(s, attr, &size);
+	return nftnl_set_elem_get(s, attr, &size);
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_get_str, nft_set_elem_attr_get_str);
+EXPORT_SYMBOL(nftnl_set_elem_get_str, nft_set_elem_attr_get_str);
 
-uint32_t nftnl_set_elem_attr_get_u32(struct nftnl_set_elem *s, uint16_t attr)
+uint32_t nftnl_set_elem_get_u32(struct nftnl_set_elem *s, uint16_t attr)
 {
 	uint32_t size;
-	uint32_t val = *((uint32_t *)nftnl_set_elem_attr_get(s, attr, &size));
+	uint32_t val = *((uint32_t *)nftnl_set_elem_get(s, attr, &size));
 	return val;
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_get_u32, nft_set_elem_attr_get_u32);
+EXPORT_SYMBOL(nftnl_set_elem_get_u32, nft_set_elem_attr_get_u32);
 
-uint64_t nftnl_set_elem_attr_get_u64(struct nftnl_set_elem *s, uint16_t attr)
+uint64_t nftnl_set_elem_get_u64(struct nftnl_set_elem *s, uint16_t attr)
 {
 	uint32_t size;
-	uint64_t val = *((uint64_t *)nftnl_set_elem_attr_get(s, attr, &size));
+	uint64_t val = *((uint64_t *)nftnl_set_elem_get(s, attr, &size));
 	return val;
 }
-EXPORT_SYMBOL(nftnl_set_elem_attr_get_u64, nft_set_elem_attr_get_u64);
+EXPORT_SYMBOL(nftnl_set_elem_get_u64, nft_set_elem_attr_get_u64);
 
 struct nftnl_set_elem *nftnl_set_elem_clone(struct nftnl_set_elem *elem)
 {
@@ -270,7 +270,7 @@ static void nftnl_set_elem_nlmsg_build_def(struct nlmsghdr *nlh,
 		mnl_attr_put_strz(nlh, NFTA_SET_ELEM_LIST_TABLE, s->table);
 }
 
-static struct nlattr *nftnl_set_elem_attr_build(struct nlmsghdr *nlh,
+static struct nlattr *nftnl_set_elem_build(struct nlmsghdr *nlh,
 					      struct nftnl_set_elem *elem, int i)
 {
 	struct nlattr *nest2;
@@ -292,7 +292,7 @@ void nftnl_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set 
 
 	nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_LIST_ELEMENTS);
 	list_for_each_entry(elem, &s->element_list, head)
-		nftnl_set_elem_attr_build(nlh, elem, ++i);
+		nftnl_set_elem_build(nlh, elem, ++i);
 
 	mnl_attr_nest_end(nlh, nest1);
 }
@@ -497,7 +497,7 @@ int nftnl_mxml_set_elem_parse(mxml_node_t *tree, struct nftnl_set_elem *e,
 	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
 			       &set_elem_flags, NFTNL_TYPE_U32, NFTNL_XML_MAND,
 			       err) == 0)
-		nftnl_set_elem_attr_set_u32(e, NFTNL_SET_ELEM_FLAGS, set_elem_flags);
+		nftnl_set_elem_set_u32(e, NFTNL_SET_ELEM_FLAGS, set_elem_flags);
 
 	if (nftnl_mxml_data_reg_parse(tree, "key", &e->key,
 				    NFTNL_XML_MAND, err) == DATA_VALUE)
@@ -886,7 +886,7 @@ int nftnl_set_elems_nlmsg_build_payload_iter(struct nlmsghdr *nlh,
 	nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_LIST_ELEMENTS);
 	elem = nftnl_set_elems_iter_next(iter);
 	while (elem != NULL) {
-		nest2 = nftnl_set_elem_attr_build(nlh, elem, ++i);
+		nest2 = nftnl_set_elem_build(nlh, elem, ++i);
 		if (nftnl_attr_nest_overflow(nlh, nest1, nest2)) {
 			/* Go back to previous not to miss this element */
 			iter->cur = list_entry(iter->cur->head.prev,

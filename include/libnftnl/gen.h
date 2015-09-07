@@ -23,17 +23,17 @@ enum {
 };
 #define NFTNL_GEN_MAX (__NFTNL_GEN_MAX - 1)
 
-bool nftnl_gen_attr_is_set(const struct nftnl_gen *gen, uint16_t attr);
-void nftnl_gen_attr_unset(struct nftnl_gen *gen, uint16_t attr);
-void nftnl_gen_attr_set(struct nftnl_gen *gen, uint16_t attr, const void *data);
-void nftnl_gen_attr_set_data(struct nftnl_gen *gen, uint16_t attr,
+bool nftnl_gen_is_set(const struct nftnl_gen *gen, uint16_t attr);
+void nftnl_gen_unset(struct nftnl_gen *gen, uint16_t attr);
+void nftnl_gen_set(struct nftnl_gen *gen, uint16_t attr, const void *data);
+void nftnl_gen_set_data(struct nftnl_gen *gen, uint16_t attr,
 			     const void *data, uint32_t data_len);
-const void *nftnl_gen_attr_get(struct nftnl_gen *gen, uint16_t attr);
-const void *nftnl_gen_attr_get_data(struct nftnl_gen *gen, uint16_t attr,
+const void *nftnl_gen_get(struct nftnl_gen *gen, uint16_t attr);
+const void *nftnl_gen_get_data(struct nftnl_gen *gen, uint16_t attr,
 				    uint32_t *data_len);
 
-void nftnl_gen_attr_set_u32(struct nftnl_gen *gen, uint16_t attr, uint32_t data);
-uint32_t nftnl_gen_attr_get_u32(struct nftnl_gen *gen, uint16_t attr);
+void nftnl_gen_set_u32(struct nftnl_gen *gen, uint16_t attr, uint32_t data);
+uint32_t nftnl_gen_get_u32(struct nftnl_gen *gen, uint16_t attr);
 
 struct nlmsghdr;
 int nftnl_gen_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_gen *gen);

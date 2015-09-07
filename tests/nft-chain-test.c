@@ -26,41 +26,41 @@ static void print_err(const char *msg)
 static void cmp_nftnl_chain(struct nftnl_chain *a, struct nftnl_chain *b)
 {
 
-	if (strcmp(nftnl_chain_attr_get_str(a, NFTNL_CHAIN_NAME),
-		   nftnl_chain_attr_get_str(b, NFTNL_CHAIN_NAME)) != 0)
+	if (strcmp(nftnl_chain_get_str(a, NFTNL_CHAIN_NAME),
+		   nftnl_chain_get_str(b, NFTNL_CHAIN_NAME)) != 0)
 		print_err("Chain name mismatches");
-	if (strcmp(nftnl_chain_attr_get_str(a, NFTNL_CHAIN_TABLE),
-		   nftnl_chain_attr_get_str(b, NFTNL_CHAIN_TABLE)) != 0)
+	if (strcmp(nftnl_chain_get_str(a, NFTNL_CHAIN_TABLE),
+		   nftnl_chain_get_str(b, NFTNL_CHAIN_TABLE)) != 0)
 		print_err("Chain table mismatches");
-	if (nftnl_chain_attr_get_u32(a, NFTNL_CHAIN_FAMILY) !=
-	    nftnl_chain_attr_get_u32(b, NFTNL_CHAIN_FAMILY))
+	if (nftnl_chain_get_u32(a, NFTNL_CHAIN_FAMILY) !=
+	    nftnl_chain_get_u32(b, NFTNL_CHAIN_FAMILY))
 		print_err("Chain family mismatches");
-	if (nftnl_chain_attr_get_u32(a, NFTNL_CHAIN_POLICY) !=
-	    nftnl_chain_attr_get_u32(b, NFTNL_CHAIN_POLICY))
+	if (nftnl_chain_get_u32(a, NFTNL_CHAIN_POLICY) !=
+	    nftnl_chain_get_u32(b, NFTNL_CHAIN_POLICY))
 		print_err("Chain policy mismatches");
-	if (nftnl_chain_attr_get_u32(a, NFTNL_CHAIN_HOOKNUM) !=
-	    nftnl_chain_attr_get_u32(b, NFTNL_CHAIN_HOOKNUM))
+	if (nftnl_chain_get_u32(a, NFTNL_CHAIN_HOOKNUM) !=
+	    nftnl_chain_get_u32(b, NFTNL_CHAIN_HOOKNUM))
 		print_err("Chain hooknum mismatches");
-	if (nftnl_chain_attr_get_s32(a, NFTNL_CHAIN_PRIO) !=
-	    nftnl_chain_attr_get_s32(b, NFTNL_CHAIN_PRIO))
+	if (nftnl_chain_get_s32(a, NFTNL_CHAIN_PRIO) !=
+	    nftnl_chain_get_s32(b, NFTNL_CHAIN_PRIO))
 		print_err("Chain Prio mismatches");
-	if (nftnl_chain_attr_get_u32(a, NFTNL_CHAIN_USE) !=
-	    nftnl_chain_attr_get_u32(b, NFTNL_CHAIN_USE))
+	if (nftnl_chain_get_u32(a, NFTNL_CHAIN_USE) !=
+	    nftnl_chain_get_u32(b, NFTNL_CHAIN_USE))
 		print_err("Chain use mismatches");
-	if (nftnl_chain_attr_get_u64(a, NFTNL_CHAIN_PACKETS) !=
-	    nftnl_chain_attr_get_u64(b, NFTNL_CHAIN_PACKETS))
+	if (nftnl_chain_get_u64(a, NFTNL_CHAIN_PACKETS) !=
+	    nftnl_chain_get_u64(b, NFTNL_CHAIN_PACKETS))
 		print_err("Chain packets mismatches");
-	if (nftnl_chain_attr_get_u64(a, NFTNL_CHAIN_BYTES) !=
-	    nftnl_chain_attr_get_u64(b, NFTNL_CHAIN_BYTES))
+	if (nftnl_chain_get_u64(a, NFTNL_CHAIN_BYTES) !=
+	    nftnl_chain_get_u64(b, NFTNL_CHAIN_BYTES))
 		print_err("Chain bytes mismatches");
-	if (nftnl_chain_attr_get_u64(a, NFTNL_CHAIN_HANDLE) !=
-	    nftnl_chain_attr_get_u64(b, NFTNL_CHAIN_HANDLE))
+	if (nftnl_chain_get_u64(a, NFTNL_CHAIN_HANDLE) !=
+	    nftnl_chain_get_u64(b, NFTNL_CHAIN_HANDLE))
 		print_err("Chain handle mismatches");
-	if (strcmp(nftnl_chain_attr_get_str(a, NFTNL_CHAIN_TYPE),
-		   nftnl_chain_attr_get_str(b, NFTNL_CHAIN_TYPE)) != 0)
+	if (strcmp(nftnl_chain_get_str(a, NFTNL_CHAIN_TYPE),
+		   nftnl_chain_get_str(b, NFTNL_CHAIN_TYPE)) != 0)
 		print_err("Chain type mismatches");
-	if (strcmp(nftnl_chain_attr_get_str(a, NFTNL_CHAIN_DEV),
-		   nftnl_chain_attr_get_str(b, NFTNL_CHAIN_DEV)) != 0)
+	if (strcmp(nftnl_chain_get_str(a, NFTNL_CHAIN_DEV),
+		   nftnl_chain_get_str(b, NFTNL_CHAIN_DEV)) != 0)
 		print_err("Chain device mismatches");
 }
 
@@ -75,18 +75,18 @@ int main(int argc, char *argv[])
 	if (a == NULL || b == NULL)
 		print_err("OOM");
 
-	nftnl_chain_attr_set_str(a, NFTNL_CHAIN_NAME, "test");
-	nftnl_chain_attr_set_u32(a, NFTNL_CHAIN_FAMILY, AF_INET);
-	nftnl_chain_attr_set_str(a, NFTNL_CHAIN_TABLE, "Table");
-	nftnl_chain_attr_set_u32(a, NFTNL_CHAIN_POLICY,0x12345678);
-	nftnl_chain_attr_set_u32(a, NFTNL_CHAIN_HOOKNUM, 0x12345678);
-	nftnl_chain_attr_set_s32(a, NFTNL_CHAIN_PRIO, 0x12345678);
-	nftnl_chain_attr_set_u32(a, NFTNL_CHAIN_USE, 0x12345678 );
-	nftnl_chain_attr_set_u64(a, NFTNL_CHAIN_PACKETS, 0x1234567812345678);
-	nftnl_chain_attr_set_u64(a, NFTNL_CHAIN_BYTES, 0x1234567812345678);
-	nftnl_chain_attr_set_u64(a, NFTNL_CHAIN_HANDLE, 0x1234567812345678);
-	nftnl_chain_attr_set_str(a, NFTNL_CHAIN_TYPE, "Prueba");
-	nftnl_chain_attr_set_str(a, NFTNL_CHAIN_DEV, "eth0");
+	nftnl_chain_set_str(a, NFTNL_CHAIN_NAME, "test");
+	nftnl_chain_set_u32(a, NFTNL_CHAIN_FAMILY, AF_INET);
+	nftnl_chain_set_str(a, NFTNL_CHAIN_TABLE, "Table");
+	nftnl_chain_set_u32(a, NFTNL_CHAIN_POLICY,0x12345678);
+	nftnl_chain_set_u32(a, NFTNL_CHAIN_HOOKNUM, 0x12345678);
+	nftnl_chain_set_s32(a, NFTNL_CHAIN_PRIO, 0x12345678);
+	nftnl_chain_set_u32(a, NFTNL_CHAIN_USE, 0x12345678 );
+	nftnl_chain_set_u64(a, NFTNL_CHAIN_PACKETS, 0x1234567812345678);
+	nftnl_chain_set_u64(a, NFTNL_CHAIN_BYTES, 0x1234567812345678);
+	nftnl_chain_set_u64(a, NFTNL_CHAIN_HANDLE, 0x1234567812345678);
+	nftnl_chain_set_str(a, NFTNL_CHAIN_TYPE, "Prueba");
+	nftnl_chain_set_str(a, NFTNL_CHAIN_DEV, "eth0");
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
 	nlh = nftnl_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, AF_INET,
