@@ -38,7 +38,7 @@ struct nftnl_expr *nftnl_expr_alloc(const char *name)
 		return NULL;
 
 	/* Manually set expression name attribute */
-	expr->flags |= (1 << NFTNL_RULE_EXPR_ATTR_NAME);
+	expr->flags |= (1 << NFTNL_EXPR_NAME);
 	expr->ops = ops;
 
 	return expr;
@@ -65,7 +65,7 @@ nftnl_expr_set(struct nftnl_expr *expr, uint16_t type,
 		  const void *data, uint32_t data_len)
 {
 	switch(type) {
-	case NFTNL_RULE_EXPR_ATTR_NAME:	/* cannot be modified */
+	case NFTNL_EXPR_NAME:	/* cannot be modified */
 		return;
 	default:
 		if (expr->ops->set(expr, type, data, data_len) < 0)
@@ -119,7 +119,7 @@ const void *nftnl_expr_get(const struct nftnl_expr *expr,
 		return NULL;
 
 	switch(type) {
-	case NFTNL_RULE_EXPR_ATTR_NAME:
+	case NFTNL_EXPR_NAME:
 		ret = expr->ops->name;
 		break;
 	default:
