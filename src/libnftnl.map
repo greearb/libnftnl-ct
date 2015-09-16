@@ -1,4 +1,4 @@
-LIBNFTNL_1.0 {
+LIBNFTNL_4 {
 global:
   nft_table_alloc;
   nft_table_free;
@@ -397,10 +397,6 @@ global:
   nftnl_parse_perror;
 
 
-local: *;
-};
-
-LIBNFTNL_1.1 {
   nft_table_attr_set_data;
   nft_table_attr_get_data;
   nft_chain_attr_set_data;
@@ -423,9 +419,6 @@ LIBNFTNL_1.1 {
   nftnl_set_set_data;
   nftnl_set_get_data;
 
-} LIBNFTNL_1.0;
-
-LIBNFTNL_1.2 {
   nft_set_elems_nlmsg_build_payload_iter;
   nft_batch_is_supported;
   nft_batch_begin;
@@ -469,9 +462,6 @@ LIBNFTNL_1.2 {
   nftnl_gen_fprintf;
 
 
-} LIBNFTNL_1.1;
-
-LIBNFTNL_1.2.0 {
   nft_ruleset_ctx_is_set;
   nft_ruleset_ctx_get;
   nft_ruleset_ctx_get_u32;
@@ -506,4 +496,5 @@ LIBNFTNL_1.2.0 {
   nftnl_batch_iovec_len;
   nftnl_batch_iovec;
 
-} LIBNFTNL_1.2;
+local: *;
+};
