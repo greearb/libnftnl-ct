@@ -189,7 +189,7 @@ static int nftnl_expr_limit_xml_parse(struct nftnl_expr *e,
 			       &burst, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_BURST, burst);
 	if (nftnl_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &burst, NFT_TYPE_U32, NFTNL_XML_MAND, err) == 0)
+			       &type, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_TYPE, type);
 
 	return 0;
