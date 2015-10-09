@@ -25,22 +25,36 @@ int main(int argc, char *argv[])
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	uint32_t portid, seq, family, flags;
-	struct nftnl_table *t = NULL;
-	int ret;
+	uint32_t portid, seq, table_seq, family, flags;
+	struct nft_table *t = NULL;
+	struct mnl_nlmsg_batch *batch;
+	int ret, batching;
 
 	if (argc != 4) {
 		fprintf(stderr, "%s <family> <name> <state>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
-	t = nftnl_table_alloc();
+	t = nft_table_alloc();
 	if (t == NULL) {
 		perror("OOM");
 		exit(EXIT_FAILURE);
 	}
 
+	batching = nft_batch_is_supported();
+	if (batching < 0) {
+		perror("cannot talk to nfnetlink");
+		exit(EXIT_FAILURE);
+	}
+
 	seq = time(NULL);
+	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
+
+	if (batching) {
+		nft_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+		mnl_nlmsg_batch_next(batch);
+	}
+
 	if (strcmp(argv[1], "ip") == 0)
 		family = NFPROTO_IPV4;
 	else if (strcmp(argv[1], "ip6") == 0)
@@ -49,8 +63,11 @@ int main(int argc, char *argv[])
 		family = NFPROTO_BRIDGE;
 	else if (strcmp(argv[1], "arp") == 0)
 		family = NFPROTO_ARP;
+	else if (strcmp(argv[1], "netdev") == 0)
+		family = NFPROTO_NETDEV;
 	else {
-		fprintf(stderr, "Unknown family: ip, ip6, bridge, arp\n");
+		fprintf(stderr,
+			"Unknown family: ip, ip6, bridge, arp, netdev\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -63,13 +80,21 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_table_set(t, NFTNL_TABLE_NAME, argv[2]);
-	nftnl_table_set_u32(t, NFTNL_TABLE_FLAGS, flags);
+	nft_table_attr_set(t, NFT_TABLE_ATTR_NAME, argv[2]);
+	nft_table_attr_set_u32(t, NFT_TABLE_ATTR_FLAGS, flags);
 
-	nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, family,
-					NLM_F_ACK, seq);
-	nftnl_table_nlmsg_build_payload(nlh, t);
-	nftnl_table_free(t);
+	table_seq = seq;
+	nlh = nft_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+					NFT_MSG_NEWTABLE, family,
+					NLM_F_ACK, seq++);
+	nft_table_nlmsg_build_payload(nlh, t);
+	nft_table_free(t);
+	mnl_nlmsg_batch_next(batch);
+
+	if (batching) {
+		nft_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+		mnl_nlmsg_batch_next(batch);
+	}
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
@@ -83,14 +108,17 @@ int main(int argc, char *argv[])
 	}
 	portid = mnl_socket_get_portid(nl);
 
-	if (mnl_socket_sendto(nl, nlh, nlh->nlmsg_len) < 0) {
+	if (mnl_socket_sendto(nl, mnl_nlmsg_batch_head(batch),
+			      mnl_nlmsg_batch_size(batch)) < 0) {
 		perror("mnl_socket_send");
 		exit(EXIT_FAILURE);
 	}
 
+	mnl_nlmsg_batch_stop(batch);
+
 	ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
 	while (ret > 0) {
-		ret = mnl_cb_run(buf, ret, seq, portid, NULL, NULL);
+		ret = mnl_cb_run(buf, ret, table_seq, portid, NULL, NULL);
 		if (ret <= 0)
 			break;
 		ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
