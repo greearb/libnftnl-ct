@@ -763,10 +763,10 @@ int nftnl_mxml_chain_parse(mxml_node_t *tree, struct nftnl_chain *c,
 			nftnl_chain_set_u32(c, NFTNL_CHAIN_POLICY,
 					       policy);
 		}
-		dev = nftnl_mxml_str_parse(tree, "device", MXML_DESCEND_FIRST,
-					 NFTNL_XML_MAND, err);
 
-		if (table != NULL)
+		dev = nftnl_mxml_str_parse(tree, "device", MXML_DESCEND_FIRST,
+					   NFTNL_XML_MAND, err);
+		if (dev != NULL)
 			nftnl_chain_set_str(c, NFTNL_CHAIN_DEV, dev);
 	}
 
