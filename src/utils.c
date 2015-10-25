@@ -26,6 +26,7 @@ static const char *const nftnl_family_str[NFPROTO_NUMPROTO] = {
 	[NFPROTO_INET]		= "inet",
 	[NFPROTO_IPV4]		= "ip",
 	[NFPROTO_ARP]		= "arp",
+	[NFPROTO_NETDEV]	= "netdev",
 	[NFPROTO_BRIDGE]	= "bridge",
 	[NFPROTO_IPV6]		= "ip6",
 };
