@@ -498,3 +498,18 @@ global:
 
 local: *;
 };
+
+LIBNFTNL_4.1 {
+	nftnl_trace_alloc;
+	nftnl_trace_free;
+
+	nftnl_trace_is_set;
+
+	nftnl_trace_get_u16;
+	nftnl_trace_get_u32;
+	nftnl_trace_get_u64;
+	nftnl_trace_get_str;
+	nftnl_trace_get_data;
+
+	nftnl_trace_nlmsg_parse;
+} LIBNFTNL_4;

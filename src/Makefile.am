@@ -11,6 +11,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      common.c		\
 		      gen.c		\
 		      table.c		\
+		      trace.c		\
 		      chain.c		\
 		      rule.c		\
 		      set.c		\

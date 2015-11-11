@@ -146,12 +146,24 @@ const char *nftnl_verdict2str(uint32_t verdict)
 		return "accept";
 	case NF_DROP:
 		return "drop";
+	case NF_STOLEN:
+		return "stolen";
+	case NF_QUEUE:
+		return "queue";
+	case NF_REPEAT:
+		return "repeat";
+	case NF_STOP:
+		return "stop";
 	case NFT_RETURN:
 		return "return";
 	case NFT_JUMP:
 		return "jump";
 	case NFT_GOTO:
 		return "goto";
+	case NFT_CONTINUE:
+		return "continue";
+	case NFT_BREAK:
+		return "break";
 	default:
 		return "unknown";
 	}
