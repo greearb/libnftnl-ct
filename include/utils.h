@@ -10,9 +10,11 @@
 #include "config.h"
 #ifdef HAVE_VISIBILITY_HIDDEN
 #	define __visible	__attribute__((visibility("default")))
-#	define EXPORT_SYMBOL(x, y)	typeof(x) (x) __visible; __typeof (y) y __attribute ((alias (#x), visibility ("default")))
+#	define EXPORT_SYMBOL(x)	typeof(x) (x) __visible;
+#	define EXPORT_SYMBOL_ALIAS(x, y)	typeof(x) (x) __visible; __typeof (y) y __attribute ((alias (#x), visibility ("default")))
 #else
 #	define EXPORT_SYMBOL
+#	define EXPORT_SYMBOL_ALIAS
 #endif
 
 #define __noreturn	__attribute__((__noreturn__))
