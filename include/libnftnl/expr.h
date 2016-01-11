@@ -184,6 +184,10 @@ enum {
 	NFTNL_EXPR_DUP_SREG_DEV,
 };
 
+enum {
+	NFTNL_EXPR_FWD_SREG_DEV = NFTNL_EXPR_BASE,
+};
+
 /*
  * Compat
  */
