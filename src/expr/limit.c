@@ -27,6 +27,7 @@ struct nftnl_expr_limit {
 	uint64_t		unit;
 	uint32_t		burst;
 	enum nft_limit_type	type;
+	uint32_t		flags;
 };
 
 static int
@@ -47,6 +48,9 @@ nftnl_expr_limit_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_LIMIT_TYPE:
 		limit->type = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_LIMIT_FLAGS:
+		limit->flags = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -73,6 +77,9 @@ nftnl_expr_limit_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_LIMIT_TYPE:
 		*data_len = sizeof(uint32_t);
 		return &limit->type;
+	case NFTNL_EXPR_LIMIT_FLAGS:
+		*data_len = sizeof(uint32_t);
+		return &limit->flags;
 	}
 	return NULL;
 }
@@ -93,6 +100,7 @@ static int nftnl_expr_limit_cb(const struct nlattr *attr, void *data)
 		break;
 	case NFTA_LIMIT_BURST:
 	case NFTA_LIMIT_TYPE:
+	case NFTA_LIMIT_FLAGS:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -115,6 +123,8 @@ nftnl_expr_limit_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_LIMIT_BURST, htonl(limit->burst));
 	if (e->flags & (1 << NFTNL_EXPR_LIMIT_TYPE))
 		mnl_attr_put_u32(nlh, NFTA_LIMIT_TYPE, htonl(limit->type));
+	if (e->flags & (1 << NFTNL_EXPR_LIMIT_FLAGS))
+		mnl_attr_put_u32(nlh, NFTA_LIMIT_FLAGS, htonl(limit->flags));
 }
 
 static int
@@ -142,6 +152,10 @@ nftnl_expr_limit_parse(struct nftnl_expr *e, struct nlattr *attr)
 		limit->type = ntohl(mnl_attr_get_u32(tb[NFTA_LIMIT_TYPE]));
 		e->flags |= (1 << NFTNL_EXPR_LIMIT_TYPE);
 	}
+	if (tb[NFTA_LIMIT_FLAGS]) {
+		limit->flags = ntohl(mnl_attr_get_u32(tb[NFTA_LIMIT_FLAGS]));
+		e->flags |= (1 << NFTNL_EXPR_LIMIT_FLAGS);
+	}
 
 	return 0;
 }
@@ -162,6 +176,8 @@ static int nftnl_expr_limit_json_parse(struct nftnl_expr *e, json_t *root,
 		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_BURST, uval32);
 	if (nftnl_jansson_parse_val(root, "type", NFTNL_TYPE_U32, &uval32, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_TYPE, uval32);
+	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &uval32, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_FLAGS, uval32);
 
 	return 0;
 #else
@@ -176,7 +192,7 @@ static int nftnl_expr_limit_xml_parse(struct nftnl_expr *e,
 {
 #ifdef XML_PARSING
 	uint64_t rate, unit;
-	uint32_t burst, type;
+	uint32_t burst, type, flags;
 
 	if (nftnl_mxml_num_parse(tree, "rate", MXML_DESCEND_FIRST, BASE_DEC,
 			       &rate, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
@@ -191,6 +207,9 @@ static int nftnl_expr_limit_xml_parse(struct nftnl_expr *e,
 	if (nftnl_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
 			       &type, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_TYPE, type);
+	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
+			       &flags, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_FLAGS, flags);
 
 	return 0;
 #else
@@ -225,6 +244,8 @@ static int nftnl_expr_limit_export(char *buf, size_t size,
 		nftnl_buf_u32(&b, type, limit->burst, BURST);
 	if (e->flags & (1 << NFTNL_EXPR_LIMIT_TYPE))
 		nftnl_buf_u32(&b, type, limit->type, TYPE);
+	if (e->flags & (1 << NFTNL_EXPR_LIMIT_FLAGS))
+		nftnl_buf_u32(&b, type, limit->flags, FLAGS);
 
 	return nftnl_buf_done(&b);
 }
@@ -246,16 +267,15 @@ static int nftnl_expr_limit_snprintf_default(char *buf, size_t len,
 {
 	struct nftnl_expr_limit *limit = nftnl_expr_data(e);
 
-	return snprintf(buf, len, "rate %"PRIu64"/%s burst %u type %s ",
+	return snprintf(buf, len, "rate %"PRIu64"/%s burst %u type %s flags 0x%x ",
 			limit->rate, get_unit(limit->unit), limit->burst,
-			limit_to_type(limit->type));
+			limit_to_type(limit->type), limit->flags);
 }
 
 static int
 nftnl_expr_limit_snprintf(char *buf, size_t len, uint32_t type,
 			    uint32_t flags, struct nftnl_expr *e)
 {
-
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		return nftnl_expr_limit_snprintf_default(buf, len, e);
