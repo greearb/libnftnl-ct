@@ -31,6 +31,12 @@ static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_MASQ_FLAGS) !=
 	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_MASQ_FLAGS))
 		print_err("Expr NFTNL_EXPR_MASQ_FLAGS mismatches");
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_MASQ_REG_PROTO_MIN) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_MASQ_REG_PROTO_MIN))
+		print_err("Expr NFTNL_EXPR_MASQ_REG_PROTO_MIN mismatches");
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_MASQ_REG_PROTO_MAX) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_MASQ_REG_PROTO_MAX))
+		print_err("Expr NFTNL_EXPR_MASQ_REG_PROTO_MAX mismatches");
 }
 
 int main(int argc, char *argv[])
@@ -51,6 +57,8 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_MASQ_FLAGS, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_MASQ_REG_PROTO_MIN, 0x5432178);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_MASQ_REG_PROTO_MAX, 0x8765421);
 
 	nftnl_rule_add_expr(a, ex);
 

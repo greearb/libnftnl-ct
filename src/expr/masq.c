@@ -21,7 +21,9 @@
 #include <libnftnl/rule.h>
 
 struct nftnl_expr_masq {
-	uint32_t	flags;
+	uint32_t		flags;
+	enum nft_registers	sreg_proto_min;
+	enum nft_registers	sreg_proto_max;
 };
 
 static int
@@ -33,6 +35,12 @@ nftnl_expr_masq_set(struct nftnl_expr *e, uint16_t type,
 	switch (type) {
 	case NFTNL_EXPR_MASQ_FLAGS:
 		masq->flags = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_MASQ_REG_PROTO_MIN:
+		masq->sreg_proto_min = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_MASQ_REG_PROTO_MAX:
+		masq->sreg_proto_max = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -50,6 +58,12 @@ nftnl_expr_masq_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_MASQ_FLAGS:
 		*data_len = sizeof(masq->flags);
 		return &masq->flags;
+	case NFTNL_EXPR_MASQ_REG_PROTO_MIN:
+		*data_len = sizeof(masq->sreg_proto_min);
+		return &masq->sreg_proto_min;
+	case NFTNL_EXPR_MASQ_REG_PROTO_MAX:
+		*data_len = sizeof(masq->sreg_proto_max);
+		return &masq->sreg_proto_max;
 	}
 	return NULL;
 }
@@ -63,6 +77,8 @@ static int nftnl_expr_masq_cb(const struct nlattr *attr, void *data)
 		return MNL_CB_OK;
 
 	switch (type) {
+	case NFTA_MASQ_REG_PROTO_MIN:
+	case NFTA_MASQ_REG_PROTO_MAX:
 	case NFTA_MASQ_FLAGS:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
@@ -80,6 +96,12 @@ nftnl_expr_masq_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
 
 	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_MASQ_FLAGS, htobe32(masq->flags));
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MIN))
+		mnl_attr_put_u32(nlh, NFTA_MASQ_REG_PROTO_MIN,
+				 htobe32(masq->sreg_proto_min));
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MAX))
+		mnl_attr_put_u32(nlh, NFTA_MASQ_REG_PROTO_MAX,
+				 htobe32(masq->sreg_proto_max));
 }
 
 static int
@@ -94,6 +116,16 @@ nftnl_expr_masq_parse(struct nftnl_expr *e, struct nlattr *attr)
 	if (tb[NFTA_MASQ_FLAGS]) {
 		masq->flags = be32toh(mnl_attr_get_u32(tb[NFTA_MASQ_FLAGS]));
 		e->flags |= (1 << NFTNL_EXPR_MASQ_FLAGS);
+        }
+	if (tb[NFTA_MASQ_REG_PROTO_MIN]) {
+		masq->sreg_proto_min =
+			be32toh(mnl_attr_get_u32(tb[NFTA_MASQ_REG_PROTO_MIN]));
+		e->flags |= (1 << NFTNL_EXPR_MASQ_REG_PROTO_MIN);
+	}
+	if (tb[NFTA_MASQ_REG_PROTO_MAX]) {
+		masq->sreg_proto_max =
+			be32toh(mnl_attr_get_u32(tb[NFTA_MASQ_REG_PROTO_MAX]));
+		e->flags |= (1 << NFTNL_EXPR_MASQ_REG_PROTO_MAX);
 	}
 
 	return 0;
@@ -104,11 +136,17 @@ nftnl_expr_masq_json_parse(struct nftnl_expr *e, json_t *root,
 			      struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
-	uint32_t flags;
+	uint32_t reg, flags;
 
 	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
 				  err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_FLAGS, flags);
+	if (nftnl_jansson_parse_reg(root, "sreg_proto_min", NFTNL_TYPE_U32,
+				    &reg, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_REG_PROTO_MIN, reg);
+	if (nftnl_jansson_parse_reg(root, "sreg_proto_max", NFTNL_TYPE_U32,
+				    &reg, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_REG_PROTO_MAX, reg);
 
 	return 0;
 #else
@@ -123,10 +161,19 @@ nftnl_expr_masq_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 {
 #ifdef XML_PARSING
 	uint32_t flags;
+	uint32_t reg_proto_min, reg_proto_max;
 
 	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
 			       &flags, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_FLAGS, flags);
+	if (nftnl_mxml_reg_parse(tree, "sreg_proto_min", &reg_proto_min,
+				 MXML_DESCEND, NFTNL_XML_MAND, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_REG_PROTO_MIN,
+				   reg_proto_min);
+	if (nftnl_mxml_reg_parse(tree, "sreg_proto_max", &reg_proto_max,
+				 MXML_DESCEND, NFTNL_XML_MAND, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_REG_PROTO_MAX,
+				   reg_proto_max);
 
 	return 0;
 #else
@@ -142,6 +189,10 @@ static int nftnl_expr_masq_export(char *buf, size_t size,
 
 	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS))
 		nftnl_buf_u32(&b, type, masq->flags, FLAGS);
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MIN))
+		nftnl_buf_u32(&b, type, masq->sreg_proto_min, SREG_PROTO_MIN);
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MAX))
+		nftnl_buf_u32(&b, type, masq->sreg_proto_max, SREG_PROTO_MAX);
 
 	return nftnl_buf_done(&b);
 }
@@ -153,6 +204,11 @@ static int nftnl_expr_masq_snprintf_default(char *buf, size_t len,
 
 	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS))
 		return snprintf(buf, len, "flags 0x%x ", masq->flags);
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MIN)) {
+		return snprintf(buf, len,
+				"proto_min reg %u proto_max reg %u ",
+				masq->sreg_proto_min, masq->sreg_proto_max);
+	}
 
 	return 0;
 }
