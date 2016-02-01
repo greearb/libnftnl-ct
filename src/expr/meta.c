@@ -22,7 +22,7 @@
 #include <libnftnl/rule.h>
 
 #ifndef NFT_META_MAX
-#define NFT_META_MAX (NFT_META_CGROUP + 1)
+#define NFT_META_MAX (NFT_META_PRANDOM + 1)
 #endif
 
 struct nftnl_expr_meta {
@@ -157,6 +157,7 @@ static const char *meta_key2str_array[NFT_META_MAX] = {
 	[NFT_META_IIFGROUP]	= "iifgroup",
 	[NFT_META_OIFGROUP]	= "oifgroup",
 	[NFT_META_CGROUP]	= "cgroup",
+	[NFT_META_PRANDOM]	= "prandom",
 };
 
 static const char *meta_key2str(uint8_t key)
