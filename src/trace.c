@@ -208,6 +208,7 @@ const char *nftnl_trace_get_str(const struct nftnl_trace *trace, uint16_t type)
 	switch (type) {
 	case NFTNL_TRACE_CHAIN: return trace->chain;
 	case NFTNL_TRACE_TABLE: return trace->table;
+	case NFTNL_TRACE_JUMP_TARGET: return trace->jump_target;
 	default: break;
 	}
 	return NULL;
