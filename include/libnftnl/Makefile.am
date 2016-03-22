@@ -7,4 +7,5 @@ pkginclude_HEADERS = batch.h		\
 		     set.h		\
 		     ruleset.h		\
 		     common.h		\
+		     udata.h		\
 		     gen.h

@@ -512,4 +512,19 @@ LIBNFTNL_4.1 {
 	nftnl_trace_get_data;
 
 	nftnl_trace_nlmsg_parse;
+
+	nftnl_udata_buf_alloc;
+	nftnl_udata_buf_free;
+	nftnl_udata_buf_len;
+	nftnl_udata_buf_data;
+	nftnl_udata_buf_put;
+	nftnl_udata_start;
+	nftnl_udata_end;
+	nftnl_udata_put;
+	nftnl_udata_put_strz;
+	nftnl_udata_type;
+	nftnl_udata_len;
+	nftnl_udata_get;
+	nftnl_udata_next;
+	nftnl_udata_parse;
 } LIBNFTNL_4;
