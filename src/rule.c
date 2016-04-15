@@ -75,6 +75,8 @@ void nftnl_rule_free(struct nftnl_rule *r)
 		xfree(r->table);
 	if (r->chain != NULL)
 		xfree(r->chain);
+	if (r->user.data != NULL)
+		xfree(r->user.data);
 
 	xfree(r);
 }
@@ -162,6 +164,9 @@ void nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 		r->position = *((uint64_t *)data);
 		break;
 	case NFTNL_RULE_USERDATA:
+		if (r->user.data != NULL)
+			xfree(r->user.data);
+
 		r->user.data = (void *)data;
 		r->user.len = data_len;
 		break;
