@@ -199,7 +199,7 @@ static const char *ctdir2str(uint8_t ctdir)
 	case IP_CT_DIR_REPLY:
 		return "reply";
 	default:
-		return "unknow";
+		return "unknown";
 	}
 }
 
