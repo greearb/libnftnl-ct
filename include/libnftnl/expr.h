@@ -17,7 +17,7 @@ enum {
 };
 
 struct nftnl_expr *nftnl_expr_alloc(const char *name);
-void nftnl_expr_free(struct nftnl_expr *expr);
+void nftnl_expr_free(const struct nftnl_expr *expr);
 
 bool nftnl_expr_is_set(const struct nftnl_expr *expr, uint16_t type);
 void nftnl_expr_set(struct nftnl_expr *expr, uint16_t type, const void *data, uint32_t data_len);
@@ -36,7 +36,7 @@ uint32_t nftnl_expr_get_u32(const struct nftnl_expr *expr, uint16_t type);
 uint64_t nftnl_expr_get_u64(const struct nftnl_expr *expr, uint16_t type);
 const char *nftnl_expr_get_str(const struct nftnl_expr *expr, uint16_t type);
 
-int nftnl_expr_snprintf(char *buf, size_t buflen, struct nftnl_expr *expr, uint32_t type, uint32_t flags);
+int nftnl_expr_snprintf(char *buf, size_t buflen, const struct nftnl_expr *expr, uint32_t type, uint32_t flags);
 
 enum {
 	NFTNL_EXPR_PAYLOAD_DREG	= NFTNL_EXPR_BASE,

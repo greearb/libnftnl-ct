@@ -13,7 +13,7 @@ struct nftnl_udata_buf;
 
 /* nftnl_udata_buf */
 struct nftnl_udata_buf *nftnl_udata_buf_alloc(uint32_t data_size);
-void nftnl_udata_buf_free(struct nftnl_udata_buf *buf);
+void nftnl_udata_buf_free(const struct nftnl_udata_buf *buf);
 uint32_t nftnl_udata_buf_len(const struct nftnl_udata_buf *buf);
 void *nftnl_udata_buf_data(const struct nftnl_udata_buf *buf);
 void nftnl_udata_buf_put(struct nftnl_udata_buf *buf, const void *data,

@@ -77,8 +77,10 @@ uint32_t nftnl_str2cmd(const char *cmd);
 
 enum nftnl_cmd_type nftnl_flag2cmd(uint32_t flags);
 
-int nftnl_fprintf(FILE *fp, void *obj, uint32_t cmd, uint32_t type,
-		uint32_t flags, int (*snprintf_cb)(char *buf, size_t bufsiz,
-		void *obj, uint32_t cmd, uint32_t type, uint32_t flags));
+int nftnl_fprintf(FILE *fpconst, const void *obj, uint32_t cmd, uint32_t type,
+		  uint32_t flags,
+		  int (*snprintf_cb)(char *buf, size_t bufsiz, const void *obj,
+			  	     uint32_t cmd, uint32_t type,
+				     uint32_t flags));
 
 #endif

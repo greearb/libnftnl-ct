@@ -93,7 +93,7 @@ struct nftnl_chain *nftnl_chain_alloc(void)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_alloc, nft_chain_alloc);
 
-void nftnl_chain_free(struct nftnl_chain *c)
+void nftnl_chain_free(const struct nftnl_chain *c)
 {
 	if (c->table != NULL)
 		xfree(c->table);
@@ -833,8 +833,8 @@ int nftnl_chain_parse_file(struct nftnl_chain *c, enum nftnl_parse_type type,
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_parse_file, nft_chain_parse_file);
 
-static int nftnl_chain_export(char *buf, size_t size, struct nftnl_chain *c,
-			    int type)
+static int nftnl_chain_export(char *buf, size_t size,
+			      const struct nftnl_chain *c, int type)
 {
 	NFTNL_BUF_INIT(b, buf, size);
 
@@ -873,7 +873,7 @@ static int nftnl_chain_export(char *buf, size_t size, struct nftnl_chain *c,
 }
 
 static int nftnl_chain_snprintf_default(char *buf, size_t size,
-				      struct nftnl_chain *c)
+					const struct nftnl_chain *c)
 {
 	int ret, len = size, offset = 0;
 
@@ -899,8 +899,9 @@ static int nftnl_chain_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_chain_cmd_snprintf(char *buf, size_t size, struct nftnl_chain *c,
-				  uint32_t cmd, uint32_t type, uint32_t flags)
+static int nftnl_chain_cmd_snprintf(char *buf, size_t size,
+				    const struct nftnl_chain *c, uint32_t cmd,
+				    uint32_t type, uint32_t flags)
 {
 	int ret, len = size, offset = 0;
 
@@ -927,23 +928,23 @@ static int nftnl_chain_cmd_snprintf(char *buf, size_t size, struct nftnl_chain *
 	return offset;
 }
 
-int nftnl_chain_snprintf(char *buf, size_t size, struct nftnl_chain *c,
-		       uint32_t type, uint32_t flags)
+int nftnl_chain_snprintf(char *buf, size_t size, const struct nftnl_chain *c,
+			 uint32_t type, uint32_t flags)
 {
 	return nftnl_chain_cmd_snprintf(buf, size, c, nftnl_flag2cmd(flags), type,
 				      flags);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_snprintf, nft_chain_snprintf);
 
-static inline int nftnl_chain_do_snprintf(char *buf, size_t size, void *c,
-					uint32_t cmd, uint32_t type,
-					uint32_t flags)
+static inline int nftnl_chain_do_snprintf(char *buf, size_t size, const void *c,
+					  uint32_t cmd, uint32_t type,
+					  uint32_t flags)
 {
 	return nftnl_chain_snprintf(buf, size, c, type, flags);
 }
 
-int nftnl_chain_fprintf(FILE *fp, struct nftnl_chain *c, uint32_t type,
-		      uint32_t flags)
+int nftnl_chain_fprintf(FILE *fp, const struct nftnl_chain *c, uint32_t type,
+			uint32_t flags)
 {
 	return nftnl_fprintf(fp, c, NFTNL_CMD_UNSPEC, type, flags,
 			   nftnl_chain_do_snprintf);
@@ -980,7 +981,7 @@ void nftnl_chain_list_free(struct nftnl_chain_list *list)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_list_free, nft_chain_list_free);
 
-int nftnl_chain_list_is_empty(struct nftnl_chain_list *list)
+int nftnl_chain_list_is_empty(const struct nftnl_chain_list *list)
 {
 	return list_empty(&list->list);
 }

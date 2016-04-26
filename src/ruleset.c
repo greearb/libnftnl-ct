@@ -64,7 +64,7 @@ struct nftnl_ruleset *nftnl_ruleset_alloc(void)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_ruleset_alloc, nft_ruleset_alloc);
 
-void nftnl_ruleset_free(struct nftnl_ruleset *r)
+void nftnl_ruleset_free(const struct nftnl_ruleset *r)
 {
 	if (r->flags & (1 << NFTNL_RULESET_TABLELIST))
 		nftnl_table_list_free(r->table_list);

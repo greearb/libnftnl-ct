@@ -186,8 +186,8 @@ err:
 
 static int
 nftnl_data_reg_value_snprintf_json(char *buf, size_t size,
-					   union nftnl_data_reg *reg,
-					   uint32_t flags)
+				   const union nftnl_data_reg *reg,
+				   uint32_t flags)
 {
 	int len = size, offset = 0, ret, i, j;
 	uint32_t utemp;
@@ -223,7 +223,8 @@ nftnl_data_reg_value_snprintf_json(char *buf, size_t size,
 
 static
 int nftnl_data_reg_value_snprintf_xml(char *buf, size_t size,
-				    union nftnl_data_reg *reg, uint32_t flags)
+				      const union nftnl_data_reg *reg,
+				      uint32_t flags)
 {
 	int len = size, offset = 0, ret, i, j;
 	uint32_t be;
@@ -259,7 +260,8 @@ int nftnl_data_reg_value_snprintf_xml(char *buf, size_t size,
 
 static int
 nftnl_data_reg_value_snprintf_default(char *buf, size_t size,
-				    union nftnl_data_reg *reg, uint32_t flags)
+				      const union nftnl_data_reg *reg,
+				      uint32_t flags)
 {
 	int len = size, offset = 0, ret, i;
 
@@ -273,7 +275,8 @@ nftnl_data_reg_value_snprintf_default(char *buf, size_t size,
 
 static int
 nftnl_data_reg_verdict_snprintf_def(char *buf, size_t size,
-				  union nftnl_data_reg *reg, uint32_t flags)
+				    const union nftnl_data_reg *reg,
+				    uint32_t flags)
 {
 	int len = size, offset = 0, ret = 0;
 
@@ -290,7 +293,8 @@ nftnl_data_reg_verdict_snprintf_def(char *buf, size_t size,
 
 static int
 nftnl_data_reg_verdict_snprintf_xml(char *buf, size_t size,
-				  union nftnl_data_reg *reg, uint32_t flags)
+				    const union nftnl_data_reg *reg,
+				    uint32_t flags)
 {
 	int len = size, offset = 0, ret = 0;
 
@@ -312,7 +316,8 @@ nftnl_data_reg_verdict_snprintf_xml(char *buf, size_t size,
 
 static int
 nftnl_data_reg_verdict_snprintf_json(char *buf, size_t size,
-				   union nftnl_data_reg *reg, uint32_t flags)
+				     const union nftnl_data_reg *reg,
+				     uint32_t flags)
 {
 	int len = size, offset = 0, ret = 0;
 
@@ -332,8 +337,10 @@ nftnl_data_reg_verdict_snprintf_json(char *buf, size_t size,
 	return offset;
 }
 
-int nftnl_data_reg_snprintf(char *buf, size_t size, union nftnl_data_reg *reg,
-			  uint32_t output_format, uint32_t flags, int reg_type)
+int nftnl_data_reg_snprintf(char *buf, size_t size,
+			    const union nftnl_data_reg *reg,
+			    uint32_t output_format, uint32_t flags,
+			    int reg_type)
 {
 	switch(reg_type) {
 	case DATA_VALUE:
@@ -499,7 +506,7 @@ int nftnl_parse_data(union nftnl_data_reg *data, struct nlattr *attr, int *type)
 	return ret;
 }
 
-void nftnl_free_verdict(union nftnl_data_reg *data)
+void nftnl_free_verdict(const union nftnl_data_reg *data)
 {
 	switch(data->verdict) {
 	case NFT_JUMP:

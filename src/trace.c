@@ -59,7 +59,7 @@ struct nftnl_trace *nftnl_trace_alloc(void)
 }
 
 EXPORT_SYMBOL(nftnl_trace_free);
-void nftnl_trace_free(struct nftnl_trace *t)
+void nftnl_trace_free(const struct nftnl_trace *t)
 {
 	xfree(t->chain);
 	xfree(t->table);

@@ -112,7 +112,7 @@ static int nftnl_expr_bitwise_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_expr_bitwise_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
+nftnl_expr_bitwise_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
 
@@ -251,7 +251,7 @@ nftnl_expr_bitwise_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 }
 
 static int nftnl_expr_bitwise_export(char *buf, size_t size,
-					struct nftnl_expr *e, int type)
+				     const struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -271,7 +271,7 @@ static int nftnl_expr_bitwise_export(char *buf, size_t size,
 }
 
 static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
-						  struct nftnl_expr *e)
+					       const struct nftnl_expr *e)
 {
 	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
 	int len = size, offset = 0, ret;
@@ -296,7 +296,7 @@ static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
 
 static int
 nftnl_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
-			       uint32_t flags, struct nftnl_expr *e)
+			    uint32_t flags, const struct nftnl_expr *e)
 {
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:

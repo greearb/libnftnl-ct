@@ -23,11 +23,13 @@ union nftnl_data_reg {
 	};
 };
 
-int nftnl_data_reg_snprintf(char *buf, size_t size, union nftnl_data_reg *reg,
-                        uint32_t output_format, uint32_t flags, int reg_type);
+int nftnl_data_reg_snprintf(char *buf, size_t size,
+			    const union nftnl_data_reg *reg,
+			    uint32_t output_format, uint32_t flags,
+			    int reg_type);
 struct nlattr;
 
 int nftnl_parse_data(union nftnl_data_reg *data, struct nlattr *attr, int *type);
-void nftnl_free_verdict(union nftnl_data_reg *data);
+void nftnl_free_verdict(const union nftnl_data_reg *data);
 
 #endif

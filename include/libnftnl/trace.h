@@ -35,7 +35,7 @@ enum nftnl_trace_attr {
 struct nftnl_trace;
 
 struct nftnl_trace *nftnl_trace_alloc(void);
-void nftnl_trace_free(struct nftnl_trace *trace);
+void nftnl_trace_free(const struct nftnl_trace *trace);
 
 bool nftnl_trace_is_set(const struct nftnl_trace *trace, uint16_t type);
 

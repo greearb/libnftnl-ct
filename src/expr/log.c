@@ -123,7 +123,7 @@ static int nftnl_expr_log_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_expr_log_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
+nftnl_expr_log_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 
@@ -265,7 +265,7 @@ static int nftnl_expr_log_xml_parse(struct nftnl_expr *e,
 }
 
 static int nftnl_expr_log_snprintf_default(char *buf, size_t size,
-					      struct nftnl_expr *e)
+					   const struct nftnl_expr *e)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 	int ret, offset = 0, len = size;
@@ -288,7 +288,7 @@ static int nftnl_expr_log_snprintf_default(char *buf, size_t size,
 }
 
 static int nftnl_expr_log_export(char *buf, size_t size,
-				    struct nftnl_expr *e, int type)
+				 const struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -311,7 +311,7 @@ static int nftnl_expr_log_export(char *buf, size_t size,
 
 static int
 nftnl_expr_log_snprintf(char *buf, size_t len, uint32_t type,
-			    uint32_t flags, struct nftnl_expr *e)
+			uint32_t flags, const struct nftnl_expr *e)
 {
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
@@ -325,7 +325,7 @@ nftnl_expr_log_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static void nftnl_expr_log_free(struct nftnl_expr *e)
+static void nftnl_expr_log_free(const struct nftnl_expr *e)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 

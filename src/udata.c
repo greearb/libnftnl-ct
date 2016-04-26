@@ -30,9 +30,9 @@ struct nftnl_udata_buf *nftnl_udata_buf_alloc(uint32_t data_size)
 }
 EXPORT_SYMBOL(nftnl_udata_buf_alloc);
 
-void nftnl_udata_buf_free(struct nftnl_udata_buf *buf)
+void nftnl_udata_buf_free(const struct nftnl_udata_buf *buf)
 {
-	free(buf);
+	xfree(buf);
 }
 EXPORT_SYMBOL(nftnl_udata_buf_free);
 

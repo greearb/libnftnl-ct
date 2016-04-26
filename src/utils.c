@@ -233,9 +233,11 @@ uint32_t nftnl_str2cmd(const char *cmd)
 	return NFTNL_CMD_UNSPEC;
 }
 
-int nftnl_fprintf(FILE *fp, void *obj, uint32_t cmd, uint32_t type, uint32_t flags,
-		int (*snprintf_cb)(char *buf, size_t bufsiz, void *obj,
-				   uint32_t cmd, uint32_t type, uint32_t flags))
+int nftnl_fprintf(FILE *fp, const void *obj, uint32_t cmd, uint32_t type,
+		  uint32_t flags,
+		  int (*snprintf_cb)(char *buf, size_t bufsiz, const void *obj,
+				     uint32_t cmd, uint32_t type,
+				     uint32_t flags))
 {
 	char _buf[NFTNL_SNPRINTF_BUFSIZ];
 	char *buf = _buf;

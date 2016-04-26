@@ -109,9 +109,9 @@ int nftnl_cmd_header_snprintf(char *buf, size_t size, uint32_t cmd, uint32_t typ
 	return nftnl_buf_done(&b);
 }
 
-static int nftnl_cmd_header_fprintf_cb(char *buf, size_t size, void *obj,
-				     uint32_t cmd, uint32_t type,
-				     uint32_t flags)
+static int nftnl_cmd_header_fprintf_cb(char *buf, size_t size, const void *obj,
+				       uint32_t cmd, uint32_t type,
+				       uint32_t flags)
 {
 	return nftnl_cmd_header_snprintf(buf, size, cmd, type, flags);
 }
@@ -142,9 +142,9 @@ int nftnl_cmd_footer_snprintf(char *buf, size_t size, uint32_t cmd, uint32_t typ
 	return nftnl_buf_done(&b);
 }
 
-static int nftnl_cmd_footer_fprintf_cb(char *buf, size_t size, void *obj,
-				     uint32_t cmd, uint32_t type,
-				     uint32_t flags)
+static int nftnl_cmd_footer_fprintf_cb(char *buf, size_t size, const void *obj,
+				       uint32_t cmd, uint32_t type,
+				       uint32_t flags)
 {
 	return nftnl_cmd_footer_snprintf(buf, size, cmd, type, flags);
 }

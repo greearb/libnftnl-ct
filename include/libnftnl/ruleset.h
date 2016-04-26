@@ -16,7 +16,7 @@ extern "C" {
 struct nftnl_ruleset;
 
 struct nftnl_ruleset *nftnl_ruleset_alloc(void);
-void nftnl_ruleset_free(struct nftnl_ruleset *r);
+void nftnl_ruleset_free(const struct nftnl_ruleset *r);
 
 enum {
 	NFTNL_RULESET_TABLELIST = 0,

@@ -89,7 +89,7 @@ static int nftnl_expr_queue_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_expr_queue_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
+nftnl_expr_queue_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
 
@@ -181,7 +181,7 @@ nftnl_expr_queue_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 }
 
 static int nftnl_expr_queue_snprintf_default(char *buf, size_t len,
-						struct nftnl_expr *e)
+					     const struct nftnl_expr *e)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
 	int ret, size = len, offset = 0;
@@ -211,7 +211,7 @@ static int nftnl_expr_queue_snprintf_default(char *buf, size_t len,
 }
 
 static int nftnl_expr_queue_export(char *buf, size_t size,
-				      struct nftnl_expr *e, int type)
+				   const struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -228,7 +228,7 @@ static int nftnl_expr_queue_export(char *buf, size_t size,
 
 static int
 nftnl_expr_queue_snprintf(char *buf, size_t len, uint32_t type,
-			      uint32_t flags, struct nftnl_expr *e)
+			  uint32_t flags, const struct nftnl_expr *e)
 {
 
 	switch (type) {

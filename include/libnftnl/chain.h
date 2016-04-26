@@ -15,7 +15,7 @@ extern "C" {
 struct nftnl_chain;
 
 struct nftnl_chain *nftnl_chain_alloc(void);
-void nftnl_chain_free(struct nftnl_chain *);
+void nftnl_chain_free(const struct nftnl_chain *);
 
 enum nftnl_chain_attr {
 	NFTNL_CHAIN_NAME	= 0,
@@ -62,8 +62,8 @@ int nftnl_chain_parse(struct nftnl_chain *c, enum nftnl_parse_type type,
 		    const char *data, struct nftnl_parse_err *err);
 int nftnl_chain_parse_file(struct nftnl_chain *c, enum nftnl_parse_type type,
 			 FILE *fp, struct nftnl_parse_err *err);
-int nftnl_chain_snprintf(char *buf, size_t size, struct nftnl_chain *t, uint32_t type, uint32_t flags);
-int nftnl_chain_fprintf(FILE *fp, struct nftnl_chain *c, uint32_t type, uint32_t flags);
+int nftnl_chain_snprintf(char *buf, size_t size, const struct nftnl_chain *t, uint32_t type, uint32_t flags);
+int nftnl_chain_fprintf(FILE *fp, const struct nftnl_chain *c, uint32_t type, uint32_t flags);
 
 #define nftnl_chain_nlmsg_build_hdr	nftnl_nlmsg_build_hdr
 int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *t);
@@ -72,7 +72,7 @@ struct nftnl_chain_list;
 
 struct nftnl_chain_list *nftnl_chain_list_alloc(void);
 void nftnl_chain_list_free(struct nftnl_chain_list *list);
-int nftnl_chain_list_is_empty(struct nftnl_chain_list *list);
+int nftnl_chain_list_is_empty(const struct nftnl_chain_list *list);
 int nftnl_chain_list_foreach(struct nftnl_chain_list *chain_list, int (*cb)(struct nftnl_chain *t, void *data), void *data);
 
 void nftnl_chain_list_add(struct nftnl_chain *r, struct nftnl_chain_list *list);

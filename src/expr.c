@@ -45,7 +45,7 @@ struct nftnl_expr *nftnl_expr_alloc(const char *name)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_expr_alloc, nft_rule_expr_alloc);
 
-void nftnl_expr_free(struct nftnl_expr *expr)
+void nftnl_expr_free(const struct nftnl_expr *expr)
 {
 	if (expr->ops->free)
 		expr->ops->free(expr);
@@ -262,8 +262,8 @@ err1:
 	return NULL;
 }
 
-int nftnl_expr_snprintf(char *buf, size_t size, struct nftnl_expr *expr,
-			   uint32_t type, uint32_t flags)
+int nftnl_expr_snprintf(char *buf, size_t size, const struct nftnl_expr *expr,
+			uint32_t type, uint32_t flags)
 {
 	int ret;
 	unsigned int offset = 0, len = size;

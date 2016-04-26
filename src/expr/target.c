@@ -109,7 +109,7 @@ static int nftnl_expr_target_cb(const struct nlattr *attr, void *data)
 }
 
 static void
-nftnl_expr_target_build(struct nlmsghdr *nlh, struct nftnl_expr *e)
+nftnl_expr_target_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_target *tg = nftnl_expr_data(e);
 
@@ -204,7 +204,7 @@ nftnl_expr_target_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 }
 
 static int nftnl_rule_exp_target_export(char *buf, size_t size,
-				      struct nftnl_expr *e, int type)
+				        const struct nftnl_expr *e, int type)
 {
 	struct nftnl_expr_target *target = nftnl_expr_data(e);
 	NFTNL_BUF_INIT(b, buf, size);
@@ -217,7 +217,7 @@ static int nftnl_rule_exp_target_export(char *buf, size_t size,
 
 static int
 nftnl_expr_target_snprintf(char *buf, size_t len, uint32_t type,
-			      uint32_t flags, struct nftnl_expr *e)
+			   uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_target *target = nftnl_expr_data(e);
 
@@ -234,7 +234,7 @@ nftnl_expr_target_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static void nftnl_expr_target_free(struct nftnl_expr *e)
+static void nftnl_expr_target_free(const struct nftnl_expr *e)
 {
 	struct nftnl_expr_target *target = nftnl_expr_data(e);
 
