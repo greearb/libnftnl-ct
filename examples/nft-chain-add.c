@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 	chain_seq = seq;
 	nlh = nftnl_chain_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 					NFT_MSG_NEWCHAIN, family,
-					NLM_F_ACK, seq++);
+					NLM_F_CREATE|NLM_F_ACK, seq++);
 	nftnl_chain_nlmsg_build_payload(nlh, t);
 	nftnl_chain_free(t);
 	mnl_nlmsg_batch_next(batch);
