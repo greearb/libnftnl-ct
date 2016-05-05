@@ -22,17 +22,13 @@
 #include "expr_ops.h"
 #include <buffer.h>
 
-#ifndef IFNAMSIZ
-#define IFNAMSIZ	16
-#endif
-
 struct nftnl_expr_dynset {
 	enum nft_registers	sreg_key;
 	enum nft_registers	sreg_data;
 	enum nft_dynset_ops	op;
 	uint64_t		timeout;
 	struct nftnl_expr	*expr;
-	char			set_name[IFNAMSIZ];
+	char			*set_name;
 	uint32_t		set_id;
 };
 
@@ -56,8 +52,7 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 		dynset->timeout = *((uint64_t *)data);
 		break;
 	case NFTNL_EXPR_DYNSET_SET_NAME:
-		snprintf(dynset->set_name, sizeof(dynset->set_name), "%s",
-			 (const char *)data);
+		dynset->set_name = strdup((const char *)data);
 		break;
 	case NFTNL_EXPR_DYNSET_SET_ID:
 		dynset->set_id = *((uint32_t *)data);
@@ -186,7 +181,8 @@ nftnl_expr_dynset_parse(struct nftnl_expr *e, struct nlattr *attr)
 		e->flags |= (1 << NFTNL_EXPR_DYNSET_TIMEOUT);
 	}
 	if (tb[NFTA_DYNSET_SET_NAME]) {
-		strcpy(dynset->set_name, mnl_attr_get_str(tb[NFTA_DYNSET_SET_NAME]));
+		dynset->set_name =
+			strdup(mnl_attr_get_str(tb[NFTA_DYNSET_SET_NAME]));
 		e->flags |= (1 << NFTNL_EXPR_DYNSET_SET_NAME);
 	}
 	if (tb[NFTA_DYNSET_SET_ID]) {
@@ -361,10 +357,18 @@ nftnl_expr_dynset_snprintf(char *buf, size_t size, uint32_t type,
 	return -1;
 }
 
+static void nftnl_expr_dynset_free(struct nftnl_expr *e)
+{
+	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
+
+	xfree(dynset->set_name);
+}
+
 struct expr_ops expr_ops_dynset = {
 	.name		= "dynset",
 	.alloc_len	= sizeof(struct nftnl_expr_dynset),
 	.max_attr	= NFTA_DYNSET_MAX,
+	.free		= nftnl_expr_dynset_free,
 	.set		= nftnl_expr_dynset_set,
 	.get		= nftnl_expr_dynset_get,
 	.parse		= nftnl_expr_dynset_parse,
