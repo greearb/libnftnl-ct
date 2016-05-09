@@ -1041,9 +1041,8 @@ int nftnl_set_snprintf(char *buf, size_t size, const struct nftnl_set *s,
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_snprintf, nft_set_snprintf);
 
-static inline int nftnl_set_do_snprintf(char *buf, size_t size, const void *s,
-					uint32_t cmd, uint32_t type,
-					uint32_t flags)
+static int nftnl_set_do_snprintf(char *buf, size_t size, const void *s,
+				 uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	return nftnl_set_snprintf(buf, size, s, type, flags);
 }

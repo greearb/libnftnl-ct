@@ -457,9 +457,8 @@ int nftnl_table_snprintf(char *buf, size_t size, const struct nftnl_table *t,
 }
 EXPORT_SYMBOL_ALIAS(nftnl_table_snprintf, nft_table_snprintf);
 
-static inline int nftnl_table_do_snprintf(char *buf, size_t size, const void *t,
-					  uint32_t cmd, uint32_t type,
-					  uint32_t flags)
+static int nftnl_table_do_snprintf(char *buf, size_t size, const void *t,
+				   uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	return nftnl_table_snprintf(buf, size, t, type, flags);
 }

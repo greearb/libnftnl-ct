@@ -978,9 +978,8 @@ int nftnl_rule_snprintf(char *buf, size_t size, const struct nftnl_rule *r,
 }
 EXPORT_SYMBOL_ALIAS(nftnl_rule_snprintf, nft_rule_snprintf);
 
-static inline int nftnl_rule_do_snprintf(char *buf, size_t size, const void *r,
-					 uint32_t cmd, uint32_t type,
-					 uint32_t flags)
+static int nftnl_rule_do_snprintf(char *buf, size_t size, const void *r,
+				  uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	return nftnl_rule_snprintf(buf, size, r, type, flags);
 }

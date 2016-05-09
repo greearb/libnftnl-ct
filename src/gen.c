@@ -194,9 +194,8 @@ int nftnl_gen_snprintf(char *buf, size_t size, const struct nftnl_gen *gen,
 }
 EXPORT_SYMBOL_ALIAS(nftnl_gen_snprintf, nft_gen_snprintf);
 
-static inline int nftnl_gen_do_snprintf(char *buf, size_t size, const void *gen,
-					uint32_t cmd, uint32_t type,
-					uint32_t flags)
+static int nftnl_gen_do_snprintf(char *buf, size_t size, const void *gen,
+				 uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	return nftnl_gen_snprintf(buf, size, gen, type, flags);
 }

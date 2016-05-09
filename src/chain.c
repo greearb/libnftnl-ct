@@ -936,9 +936,8 @@ int nftnl_chain_snprintf(char *buf, size_t size, const struct nftnl_chain *c,
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_snprintf, nft_chain_snprintf);
 
-static inline int nftnl_chain_do_snprintf(char *buf, size_t size, const void *c,
-					  uint32_t cmd, uint32_t type,
-					  uint32_t flags)
+static int nftnl_chain_do_snprintf(char *buf, size_t size, const void *c,
+				   uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	return nftnl_chain_snprintf(buf, size, c, type, flags);
 }
