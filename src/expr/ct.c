@@ -152,7 +152,7 @@ nftnl_expr_ct_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-const char *ctkey2str_array[NFT_CT_MAX] = {
+static const char *ctkey2str_array[NFT_CT_MAX] = {
 	[NFT_CT_STATE]		= "state",
 	[NFT_CT_DIRECTION]	= "direction",
 	[NFT_CT_STATUS]		= "status",

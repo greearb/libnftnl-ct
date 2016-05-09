@@ -201,7 +201,7 @@ enum nftnl_cmd_type nftnl_flag2cmd(uint32_t flags)
 	return NFTNL_CMD_UNSPEC;
 }
 
-const char *cmd2tag[NFTNL_CMD_MAX] = {
+static const char *cmd2tag[NFTNL_CMD_MAX] = {
 	[NFTNL_CMD_ADD]			= ADD,
 	[NFTNL_CMD_INSERT]		= INSERT,
 	[NFTNL_CMD_DELETE]		= DELETE,
