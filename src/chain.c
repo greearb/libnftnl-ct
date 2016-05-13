@@ -260,8 +260,8 @@ void nftnl_chain_set_str(struct nftnl_chain *c, uint16_t attr, const char *str)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_set_str, nft_chain_attr_set_str);
 
-const void *nftnl_chain_get_data(struct nftnl_chain *c, uint16_t attr,
-				    uint32_t *data_len)
+const void *nftnl_chain_get_data(const struct nftnl_chain *c, uint16_t attr,
+				 uint32_t *data_len)
 {
 	if (!(c->flags & (1 << attr)))
 		return NULL;
@@ -305,20 +305,20 @@ const void *nftnl_chain_get_data(struct nftnl_chain *c, uint16_t attr,
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_get_data, nft_chain_attr_get_data);
 
-const void *nftnl_chain_get(struct nftnl_chain *c, uint16_t attr)
+const void *nftnl_chain_get(const struct nftnl_chain *c, uint16_t attr)
 {
 	uint32_t data_len;
 	return nftnl_chain_get_data(c, attr, &data_len);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_get, nft_chain_attr_get);
 
-const char *nftnl_chain_get_str(struct nftnl_chain *c, uint16_t attr)
+const char *nftnl_chain_get_str(const struct nftnl_chain *c, uint16_t attr)
 {
 	return nftnl_chain_get(c, attr);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_get_str, nft_chain_attr_get_str);
 
-uint32_t nftnl_chain_get_u32(struct nftnl_chain *c, uint16_t attr)
+uint32_t nftnl_chain_get_u32(const struct nftnl_chain *c, uint16_t attr)
 {
 	uint32_t data_len;
 	const uint32_t *val = nftnl_chain_get_data(c, attr, &data_len);
@@ -329,7 +329,7 @@ uint32_t nftnl_chain_get_u32(struct nftnl_chain *c, uint16_t attr)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_get_u32, nft_chain_attr_get_u32);
 
-int32_t nftnl_chain_get_s32(struct nftnl_chain *c, uint16_t attr)
+int32_t nftnl_chain_get_s32(const struct nftnl_chain *c, uint16_t attr)
 {
 	uint32_t data_len;
 	const int32_t *val = nftnl_chain_get_data(c, attr, &data_len);
@@ -340,7 +340,7 @@ int32_t nftnl_chain_get_s32(struct nftnl_chain *c, uint16_t attr)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_get_s32, nft_chain_attr_get_s32);
 
-uint64_t nftnl_chain_get_u64(struct nftnl_chain *c, uint16_t attr)
+uint64_t nftnl_chain_get_u64(const struct nftnl_chain *c, uint16_t attr)
 {
 	uint32_t data_len;
 	const uint64_t *val = nftnl_chain_get_data(c, attr, &data_len);
@@ -351,7 +351,7 @@ uint64_t nftnl_chain_get_u64(struct nftnl_chain *c, uint16_t attr)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_chain_get_u64, nft_chain_attr_get_u64);
 
-uint8_t nftnl_chain_get_u8(struct nftnl_chain *c, uint16_t attr)
+uint8_t nftnl_chain_get_u8(const struct nftnl_chain *c, uint16_t attr)
 {
 	uint32_t data_len;
 	const uint8_t *val = nftnl_chain_get_data(c, attr, &data_len);

@@ -45,14 +45,14 @@ void nftnl_chain_set_s32(struct nftnl_chain *t, uint16_t attr, int32_t data);
 void nftnl_chain_set_u64(struct nftnl_chain *t, uint16_t attr, uint64_t data);
 void nftnl_chain_set_str(struct nftnl_chain *t, uint16_t attr, const char *str);
 
-const void *nftnl_chain_get(struct nftnl_chain *c, uint16_t attr);
-const void *nftnl_chain_get_data(struct nftnl_chain *c, uint16_t attr,
-				    uint32_t *data_len);
-const char *nftnl_chain_get_str(struct nftnl_chain *c, uint16_t attr);
-uint8_t nftnl_chain_get_u8(struct nftnl_chain *c, uint16_t attr);
-uint32_t nftnl_chain_get_u32(struct nftnl_chain *c, uint16_t attr);
-int32_t nftnl_chain_get_s32(struct nftnl_chain *c, uint16_t attr);
-uint64_t nftnl_chain_get_u64(struct nftnl_chain *c, uint16_t attr);
+const void *nftnl_chain_get(const struct nftnl_chain *c, uint16_t attr);
+const void *nftnl_chain_get_data(const struct nftnl_chain *c, uint16_t attr,
+				 uint32_t *data_len);
+const char *nftnl_chain_get_str(const struct nftnl_chain *c, uint16_t attr);
+uint8_t nftnl_chain_get_u8(const struct nftnl_chain *c, uint16_t attr);
+uint32_t nftnl_chain_get_u32(const struct nftnl_chain *c, uint16_t attr);
+int32_t nftnl_chain_get_s32(const struct nftnl_chain *c, uint16_t attr);
+uint64_t nftnl_chain_get_u64(const struct nftnl_chain *c, uint16_t attr);
 
 struct nlmsghdr;
 
