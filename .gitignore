@@ -23,9 +23,9 @@ doxygen.cfg
 # Debian package build temporary files
 build-stamp
 
-examples/
+examples/*
 !examples/*.c
 !examples/Makefile.am
-tests/
+tests/*
 !tests/*.c
 !tests/Makefile.am
