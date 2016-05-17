@@ -122,6 +122,8 @@ static int nftnl_trace_parse_attr_cb(const struct nlattr *attr, void *data)
 		if (mnl_attr_get_payload_len(attr) == 0)
 			abi_breakage();
 		break;
+	default:
+		return MNL_CB_OK;
 	};
 
 	tb[type] = attr;

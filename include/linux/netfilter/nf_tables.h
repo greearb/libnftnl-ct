@@ -3,6 +3,7 @@
 
 #define NFT_TABLE_MAXNAMELEN	32
 #define NFT_CHAIN_MAXNAMELEN	32
+#define NFT_SET_MAXNAMELEN	32
 #define NFT_USERDATA_MAXLEN	256
 
 /**
@@ -182,6 +183,7 @@ enum nft_chain_attributes {
 	NFTA_CHAIN_USE,
 	NFTA_CHAIN_TYPE,
 	NFTA_CHAIN_COUNTERS,
+	NFTA_CHAIN_PAD,
 	__NFTA_CHAIN_MAX
 };
 #define NFTA_CHAIN_MAX		(__NFTA_CHAIN_MAX - 1)
@@ -206,6 +208,7 @@ enum nft_rule_attributes {
 	NFTA_RULE_COMPAT,
 	NFTA_RULE_POSITION,
 	NFTA_RULE_USERDATA,
+	NFTA_RULE_PAD,
 	__NFTA_RULE_MAX
 };
 #define NFTA_RULE_MAX		(__NFTA_RULE_MAX - 1)
@@ -291,6 +294,7 @@ enum nft_set_desc_attributes {
  * @NFTA_SET_ID: uniquely identifies a set in a transaction (NLA_U32)
  * @NFTA_SET_TIMEOUT: default timeout value (NLA_U64)
  * @NFTA_SET_GC_INTERVAL: garbage collection interval (NLA_U32)
+ * @NFTA_SET_USERDATA: user data (NLA_BINARY)
  */
 enum nft_set_attributes {
 	NFTA_SET_UNSPEC,
@@ -306,6 +310,8 @@ enum nft_set_attributes {
 	NFTA_SET_ID,
 	NFTA_SET_TIMEOUT,
 	NFTA_SET_GC_INTERVAL,
+	NFTA_SET_USERDATA,
+	NFTA_SET_PAD,
 	__NFTA_SET_MAX
 };
 #define NFTA_SET_MAX		(__NFTA_SET_MAX - 1)
@@ -339,6 +345,7 @@ enum nft_set_elem_attributes {
 	NFTA_SET_ELEM_EXPIRATION,
 	NFTA_SET_ELEM_USERDATA,
 	NFTA_SET_ELEM_EXPR,
+	NFTA_SET_ELEM_PAD,
 	__NFTA_SET_ELEM_MAX
 };
 #define NFTA_SET_ELEM_MAX	(__NFTA_SET_ELEM_MAX - 1)
@@ -582,6 +589,7 @@ enum nft_dynset_attributes {
 	NFTA_DYNSET_SREG_DATA,
 	NFTA_DYNSET_TIMEOUT,
 	NFTA_DYNSET_EXPR,
+	NFTA_DYNSET_PAD,
 	__NFTA_DYNSET_MAX,
 };
 #define NFTA_DYNSET_MAX		(__NFTA_DYNSET_MAX - 1)
@@ -785,7 +793,7 @@ enum nft_limit_type {
 };
 
 enum nft_limit_flags {
-	NFT_LIMIT_F_INV = (1 << 0),
+	NFT_LIMIT_F_INV	= (1 << 0),
 };
 
 /**
@@ -804,6 +812,7 @@ enum nft_limit_attributes {
 	NFTA_LIMIT_BURST,
 	NFTA_LIMIT_TYPE,
 	NFTA_LIMIT_FLAGS,
+	NFTA_LIMIT_PAD,
 	__NFTA_LIMIT_MAX
 };
 #define NFTA_LIMIT_MAX		(__NFTA_LIMIT_MAX - 1)
@@ -818,6 +827,7 @@ enum nft_counter_attributes {
 	NFTA_COUNTER_UNSPEC,
 	NFTA_COUNTER_BYTES,
 	NFTA_COUNTER_PACKETS,
+	NFTA_COUNTER_PAD,
 	__NFTA_COUNTER_MAX
 };
 #define NFTA_COUNTER_MAX	(__NFTA_COUNTER_MAX - 1)
@@ -949,6 +959,8 @@ enum nft_nat_attributes {
  * enum nft_masq_attributes - nf_tables masquerade expression attributes
  *
  * @NFTA_MASQ_FLAGS: NAT flags (see NF_NAT_RANGE_* in linux/netfilter/nf_nat.h) (NLA_U32)
+ * @NFTA_MASQ_REG_PROTO_MIN: source register of proto range start (NLA_U32: nft_registers)
+ * @NFTA_MASQ_REG_PROTO_MAX: source register of proto range end (NLA_U32: nft_registers)
  */
 enum nft_masq_attributes {
 	NFTA_MASQ_UNSPEC,
@@ -978,8 +990,8 @@ enum nft_redir_attributes {
 /**
  * enum nft_dup_attributes - nf_tables dup expression netlink attributes
  *
- * @NFTA_DUP_SREG_ADDR: source register of destination (NLA_U32: nft_registers)
- * @NFTA_DUP_SREG_DEV: output interface name (NLA_U32: nft_register)
+ * @NFTA_DUP_SREG_ADDR: source register of address (NLA_U32: nft_registers)
+ * @NFTA_DUP_SREG_DEV: source register of output interface (NLA_U32: nft_register)
  */
 enum nft_dup_attributes {
 	NFTA_DUP_UNSPEC,
@@ -992,7 +1004,7 @@ enum nft_dup_attributes {
 /**
  * enum nft_fwd_attributes - nf_tables fwd expression netlink attributes
  *
- * @NFTA_FWD_SREG_DEV: output interface name (NLA_U32: nft_register)
+ * @NFTA_FWD_SREG_DEV: source register of output interface (NLA_U32: nft_register)
  */
 enum nft_fwd_attributes {
 	NFTA_FWD_UNSPEC,
@@ -1051,6 +1063,7 @@ enum nft_trace_attibutes {
 	NFTA_TRACE_MARK,
 	NFTA_TRACE_NFPROTO,
 	NFTA_TRACE_POLICY,
+	NFTA_TRACE_PAD,
 	__NFTA_TRACE_MAX
 };
 #define NFTA_TRACE_MAX (__NFTA_TRACE_MAX - 1)
