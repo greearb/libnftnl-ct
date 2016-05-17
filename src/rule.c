@@ -167,7 +167,11 @@ void nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 		if (r->user.data != NULL)
 			xfree(r->user.data);
 
-		r->user.data = (void *)data;
+		r->user.data = malloc(data_len);
+		if (!r->user.data)
+			return;
+
+		memcpy(r->user.data, data, data_len);
 		r->user.len = data_len;
 		break;
 	}
