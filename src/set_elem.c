@@ -51,6 +51,9 @@ void nftnl_set_elem_free(struct nftnl_set_elem *s)
 	if (s->flags & (1 << NFTNL_SET_ELEM_EXPR))
 		nftnl_expr_free(s->expr);
 
+	if (s->flags & (1 << NFTNL_SET_ELEM_USERDATA))
+		xfree(s->user.data);
+
 	xfree(s);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_elem_free, nft_set_elem_free);
