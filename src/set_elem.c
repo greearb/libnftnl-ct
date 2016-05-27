@@ -125,8 +125,14 @@ void nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 		s->timeout = *((uint64_t *)data);
 		break;
 	case NFTNL_SET_ELEM_USERDATA: /* NFTA_SET_ELEM_USERDATA */
-		s->user.data = (void *)data;
-		s->user.len  = data_len;
+		if (s->user.data != NULL)
+			xfree(s->user.data);
+
+		s->user.data = malloc(data_len);
+		if (!s->user.data)
+			return;
+		memcpy(s->user.data, data, data_len);
+		s->user.len = data_len;
 		break;
 	default:
 		return;
