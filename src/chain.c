@@ -119,18 +119,12 @@ void nftnl_chain_unset(struct nftnl_chain *c, uint16_t attr)
 
 	switch (attr) {
 	case NFTNL_CHAIN_TABLE:
-		if (c->table) {
-			xfree(c->table);
-			c->table = NULL;
-		}
+		xfree(c->table);
 		break;
 	case NFTNL_CHAIN_USE:
 		break;
 	case NFTNL_CHAIN_TYPE:
-		if (c->type) {
-			xfree(c->type);
-			c->type = NULL;
-		}
+		xfree(c->type);
 		break;
 	case NFTNL_CHAIN_NAME:
 	case NFTNL_CHAIN_HOOKNUM:
@@ -142,10 +136,7 @@ void nftnl_chain_unset(struct nftnl_chain *c, uint16_t attr)
 	case NFTNL_CHAIN_FAMILY:
 		break;
 	case NFTNL_CHAIN_DEV:
-		if (c->dev) {
-			xfree(c->dev);
-			c->dev = NULL;
-		}
+		xfree(c->dev);
 		break;
 	default:
 		return;

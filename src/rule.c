@@ -95,16 +95,10 @@ void nftnl_rule_unset(struct nftnl_rule *r, uint16_t attr)
 
 	switch (attr) {
 	case NFTNL_RULE_TABLE:
-		if (r->table) {
-			xfree(r->table);
-			r->table = NULL;
-		}
+		xfree(r->table);
 		break;
 	case NFTNL_RULE_CHAIN:
-		if (r->chain) {
-			xfree(r->chain);
-			r->chain = NULL;
-		}
+		xfree(r->chain);
 		break;
 	case NFTNL_RULE_HANDLE:
 	case NFTNL_RULE_COMPAT_PROTO:

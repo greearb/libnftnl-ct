@@ -92,19 +92,15 @@ void nftnl_ruleset_unset(struct nftnl_ruleset *r, uint16_t attr)
 	switch (attr) {
 	case NFTNL_RULESET_TABLELIST:
 		nftnl_table_list_free(r->table_list);
-		r->table_list = NULL;
 		break;
 	case NFTNL_RULESET_CHAINLIST:
 		nftnl_chain_list_free(r->chain_list);
-		r->chain_list = NULL;
 		break;
 	case NFTNL_RULESET_SETLIST:
 		nftnl_set_list_free(r->set_list);
-		r->set_list = NULL;
 		break;
 	case NFTNL_RULESET_RULELIST:
 		nftnl_rule_list_free(r->rule_list);
-		r->rule_list = NULL;
 		break;
 	}
 	r->flags &= ~(1 << attr);

@@ -65,20 +65,15 @@ EXPORT_SYMBOL_ALIAS(nftnl_set_is_set, nft_set_attr_is_set);
 
 void nftnl_set_unset(struct nftnl_set *s, uint16_t attr)
 {
+	if (!(s->flags & (1 << attr)))
+		return;
+
 	switch (attr) {
 	case NFTNL_SET_TABLE:
-		if (s->flags & (1 << NFTNL_SET_TABLE))
-			if (s->table) {
-				xfree(s->table);
-				s->table = NULL;
-			}
+		xfree(s->table);
 		break;
 	case NFTNL_SET_NAME:
-		if (s->flags & (1 << NFTNL_SET_NAME))
-			if (s->name) {
-				xfree(s->name);
-				s->name = NULL;
-			}
+		xfree(s->name);
 		break;
 	case NFTNL_SET_FLAGS:
 	case NFTNL_SET_KEY_TYPE:
