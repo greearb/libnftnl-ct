@@ -428,10 +428,8 @@ nftnl_parse_verdict(union nftnl_data_reg *data, const struct nlattr *attr, int *
 {
 	struct nlattr *tb[NFTA_VERDICT_MAX+1];
 
-	if (mnl_attr_parse_nested(attr, nftnl_verdict_parse_cb, tb) < 0) {
-		perror("mnl_attr_parse_nested");
+	if (mnl_attr_parse_nested(attr, nftnl_verdict_parse_cb, tb) < 0)
 		return -1;
-	}
 
 	if (!tb[NFTA_VERDICT_CODE])
 		return -1;
@@ -491,10 +489,9 @@ int nftnl_parse_data(union nftnl_data_reg *data, struct nlattr *attr, int *type)
 	struct nlattr *tb[NFTA_DATA_MAX+1] = {};
 	int ret = 0;
 
-	if (mnl_attr_parse_nested(attr, nftnl_data_parse_cb, tb) < 0) {
-		perror("mnl_attr_parse_nested");
+	if (mnl_attr_parse_nested(attr, nftnl_data_parse_cb, tb) < 0)
 		return -1;
-	}
+
 	if (tb[NFTA_DATA_VALUE]) {
 		if (type)
 			*type = DATA_VALUE;
