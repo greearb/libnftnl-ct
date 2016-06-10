@@ -111,7 +111,9 @@ void nftnl_rule_unset(struct nftnl_rule *r, uint16_t attr)
 	case NFTNL_RULE_COMPAT_FLAGS:
 	case NFTNL_RULE_POSITION:
 	case NFTNL_RULE_FAMILY:
+		break;
 	case NFTNL_RULE_USERDATA:
+		xfree(r->user.data);
 		break;
 	}
 
