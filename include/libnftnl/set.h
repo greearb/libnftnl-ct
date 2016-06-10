@@ -35,12 +35,12 @@ struct nftnl_set *nftnl_set_clone(const struct nftnl_set *set);
 
 bool nftnl_set_is_set(const struct nftnl_set *s, uint16_t attr);
 void nftnl_set_unset(struct nftnl_set *s, uint16_t attr);
-void nftnl_set_set(struct nftnl_set *s, uint16_t attr, const void *data);
-void nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
-			   uint32_t data_len);
+int nftnl_set_set(struct nftnl_set *s, uint16_t attr, const void *data);
+int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
+		       uint32_t data_len);
 void nftnl_set_set_u32(struct nftnl_set *s, uint16_t attr, uint32_t val);
 void nftnl_set_set_u64(struct nftnl_set *s, uint16_t attr, uint64_t val);
-void nftnl_set_set_str(struct nftnl_set *s, uint16_t attr, const char *str);
+int nftnl_set_set_str(struct nftnl_set *s, uint16_t attr, const char *str);
 
 const void *nftnl_set_get(const struct nftnl_set *s, uint16_t attr);
 const void *nftnl_set_get_data(const struct nftnl_set *s, uint16_t attr,
@@ -106,10 +106,10 @@ struct nftnl_set_elem *nftnl_set_elem_clone(struct nftnl_set_elem *elem);
 void nftnl_set_elem_add(struct nftnl_set *s, struct nftnl_set_elem *elem);
 
 void nftnl_set_elem_unset(struct nftnl_set_elem *s, uint16_t attr);
-void nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr, const void *data, uint32_t data_len);
+int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr, const void *data, uint32_t data_len);
 void nftnl_set_elem_set_u32(struct nftnl_set_elem *s, uint16_t attr, uint32_t val);
 void nftnl_set_elem_set_u64(struct nftnl_set_elem *s, uint16_t attr, uint64_t val);
-void nftnl_set_elem_set_str(struct nftnl_set_elem *s, uint16_t attr, const char *str);
+int nftnl_set_elem_set_str(struct nftnl_set_elem *s, uint16_t attr, const char *str);
 
 const void *nftnl_set_elem_get(struct nftnl_set_elem *s, uint16_t attr, uint32_t *data_len);
 const char *nftnl_set_elem_get_str(struct nftnl_set_elem *s, uint16_t attr);

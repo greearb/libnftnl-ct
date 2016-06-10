@@ -113,8 +113,8 @@ static uint32_t nftnl_set_validate[NFTNL_SET_MAX + 1] = {
 	[NFTNL_SET_GC_INTERVAL]	= sizeof(uint32_t),
 };
 
-void nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
-			   uint32_t data_len)
+int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
+		       uint32_t data_len)
 {
 	nftnl_assert_attr_exists(attr, NFTNL_SET_MAX);
 	nftnl_assert_validate(data, nftnl_set_validate, attr, data_len);
@@ -125,12 +125,16 @@ void nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 			xfree(s->table);
 
 		s->table = strdup(data);
+		if (!s->table)
+			return -1;
 		break;
 	case NFTNL_SET_NAME:
 		if (s->name)
 			xfree(s->name);
 
 		s->name = strdup(data);
+		if (!s->name)
+			return -1;
 		break;
 	case NFTNL_SET_FLAGS:
 		s->set_flags = *((uint32_t *)data);
@@ -167,12 +171,13 @@ void nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 		break;
 	}
 	s->flags |= (1 << attr);
+	return 0;
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_set_data, nft_set_attr_set_data);
 
-void nftnl_set_set(struct nftnl_set *s, uint16_t attr, const void *data)
+int nftnl_set_set(struct nftnl_set *s, uint16_t attr, const void *data)
 {
-	nftnl_set_set_data(s, attr, data, nftnl_set_validate[attr]);
+	return nftnl_set_set_data(s, attr, data, nftnl_set_validate[attr]);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_set, nft_set_attr_set);
 
@@ -188,9 +193,9 @@ void nftnl_set_set_u64(struct nftnl_set *s, uint16_t attr, uint64_t val)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_set_u64, nft_set_attr_set_u64);
 
-void nftnl_set_set_str(struct nftnl_set *s, uint16_t attr, const char *str)
+int nftnl_set_set_str(struct nftnl_set *s, uint16_t attr, const char *str)
 {
-	nftnl_set_set(s, attr, str);
+	return nftnl_set_set(s, attr, str);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_set_str, nft_set_attr_set_str);
 

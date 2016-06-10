@@ -84,8 +84,8 @@ static uint32_t nftnl_table_validate[NFTNL_TABLE_MAX + 1] = {
 	[NFTNL_TABLE_FAMILY]	= sizeof(uint32_t),
 };
 
-void nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
-			     const void *data, uint32_t data_len)
+int nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
+			 const void *data, uint32_t data_len)
 {
 	nftnl_assert_attr_exists(attr, NFTNL_TABLE_MAX);
 	nftnl_assert_validate(data, nftnl_table_validate, attr, data_len);
@@ -96,6 +96,8 @@ void nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
 			xfree(t->name);
 
 		t->name = strdup(data);
+		if (!t->name)
+			return -1;
 		break;
 	case NFTNL_TABLE_FLAGS:
 		t->table_flags = *((uint32_t *)data);
@@ -108,6 +110,7 @@ void nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
 		break;
 	}
 	t->flags |= (1 << attr);
+	return 0;
 }
 EXPORT_SYMBOL_ALIAS(nftnl_table_set_data, nft_table_attr_set_data);
 
@@ -129,9 +132,9 @@ void nftnl_table_set_u8(struct nftnl_table *t, uint16_t attr, uint8_t val)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_table_set_u8, nft_table_attr_set_u8);
 
-void nftnl_table_set_str(struct nftnl_table *t, uint16_t attr, const char *str)
+int nftnl_table_set_str(struct nftnl_table *t, uint16_t attr, const char *str)
 {
-	nftnl_table_set_data(t, attr, str, 0);
+	return nftnl_table_set_data(t, attr, str, 0);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_table_set_str, nft_table_attr_set_str);
 

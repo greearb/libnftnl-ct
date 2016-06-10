@@ -29,15 +29,15 @@ enum nftnl_table_attr {
 bool nftnl_table_is_set(const struct nftnl_table *t, uint16_t attr);
 void nftnl_table_unset(struct nftnl_table *t, uint16_t attr);
 void nftnl_table_set(struct nftnl_table *t, uint16_t attr, const void *data);
-void nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
-			     const void *data, uint32_t data_len);
+int nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
+			 const void *data, uint32_t data_len);
 const void *nftnl_table_get(const struct nftnl_table *t, uint16_t attr);
 const void *nftnl_table_get_data(const struct nftnl_table *t, uint16_t attr,
 				 uint32_t *data_len);
 
 void nftnl_table_set_u8(struct nftnl_table *t, uint16_t attr, uint8_t data);
 void nftnl_table_set_u32(struct nftnl_table *t, uint16_t attr, uint32_t data);
-void nftnl_table_set_str(struct nftnl_table *t, uint16_t attr, const char *str);
+int nftnl_table_set_str(struct nftnl_table *t, uint16_t attr, const char *str);
 uint8_t nftnl_table_get_u8(const struct nftnl_table *t, uint16_t attr);
 uint32_t nftnl_table_get_u32(const struct nftnl_table *t, uint16_t attr);
 const char *nftnl_table_get_str(const struct nftnl_table *t, uint16_t attr);

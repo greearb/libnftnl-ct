@@ -20,13 +20,13 @@ struct nftnl_expr *nftnl_expr_alloc(const char *name);
 void nftnl_expr_free(const struct nftnl_expr *expr);
 
 bool nftnl_expr_is_set(const struct nftnl_expr *expr, uint16_t type);
-void nftnl_expr_set(struct nftnl_expr *expr, uint16_t type, const void *data, uint32_t data_len);
+int nftnl_expr_set(struct nftnl_expr *expr, uint16_t type, const void *data, uint32_t data_len);
 #define nftnl_expr_set_data nftnl_expr_set
 void nftnl_expr_set_u8(struct nftnl_expr *expr, uint16_t type, uint8_t data);
 void nftnl_expr_set_u16(struct nftnl_expr *expr, uint16_t type, uint16_t data);
 void nftnl_expr_set_u32(struct nftnl_expr *expr, uint16_t type, uint32_t data);
 void nftnl_expr_set_u64(struct nftnl_expr *expr, uint16_t type, uint64_t data);
-void nftnl_expr_set_str(struct nftnl_expr *expr, uint16_t type, const char *str);
+int nftnl_expr_set_str(struct nftnl_expr *expr, uint16_t type, const char *str);
 
 const void *nftnl_expr_get(const struct nftnl_expr *expr, uint16_t type, uint32_t *data_len);
 #define nftnl_expr_get_data nftnl_expr_get

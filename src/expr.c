@@ -60,18 +60,18 @@ bool nftnl_expr_is_set(const struct nftnl_expr *expr, uint16_t type)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_expr_is_set, nft_rule_expr_is_set);
 
-void
-nftnl_expr_set(struct nftnl_expr *expr, uint16_t type,
-		  const void *data, uint32_t data_len)
+int nftnl_expr_set(struct nftnl_expr *expr, uint16_t type,
+		   const void *data, uint32_t data_len)
 {
 	switch(type) {
 	case NFTNL_EXPR_NAME:	/* cannot be modified */
-		return;
+		return 0;
 	default:
 		if (expr->ops->set(expr, type, data, data_len) < 0)
-			return;
+			return -1;
 	}
 	expr->flags |= (1 << type);
+	return 0;
 }
 EXPORT_SYMBOL_ALIAS(nftnl_expr_set, nft_rule_expr_set);
 
@@ -103,10 +103,9 @@ nftnl_expr_set_u64(struct nftnl_expr *expr, uint16_t type, uint64_t data)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_expr_set_u64, nft_rule_expr_set_u64);
 
-void
-nftnl_expr_set_str(struct nftnl_expr *expr, uint16_t type, const char *str)
+int nftnl_expr_set_str(struct nftnl_expr *expr, uint16_t type, const char *str)
 {
-	nftnl_expr_set(expr, type, str, strlen(str)+1);
+	return nftnl_expr_set(expr, type, str, strlen(str) + 1);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_expr_set_str, nft_rule_expr_set_str);
 

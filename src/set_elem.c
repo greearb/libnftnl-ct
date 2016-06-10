@@ -99,8 +99,8 @@ void nftnl_set_elem_unset(struct nftnl_set_elem *s, uint16_t attr)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_elem_unset, nft_set_elem_attr_unset);
 
-void nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
-			   const void *data, uint32_t data_len)
+int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
+		       const void *data, uint32_t data_len)
 {
 	switch(attr) {
 	case NFTNL_SET_ELEM_FLAGS:
@@ -132,14 +132,13 @@ void nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 
 		s->user.data = malloc(data_len);
 		if (!s->user.data)
-			return;
+			return -1;
 		memcpy(s->user.data, data, data_len);
 		s->user.len = data_len;
 		break;
-	default:
-		return;
 	}
 	s->flags |= (1 << attr);
+	return -1;
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_elem_set, nft_set_elem_attr_set);
 
@@ -155,9 +154,9 @@ void nftnl_set_elem_set_u64(struct nftnl_set_elem *s, uint16_t attr, uint64_t va
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_elem_set_u64, nft_set_elem_attr_set_u64);
 
-void nftnl_set_elem_set_str(struct nftnl_set_elem *s, uint16_t attr, const char *str)
+int nftnl_set_elem_set_str(struct nftnl_set_elem *s, uint16_t attr, const char *str)
 {
-	nftnl_set_elem_set(s, attr, str, strlen(str));
+	return nftnl_set_elem_set(s, attr, str, strlen(str));
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_elem_set_str, nft_set_elem_attr_set_str);
 

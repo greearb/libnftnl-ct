@@ -129,8 +129,8 @@ static uint32_t nftnl_rule_validate[NFTNL_RULE_MAX + 1] = {
 	[NFTNL_RULE_POSITION]	= sizeof(uint64_t),
 };
 
-void nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
-			    const void *data, uint32_t data_len)
+int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
+			const void *data, uint32_t data_len)
 {
 	nftnl_assert_attr_exists(attr, NFTNL_RULE_MAX);
 	nftnl_assert_validate(data, nftnl_rule_validate, attr, data_len);
@@ -141,12 +141,16 @@ void nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 			xfree(r->table);
 
 		r->table = strdup(data);
+		if (!r->table)
+			return -1;
 		break;
 	case NFTNL_RULE_CHAIN:
 		if (r->chain)
 			xfree(r->chain);
 
 		r->chain = strdup(data);
+		if (!r->chain)
+			return -1;
 		break;
 	case NFTNL_RULE_HANDLE:
 		r->handle = *((uint64_t *)data);
@@ -169,19 +173,20 @@ void nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 
 		r->user.data = malloc(data_len);
 		if (!r->user.data)
-			return;
+			return -1;
 
 		memcpy(r->user.data, data, data_len);
 		r->user.len = data_len;
 		break;
 	}
 	r->flags |= (1 << attr);
+	return 0;
 }
 EXPORT_SYMBOL_ALIAS(nftnl_rule_set_data, nft_rule_attr_set_data);
 
-void nftnl_rule_set(struct nftnl_rule *r, uint16_t attr, const void *data)
+int nftnl_rule_set(struct nftnl_rule *r, uint16_t attr, const void *data)
 {
-	nftnl_rule_set_data(r, attr, data, nftnl_rule_validate[attr]);
+	return nftnl_rule_set_data(r, attr, data, nftnl_rule_validate[attr]);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_rule_set, nft_rule_attr_set);
 
@@ -197,9 +202,9 @@ void nftnl_rule_set_u64(struct nftnl_rule *r, uint16_t attr, uint64_t val)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_rule_set_u64, nft_rule_attr_set_u64);
 
-void nftnl_rule_set_str(struct nftnl_rule *r, uint16_t attr, const char *str)
+int nftnl_rule_set_str(struct nftnl_rule *r, uint16_t attr, const char *str)
 {
-	nftnl_rule_set_data(r, attr, str, strlen(str));
+	return nftnl_rule_set_data(r, attr, str, strlen(str));
 }
 EXPORT_SYMBOL_ALIAS(nftnl_rule_set_str, nft_rule_attr_set_str);
 

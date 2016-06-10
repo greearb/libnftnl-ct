@@ -25,9 +25,9 @@ enum {
 
 bool nftnl_gen_is_set(const struct nftnl_gen *gen, uint16_t attr);
 void nftnl_gen_unset(struct nftnl_gen *gen, uint16_t attr);
-void nftnl_gen_set(struct nftnl_gen *gen, uint16_t attr, const void *data);
-void nftnl_gen_set_data(struct nftnl_gen *gen, uint16_t attr,
-			     const void *data, uint32_t data_len);
+int nftnl_gen_set(struct nftnl_gen *gen, uint16_t attr, const void *data);
+int nftnl_gen_set_data(struct nftnl_gen *gen, uint16_t attr,
+		       const void *data, uint32_t data_len);
 const void *nftnl_gen_get(const struct nftnl_gen *gen, uint16_t attr);
 const void *nftnl_gen_get_data(const struct nftnl_gen *gen, uint16_t attr,
 			       uint32_t *data_len);
