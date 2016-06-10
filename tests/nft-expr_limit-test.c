@@ -66,10 +66,10 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nftnl_expr_set_u64(ex, NFTNL_EXPR_LIMIT_RATE, 0x123456789abcdef0);
-	nftnl_expr_set_u64(ex, NFTNL_EXPR_LIMIT_UNIT, 0x123456789abcdef0);
+	nftnl_expr_set_u64(ex, NFTNL_EXPR_LIMIT_UNIT, 0xf0123456789abcde);
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_LIMIT_BURST, 0x89123456);
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_LIMIT_TYPE, 0xdef01234);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_LIMIT_FLAGS, 0xdef01234);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_LIMIT_FLAGS, 0x34def012);
 
 	nftnl_rule_add_expr(a, ex);
 

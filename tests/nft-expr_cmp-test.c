@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
 	nftnl_expr_set(ex, NFTNL_EXPR_CMP_DATA, &data_len, sizeof(data_len));
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_CMP_SREG, 0x12345678);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_CMP_OP, 0x12345678);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_CMP_OP, 0x78123456);
 
 	nftnl_rule_add_expr(a, ex);
 

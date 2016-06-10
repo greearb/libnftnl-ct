@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nftnl_expr_set(ex, NFTNL_EXPR_TG_NAME, "test", strlen("test"));
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_TG_REV, 0x12345678);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_TG_REV, 0x56781234);
 	nftnl_expr_set(ex, NFTNL_EXPR_TG_INFO, strdup(data), sizeof(data));
 	nftnl_rule_add_expr(a, ex);
 

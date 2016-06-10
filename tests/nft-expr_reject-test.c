@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
 	if (ex == NULL)
 		print_err("OOM");
 
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_REJECT_TYPE, 0x1234568);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_REJECT_CODE, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_REJECT_TYPE, 0x12345678);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_REJECT_CODE, 0x45681234);
 
 	nftnl_rule_add_expr(a, ex);
 

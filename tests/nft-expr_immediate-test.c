@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
 	char buf[4096];
 	struct nftnl_expr_iter *iter_a, *iter_b;
 	struct nftnl_expr *rule_a, *rule_b;
-	uint32_t chain_t = 0x12345678;
-	uint32_t data_t = 0x12345678;
+	uint32_t chain = 0x12345678;
+	uint32_t data = 0x56781234;
 
 	a = nftnl_rule_alloc();
 	b = nftnl_rule_alloc();
@@ -68,9 +68,9 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_IMM_DREG, 0x1234568);
-	nftnl_expr_set(ex, NFTNL_EXPR_IMM_DATA, &chain_t, sizeof(chain_t));
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_IMM_VERDICT, 0x12345678);
-	nftnl_expr_set(ex, NFTNL_EXPR_IMM_CHAIN, &data_t, sizeof(data_t));
+	nftnl_expr_set(ex, NFTNL_EXPR_IMM_DATA, &data, sizeof(data));
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_IMM_VERDICT, 0x78123456);
+	nftnl_expr_set(ex, NFTNL_EXPR_IMM_CHAIN, &chain, sizeof(chain));
 
 	nftnl_rule_add_expr(a, ex);
 

@@ -79,12 +79,12 @@ int main(int argc, char *argv[])
 	nftnl_chain_set_u32(a, NFTNL_CHAIN_FAMILY, AF_INET);
 	nftnl_chain_set_str(a, NFTNL_CHAIN_TABLE, "Table");
 	nftnl_chain_set_u32(a, NFTNL_CHAIN_POLICY,0x12345678);
-	nftnl_chain_set_u32(a, NFTNL_CHAIN_HOOKNUM, 0x12345678);
-	nftnl_chain_set_s32(a, NFTNL_CHAIN_PRIO, 0x12345678);
-	nftnl_chain_set_u32(a, NFTNL_CHAIN_USE, 0x12345678 );
+	nftnl_chain_set_u32(a, NFTNL_CHAIN_HOOKNUM, 0x34567812);
+	nftnl_chain_set_s32(a, NFTNL_CHAIN_PRIO, 0x56781234);
+	nftnl_chain_set_u32(a, NFTNL_CHAIN_USE, 0x78123456);
 	nftnl_chain_set_u64(a, NFTNL_CHAIN_PACKETS, 0x1234567812345678);
-	nftnl_chain_set_u64(a, NFTNL_CHAIN_BYTES, 0x1234567812345678);
-	nftnl_chain_set_u64(a, NFTNL_CHAIN_HANDLE, 0x1234567812345678);
+	nftnl_chain_set_u64(a, NFTNL_CHAIN_BYTES, 0x7812345678123456);
+	nftnl_chain_set_u64(a, NFTNL_CHAIN_HANDLE, 0x5678123456781234);
 	nftnl_chain_set_str(a, NFTNL_CHAIN_TYPE, "Prueba");
 	nftnl_chain_set_str(a, NFTNL_CHAIN_DEV, "eth0");
 

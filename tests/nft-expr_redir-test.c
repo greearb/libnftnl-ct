@@ -56,9 +56,9 @@ int main(int argc, char *argv[])
 	if (ex == NULL)
 		print_err("OOM");
 
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_REDIR_REG_PROTO_MIN, 0x1234568);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_REDIR_REG_PROTO_MAX, 0x23456);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_REDIR_FLAGS, 0x1234568);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_REDIR_REG_PROTO_MIN, 0x12345678);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_REDIR_REG_PROTO_MAX, 0x56781234);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_REDIR_FLAGS, 0x12003400);
 
 	nftnl_rule_add_expr(a, ex);
 

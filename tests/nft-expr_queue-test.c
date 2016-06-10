@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
 	if (ex == NULL)
 		print_err("OOM");
 
-	nftnl_expr_set_u16(ex, NFTNL_EXPR_QUEUE_NUM, 0x123);
-	nftnl_expr_set_u16(ex, NFTNL_EXPR_QUEUE_TOTAL, 0x2);
-	nftnl_expr_set_u16(ex, NFTNL_EXPR_QUEUE_FLAGS, 0x2);
+	nftnl_expr_set_u16(ex, NFTNL_EXPR_QUEUE_NUM, 0x01010);
+	nftnl_expr_set_u16(ex, NFTNL_EXPR_QUEUE_TOTAL, 0x1234);
+	nftnl_expr_set_u16(ex, NFTNL_EXPR_QUEUE_FLAGS, 0x4321);
 
 	nftnl_rule_add_expr(a, ex);
 

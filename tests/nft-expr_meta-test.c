@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_META_KEY, 0x1234568);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_META_DREG, 0x12345678);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_META_DREG, 0x78123456);
 
 	nftnl_rule_add_expr(a, ex);
 

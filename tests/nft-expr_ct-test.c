@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_CT_KEY, 0x1234568);
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_CT_DIR, 0x12);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_CT_DREG, 0x12345678);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_CT_DREG, 0x78123456);
 
 	nftnl_rule_add_expr(a, ex);
 

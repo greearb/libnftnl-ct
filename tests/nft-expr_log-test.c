@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOG_SNAPLEN, 0x12345678);
 	nftnl_expr_set_u16(ex, NFTNL_EXPR_LOG_GROUP, 0x1234);
-	nftnl_expr_set_u16(ex, NFTNL_EXPR_LOG_QTHRESHOLD, 0x1234);
+	nftnl_expr_set_u16(ex, NFTNL_EXPR_LOG_QTHRESHOLD, 0x3412);
 	nftnl_expr_set_str(ex, NFTNL_EXPR_LOG_PREFIX, "test");
 
 	nftnl_rule_add_expr(a, ex);

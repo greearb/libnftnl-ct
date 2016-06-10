@@ -63,9 +63,9 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_PAYLOAD_DREG, 0x1234568);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_PAYLOAD_BASE, 0x12345678);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_PAYLOAD_OFFSET, 0x12345678);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_PAYLOAD_LEN, 0x12345678);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_PAYLOAD_BASE, 0x78123456);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_PAYLOAD_OFFSET, 0x56781234);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_PAYLOAD_LEN, 0x78561234);
 
 	nftnl_rule_add_expr(a, ex);
 

@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOOKUP_SREG, 0x12345678);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOOKUP_DREG, 0x12345678);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOOKUP_DREG, 0x78123456);
 	nftnl_expr_set(ex, NFTNL_EXPR_LOOKUP_SET, &lookup_set,
 			  sizeof(lookup_set));
 
