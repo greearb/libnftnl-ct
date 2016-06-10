@@ -159,7 +159,7 @@ nftnl_expr_payload_parse(struct nftnl_expr *e, struct nlattr *attr)
 
 	if (tb[NFTA_PAYLOAD_SREG]) {
 		payload->sreg = ntohl(mnl_attr_get_u32(tb[NFTA_PAYLOAD_SREG]));
-		e->flags |= (1 << NFT_EXPR_PAYLOAD_SREG);
+		e->flags |= (1 << NFTNL_EXPR_PAYLOAD_SREG);
 	}
 	if (tb[NFTA_PAYLOAD_DREG]) {
 		payload->dreg = ntohl(mnl_attr_get_u32(tb[NFTA_PAYLOAD_DREG]));
