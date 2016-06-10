@@ -43,7 +43,7 @@ nftnl_expr_immediate_set(struct nftnl_expr *e, uint16_t type,
 		imm->data.verdict = *((uint32_t *)data);
 		break;
 	case NFTNL_EXPR_IMM_CHAIN:
-		if (imm->data.chain)
+		if (e->flags & (1 << NFTNL_EXPR_IMM_CHAIN))
 			xfree(imm->data.chain);
 
 		imm->data.chain = strdup(data);

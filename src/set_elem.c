@@ -41,12 +41,8 @@ EXPORT_SYMBOL_ALIAS(nftnl_set_elem_alloc, nft_set_elem_alloc);
 
 void nftnl_set_elem_free(struct nftnl_set_elem *s)
 {
-	if (s->flags & (1 << NFTNL_SET_ELEM_CHAIN)) {
-		if (s->data.chain) {
-			xfree(s->data.chain);
-			s->data.chain = NULL;
-		}
-	}
+	if (s->flags & (1 << NFTNL_SET_ELEM_CHAIN))
+		xfree(s->data.chain);
 
 	if (s->flags & (1 << NFTNL_SET_ELEM_EXPR))
 		nftnl_expr_free(s->expr);
@@ -109,7 +105,7 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 		s->data.verdict = *((uint32_t *)data);
 		break;
 	case NFTNL_SET_ELEM_CHAIN:	/* NFTA_SET_ELEM_DATA */
-		if (s->data.chain)
+		if (s->flags & (1 << NFTNL_SET_ELEM_CHAIN))
 			xfree(s->data.chain);
 
 		s->data.chain = strdup(data);
@@ -124,7 +120,7 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 		s->timeout = *((uint64_t *)data);
 		break;
 	case NFTNL_SET_ELEM_USERDATA: /* NFTA_SET_ELEM_USERDATA */
-		if (s->user.data != NULL)
+		if (s->flags & (1 << NFTNL_SET_ELEM_USERDATA))
 			xfree(s->user.data);
 
 		s->user.data = malloc(data_len);
@@ -402,7 +398,7 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 		const void *udata =
 			mnl_attr_get_payload(tb[NFTA_SET_ELEM_USERDATA]);
 
-		if (e->user.data)
+		if (e->flags & (1 << NFTNL_RULE_USERDATA))
 			xfree(e->user.data);
 
 		e->user.len  = mnl_attr_get_payload_len(tb[NFTA_SET_ELEM_USERDATA]);
@@ -475,7 +471,8 @@ int nftnl_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		return -1;
 
 	if (tb[NFTA_SET_ELEM_LIST_TABLE]) {
-		xfree(s->table);
+		if (s->flags & (1 << NFTNL_SET_TABLE))
+			xfree(s->table);
 		s->table =
 			strdup(mnl_attr_get_str(tb[NFTA_SET_ELEM_LIST_TABLE]));
 		if (!s->table)
@@ -483,7 +480,8 @@ int nftnl_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		s->flags |= (1 << NFTNL_SET_TABLE);
 	}
 	if (tb[NFTA_SET_ELEM_LIST_SET]) {
-		xfree(s->name);
+		if (s->flags & (1 << NFTNL_SET_NAME))
+			xfree(s->name);
 		s->name =
 			strdup(mnl_attr_get_str(tb[NFTA_SET_ELEM_LIST_SET]));
 		if (!s->name)

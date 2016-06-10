@@ -44,9 +44,9 @@ void nftnl_set_free(const struct nftnl_set *s)
 {
 	struct nftnl_set_elem *elem, *tmp;
 
-	if (s->table != NULL)
+	if (s->flags & (1 << NFTNL_SET_TABLE))
 		xfree(s->table);
-	if (s->name != NULL)
+	if (s->flags & (1 << NFTNL_SET_NAME))
 		xfree(s->name);
 
 	list_for_each_entry_safe(elem, tmp, &s->element_list, head) {
@@ -116,7 +116,7 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 
 	switch(attr) {
 	case NFTNL_SET_TABLE:
-		if (s->table)
+		if (s->flags & (1 << NFTNL_SET_TABLE))
 			xfree(s->table);
 
 		s->table = strdup(data);
@@ -124,7 +124,7 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 			return -1;
 		break;
 	case NFTNL_SET_NAME:
-		if (s->name)
+		if (s->flags & (1 << NFTNL_SET_NAME))
 			xfree(s->name);
 
 		s->name = strdup(data);
@@ -439,14 +439,16 @@ int nftnl_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		return -1;
 
 	if (tb[NFTA_SET_TABLE]) {
-		xfree(s->table);
+		if (s->flags & (1 << NFTNL_SET_TABLE))
+			xfree(s->table);
 		s->table = strdup(mnl_attr_get_str(tb[NFTA_SET_TABLE]));
 		if (!s->table)
 			return -1;
 		s->flags |= (1 << NFTNL_SET_TABLE);
 	}
 	if (tb[NFTA_SET_NAME]) {
-		xfree(s->name);
+		if (s->flags & (1 << NFTNL_SET_NAME))
+			xfree(s->name);
 		s->name = strdup(mnl_attr_get_str(tb[NFTA_SET_NAME]));
 		if (!s->name)
 			return -1;

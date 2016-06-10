@@ -71,11 +71,11 @@ void nftnl_rule_free(const struct nftnl_rule *r)
 	list_for_each_entry_safe(e, tmp, &r->expr_list, head)
 		nftnl_expr_free(e);
 
-	if (r->table != NULL)
+	if (r->flags & (1 << (NFTNL_RULE_TABLE)))
 		xfree(r->table);
-	if (r->chain != NULL)
+	if (r->flags & (1 << (NFTNL_RULE_CHAIN)))
 		xfree(r->chain);
-	if (r->user.data != NULL)
+	if (r->flags & (1 << (NFTNL_RULE_USERDATA)))
 		xfree(r->user.data);
 
 	xfree(r);
@@ -131,7 +131,7 @@ int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 
 	switch(attr) {
 	case NFTNL_RULE_TABLE:
-		if (r->table)
+		if (r->flags & (1 << NFTNL_RULE_TABLE))
 			xfree(r->table);
 
 		r->table = strdup(data);
@@ -139,7 +139,7 @@ int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 			return -1;
 		break;
 	case NFTNL_RULE_CHAIN:
-		if (r->chain)
+		if (r->flags & (1 << NFTNL_RULE_CHAIN))
 			xfree(r->chain);
 
 		r->chain = strdup(data);
@@ -162,7 +162,7 @@ int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 		r->position = *((uint64_t *)data);
 		break;
 	case NFTNL_RULE_USERDATA:
-		if (r->user.data != NULL)
+		if (r->flags & (1 << NFTNL_RULE_USERDATA))
 			xfree(r->user.data);
 
 		r->user.data = malloc(data_len);
@@ -433,14 +433,16 @@ int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *r)
 		return -1;
 
 	if (tb[NFTA_RULE_TABLE]) {
-		xfree(r->table);
+		if (r->flags & (1 << NFTNL_RULE_TABLE))
+			xfree(r->table);
 		r->table = strdup(mnl_attr_get_str(tb[NFTA_RULE_TABLE]));
 		if (!r->table)
 			return -1;
 		r->flags |= (1 << NFTNL_RULE_TABLE);
 	}
 	if (tb[NFTA_RULE_CHAIN]) {
-		xfree(r->chain);
+		if (r->flags & (1 << NFTNL_RULE_CHAIN))
+			xfree(r->chain);
 		r->chain = strdup(mnl_attr_get_str(tb[NFTA_RULE_CHAIN]));
 		if (!r->chain)
 			return -1;
@@ -462,7 +464,7 @@ int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *r)
 		const void *udata =
 			mnl_attr_get_payload(tb[NFTA_RULE_USERDATA]);
 
-		if (r->user.data)
+		if (r->flags & (1 << NFTNL_RULE_USERDATA))
 			xfree(r->user.data);
 
 		r->user.len = mnl_attr_get_payload_len(tb[NFTA_RULE_USERDATA]);

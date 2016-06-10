@@ -49,7 +49,7 @@ nftnl_expr_match_set(struct nftnl_expr *e, uint16_t type,
 		mt->rev = *((uint32_t *)data);
 		break;
 	case NFTNL_EXPR_MT_INFO:
-		if (mt->data)
+		if (e->flags & (1 << NFTNL_EXPR_MT_INFO))
 			xfree(mt->data);
 
 		mt->data = data;
@@ -146,7 +146,7 @@ static int nftnl_expr_match_parse(struct nftnl_expr *e, struct nlattr *attr)
 		uint32_t len = mnl_attr_get_payload_len(tb[NFTA_MATCH_INFO]);
 		void *match_data;
 
-		if (match->data)
+		if (e->flags & (1 << NFTNL_EXPR_MT_INFO))
 			xfree(match->data);
 
 		match_data = calloc(1, len);

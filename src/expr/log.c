@@ -37,7 +37,7 @@ static int nftnl_expr_log_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_LOG_PREFIX:
-		if (log->prefix)
+		if (log->flags & (1 << NFTNL_EXPR_LOG_PREFIX))
 			xfree(log->prefix);
 
 		log->prefix = strdup(data);

@@ -89,7 +89,7 @@ int nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
 
 	switch (attr) {
 	case NFTNL_TABLE_NAME:
-		if (t->name)
+		if (t->flags & (1 << NFTNL_TABLE_NAME))
 			xfree(t->name);
 
 		t->name = strdup(data);
@@ -227,7 +227,8 @@ int nftnl_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_table *t)
 		return -1;
 
 	if (tb[NFTA_TABLE_NAME]) {
-		xfree(t->name);
+		if (t->flags & (1 << NFTNL_TABLE_NAME))
+			xfree(t->name);
 		t->name = strdup(mnl_attr_get_str(tb[NFTA_TABLE_NAME]));
 		if (!t->name)
 			return -1;

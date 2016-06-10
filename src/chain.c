@@ -95,11 +95,11 @@ EXPORT_SYMBOL_ALIAS(nftnl_chain_alloc, nft_chain_alloc);
 
 void nftnl_chain_free(const struct nftnl_chain *c)
 {
-	if (c->table != NULL)
+	if (c->flags & (1 << NFTNL_CHAIN_TABLE))
 		xfree(c->table);
-	if (c->type != NULL)
+	if (c->flags & (1 << NFTNL_CHAIN_TYPE))
 		xfree(c->type);
-	if (c->dev != NULL)
+	if (c->flags & (1 << NFTNL_CHAIN_DEV))
 		xfree(c->dev);
 
 	xfree(c);
@@ -167,7 +167,7 @@ int nftnl_chain_set_data(struct nftnl_chain *c, uint16_t attr,
 		strncpy(c->name, data, NFT_CHAIN_MAXNAMELEN);
 		break;
 	case NFTNL_CHAIN_TABLE:
-		if (c->table)
+		if (c->flags & (1 << NFTNL_CHAIN_TABLE))
 			xfree(c->table);
 
 		c->table = strdup(data);
@@ -199,7 +199,7 @@ int nftnl_chain_set_data(struct nftnl_chain *c, uint16_t attr,
 		c->family = *((uint32_t *)data);
 		break;
 	case NFTNL_CHAIN_TYPE:
-		if (c->type)
+		if (c->flags & (1 << NFTNL_CHAIN_TYPE))
 			xfree(c->type);
 
 		c->type = strdup(data);
@@ -207,7 +207,7 @@ int nftnl_chain_set_data(struct nftnl_chain *c, uint16_t attr,
 			return -1;
 		break;
 	case NFTNL_CHAIN_DEV:
-		if (c->dev)
+		if (c->flags & (1 << NFTNL_CHAIN_DEV))
 			xfree(c->dev);
 
 		c->dev = strdup(data);
@@ -533,7 +533,8 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 		c->flags |= (1 << NFTNL_CHAIN_NAME);
 	}
 	if (tb[NFTA_CHAIN_TABLE]) {
-		xfree(c->table);
+		if (c->flags & (1 << NFTNL_CHAIN_TABLE))
+			xfree(c->table);
 		c->table = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_TABLE]));
 		if (!c->table)
 			return -1;
@@ -562,7 +563,8 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 		c->flags |= (1 << NFTNL_CHAIN_HANDLE);
 	}
 	if (tb[NFTA_CHAIN_TYPE]) {
-		xfree(c->type);
+		if (c->flags & (1 << NFTNL_CHAIN_TYPE))
+			xfree(c->type);
 		c->type = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_TYPE]));
 		if (!c->type)
 			return -1;

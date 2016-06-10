@@ -49,7 +49,7 @@ nftnl_expr_target_set(struct nftnl_expr *e, uint16_t type,
 		tg->rev = *((uint32_t *)data);
 		break;
 	case NFTNL_EXPR_TG_INFO:
-		if (tg->data)
+		if (e->flags & (1 << NFTNL_EXPR_TG_INFO))
 			xfree(tg->data);
 
 		tg->data = data;
