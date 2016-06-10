@@ -43,6 +43,8 @@ nftnl_expr_lookup_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_LOOKUP_SET:
 		lookup->set_name = strdup((const char *)data);
+		if (!lookup->set_name)
+			return -1;
 		break;
 	case NFTNL_EXPR_LOOKUP_SET_ID:
 		lookup->set_id = *((uint32_t *)data);
@@ -137,6 +139,8 @@ nftnl_expr_lookup_parse(struct nftnl_expr *e, struct nlattr *attr)
 	if (tb[NFTA_LOOKUP_SET]) {
 		lookup->set_name =
 			strdup(mnl_attr_get_str(tb[NFTA_LOOKUP_SET]));
+		if (!lookup->set_name)
+			return -1;
 		e->flags |= (1 << NFTNL_EXPR_LOOKUP_SET);
 	}
 	if (tb[NFTA_LOOKUP_SET_ID]) {

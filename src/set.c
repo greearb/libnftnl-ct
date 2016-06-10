@@ -294,10 +294,16 @@ struct nftnl_set *nftnl_set_clone(const struct nftnl_set *set)
 
 	memcpy(newset, set, sizeof(*set));
 
-	if (set->flags & (1 << NFTNL_SET_TABLE))
+	if (set->flags & (1 << NFTNL_SET_TABLE)) {
 		newset->table = strdup(set->table);
-	if (set->flags & (1 << NFTNL_SET_NAME))
+		if (!newset->table)
+			goto err;
+	}
+	if (set->flags & (1 << NFTNL_SET_NAME)) {
 		newset->name = strdup(set->name);
+		if (!newset->name)
+			goto err;
+	}
 
 	INIT_LIST_HEAD(&newset->element_list);
 	list_for_each_entry(elem, &set->element_list, head) {
@@ -440,11 +446,15 @@ int nftnl_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 	if (tb[NFTA_SET_TABLE]) {
 		xfree(s->table);
 		s->table = strdup(mnl_attr_get_str(tb[NFTA_SET_TABLE]));
+		if (!s->table)
+			return -1;
 		s->flags |= (1 << NFTNL_SET_TABLE);
 	}
 	if (tb[NFTA_SET_NAME]) {
 		xfree(s->name);
 		s->name = strdup(mnl_attr_get_str(tb[NFTA_SET_NAME]));
+		if (!s->name)
+			return -1;
 		s->flags |= (1 << NFTNL_SET_NAME);
 	}
 	if (tb[NFTA_SET_FLAGS]) {

@@ -47,6 +47,8 @@ nftnl_expr_immediate_set(struct nftnl_expr *e, uint16_t type,
 			xfree(imm->data.chain);
 
 		imm->data.chain = strdup(data);
+		if (!imm->data.chain)
+			return -1;
 		break;
 	default:
 		return -1;

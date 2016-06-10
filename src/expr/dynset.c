@@ -53,6 +53,8 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_DYNSET_SET_NAME:
 		dynset->set_name = strdup((const char *)data);
+		if (!dynset->set_name)
+			return -1;
 		break;
 	case NFTNL_EXPR_DYNSET_SET_ID:
 		dynset->set_id = *((uint32_t *)data);
@@ -183,6 +185,8 @@ nftnl_expr_dynset_parse(struct nftnl_expr *e, struct nlattr *attr)
 	if (tb[NFTA_DYNSET_SET_NAME]) {
 		dynset->set_name =
 			strdup(mnl_attr_get_str(tb[NFTA_DYNSET_SET_NAME]));
+		if (!dynset->set_name)
+			return -1;
 		e->flags |= (1 << NFTNL_EXPR_DYNSET_SET_NAME);
 	}
 	if (tb[NFTA_DYNSET_SET_ID]) {

@@ -455,6 +455,9 @@ nftnl_parse_verdict(union nftnl_data_reg *data, const struct nlattr *attr, int *
 			return -1;
 
 		data->chain = strdup(mnl_attr_get_str(tb[NFTA_VERDICT_CHAIN]));
+		if (!data->chain)
+			return -1;
+
 		if (type)
 			*type = DATA_CHAIN;
 		break;

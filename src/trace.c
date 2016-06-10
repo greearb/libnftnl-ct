@@ -296,8 +296,8 @@ static int nftnl_trace_parse_verdict_cb(const struct nlattr *attr, void *data)
 	return MNL_CB_OK;
 }
 
-static void
-nftnl_trace_parse_verdict(const struct nlattr *attr, struct nftnl_trace *t)
+static int nftnl_trace_parse_verdict(const struct nlattr *attr,
+				     struct nftnl_trace *t)
 {
 	struct nlattr *tb[NFTA_VERDICT_MAX+1];
 
@@ -315,13 +315,16 @@ nftnl_trace_parse_verdict(const struct nlattr *attr, struct nftnl_trace *t)
 		if (!tb[NFTA_VERDICT_CHAIN])
 			abi_breakage();
 		t->jump_target = strdup(mnl_attr_get_str(tb[NFTA_VERDICT_CHAIN]));
-		if (t->jump_target)
-			t->flags |= (1 << NFTNL_TRACE_JUMP_TARGET);
+		if (!t->jump_target)
+			return -1;
+
+		t->flags |= (1 << NFTNL_TRACE_JUMP_TARGET);
 		break;
 	}
+	return 0;
 }
-
 EXPORT_SYMBOL(nftnl_trace_nlmsg_parse);
+
 int nftnl_trace_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_trace *t)
 {
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
@@ -347,11 +350,17 @@ int nftnl_trace_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_trace *t)
 
 	if (tb[NFTA_TRACE_TABLE]) {
 		t->table = strdup(mnl_attr_get_str(tb[NFTA_TRACE_TABLE]));
+		if (!t->table)
+			return -1;
+
 		t->flags |= (1 << NFTNL_TRACE_TABLE);
 	}
 
 	if (tb[NFTA_TRACE_CHAIN]) {
 		t->chain = strdup(mnl_attr_get_str(tb[NFTA_TRACE_CHAIN]));
+		if (!t->chain)
+			return -1;
+
 		t->flags |= (1 << NFTNL_TRACE_CHAIN);
 	}
 
@@ -385,8 +394,9 @@ int nftnl_trace_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_trace *t)
 		t->flags |= (1 << NFTNL_TRACE_RULE_HANDLE);
 	}
 
-	if (tb[NFTA_TRACE_VERDICT])
-		nftnl_trace_parse_verdict(tb[NFTA_TRACE_VERDICT], t);
+	if (tb[NFTA_TRACE_VERDICT] &&
+	    nftnl_trace_parse_verdict(tb[NFTA_TRACE_VERDICT], t) < 0)
+		return -1;
 
 	if (nftnl_trace_nlmsg_parse_hdrdata(tb[NFTA_TRACE_LL_HEADER], &t->ll))
 		t->flags |= (1 << NFTNL_TRACE_LL_HEADER);

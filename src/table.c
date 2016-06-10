@@ -232,6 +232,8 @@ int nftnl_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_table *t)
 	if (tb[NFTA_TABLE_NAME]) {
 		xfree(t->name);
 		t->name = strdup(mnl_attr_get_str(tb[NFTA_TABLE_NAME]));
+		if (!t->name)
+			return -1;
 		t->flags |= (1 << NFTNL_TABLE_NAME);
 	}
 	if (tb[NFTA_TABLE_FLAGS]) {

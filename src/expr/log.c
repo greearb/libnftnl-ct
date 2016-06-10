@@ -41,6 +41,8 @@ static int nftnl_expr_log_set(struct nftnl_expr *e, uint16_t type,
 			xfree(log->prefix);
 
 		log->prefix = strdup(data);
+		if (!log->prefix)
+			return -1;
 		break;
 	case NFTNL_EXPR_LOG_GROUP:
 		log->group = *((uint16_t *)data);
@@ -155,6 +157,8 @@ nftnl_expr_log_parse(struct nftnl_expr *e, struct nlattr *attr)
 			xfree(log->prefix);
 
 		log->prefix = strdup(mnl_attr_get_str(tb[NFTA_LOG_PREFIX]));
+		if (!log->prefix)
+			return -1;
 		e->flags |= (1 << NFTNL_EXPR_LOG_PREFIX);
 	}
 	if (tb[NFTA_LOG_GROUP]) {

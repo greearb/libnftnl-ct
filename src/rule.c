@@ -441,11 +441,15 @@ int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *r)
 	if (tb[NFTA_RULE_TABLE]) {
 		xfree(r->table);
 		r->table = strdup(mnl_attr_get_str(tb[NFTA_RULE_TABLE]));
+		if (!r->table)
+			return -1;
 		r->flags |= (1 << NFTNL_RULE_TABLE);
 	}
 	if (tb[NFTA_RULE_CHAIN]) {
 		xfree(r->chain);
 		r->chain = strdup(mnl_attr_get_str(tb[NFTA_RULE_CHAIN]));
+		if (!r->chain)
+			return -1;
 		r->flags |= (1 << NFTNL_RULE_CHAIN);
 	}
 	if (tb[NFTA_RULE_HANDLE]) {

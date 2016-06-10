@@ -519,6 +519,8 @@ static int nftnl_chain_parse_hook(struct nlattr *attr, struct nftnl_chain *c)
 	}
 	if (tb[NFTA_HOOK_DEV]) {
 		c->dev = strdup(mnl_attr_get_str(tb[NFTA_HOOK_DEV]));
+		if (!c->dev)
+			return -1;
 		c->flags |= (1 << NFTNL_CHAIN_DEV);
 	}
 
@@ -542,6 +544,8 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 	if (tb[NFTA_CHAIN_TABLE]) {
 		xfree(c->table);
 		c->table = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_TABLE]));
+		if (!c->table)
+			return -1;
 		c->flags |= (1 << NFTNL_CHAIN_TABLE);
 	}
 	if (tb[NFTA_CHAIN_HOOK]) {
@@ -569,6 +573,8 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 	if (tb[NFTA_CHAIN_TYPE]) {
 		xfree(c->type);
 		c->type = strdup(mnl_attr_get_str(tb[NFTA_CHAIN_TYPE]));
+		if (!c->type)
+			return -1;
 		c->flags |= (1 << NFTNL_CHAIN_TYPE);
 	}
 

@@ -118,6 +118,8 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 			xfree(s->data.chain);
 
 		s->data.chain = strdup(data);
+		if (!s->data.chain)
+			return -1;
 		break;
 	case NFTNL_SET_ELEM_DATA:	/* NFTA_SET_ELEM_DATA */
 		memcpy(s->data.val, data, data_len);
@@ -226,10 +228,16 @@ struct nftnl_set_elem *nftnl_set_elem_clone(struct nftnl_set_elem *elem)
 
 	memcpy(newelem, elem, sizeof(*elem));
 
-	if (elem->flags & (1 << NFTNL_SET_ELEM_CHAIN))
+	if (elem->flags & (1 << NFTNL_SET_ELEM_CHAIN)) {
 		newelem->data.chain = strdup(elem->data.chain);
+		if (!newelem->data.chain)
+			goto err;
+	}
 
 	return newelem;
+err:
+	nftnl_set_elem_free(newelem);
+	return NULL;
 }
 
 void nftnl_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
@@ -475,12 +483,16 @@ int nftnl_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		xfree(s->table);
 		s->table =
 			strdup(mnl_attr_get_str(tb[NFTA_SET_ELEM_LIST_TABLE]));
+		if (!s->table)
+			return -1;
 		s->flags |= (1 << NFTNL_SET_TABLE);
 	}
 	if (tb[NFTA_SET_ELEM_LIST_SET]) {
 		xfree(s->name);
 		s->name =
 			strdup(mnl_attr_get_str(tb[NFTA_SET_ELEM_LIST_SET]));
+		if (!s->name)
+			return -1;
 		s->flags |= (1 << NFTNL_SET_NAME);
 	}
 	if (tb[NFTA_SET_ELEM_LIST_SET_ID]) {
