@@ -132,9 +132,7 @@ static uint32_t nftnl_rule_validate[NFTNL_RULE_MAX + 1] = {
 void nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 			    const void *data, uint32_t data_len)
 {
-	if (attr > NFTNL_RULE_MAX)
-		return;
-
+	nftnl_assert_attr_exists(attr, NFTNL_RULE_MAX);
 	nftnl_assert_validate(data, nftnl_rule_validate, attr, data_len);
 
 	switch(attr) {

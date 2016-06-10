@@ -269,6 +269,14 @@ out:
 	return ret;
 }
 
+void __nftnl_assert_attr_exists(uint16_t attr, uint16_t attr_max,
+				const char *filename, int line)
+{
+	fprintf(stderr, "libnftnl: attribute %d > %d (maximum) assertion failed in %s:%d\n",
+		attr, attr_max, filename, line);
+	exit(EXIT_FAILURE);
+}
+
 void __nftnl_assert_fail(uint16_t attr, const char *filename, int line)
 {
 	fprintf(stderr, "libnftnl: attribute %d assertion failed in %s:%d\n",

@@ -43,6 +43,15 @@ void __nftnl_assert_fail(uint16_t attr, const char *filename, int line);
 		nftnl_assert(data, attr, _validate_array[_attr] == _data_len);	\
 })
 
+void __nftnl_assert_attr_exists(uint16_t attr, uint16_t attr_max,
+				const char *filename, int line);
+
+#define nftnl_assert_attr_exists(_attr, _attr_max)					\
+({											\
+	if (_attr > _attr_max)								\
+		__nftnl_assert_attr_exists(_attr, _attr_max, __FILE__, __LINE__);	\
+})
+
 #define SNPRINTF_BUFFER_SIZE(ret, size, len, offset)	\
 	if (ret < 0)					\
 		return ret;				\
