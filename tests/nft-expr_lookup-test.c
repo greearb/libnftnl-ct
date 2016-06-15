@@ -30,18 +30,15 @@ static void print_err(const char *msg)
 static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
 			      struct nftnl_expr *rule_b)
 {
-	uint32_t data_lena, data_lenb;
-
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_LOOKUP_SREG) !=
 	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOPUP_SREG))
 		print_err("Expr NFTNL_EXPR_LOOkUP_SREG mismatches");
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_LOOKUP_DREG) !=
 	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOPUP_DREG))
 		print_err("Expr NFTNL_EXPR_LOOkUP_DREG mismatches");
-	nftnl_expr_get(rule_a, NFTNL_EXPR_LOOKUP_SET, &data_lena);
-	nftnl_expr_get(rule_b, NFTNL_EXPR_LOOKUP_SET, &data_lenb);
-	if (data_lena != data_lenb)
-		print_err("Expr NFTNL_EXPR_LOOKUP_SET size mismatches");
+	if (strcmp(nftnl_expr_get_str(rule_a, NFTNL_EXPR_LOOKUP_SET),
+		   nftnl_expr_get_str(rule_b, NFTNL_EXPR_LOOKUP_SET)))
+		print_err("Expr NFTNL_EXPR_LOOKUP_SET mismatches");
 }
 
 int main(int argc, char *argv[])
