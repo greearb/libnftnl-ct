@@ -219,7 +219,7 @@ int nftnl_chain_set_data(struct nftnl_chain *c, uint16_t attr,
 			xfree(c->dev);
 
 		c->dev = strdup(data);
-		if (!c->type)
+		if (!c->dev)
 			return -1;
 		break;
 	}
