@@ -345,16 +345,15 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 {
 	struct nlattr *tb[NFTA_SET_ELEM_MAX+1] = {};
 	struct nftnl_set_elem *e;
-	int ret = 0, type;
+	int ret, type;
 
 	e = nftnl_set_elem_alloc();
 	if (e == NULL)
 		return -1;
 
-	if (mnl_attr_parse_nested(nest, nftnl_set_elem_parse_attr_cb, tb) < 0) {
-		nftnl_set_elem_free(e);
-		return -1;
-	}
+	ret = mnl_attr_parse_nested(nest, nftnl_set_elem_parse_attr_cb, tb);
+	if (ret < 0)
+		goto out_set_elem;
 
 	if (tb[NFTA_SET_ELEM_FLAGS]) {
 		e->set_elem_flags =
@@ -371,10 +370,14 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 	}
         if (tb[NFTA_SET_ELEM_KEY]) {
 		ret = nftnl_parse_data(&e->key, tb[NFTA_SET_ELEM_KEY], &type);
+		if (ret < 0)
+			goto out_set_elem;
 		e->flags |= (1 << NFTNL_SET_ELEM_KEY);
         }
         if (tb[NFTA_SET_ELEM_DATA]) {
 		ret = nftnl_parse_data(&e->data, tb[NFTA_SET_ELEM_DATA], &type);
+		if (ret < 0)
+			goto out_set_elem;
 		switch(type) {
 		case DATA_VERDICT:
 			e->flags |= (1 << NFTNL_SET_ELEM_VERDICT);
@@ -391,7 +394,7 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 	if (tb[NFTA_SET_ELEM_EXPR]) {
 		e->expr = nftnl_expr_parse(tb[NFTA_SET_ELEM_EXPR]);
 		if (e->expr == NULL)
-			goto err;
+			goto out_set_elem;
 		e->flags |= (1 << NFTNL_SET_ELEM_EXPR);
 	}
 	if (tb[NFTA_SET_ELEM_USERDATA]) {
@@ -404,20 +407,19 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 		e->user.len  = mnl_attr_get_payload_len(tb[NFTA_SET_ELEM_USERDATA]);
 		e->user.data = malloc(e->user.len);
 		if (e->user.data == NULL)
-			goto err;
+			goto out_expr;
 		memcpy(e->user.data, udata, e->user.len);
 		e->flags |= (1 << NFTNL_RULE_USERDATA);
-	}
-
-	if (ret < 0) {
-err:
-		nftnl_set_elem_free(e);
-		return -1;
 	}
 
 	/* Add this new element to this set */
 	list_add_tail(&e->head, &s->element_list);
 
+	return 0;
+out_expr:
+	nftnl_expr_free(e->expr);
+out_set_elem:
+	nftnl_set_elem_free(e);
 	return ret;
 }
 
@@ -449,13 +451,15 @@ nftnl_set_elem_list_parse_attr_cb(const struct nlattr *attr, void *data)
 static int nftnl_set_elems_parse(struct nftnl_set *s, const struct nlattr *nest)
 {
 	struct nlattr *attr;
-	int ret = 0;
+	int ret;
 
 	mnl_attr_for_each_nested(attr, nest) {
 		if (mnl_attr_get_type(attr) != NFTA_LIST_ELEM)
 			return -1;
 
 		ret = nftnl_set_elems_parse2(s, attr);
+		if (ret < 0)
+			return ret;
 	}
 	return ret;
 }
@@ -464,7 +468,7 @@ int nftnl_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 {
 	struct nlattr *tb[NFTA_SET_ELEM_LIST_MAX+1] = {};
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
-	int ret = 0;
+	int ret;
 
 	if (mnl_attr_parse(nlh, sizeof(*nfg),
 			   nftnl_set_elem_list_parse_attr_cb, tb) < 0)
@@ -492,13 +496,16 @@ int nftnl_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		s->id = ntohl(mnl_attr_get_u32(tb[NFTA_SET_ELEM_LIST_SET_ID]));
 		s->flags |= (1 << NFTNL_SET_ID);
 	}
-        if (tb[NFTA_SET_ELEM_LIST_ELEMENTS])
+        if (tb[NFTA_SET_ELEM_LIST_ELEMENTS]) {
 	 	ret = nftnl_set_elems_parse(s, tb[NFTA_SET_ELEM_LIST_ELEMENTS]);
+		if (ret < 0)
+			return ret;
+	}
 
 	s->family = nfg->nfgen_family;
 	s->flags |= (1 << NFTNL_SET_FAMILY);
 
-	return ret;
+	return 0;
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_elems_nlmsg_parse, nft_set_elems_nlmsg_parse);
 

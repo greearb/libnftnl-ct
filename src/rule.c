@@ -427,7 +427,7 @@ int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *r)
 {
 	struct nlattr *tb[NFTA_RULE_MAX+1] = {};
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
-	int ret = 0;
+	int ret;
 
 	if (mnl_attr_parse(nlh, sizeof(*nfg), nftnl_rule_parse_attr_cb, tb) < 0)
 		return -1;
@@ -452,10 +452,16 @@ int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *r)
 		r->handle = be64toh(mnl_attr_get_u64(tb[NFTA_RULE_HANDLE]));
 		r->flags |= (1 << NFTNL_RULE_HANDLE);
 	}
-	if (tb[NFTA_RULE_EXPRESSIONS])
+	if (tb[NFTA_RULE_EXPRESSIONS]) {
 		ret = nftnl_rule_parse_expr(tb[NFTA_RULE_EXPRESSIONS], r);
-	if (tb[NFTA_RULE_COMPAT])
+		if (ret < 0)
+			return ret;
+	}
+	if (tb[NFTA_RULE_COMPAT]) {
 		ret = nftnl_rule_parse_compat(tb[NFTA_RULE_COMPAT], r);
+		if (ret < 0)
+			return ret;
+	}
 	if (tb[NFTA_RULE_POSITION]) {
 		r->position = be64toh(mnl_attr_get_u64(tb[NFTA_RULE_POSITION]));
 		r->flags |= (1 << NFTNL_RULE_POSITION);
@@ -480,7 +486,7 @@ int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *r)
 	r->family = nfg->nfgen_family;
 	r->flags |= (1 << NFTNL_RULE_FAMILY);
 
-	return ret;
+	return 0;
 }
 EXPORT_SYMBOL_ALIAS(nftnl_rule_nlmsg_parse, nft_rule_nlmsg_parse);
 

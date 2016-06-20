@@ -433,7 +433,7 @@ int nftnl_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 {
 	struct nlattr *tb[NFTA_SET_MAX+1] = {};
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
-	int ret = 0;
+	int ret;
 
 	if (mnl_attr_parse(nlh, sizeof(*nfg), nftnl_set_parse_attr_cb, tb) < 0)
 		return -1;
@@ -490,13 +490,16 @@ int nftnl_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		s->gc_interval = ntohl(mnl_attr_get_u32(tb[NFTA_SET_GC_INTERVAL]));
 		s->flags |= (1 << NFTNL_SET_GC_INTERVAL);
 	}
-	if (tb[NFTA_SET_DESC])
+	if (tb[NFTA_SET_DESC]) {
 		ret = nftnl_set_desc_parse(s, tb[NFTA_SET_DESC]);
+		if (ret < 0)
+			return ret;
+	}
 
 	s->family = nfg->nfgen_family;
 	s->flags |= (1 << NFTNL_SET_FAMILY);
 
-	return ret;
+	return 0;
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_nlmsg_parse, nft_set_nlmsg_parse);
 
