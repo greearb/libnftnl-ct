@@ -393,8 +393,10 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
         }
 	if (tb[NFTA_SET_ELEM_EXPR]) {
 		e->expr = nftnl_expr_parse(tb[NFTA_SET_ELEM_EXPR]);
-		if (e->expr == NULL)
+		if (e->expr == NULL) {
+			ret = -1;
 			goto out_set_elem;
+		}
 		e->flags |= (1 << NFTNL_SET_ELEM_EXPR);
 	}
 	if (tb[NFTA_SET_ELEM_USERDATA]) {
@@ -406,8 +408,10 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 
 		e->user.len  = mnl_attr_get_payload_len(tb[NFTA_SET_ELEM_USERDATA]);
 		e->user.data = malloc(e->user.len);
-		if (e->user.data == NULL)
+		if (e->user.data == NULL) {
+			ret = -1;
 			goto out_expr;
+		}
 		memcpy(e->user.data, udata, e->user.len);
 		e->flags |= (1 << NFTNL_RULE_USERDATA);
 	}
