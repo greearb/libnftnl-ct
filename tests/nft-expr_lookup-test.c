@@ -39,6 +39,9 @@ static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
 	if (strcmp(nftnl_expr_get_str(rule_a, NFTNL_EXPR_LOOKUP_SET),
 		   nftnl_expr_get_str(rule_b, NFTNL_EXPR_LOOKUP_SET)))
 		print_err("Expr NFTNL_EXPR_LOOKUP_SET mismatches");
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_LOOKUP_FLAGS) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOPUP_FLAGS))
+		print_err("Expr NFTNL_EXPR_LOOkUP_FLAGS mismatches");
 }
 
 int main(int argc, char *argv[])
@@ -63,6 +66,7 @@ int main(int argc, char *argv[])
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOOKUP_DREG, 0x78123456);
 	nftnl_expr_set(ex, NFTNL_EXPR_LOOKUP_SET, &lookup_set,
 			  sizeof(lookup_set));
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOOKUP_FLAGS, 0x12345678);
 
 	nftnl_rule_add_expr(a, ex);
 
