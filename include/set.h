@@ -14,6 +14,10 @@ struct nftnl_set {
 	uint32_t		key_len;
 	uint32_t		data_type;
 	uint32_t		data_len;
+	struct {
+		void		*data;
+		uint32_t	len;
+	} user;
 	uint32_t		id;
 	enum nft_set_policies	policy;
 	struct {
