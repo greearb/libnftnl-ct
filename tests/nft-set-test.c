@@ -47,6 +47,9 @@ static void cmp_nftnl_set(struct nftnl_set *a, struct nftnl_set *b)
 	if (nftnl_set_get_u32(a, NFTNL_SET_DATA_LEN) !=
 	    nftnl_set_get_u32(b, NFTNL_SET_DATA_LEN))
 		print_err("Set data-len mismatches");
+	if (strcmp(nftnl_set_get_str(a, NFTNL_SET_USERDATA),
+		   nftnl_set_get_str(b, NFTNL_SET_USERDATA)) != 0)
+		print_err("Set userdata mismatches");
 }
 
 int main(int argc, char *argv[])
@@ -68,6 +71,7 @@ int main(int argc, char *argv[])
 	nftnl_set_set_u32(a, NFTNL_SET_DATA_TYPE, 0x12345678);
 	nftnl_set_set_u32(a, NFTNL_SET_DATA_LEN, 0x12345678);
 	nftnl_set_set_u32(a, NFTNL_SET_FAMILY, 0x12345678);
+	nftnl_set_set_str(a, NFTNL_SET_USERDATA, "testing user data");
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
 	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_NEWSET, AF_INET, 0, 1234);
