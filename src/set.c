@@ -203,7 +203,7 @@ EXPORT_SYMBOL_ALIAS(nftnl_set_set_u64, nft_set_attr_set_u64);
 
 int nftnl_set_set_str(struct nftnl_set *s, uint16_t attr, const char *str)
 {
-	return nftnl_set_set(s, attr, str);
+	return nftnl_set_set_data(s, attr, str, strlen(str) + 1);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_set_str, nft_set_attr_set_str);
 

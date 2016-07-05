@@ -131,7 +131,7 @@ EXPORT_SYMBOL_ALIAS(nftnl_table_set_u8, nft_table_attr_set_u8);
 
 int nftnl_table_set_str(struct nftnl_table *t, uint16_t attr, const char *str)
 {
-	return nftnl_table_set_data(t, attr, str, 0);
+	return nftnl_table_set_data(t, attr, str, strlen(str) + 1);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_table_set_str, nft_table_attr_set_str);
 
