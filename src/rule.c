@@ -213,8 +213,10 @@ const void *nftnl_rule_get_data(const struct nftnl_rule *r, uint16_t attr,
 		*data_len = sizeof(uint32_t);
 		return &r->family;
 	case NFTNL_RULE_TABLE:
+		*data_len = strlen(r->table) + 1;
 		return r->table;
 	case NFTNL_RULE_CHAIN:
+		*data_len = strlen(r->chain) + 1;
 		return r->chain;
 	case NFTNL_RULE_HANDLE:
 		*data_len = sizeof(uint64_t);

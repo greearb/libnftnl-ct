@@ -215,8 +215,10 @@ const void *nftnl_set_get_data(const struct nftnl_set *s, uint16_t attr,
 
 	switch(attr) {
 	case NFTNL_SET_TABLE:
+		*data_len = strlen(s->table) + 1;
 		return s->table;
 	case NFTNL_SET_NAME:
+		*data_len = strlen(s->name) + 1;
 		return s->name;
 	case NFTNL_SET_FLAGS:
 		*data_len = sizeof(uint32_t);

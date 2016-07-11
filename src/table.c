@@ -143,6 +143,7 @@ const void *nftnl_table_get_data(const struct nftnl_table *t, uint16_t attr,
 
 	switch(attr) {
 	case NFTNL_TABLE_NAME:
+		*data_len = strlen(t->name) + 1;
 		return t->name;
 	case NFTNL_TABLE_FLAGS:
 		*data_len = sizeof(uint32_t);

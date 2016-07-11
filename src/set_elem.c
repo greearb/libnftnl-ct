@@ -160,25 +160,31 @@ const void *nftnl_set_elem_get(struct nftnl_set_elem *s, uint16_t attr, uint32_t
 
 	switch(attr) {
 	case NFTNL_SET_ELEM_FLAGS:
+		*data_len = sizeof(s->set_elem_flags);
 		return &s->set_elem_flags;
 	case NFTNL_SET_ELEM_KEY:	/* NFTA_SET_ELEM_KEY */
 		*data_len = s->key.len;
 		return &s->key.val;
 	case NFTNL_SET_ELEM_VERDICT:	/* NFTA_SET_ELEM_DATA */
+		*data_len = sizeof(s->data.verdict);
 		return &s->data.verdict;
 	case NFTNL_SET_ELEM_CHAIN:	/* NFTA_SET_ELEM_DATA */
+		*data_len = strlen(s->data.chain) + 1;
 		return s->data.chain;
 	case NFTNL_SET_ELEM_DATA:	/* NFTA_SET_ELEM_DATA */
 		*data_len = s->data.len;
 		return &s->data.val;
 	case NFTNL_SET_ELEM_TIMEOUT:	/* NFTA_SET_ELEM_TIMEOUT */
+		*data_len = sizeof(s->timeout);
 		return &s->timeout;
 	case NFTNL_SET_ELEM_EXPIRATION:	/* NFTA_SET_ELEM_EXPIRATION */
+		*data_len = sizeof(s->expiration);
 		return &s->expiration;
 	case NFTNL_SET_ELEM_USERDATA:
 		*data_len = s->user.len;
 		return s->user.data;
 	case NFTNL_SET_ELEM_EXPR:
+		*data_len = 0;
 		return s->expr;
 	}
 	return NULL;

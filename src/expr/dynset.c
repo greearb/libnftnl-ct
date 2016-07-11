@@ -88,10 +88,13 @@ nftnl_expr_dynset_get(const struct nftnl_expr *e, uint16_t type,
 		*data_len = sizeof(dynset->timeout);
 		return &dynset->timeout;
 	case NFTNL_EXPR_DYNSET_SET_NAME:
+		*data_len = strlen(dynset->set_name) + 1;
 		return dynset->set_name;
 	case NFTNL_EXPR_DYNSET_SET_ID:
+		*data_len = sizeof(dynset->set_id);
 		return &dynset->set_id;
 	case NFTNL_EXPR_DYNSET_EXPR:
+		*data_len = 0;
 		return dynset->expr;
 	}
 	return NULL;

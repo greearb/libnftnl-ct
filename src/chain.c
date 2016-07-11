@@ -272,8 +272,10 @@ const void *nftnl_chain_get_data(const struct nftnl_chain *c, uint16_t attr,
 
 	switch(attr) {
 	case NFTNL_CHAIN_NAME:
+		*data_len = strlen(c->name) + 1;
 		return c->name;
 	case NFTNL_CHAIN_TABLE:
+		*data_len = strlen(c->table) + 1;
 		return c->table;
 	case NFTNL_CHAIN_HOOKNUM:
 		*data_len = sizeof(uint32_t);
@@ -303,6 +305,7 @@ const void *nftnl_chain_get_data(const struct nftnl_chain *c, uint16_t attr,
 		*data_len = sizeof(uint32_t);
 		return c->type;
 	case NFTNL_CHAIN_DEV:
+		*data_len = strlen(c->dev) + 1;
 		return c->dev;
 	}
 	return NULL;

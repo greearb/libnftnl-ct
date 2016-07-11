@@ -165,13 +165,13 @@ const void *nftnl_trace_get_data(const struct nftnl_trace *trace,
 		*data_len = sizeof(uint32_t);
 		return &trace->type;
 	case NFTNL_TRACE_CHAIN:
-		*data_len = strlen(trace->chain);
+		*data_len = strlen(trace->chain) + 1;
 		return trace->chain;
 	case NFTNL_TRACE_TABLE:
-		*data_len = strlen(trace->table);
+		*data_len = strlen(trace->table) + 1;
 		return trace->table;
 	case NFTNL_TRACE_JUMP_TARGET:
-		*data_len = strlen(trace->jump_target);
+		*data_len = strlen(trace->jump_target) + 1;
 		return trace->jump_target;
 	case NFTNL_TRACE_TRANSPORT_HEADER:
 		*data_len = trace->th.len;

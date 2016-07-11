@@ -100,6 +100,7 @@ const void *nftnl_gen_get_data(const struct nftnl_gen *gen, uint16_t attr,
 
 	switch(attr) {
 	case NFTNL_GEN_ID:
+		*data_len = sizeof(gen->id);
 		return &gen->id;
 	}
 	return NULL;

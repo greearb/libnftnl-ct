@@ -73,10 +73,13 @@ nftnl_expr_lookup_get(const struct nftnl_expr *e, uint16_t type,
 		*data_len = sizeof(lookup->dreg);
 		return &lookup->dreg;
 	case NFTNL_EXPR_LOOKUP_SET:
+		*data_len = strlen(lookup->set_name) + 1;
 		return lookup->set_name;
 	case NFTNL_EXPR_LOOKUP_SET_ID:
+		*data_len = sizeof(lookup->set_id);
 		return &lookup->set_id;
 	case NFTNL_EXPR_LOOKUP_FLAGS:
+		*data_len = sizeof(lookup->flags);
 		return &lookup->flags;
 	}
 	return NULL;

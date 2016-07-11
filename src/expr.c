@@ -119,6 +119,7 @@ const void *nftnl_expr_get(const struct nftnl_expr *expr,
 
 	switch(type) {
 	case NFTNL_EXPR_NAME:
+		*data_len = strlen(expr->ops->name) + 1;
 		ret = expr->ops->name;
 		break;
 	default:
