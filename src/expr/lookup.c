@@ -264,8 +264,10 @@ nftnl_expr_lookup_snprintf_default(char *buf, size_t size,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf + offset, len, "0x%x ", l->flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_FLAGS)) {
+		ret = snprintf(buf + offset, len, "0x%x ", l->flags);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	return offset;
 }
