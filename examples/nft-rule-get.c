@@ -46,17 +46,43 @@ err:
 	return MNL_CB_OK;
 }
 
+static struct nftnl_rule *setup_rule(uint8_t family, const char *table,
+				     const char *chain, const char *handle)
+{
+	struct nftnl_rule *r;
+	uint64_t handle_num;
+
+	r = nftnl_rule_alloc();
+	if (r == NULL)
+		return NULL;
+
+	if (table != NULL)
+		nftnl_rule_set_str(r, NFTNL_RULE_TABLE, table);
+	if (chain != NULL)
+		nftnl_rule_set_str(r, NFTNL_RULE_CHAIN, chain);
+
+	nftnl_rule_set_u32(r, NFTNL_RULE_FAMILY, family);
+
+	if (handle != NULL) {
+		handle_num = atoll(handle);
+		nftnl_rule_set_u64(r, NFTNL_RULE_POSITION, handle_num);
+	}
+
+	return r;
+}
+
 int main(int argc, char *argv[])
 {
 	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, type = NFTNL_OUTPUT_DEFAULT;
-	struct nftnl_rule *t = NULL;
+	const char *table = NULL, *chain = NULL;
+	struct nftnl_rule *r;
 	int ret, family;
 
-	if (argc < 2 || argc > 3) {
-		fprintf(stderr, "Usage: %s <family> [xml|json]\n",
+	if (argc < 2 || argc > 5) {
+		fprintf(stderr, "Usage: %s <family> [<table> <chain>] [xml|json]\n",
 			argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -76,24 +102,30 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (argc == 3) {
-		if (strcmp(argv[2], "xml") == 0)
+	/* [xml|json] specified */
+	if (argc == 3 || argc == 5) {
+		if (strcmp(argv[argc - 1], "xml") == 0)
 			type = NFTNL_OUTPUT_XML;
-		else if (strcmp(argv[2], "json") == 0)
+		else if (strcmp(argv[argc - 1], "json") == 0)
 			type = NFTNL_OUTPUT_JSON;
 	}
 
-	/* XXX requires table, chain and handle attributes for selective get */
-
-	t = nftnl_rule_alloc();
-	if (t == NULL) {
-		perror("OOM");
-		exit(EXIT_FAILURE);
+	/* at least [<table> <chain>] specified */
+	if (argc >= 4) {
+		table = argv[2];
+		chain = argv[3];
 	}
 
 	seq = time(NULL);
 	nlh = nftnl_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
-					NLM_F_DUMP, seq);
+					 NLM_F_DUMP, seq);
+
+	r = setup_rule(family, table, chain, NULL);
+	if (!r) {
+		perror("setup_rule");
+		exit(EXIT_FAILURE);
+	}
+	nftnl_rule_nlmsg_build_payload(nlh, r);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
