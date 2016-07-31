@@ -94,7 +94,6 @@ nftnl_expr_dynset_get(const struct nftnl_expr *e, uint16_t type,
 		*data_len = sizeof(dynset->set_id);
 		return &dynset->set_id;
 	case NFTNL_EXPR_DYNSET_EXPR:
-		*data_len = 0;
 		return dynset->expr;
 	}
 	return NULL;

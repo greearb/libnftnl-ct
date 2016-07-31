@@ -184,7 +184,6 @@ const void *nftnl_set_elem_get(struct nftnl_set_elem *s, uint16_t attr, uint32_t
 		*data_len = s->user.len;
 		return s->user.data;
 	case NFTNL_SET_ELEM_EXPR:
-		*data_len = 0;
 		return s->expr;
 	}
 	return NULL;
