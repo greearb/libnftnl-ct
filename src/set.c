@@ -1175,11 +1175,12 @@ int nftnl_set_list_foreach(struct nftnl_set_list *set_list,
 EXPORT_SYMBOL_ALIAS(nftnl_set_list_foreach, nft_set_list_foreach);
 
 struct nftnl_set_list_iter {
-	struct nftnl_set_list	*list;
+	const struct nftnl_set_list	*list;
 	struct nftnl_set		*cur;
 };
 
-struct nftnl_set_list_iter *nftnl_set_list_iter_create(struct nftnl_set_list *l)
+struct nftnl_set_list_iter *
+nftnl_set_list_iter_create(const struct nftnl_set_list *l)
 {
 	struct nftnl_set_list_iter *iter;
 
@@ -1197,7 +1198,8 @@ struct nftnl_set_list_iter *nftnl_set_list_iter_create(struct nftnl_set_list *l)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_list_iter_create, nft_set_list_iter_create);
 
-struct nftnl_set *nftnl_set_list_iter_cur(struct nftnl_set_list_iter *iter)
+struct nftnl_set *
+nftnl_set_list_iter_cur(const struct nftnl_set_list_iter *iter)
 {
 	return iter->cur;
 }

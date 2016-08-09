@@ -81,7 +81,7 @@ void nftnl_chain_list_del(struct nftnl_chain *c);
 
 struct nftnl_chain_list_iter;
 
-struct nftnl_chain_list_iter *nftnl_chain_list_iter_create(struct nftnl_chain_list *l);
+struct nftnl_chain_list_iter *nftnl_chain_list_iter_create(const struct nftnl_chain_list *l);
 struct nftnl_chain *nftnl_chain_list_iter_next(struct nftnl_chain_list_iter *iter);
 void nftnl_chain_list_iter_destroy(struct nftnl_chain_list_iter *iter);
 
@@ -158,7 +158,7 @@ void nft_chain_list_del(struct nft_chain *c);
 
 struct nft_chain_list_iter;
 
-struct nft_chain_list_iter *nft_chain_list_iter_create(struct nft_chain_list *l);
+struct nft_chain_list_iter *nft_chain_list_iter_create(const struct nft_chain_list *l);
 struct nft_chain *nft_chain_list_iter_next(struct nft_chain_list_iter *iter);
 void nft_chain_list_iter_destroy(struct nft_chain_list_iter *iter);
 

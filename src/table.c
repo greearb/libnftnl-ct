@@ -544,11 +544,12 @@ int nftnl_table_list_foreach(struct nftnl_table_list *table_list,
 EXPORT_SYMBOL_ALIAS(nftnl_table_list_foreach, nft_table_list_foreach);
 
 struct nftnl_table_list_iter {
-	struct nftnl_table_list	*list;
-	struct nftnl_table	*cur;
+	const struct nftnl_table_list	*list;
+	struct nftnl_table		*cur;
 };
 
-struct nftnl_table_list_iter *nftnl_table_list_iter_create(struct nftnl_table_list *l)
+struct nftnl_table_list_iter *
+nftnl_table_list_iter_create(const struct nftnl_table_list *l)
 {
 	struct nftnl_table_list_iter *iter;
 

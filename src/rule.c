@@ -1026,11 +1026,11 @@ int nftnl_expr_foreach(struct nftnl_rule *r,
 EXPORT_SYMBOL_ALIAS(nftnl_expr_foreach, nft_rule_expr_foreach);
 
 struct nftnl_expr_iter {
-	struct nftnl_rule		*r;
+	const struct nftnl_rule	*r;
 	struct nftnl_expr	*cur;
 };
 
-struct nftnl_expr_iter *nftnl_expr_iter_create(struct nftnl_rule *r)
+struct nftnl_expr_iter *nftnl_expr_iter_create(const struct nftnl_rule *r)
 {
 	struct nftnl_expr_iter *iter;
 
@@ -1142,11 +1142,12 @@ int nftnl_rule_list_foreach(struct nftnl_rule_list *rule_list,
 EXPORT_SYMBOL_ALIAS(nftnl_rule_list_foreach, nft_rule_list_foreach);
 
 struct nftnl_rule_list_iter {
-	struct nftnl_rule_list	*list;
+	const struct nftnl_rule_list	*list;
 	struct nftnl_rule		*cur;
 };
 
-struct nftnl_rule_list_iter *nftnl_rule_list_iter_create(struct nftnl_rule_list *l)
+struct nftnl_rule_list_iter *
+nftnl_rule_list_iter_create(const struct nftnl_rule_list *l)
 {
 	struct nftnl_rule_list_iter *iter;
 

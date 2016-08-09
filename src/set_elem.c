@@ -274,7 +274,7 @@ void nftnl_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 }
 
 static void nftnl_set_elem_nlmsg_build_def(struct nlmsghdr *nlh,
-					 struct nftnl_set *s)
+					   const struct nftnl_set *s)
 {
 	if (s->flags & (1 << NFTNL_SET_NAME))
 		mnl_attr_put_strz(nlh, NFTA_SET_ELEM_LIST_SET, s->name);
@@ -840,12 +840,13 @@ int nftnl_set_elem_foreach(struct nftnl_set *s,
 EXPORT_SYMBOL_ALIAS(nftnl_set_elem_foreach, nft_set_elem_foreach);
 
 struct nftnl_set_elems_iter {
-	struct nftnl_set			*set;
-	struct list_head		*list;
+	const struct nftnl_set		*set;
+	const struct list_head		*list;
 	struct nftnl_set_elem		*cur;
 };
 
-struct nftnl_set_elems_iter *nftnl_set_elems_iter_create(struct nftnl_set *s)
+struct nftnl_set_elems_iter *
+nftnl_set_elems_iter_create(const struct nftnl_set *s)
 {
 	struct nftnl_set_elems_iter *iter;
 
@@ -865,7 +866,8 @@ struct nftnl_set_elems_iter *nftnl_set_elems_iter_create(struct nftnl_set *s)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_elems_iter_create, nft_set_elems_iter_create);
 
-struct nftnl_set_elem *nftnl_set_elems_iter_cur(struct nftnl_set_elems_iter *iter)
+struct nftnl_set_elem *
+nftnl_set_elems_iter_cur(const struct nftnl_set_elems_iter *iter)
 {
 	return iter->cur;
 }

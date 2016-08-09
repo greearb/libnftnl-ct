@@ -69,7 +69,7 @@ void nftnl_table_list_del(struct nftnl_table *r);
 
 struct nftnl_table_list_iter;
 
-struct nftnl_table_list_iter *nftnl_table_list_iter_create(struct nftnl_table_list *l);
+struct nftnl_table_list_iter *nftnl_table_list_iter_create(const struct nftnl_table_list *l);
 struct nftnl_table *nftnl_table_list_iter_next(struct nftnl_table_list_iter *iter);
 void nftnl_table_list_iter_destroy(const struct nftnl_table_list_iter *iter);
 
@@ -134,7 +134,7 @@ void nft_table_list_del(struct nft_table *r);
 
 struct nft_table_list_iter;
 
-struct nft_table_list_iter *nft_table_list_iter_create(struct nft_table_list *l);
+struct nft_table_list_iter *nft_table_list_iter_create(const struct nft_table_list *l);
 struct nft_table *nft_table_list_iter_next(struct nft_table_list_iter *iter);
 void nft_table_list_iter_destroy(struct nft_table_list_iter *iter);
 

@@ -1039,11 +1039,12 @@ int nftnl_chain_list_foreach(struct nftnl_chain_list *chain_list,
 EXPORT_SYMBOL_ALIAS(nftnl_chain_list_foreach, nft_chain_list_foreach);
 
 struct nftnl_chain_list_iter {
-	struct nftnl_chain_list	*list;
-	struct nftnl_chain	*cur;
+	const struct nftnl_chain_list	*list;
+	struct nftnl_chain		*cur;
 };
 
-struct nftnl_chain_list_iter *nftnl_chain_list_iter_create(struct nftnl_chain_list *l)
+struct nftnl_chain_list_iter *
+nftnl_chain_list_iter_create(const struct nftnl_chain_list *l)
 {
 	struct nftnl_chain_list_iter *iter;
 
