@@ -1030,6 +1030,17 @@ struct nftnl_expr_iter {
 	struct nftnl_expr	*cur;
 };
 
+static void nftnl_expr_iter_init(const struct nftnl_rule *r,
+				 struct nftnl_expr_iter *iter)
+{
+	iter->r = r;
+	if (list_empty(&r->expr_list))
+		iter->cur = NULL;
+	else
+		iter->cur = list_entry(r->expr_list.next, struct nftnl_expr,
+				       head);
+}
+
 struct nftnl_expr_iter *nftnl_expr_iter_create(const struct nftnl_rule *r)
 {
 	struct nftnl_expr_iter *iter;
@@ -1038,12 +1049,7 @@ struct nftnl_expr_iter *nftnl_expr_iter_create(const struct nftnl_rule *r)
 	if (iter == NULL)
 		return NULL;
 
-	iter->r = r;
-	if (list_empty(&r->expr_list))
-		iter->cur = NULL;
-	else
-		iter->cur = list_entry(r->expr_list.next, struct nftnl_expr,
-				       head);
+	nftnl_expr_iter_init(r, iter);
 
 	return iter;
 }
