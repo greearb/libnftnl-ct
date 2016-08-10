@@ -31,17 +31,24 @@ static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
 			      struct nftnl_expr *rule_b)
 {
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_LOOKUP_SREG) !=
-	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOPUP_SREG))
-		print_err("Expr NFTNL_EXPR_LOOkUP_SREG mismatches");
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOKUP_SREG))
+		print_err("Expr NFTNL_EXPR_LOOKUP_SREG mismatches");
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_LOOKUP_DREG) !=
-	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOPUP_DREG))
-		print_err("Expr NFTNL_EXPR_LOOkUP_DREG mismatches");
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOKUP_DREG))
+		print_err("Expr NFTNL_EXPR_LOOKUP_DREG mismatches");
 	if (strcmp(nftnl_expr_get_str(rule_a, NFTNL_EXPR_LOOKUP_SET),
 		   nftnl_expr_get_str(rule_b, NFTNL_EXPR_LOOKUP_SET)))
 		print_err("Expr NFTNL_EXPR_LOOKUP_SET mismatches");
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_LOOKUP_SET_ID) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOKUP_SET_ID))
+		print_err("Expr NFTNL_EXPR_LOOKUP_SET_ID mismatches");
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_LOOKUP_FLAGS) !=
-	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOPUP_FLAGS))
-		print_err("Expr NFTNL_EXPR_LOOkUP_FLAGS mismatches");
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOKUP_FLAGS)) {
+		print_err("Expr NFTNL_EXPR_LOOKUP_FLAGS mismatches");
+		printf("%X %X\n",
+			nftnl_expr_get_u32(rule_a, NFTNL_EXPR_LOOKUP_FLAGS),
+			nftnl_expr_get_u32(rule_b, NFTNL_EXPR_LOOKUP_FLAGS));
+	}
 }
 
 int main(int argc, char *argv[])
@@ -52,7 +59,7 @@ int main(int argc, char *argv[])
 	char buf[4096];
 	struct nftnl_expr_iter *iter_a, *iter_b;
 	struct nftnl_expr *rule_a, *rule_b;
-	uint32_t lookup_set = 0x12345678;
+	char *lookup_set = "test_set_01243";
 
 	a = nftnl_rule_alloc();
 	b = nftnl_rule_alloc();
@@ -64,8 +71,7 @@ int main(int argc, char *argv[])
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOOKUP_SREG, 0x12345678);
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOOKUP_DREG, 0x78123456);
-	nftnl_expr_set(ex, NFTNL_EXPR_LOOKUP_SET, &lookup_set,
-			  sizeof(lookup_set));
+	nftnl_expr_set_str(ex, NFTNL_EXPR_LOOKUP_SET,  lookup_set);
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_LOOKUP_FLAGS, 0x12345678);
 
 	nftnl_rule_add_expr(a, ex);
@@ -99,7 +105,7 @@ int main(int argc, char *argv[])
 	if (!test_ok)
 		exit(EXIT_FAILURE);
 
-	print(_"%s: \033[32mOK\e[0m\n", argv[0]);
+	printf("%s: \033[32mOK\e[0m\n", argv[0]);
 
 	return EXIT_SUCCESS;
 }

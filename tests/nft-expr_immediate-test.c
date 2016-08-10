@@ -27,52 +27,71 @@ static void print_err(const char *msg)
 	printf("\033[31mERROR:\e[0m %s\n", msg);
 }
 
-static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
-			      struct nftnl_expr *rule_b)
+static void cmp_nftnl_expr_verdict(struct nftnl_expr *rule_a,
+				   struct nftnl_expr *rule_b)
 {
-	uint32_t data_a, data_b, chain_a, chain_b;
+	const char *chain_a, *chain_b;
+	uint32_t len_a, len_b;
 
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_IMM_DREG) !=
 	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_IMM_DREG))
 		print_err("Expr NFTNL_EXPR_IMM_DREG mismatches");
-	nftnl_expr_get(rule_a, NFTNL_EXPR_IMM_DATA, data_a);
-	nftnl_expr_get(rule_b, NFTNL_EXPR_IMM_DATA, data_b)
+
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_IMM_VERDICT) !=
 	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_IMM_VERDICT))
 		print_err("Expr NFTNL_EXPR_IMM_VERDICT mismatches");
-	nftnl_expr_get(rule_a, NFTNL_EXPR_IMM_CHAIN, chain_a);
-	nftnl_expr_get(rule_b, NFTNL_EXPR_IMM_CHAIN, chain_b);
-	if (data_a != data_b)
-		print_err("Expr NFTNL_EXPR_IMM_DATA. Size mismatches");
-	if (chain_a != chain_b)
-		print_err("Expr NFTNL_EXPR_IMM_CHAIN. Size mismatches");
+
+	chain_a = nftnl_expr_get(rule_a, NFTNL_EXPR_IMM_CHAIN, &len_a);
+	chain_b = nftnl_expr_get(rule_b, NFTNL_EXPR_IMM_CHAIN, &len_b);
+	if (len_a != len_b || strncmp(chain_a, chain_b, len_a))
+		print_err("Expr NFTNL_EXPR_IMM_CHAIN mismatches");
+}
+
+static void cmp_nftnl_expr_value(struct nftnl_expr *rule_a,
+				 struct nftnl_expr *rule_b)
+{
+	const uint32_t *data_a, *data_b;
+	uint32_t len_a, len_b;
+
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_IMM_DREG) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_IMM_DREG))
+		print_err("Expr NFTNL_EXPR_IMM_DREG mismatches");
+
+	data_a = nftnl_expr_get(rule_a, NFTNL_EXPR_IMM_DATA, &len_a);
+	data_b = nftnl_expr_get(rule_b, NFTNL_EXPR_IMM_DATA, &len_b);
+	if (len_a != len_b || memcmp(data_a, data_b, len_a))
+		print_err("Expr NFTNL_EXPR_IMM_DATA mismatches");
 }
 
 int main(int argc, char *argv[])
 {
 	struct nftnl_rule *a, *b;
-	struct nftnl_expr *ex;
+	struct nftnl_expr *ex_val, *ex_ver;
 	struct nlmsghdr *nlh;
 	char buf[4096];
 	struct nftnl_expr_iter *iter_a, *iter_b;
 	struct nftnl_expr *rule_a, *rule_b;
-	uint32_t chain = 0x12345678;
-	uint32_t data = 0x56781234;
+	char *chain = "tests_chain01234";
+	char *data = "test_data_01234";
 
 	a = nftnl_rule_alloc();
 	b = nftnl_rule_alloc();
 	if (a == NULL || b == NULL)
 		print_err("OOM");
-	ex = nftnl_expr_alloc("immediate");
-	if (ex == NULL)
+	ex_val = nftnl_expr_alloc("immediate");
+	ex_ver = nftnl_expr_alloc("immediate");
+	if (!ex_val || !ex_ver)
 		print_err("OOM");
 
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_IMM_DREG, 0x1234568);
-	nftnl_expr_set(ex, NFTNL_EXPR_IMM_DATA, &data, sizeof(data));
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_IMM_VERDICT, 0x78123456);
-	nftnl_expr_set(ex, NFTNL_EXPR_IMM_CHAIN, &chain, sizeof(chain));
+	nftnl_expr_set_u32(ex_val, NFTNL_EXPR_IMM_DREG, 0x1234568);
+	nftnl_expr_set(ex_val,     NFTNL_EXPR_IMM_DATA, data, sizeof(data));
 
-	nftnl_rule_add_expr(a, ex);
+	nftnl_expr_set_u32(ex_ver, NFTNL_EXPR_IMM_DREG,    0x1234568);
+	nftnl_expr_set_u32(ex_ver, NFTNL_EXPR_IMM_VERDICT, NFT_GOTO);
+	nftnl_expr_set(ex_ver,     NFTNL_EXPR_IMM_CHAIN, chain, sizeof(chain));
+
+	nftnl_rule_add_expr(a, ex_val);
+	nftnl_rule_add_expr(a, ex_ver);
 
 	nlh = nftnl_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, AF_INET, 0, 1234);
 	nftnl_rule_nlmsg_build_payload(nlh, a);
@@ -90,11 +109,18 @@ int main(int argc, char *argv[])
 	if (rule_a == NULL || rule_b == NULL)
 		print_err("OOM");
 
-	cmp_nftnl_expr(rule_a, rule_b);
+	cmp_nftnl_expr_value(rule_a, rule_b);
+
+	rule_a = nftnl_expr_iter_next(iter_a);
+	rule_b = nftnl_expr_iter_next(iter_b);
+	if (rule_a == NULL || rule_b == NULL)
+		print_err("OOM");
+
+	cmp_nftnl_expr_verdict(rule_a, rule_b);
 
 	if (nftnl_expr_iter_next(iter_a) != NULL ||
 	    nftnl_expr_iter_next(iter_b) != NULL)
-		print_err("More 1 expr.");
+		print_err("More 2 expr.");
 
 	nftnl_expr_iter_destroy(iter_a);
 	nftnl_expr_iter_destroy(iter_b);

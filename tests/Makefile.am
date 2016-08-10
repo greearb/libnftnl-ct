@@ -70,13 +70,13 @@ nft_expr_dup_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 nft_expr_fwd_test_SOURCES = nft-expr_fwd-test.c
 nft_expr_fwd_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
-nft_expr_immediate_test_SOURCES = nft-expr_counter-test.c
+nft_expr_immediate_test_SOURCES = nft-expr_immediate-test.c
 nft_expr_immediate_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_limit_test_SOURCES = nft-expr_limit-test.c
 nft_expr_limit_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
-nft_expr_lookup_test_SOURCES = nft-expr_limit-test.c
+nft_expr_lookup_test_SOURCES = nft-expr_lookup-test.c
 nft_expr_lookup_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_log_test_SOURCES = nft-expr_log-test.c
