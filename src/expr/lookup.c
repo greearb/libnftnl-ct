@@ -122,12 +122,11 @@ nftnl_expr_lookup_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_LOOKUP_DREG, htonl(lookup->dreg));
 	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_SET))
 		mnl_attr_put_strz(nlh, NFTA_LOOKUP_SET, lookup->set_name);
-	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_SET_ID)) {
+	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_SET_ID))
 		mnl_attr_put_u32(nlh, NFTA_LOOKUP_SET_ID,
 				 htonl(lookup->set_id));
 	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_LOOKUP_FLAGS, htonl(lookup->flags));
-	}
 }
 
 static int
