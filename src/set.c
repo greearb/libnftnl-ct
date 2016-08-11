@@ -781,7 +781,7 @@ static int nftnl_set_do_parse(struct nftnl_set *s, enum nftnl_parse_type type,
 			    enum nftnl_parse_input input)
 {
 	int ret;
-	struct nftnl_parse_err perr;
+	struct nftnl_parse_err perr = {};
 
 	switch (type) {
 	case NFTNL_PARSE_XML:
