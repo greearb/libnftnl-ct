@@ -259,7 +259,6 @@ static const char *limit_to_type(enum nft_limit_type type)
 	case NFT_LIMIT_PKT_BYTES:
 		return "bytes";
 	}
-	return "unknown";
 }
 
 static int nftnl_expr_limit_snprintf_default(char *buf, size_t len,
