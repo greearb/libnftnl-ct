@@ -173,7 +173,7 @@ static const char *ctkey2str_array[NFT_CT_MAX] = {
 
 static const char *ctkey2str(uint32_t ctkey)
 {
-	if (ctkey > NFT_CT_MAX)
+	if (ctkey >= NFT_CT_MAX)
 		return "unknown";
 
 	return ctkey2str_array[ctkey];
