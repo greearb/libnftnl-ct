@@ -551,6 +551,7 @@ static int nftnl_ruleset_json_parse(const void *json,
 
 	ctx.cb = cb;
 	ctx.format = type;
+	ctx.flags = 0;
 
 	ctx.set_list = nftnl_set_list_alloc();
 	if (ctx.set_list == NULL)
@@ -682,6 +683,7 @@ static int nftnl_ruleset_xml_parse(const void *xml, struct nftnl_parse_err *err,
 
 	ctx.cb = cb;
 	ctx.format = type;
+	ctx.flags = 0;
 
 	ctx.set_list = nftnl_set_list_alloc();
 	if (ctx.set_list == NULL)
