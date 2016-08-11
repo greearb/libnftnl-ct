@@ -610,12 +610,12 @@ static int nftnl_jansson_parse_set_info(struct nftnl_set *s, json_t *tree,
 				return -1;
 
 			json_elem = json_array_get(array, i);
-			if (json_elem == NULL)
+			if (json_elem == NULL ||
+			    nftnl_jansson_set_elem_parse(elem,
+							 json_elem, err) < 0) {
+				free(elem);
 				return -1;
-
-			if (nftnl_jansson_set_elem_parse(elem,
-						       json_elem, err) < 0)
-				return -1;
+			}
 
 			list_add_tail(&elem->head, &s->element_list);
 		}
