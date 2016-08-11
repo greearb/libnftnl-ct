@@ -192,6 +192,9 @@ int nftnl_batch_is_supported(void)
 	uint32_t seq = time(NULL), req_seq;
 	int ret;
 
+	if (seq == (uint32_t)-1)
+		seq = 0;
+
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL)
 		return -1;
