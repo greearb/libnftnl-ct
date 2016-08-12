@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	b = nftnl_rule_alloc();
 	if (a == NULL || b == NULL)
 		print_err("OOM");
-	ex = nftnl_expr_alloc("nat");
+	ex = nftnl_expr_alloc("masq");
 	if (ex == NULL)
 		print_err("OOM");
 
