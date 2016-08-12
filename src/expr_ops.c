@@ -26,6 +26,7 @@ extern struct expr_ops expr_ops_reject;
 extern struct expr_ops expr_ops_queue;
 extern struct expr_ops expr_ops_target;
 extern struct expr_ops expr_ops_dynset;
+extern struct expr_ops expr_ops_hash;
 
 static struct expr_ops *expr_ops[] = {
 	&expr_ops_bitwise,
@@ -50,6 +51,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_queue,
 	&expr_ops_target,
 	&expr_ops_dynset,
+	&expr_ops_hash,
 	NULL,
 };
 

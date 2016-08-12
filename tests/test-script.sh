@@ -20,6 +20,7 @@
 ./nft-expr_payload-test
 ./nft-expr_reject-test
 ./nft-expr_target-test
+./nft-expr_hash-test
 ./nft-rule-test
 ./nft-set-test
 ./nft-table-test

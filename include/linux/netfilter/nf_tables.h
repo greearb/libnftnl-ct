@@ -1082,4 +1082,25 @@ enum nft_trace_types {
 	__NFT_TRACETYPE_MAX
 };
 #define NFT_TRACETYPE_MAX (__NFT_TRACETYPE_MAX - 1)
+
+/**
+ * enum nft_hash_attributes - nf_tables hash expression attributes
+ *
+ * @NFTA_HASH_SREG: source register (NLA_U32)
+ * @NFTA_HASH_DREG: destination register (NLA_U32)
+ * @NFTA_HASH_LEN: data length (NLA_U32)
+ * @NFTA_HASH_MODULUS: Modulus value (NLA_U32)
+ * @NFTA_HASH_SEED: hash initial value (NLA_U32)
+ */
+enum nft_hash_attributes {
+	NFTA_HASH_UNSPEC,
+	NFTA_HASH_SREG,
+	NFTA_HASH_DREG,
+	NFTA_HASH_LEN,
+	NFTA_HASH_MODULUS,
+	NFTA_HASH_SEED,
+	__NFTA_HASH_MAX
+};
+#define NFTA_HASH_MAX		(__NFTA_HASH_MAX - 1)
+
 #endif /* _LINUX_NF_TABLES_H */

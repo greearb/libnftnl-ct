@@ -29,7 +29,8 @@ check_PROGRAMS = 	nft-parsing-test		\
 			nft-expr_queue-test		\
 			nft-expr_redir-test		\
 			nft-expr_reject-test		\
-			nft-expr_target-test
+			nft-expr_target-test		\
+			nft-expr_hash-test
 
 nft_parsing_test_SOURCES = nft-parsing-test.c
 nft_parsing_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS} ${LIBXML_LIBS} ${LIBJSON_LIBS}
@@ -108,3 +109,6 @@ nft_expr_redir_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_target_test_SOURCES = nft-expr_target-test.c
 nft_expr_target_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
+nft_expr_hash_test_SOURCES = nft-expr_hash-test.c
+nft_expr_hash_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}

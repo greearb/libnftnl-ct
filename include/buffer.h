@@ -89,5 +89,7 @@ int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 #define DELETE			"delete"
 #define REPLACE			"replace"
 #define FLUSH			"flush"
+#define MODULUS			"modulus"
+#define SEED			"seed"
 
 #endif
