@@ -54,7 +54,7 @@ void __nftnl_assert_attr_exists(uint16_t attr, uint16_t attr_max,
 
 #define SNPRINTF_BUFFER_SIZE(ret, size, len, offset)	\
 	if (ret < 0)					\
-		return ret;				\
+		ret = 0;				\
 	offset += ret;					\
 	if (ret > len)					\
 		ret = len;				\
