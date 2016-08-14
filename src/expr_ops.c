@@ -19,6 +19,7 @@ extern struct expr_ops expr_ops_lookup;
 extern struct expr_ops expr_ops_masq;
 extern struct expr_ops expr_ops_match;
 extern struct expr_ops expr_ops_meta;
+extern struct expr_ops expr_ops_ng;
 extern struct expr_ops expr_ops_nat;
 extern struct expr_ops expr_ops_payload;
 extern struct expr_ops expr_ops_redir;
@@ -45,6 +46,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_masq,
 	&expr_ops_match,
 	&expr_ops_meta,
+	&expr_ops_ng,
 	&expr_ops_nat,
 	&expr_ops_payload,
 	&expr_ops_redir,

@@ -14,6 +14,7 @@
 ./nft-expr_match-test
 ./nft-expr_masq-test
 ./nft-expr_meta-test
+./nft-expr_numgen-test
 ./nft-expr_queue-test
 ./nft-expr_redir-test
 ./nft-expr_nat-test

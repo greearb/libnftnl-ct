@@ -38,6 +38,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/immediate.c	\
 		      expr/match.c	\
 		      expr/meta.c	\
+		      expr/numgen.c	\
 		      expr/nat.c	\
 		      expr/payload.c	\
 		      expr/queue.c	\

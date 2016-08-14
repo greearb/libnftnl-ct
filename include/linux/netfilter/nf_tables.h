@@ -667,6 +667,33 @@ enum nft_exthdr_attributes {
 #define NFTA_EXTHDR_MAX		(__NFTA_EXTHDR_MAX - 1)
 
 /**
+ * enum nft_ng_attributes - nf_tables number generator expression attributes
+ *
+ * @NFTA_NG_DREG: destination register (NLA_U32)
+ * @NFTA_NG_UNTIL: limit value (NLA_U32)
+ * @NFTA_NG_TYPE: type of operation (NLA_U32)
+ */
+enum nft_ng_attributes {
+	NFTA_NG_UNSPEC,
+	NFTA_NG_DREG,
+	NFTA_NG_UNTIL,
+	NFTA_NG_TYPE,
+	__NFTA_NG_MAX
+};
+#define NFTA_NG_MAX		(__NFTA_NG_MAX - 1)
+
+/**
+ * enum nft_ng_type - nf_tables number generator expression reject types
+ *
+ * @NFT_NG_INCREMENTAL: Incremental number generator
+ * @NFT_NG_RANDOM: Random number generator
+ */
+enum nft_ng_type {
+	NFT_NG_INCREMENTAL,
+	NFT_NG_RANDOM
+};
+
+/**
  * enum nft_meta_keys - nf_tables meta expression keys
  *
  * @NFT_META_LEN: packet length (skb->len)
