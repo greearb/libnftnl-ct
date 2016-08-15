@@ -33,7 +33,7 @@ static const char *const nftnl_family_str[NFPROTO_NUMPROTO] = {
 
 const char *nftnl_family2str(uint32_t family)
 {
-	if (nftnl_family_str[family] == NULL)
+	if (family >= NFPROTO_NUMPROTO || !nftnl_family_str[family])
 		return "unknown";
 
 	return nftnl_family_str[family];
