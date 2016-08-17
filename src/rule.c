@@ -1077,6 +1077,36 @@ void nftnl_expr_iter_destroy(struct nftnl_expr_iter *iter)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_expr_iter_destroy, nft_rule_expr_iter_destroy);
 
+bool nftnl_rule_cmp(const struct nftnl_rule *r1, const struct nftnl_rule *r2)
+{
+	struct nftnl_expr_iter it1, it2;
+	struct nftnl_expr *e1, *e2;
+	unsigned int eq = 1;
+
+	if (r1->flags & r1->flags & (1 << NFTNL_RULE_TABLE))
+		eq &= !strcmp(r1->table, r2->table);
+	if (r1->flags & r1->flags & (1 << NFTNL_RULE_CHAIN))
+		eq &= !strcmp(r1->chain, r2->chain);
+	if (r1->flags & r1->flags & (1 << NFTNL_RULE_COMPAT_FLAGS))
+		eq &= (r1->compat.flags == r2->compat.flags);
+	if (r1->flags & r1->flags & (1 << NFTNL_RULE_COMPAT_PROTO))
+		eq &= (r1->compat.proto == r2->compat.proto);
+
+	nftnl_expr_iter_init(r1, &it1);
+	nftnl_expr_iter_init(r2, &it2);
+	e1 = nftnl_expr_iter_next(&it1);
+	e2 = nftnl_expr_iter_next(&it2);
+	while (eq && e1 && e2) {
+		eq = nftnl_expr_cmp(e1, e2);
+
+		e1 = nftnl_expr_iter_next(&it1);
+		e2 = nftnl_expr_iter_next(&it2);
+	}
+
+	return eq;
+}
+EXPORT_SYMBOL(nftnl_rule_cmp);
+
 struct nftnl_rule_list {
 	struct list_head list;
 };

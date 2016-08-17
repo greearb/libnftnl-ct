@@ -241,11 +241,31 @@ static void nftnl_expr_target_free(const struct nftnl_expr *e)
 	xfree(target->data);
 }
 
+static bool nftnl_expr_target_cmp(const struct nftnl_expr *e1,
+				  const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_target *t1 = nftnl_expr_data(e1);
+	struct nftnl_expr_target *t2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_TG_NAME))
+		eq &= !strcmp(t1->name, t2->name);
+	if (e1->flags & (1 << NFTNL_EXPR_TG_REV))
+		eq &= (t1->rev == t2->rev);
+	if (e1->flags & (1 << NFTNL_EXPR_TG_INFO)) {
+		eq &= (t1->data_len == t2->data_len);
+		eq &= !memcmp(t1->data, t2->data, t1->data_len);
+	}
+
+	return eq;
+}
+
 struct expr_ops expr_ops_target = {
 	.name		= "target",
 	.alloc_len	= sizeof(struct nftnl_expr_target),
 	.max_attr	= NFTA_TARGET_MAX,
 	.free		= nftnl_expr_target_free,
+	.cmp		= nftnl_expr_target_cmp,
 	.set		= nftnl_expr_target_set,
 	.get		= nftnl_expr_target_get,
 	.parse		= nftnl_expr_target_parse,

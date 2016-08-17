@@ -335,10 +335,36 @@ nftnl_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static bool nftnl_expr_payload_cmp(const struct nftnl_expr *e1,
+				   const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_payload *p1 = nftnl_expr_data(e1);
+	struct nftnl_expr_payload *p2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_PAYLOAD_SREG))
+		eq &= (p1->sreg == p2->sreg);
+	if (e1->flags & (1 << NFTNL_EXPR_PAYLOAD_DREG))
+		eq &= (p1->dreg == p2->dreg);
+	if (e1->flags & (1 << NFTNL_EXPR_PAYLOAD_BASE))
+		eq &= (p1->base == p2->base);
+	if (e1->flags & (1 << NFTNL_EXPR_PAYLOAD_OFFSET))
+		eq &= (p1->offset == p2->offset);
+	if (e1->flags & (1 << NFTNL_EXPR_PAYLOAD_LEN))
+		eq &= (p1->len == p2->len);
+	if (e1->flags & (1 << NFTNL_EXPR_PAYLOAD_CSUM_TYPE))
+		eq &= (p1->csum_type == p2->csum_type);
+	if (e1->flags & (1 << NFTNL_EXPR_PAYLOAD_CSUM_OFFSET))
+		eq &= (p1->csum_offset == p2->csum_offset);
+
+	return eq;
+}
+
 struct expr_ops expr_ops_payload = {
 	.name		= "payload",
 	.alloc_len	= sizeof(struct nftnl_expr_payload),
 	.max_attr	= NFTA_PAYLOAD_MAX,
+	.cmp		= nftnl_expr_payload_cmp,
 	.set		= nftnl_expr_payload_set,
 	.get		= nftnl_expr_payload_get,
 	.parse		= nftnl_expr_payload_parse,

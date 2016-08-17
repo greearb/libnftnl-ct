@@ -240,11 +240,31 @@ static void nftnl_expr_match_free(const struct nftnl_expr *e)
 	xfree(match->data);
 }
 
+static bool nftnl_expr_match_cmp(const struct nftnl_expr *e1,
+				 const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_match *m1 = nftnl_expr_data(e1);
+	struct nftnl_expr_match *m2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_MT_NAME))
+		eq &= !strcmp(m1->name, m2->name);
+	if (e1->flags & (1 << NFTNL_EXPR_MT_REV))
+		eq &= (m1->rev == m2->rev);
+	if (e1->flags & (1 << NFTNL_EXPR_MT_INFO)) {
+		eq &= (m1->data_len == m2->data_len);
+		eq &= !memcmp(m1->data, m2->data, m1->data_len);
+	}
+
+	return eq;
+}
+
 struct expr_ops expr_ops_match = {
 	.name		= "match",
 	.alloc_len	= sizeof(struct nftnl_expr_match),
 	.max_attr	= NFTA_MATCH_MAX,
 	.free		= nftnl_expr_match_free,
+	.cmp		= nftnl_expr_match_cmp,
 	.set		= nftnl_expr_match_set,
 	.get		= nftnl_expr_match_get,
 	.parse		= nftnl_expr_match_parse,

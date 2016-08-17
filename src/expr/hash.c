@@ -280,10 +280,32 @@ nftnl_expr_hash_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static bool nftnl_expr_hash_cmp(const struct nftnl_expr *e1,
+				const struct nftnl_expr *e2)
+{
+       struct nftnl_expr_hash *h1 = nftnl_expr_data(e1);
+       struct nftnl_expr_hash *h2 = nftnl_expr_data(e2);
+       bool eq = true;
+
+       if (e1->flags & (1 << NFTNL_EXPR_HASH_SREG))
+               eq &= (h1->sreg == h2->sreg);
+       if (e1->flags & (1 << NFTNL_EXPR_HASH_DREG))
+               eq &= (h1->dreg == h2->dreg);
+       if (e1->flags & (1 << NFTNL_EXPR_HASH_LEN))
+               eq &= (h1->len == h2->len);
+       if (e1->flags & (1 << NFTNL_EXPR_HASH_MODULUS))
+               eq &= (h1->modulus == h2->modulus);
+       if (e1->flags & (1 << NFTNL_EXPR_HASH_SEED))
+               eq &= (h1->seed == h2->seed);
+
+       return eq;
+}
+
 struct expr_ops expr_ops_hash = {
 	.name		= "hash",
 	.alloc_len	= sizeof(struct nftnl_expr_hash),
 	.max_attr	= NFTA_HASH_MAX,
+	.cmp		= nftnl_expr_hash_cmp,
 	.set		= nftnl_expr_hash_set,
 	.get		= nftnl_expr_hash_get,
 	.parse		= nftnl_expr_hash_parse,

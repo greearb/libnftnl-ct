@@ -175,10 +175,24 @@ static int nftnl_expr_fwd_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static bool nftnl_expr_fwd_cmp(const struct nftnl_expr *e1,
+			       const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_fwd *f1 = nftnl_expr_data(e1);
+	struct nftnl_expr_fwd *f2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_FWD_SREG_DEV))
+		eq &= (f1->sreg_dev == f2->sreg_dev);
+
+	return eq;
+}
+
 struct expr_ops expr_ops_fwd = {
 	.name		= "fwd",
 	.alloc_len	= sizeof(struct nftnl_expr_fwd),
 	.max_attr	= NFTA_FWD_MAX,
+	.cmp		= nftnl_expr_fwd_cmp,
 	.set		= nftnl_expr_fwd_set,
 	.get		= nftnl_expr_fwd_get,
 	.parse		= nftnl_expr_fwd_parse,

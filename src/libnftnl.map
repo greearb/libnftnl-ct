@@ -528,3 +528,8 @@ LIBNFTNL_4.1 {
 	nftnl_udata_next;
 	nftnl_udata_parse;
 } LIBNFTNL_4;
+
+LIBNFTNL_4.2 {
+	nftnl_rule_cmp;
+	nftnl_expr_cmp;
+} LIBNFTNL_4.1;

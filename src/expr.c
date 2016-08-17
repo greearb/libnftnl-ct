@@ -203,6 +203,16 @@ const char *nftnl_expr_get_str(const struct nftnl_expr *expr, uint16_t type)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_expr_get_str, nft_rule_expr_get_str);
 
+bool nftnl_expr_cmp(const struct nftnl_expr *e1, const struct nftnl_expr *e2)
+{
+	if (e1->flags != e2->flags ||
+	    strcmp(e1->ops->name, e2->ops->name) != 0)
+		return false;
+
+	return e1->ops->cmp(e1, e2);
+}
+EXPORT_SYMBOL(nftnl_expr_cmp);
+
 void
 nftnl_expr_build_payload(struct nlmsghdr *nlh, struct nftnl_expr *expr)
 {

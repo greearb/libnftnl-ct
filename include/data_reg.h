@@ -3,6 +3,7 @@
 
 #include <linux/netfilter/nf_tables.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <unistd.h>
 
 enum {
@@ -27,6 +28,8 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 			    const union nftnl_data_reg *reg,
 			    uint32_t output_format, uint32_t flags,
 			    int reg_type);
+bool nftnl_data_reg_cmp(const union nftnl_data_reg *r1,
+		        const union nftnl_data_reg *r2, int reg_type);
 struct nlattr;
 
 int nftnl_parse_data(union nftnl_data_reg *data, struct nlattr *attr, int *type);

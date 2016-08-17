@@ -228,10 +228,28 @@ static int nftnl_expr_masq_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static bool nftnl_expr_masq_cmp(const struct nftnl_expr *e1,
+				const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_masq *m1 = nftnl_expr_data(e1);
+	struct nftnl_expr_masq *m2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_MASQ_FLAGS))
+		eq &= (m1->flags == m2->flags);
+	if (e1->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MIN))
+		eq &= (m1->sreg_proto_min == m2->sreg_proto_min);
+	if (e1->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MAX))
+		eq &= (m1->sreg_proto_max == m2->sreg_proto_max);
+
+	return eq;
+}
+
 struct expr_ops expr_ops_masq = {
 	.name		= "masq",
 	.alloc_len	= sizeof(struct nftnl_expr_masq),
 	.max_attr	= NFTA_MASQ_MAX,
+	.cmp		= nftnl_expr_masq_cmp,
 	.set		= nftnl_expr_masq_set,
 	.get		= nftnl_expr_masq_get,
 	.parse		= nftnl_expr_masq_parse,

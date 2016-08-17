@@ -243,10 +243,28 @@ nftnl_expr_queue_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static bool nftnl_expr_queue_cmp(const struct nftnl_expr *e1,
+			    const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_queue *q1 = nftnl_expr_data(e1);
+	struct nftnl_expr_queue *q2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_QUEUE_NUM))
+		eq &= (q1->queuenum == q2->queuenum);
+	if (e1->flags & (1 << NFTNL_EXPR_QUEUE_TOTAL))
+		eq &= (q1->queues_total == q2->queues_total);
+	if (e1->flags & (1 << NFTNL_EXPR_QUEUE_FLAGS))
+		eq &= (q1->flags == q2->flags);
+
+	return eq;
+}
+
 struct expr_ops expr_ops_queue = {
 	.name		= "queue",
 	.alloc_len	= sizeof(struct nftnl_expr_queue),
 	.max_attr	= NFTA_QUEUE_MAX,
+	.cmp		= nftnl_expr_queue_cmp,
 	.set		= nftnl_expr_queue_set,
 	.get		= nftnl_expr_queue_get,
 	.parse		= nftnl_expr_queue_parse,

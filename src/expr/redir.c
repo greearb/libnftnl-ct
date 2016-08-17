@@ -242,10 +242,28 @@ nftnl_expr_redir_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static bool nftnl_expr_redir_cmp(const struct nftnl_expr *e1,
+				 const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_redir *r1 = nftnl_expr_data(e1);
+	struct nftnl_expr_redir *r2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_REDIR_REG_PROTO_MIN))
+		eq &= (r1->sreg_proto_min== r2->sreg_proto_min);
+	if (e1->flags & (1 << NFTNL_EXPR_REDIR_REG_PROTO_MAX))
+		eq &= (r1->sreg_proto_max== r2->sreg_proto_max);
+	if (e1->flags & (1 << NFTNL_EXPR_REDIR_FLAGS))
+		eq &= (r1->flags== r2->flags);
+
+	return eq;
+}
+
 struct expr_ops expr_ops_redir = {
 	.name		= "redir",
 	.alloc_len	= sizeof(struct nftnl_expr_redir),
 	.max_attr	= NFTA_REDIR_MAX,
+	.cmp		= nftnl_expr_redir_cmp,
 	.set		= nftnl_expr_redir_set,
 	.get		= nftnl_expr_redir_get,
 	.parse		= nftnl_expr_redir_parse,

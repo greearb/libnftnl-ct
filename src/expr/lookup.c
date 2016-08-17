@@ -295,11 +295,33 @@ static void nftnl_expr_lookup_free(const struct nftnl_expr *e)
 	xfree(lookup->set_name);
 }
 
+static bool nftnl_expr_lookup_cmp(const struct nftnl_expr *e1,
+				  const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_lookup *l1 = nftnl_expr_data(e1);
+	struct nftnl_expr_lookup *l2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_LOOKUP_SREG))
+		eq &= (l1->sreg == l2->sreg);
+	if (e1->flags & (1 << NFTNL_EXPR_LOOKUP_DREG))
+		eq &= (l1->dreg == l2->dreg);
+	if (e1->flags & (1 << NFTNL_EXPR_LOOKUP_SET))
+		eq &= !strcmp(l1->set_name, l2->set_name);
+	if (e1->flags & (1 << NFTNL_EXPR_LOOKUP_SET_ID))
+		eq &= (l1->set_id == l2->set_id);
+	if (e1->flags & (1 << NFTNL_EXPR_LOOKUP_FLAGS))
+		eq &= (l1->flags == l2->flags);
+
+	return eq;
+}
+
 struct expr_ops expr_ops_lookup = {
 	.name		= "lookup",
 	.alloc_len	= sizeof(struct nftnl_expr_lookup),
 	.max_attr	= NFTA_LOOKUP_MAX,
 	.free		= nftnl_expr_lookup_free,
+	.cmp		= nftnl_expr_lookup_cmp,
 	.set		= nftnl_expr_lookup_set,
 	.get		= nftnl_expr_lookup_get,
 	.parse		= nftnl_expr_lookup_parse,

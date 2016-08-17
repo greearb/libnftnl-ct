@@ -379,6 +379,22 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 	return -1;
 }
 
+bool nftnl_data_reg_cmp(const union nftnl_data_reg *r1,
+		        const union nftnl_data_reg *r2, int reg_type)
+{
+	switch (reg_type) {
+	case DATA_VALUE:
+		return	r1->len == r2->len &&
+			!memcmp(r1->val, r2->val, r1->len);
+	case DATA_VERDICT:
+	case DATA_CHAIN:
+		return	r1->verdict == r2->verdict &&
+			!strcmp(r1->chain, r2->chain);
+	default:
+		return false;
+	}
+}
+
 static int nftnl_data_parse_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;

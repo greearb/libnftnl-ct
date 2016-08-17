@@ -13,6 +13,7 @@ struct expr_ops {
 	uint32_t alloc_len;
 	int	max_attr;
 	void	(*free)(const struct nftnl_expr *e);
+	bool    (*cmp)(const struct nftnl_expr *e1, const struct nftnl_expr *e2);
 	int	(*set)(struct nftnl_expr *e, uint16_t type, const void *data, uint32_t data_len);
 	const void *(*get)(const struct nftnl_expr *e, uint16_t type, uint32_t *data_len);
 	int 	(*parse)(struct nftnl_expr *e, struct nlattr *attr);
