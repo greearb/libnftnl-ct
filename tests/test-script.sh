@@ -18,6 +18,7 @@
 ./nft-expr_redir-test
 ./nft-expr_nat-test
 ./nft-expr_payload-test
+./nft-expr_quota-test
 ./nft-expr_reject-test
 ./nft-expr_target-test
 ./nft-expr_hash-test
