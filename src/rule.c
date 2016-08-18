@@ -1102,6 +1102,7 @@ bool nftnl_rule_cmp(const struct nftnl_rule *r1, const struct nftnl_rule *r2)
 		e1 = nftnl_expr_iter_next(&it1);
 		e2 = nftnl_expr_iter_next(&it2);
 	}
+	eq &= (!e1 && !e2);
 
 	return eq;
 }
