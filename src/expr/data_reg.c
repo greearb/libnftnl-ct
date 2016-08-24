@@ -387,6 +387,7 @@ bool nftnl_data_reg_cmp(const union nftnl_data_reg *r1,
 		return	r1->len == r2->len &&
 			!memcmp(r1->val, r2->val, r1->len);
 	case DATA_VERDICT:
+		return	r1->verdict == r2->verdict;
 	case DATA_CHAIN:
 		return	r1->verdict == r2->verdict &&
 			!strcmp(r1->chain, r2->chain);
