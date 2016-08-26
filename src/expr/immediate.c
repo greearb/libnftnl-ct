@@ -326,13 +326,20 @@ static bool nftnl_expr_immediate_cmp(const struct nftnl_expr *e1,
 	struct nftnl_expr_immediate *i1 = nftnl_expr_data(e1);
 	struct nftnl_expr_immediate *i2 = nftnl_expr_data(e2);
 	bool eq = true;
+	int type = DATA_NONE;
 
 	if (e1->flags & (1 << NFTNL_EXPR_IMM_DREG))
 		eq &= (i1->dreg == i2->dreg);
 	if (e1->flags & (1 << NFTNL_EXPR_IMM_VERDICT))
-		eq &= nftnl_data_reg_cmp(&i1->data, &i2->data, DATA_VERDICT);
+		if (e1->flags & (1 << NFTNL_EXPR_IMM_CHAIN))
+			type = DATA_CHAIN;
+		else
+			type = DATA_VERDICT;
 	else if (e1->flags & (1 << NFTNL_EXPR_IMM_DATA))
-		eq &= nftnl_data_reg_cmp(&i1->data, &i2->data, DATA_VALUE);
+		type = DATA_VALUE;
+
+	if (type != DATA_NONE)
+		eq &= nftnl_data_reg_cmp(&i1->data, &i2->data, type);
 
 	return eq;
 }
