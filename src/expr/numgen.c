@@ -189,16 +189,17 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 	struct nftnl_expr_ng *ng = nftnl_expr_data(e);
 	int len = size, offset = 0, ret;
 
-	if (ng->type == NFT_NG_INCREMENTAL) {
+	switch (ng->type) {
+	case NFT_NG_INCREMENTAL:
 		ret = snprintf(buf, len, "reg %u = inc(%u)", ng->dreg,
 			       ng->until);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (ng->type == NFT_NG_RANDOM) {
+		break;
+	case NFT_NG_RANDOM:
 		ret = snprintf(buf, len, "reg %u = random(%u)", ng->dreg,
 			       ng->until);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		break;
 	}
 
 	return offset;
