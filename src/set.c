@@ -423,7 +423,7 @@ static int nftnl_set_desc_parse_attr_cb(const struct nlattr *attr, void *data)
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
 
-	if (mnl_attr_type_valid(attr, NFTA_SET_MAX) < 0)
+	if (mnl_attr_type_valid(attr, NFTA_SET_DESC_MAX) < 0)
 		return MNL_CB_OK;
 
 	switch (type) {
