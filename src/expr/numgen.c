@@ -191,12 +191,12 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 
 	switch (ng->type) {
 	case NFT_NG_INCREMENTAL:
-		ret = snprintf(buf, len, "reg %u = inc(%u)", ng->dreg,
+		ret = snprintf(buf, len, "reg %u = inc(%u) ", ng->dreg,
 			       ng->until);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	case NFT_NG_RANDOM:
-		ret = snprintf(buf, len, "reg %u = random(%u)", ng->dreg,
+		ret = snprintf(buf, len, "reg %u = random(%u) ", ng->dreg,
 			       ng->until);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
