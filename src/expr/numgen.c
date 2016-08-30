@@ -238,10 +238,28 @@ nftnl_expr_ng_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
+static bool nftnl_expr_ng_cmp(const struct nftnl_expr *e1,
+			      const struct nftnl_expr *e2)
+{
+	struct nftnl_expr_ng *n1 = nftnl_expr_data(e1);
+	struct nftnl_expr_ng *n2 = nftnl_expr_data(e2);
+	bool eq = true;
+
+	if (e1->flags & (1 << NFTNL_EXPR_NG_DREG))
+		eq &= (n1->dreg == n2->dreg);
+	if (e1->flags & (1 << NFTNL_EXPR_NG_UNTIL))
+		eq &= (n1->until == n2->until);
+	if (e1->flags & (1 << NFTNL_EXPR_NG_TYPE))
+		eq &= (n1->type == n2->type);
+
+	return eq;
+}
+
 struct expr_ops expr_ops_ng = {
 	.name		= "numgen",
 	.alloc_len	= sizeof(struct nftnl_expr_ng),
 	.max_attr	= NFTA_NG_MAX,
+	.cmp		= nftnl_expr_ng_cmp,
 	.set		= nftnl_expr_ng_set,
 	.get		= nftnl_expr_ng_get,
 	.parse		= nftnl_expr_ng_parse,
