@@ -235,7 +235,7 @@ nftnl_expr_hash_snprintf_default(char *buf, size_t size,
 	struct nftnl_expr_hash *hash = nftnl_expr_data(e);
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "reg %u = jhash(reg %u, %u, %u) %% modulus %u",
+	ret = snprintf(buf, len, "reg %u = jhash(reg %u, %u, 0x%x) %% mod %u ",
 		       hash->dreg, hash->sreg, hash->len, hash->seed,
 		       hash->modulus);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
