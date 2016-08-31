@@ -79,7 +79,7 @@ bool nftnl_trace_is_set(const struct nftnl_trace *t, uint16_t attr)
 static int nftnl_trace_parse_attr_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
-	enum nft_trace_attibutes type = mnl_attr_get_type(attr);
+	enum nft_trace_attributes type = mnl_attr_get_type(attr);
 
 	if (mnl_attr_type_valid(attr, NFTA_TRACE_MAX) < 0)
 		return MNL_CB_OK;

@@ -667,33 +667,6 @@ enum nft_exthdr_attributes {
 #define NFTA_EXTHDR_MAX		(__NFTA_EXTHDR_MAX - 1)
 
 /**
- * enum nft_ng_attributes - nf_tables number generator expression attributes
- *
- * @NFTA_NG_DREG: destination register (NLA_U32)
- * @NFTA_NG_UNTIL: limit value (NLA_U32)
- * @NFTA_NG_TYPE: type of operation (NLA_U32)
- */
-enum nft_ng_attributes {
-	NFTA_NG_UNSPEC,
-	NFTA_NG_DREG,
-	NFTA_NG_UNTIL,
-	NFTA_NG_TYPE,
-	__NFTA_NG_MAX
-};
-#define NFTA_NG_MAX		(__NFTA_NG_MAX - 1)
-
-/**
- * enum nft_ng_type - nf_tables number generator expression reject types
- *
- * @NFT_NG_INCREMENTAL: Incremental number generator
- * @NFT_NG_RANDOM: Random number generator
- */
-enum nft_ng_type {
-	NFT_NG_INCREMENTAL,
-	NFT_NG_RANDOM
-};
-
-/**
  * enum nft_meta_keys - nf_tables meta expression keys
  *
  * @NFT_META_LEN: packet length (skb->len)
@@ -749,6 +722,26 @@ enum nft_meta_keys {
 	NFT_META_CGROUP,
 	NFT_META_PRANDOM,
 };
+
+/**
+ * enum nft_hash_attributes - nf_tables hash expression netlink attributes
+ *
+ * @NFTA_HASH_SREG: source register (NLA_U32)
+ * @NFTA_HASH_DREG: destination register (NLA_U32)
+ * @NFTA_HASH_LEN: source data length (NLA_U32)
+ * @NFTA_HASH_MODULUS: modulus value (NLA_U32)
+ * @NFTA_HASH_SEED: seed value (NLA_U32)
+ */
+enum nft_hash_attributes {
+	NFTA_HASH_UNSPEC,
+	NFTA_HASH_SREG,
+	NFTA_HASH_DREG,
+	NFTA_HASH_LEN,
+	NFTA_HASH_MODULUS,
+	NFTA_HASH_SEED,
+	__NFTA_HASH_MAX,
+};
+#define NFTA_HASH_MAX	(__NFTA_HASH_MAX - 1)
 
 /**
  * enum nft_meta_attributes - nf_tables meta expression netlink attributes
@@ -908,7 +901,7 @@ enum nft_queue_attributes {
 #define NFT_QUEUE_FLAG_MASK		0x03
 
 enum nft_quota_flags {
-	NFT_QUOTA_F_INV	= (1 << 0),
+	NFT_QUOTA_F_INV		= (1 << 0),
 };
 
 /**
@@ -1097,7 +1090,7 @@ enum nft_gen_attributes {
  * @NFTA_TRACE_NFPROTO: nf protocol processed (NLA_U32)
  * @NFTA_TRACE_POLICY: policy that decided fate of packet (NLA_U32)
  */
-enum nft_trace_attibutes {
+enum nft_trace_attributes {
 	NFTA_TRACE_UNSPEC,
 	NFTA_TRACE_TABLE,
 	NFTA_TRACE_CHAIN,
@@ -1130,23 +1123,26 @@ enum nft_trace_types {
 #define NFT_TRACETYPE_MAX (__NFT_TRACETYPE_MAX - 1)
 
 /**
- * enum nft_hash_attributes - nf_tables hash expression attributes
+ * enum nft_ng_attributes - nf_tables number generator expression netlink attributes
  *
- * @NFTA_HASH_SREG: source register (NLA_U32)
- * @NFTA_HASH_DREG: destination register (NLA_U32)
- * @NFTA_HASH_LEN: data length (NLA_U32)
- * @NFTA_HASH_MODULUS: Modulus value (NLA_U32)
- * @NFTA_HASH_SEED: hash initial value (NLA_U32)
+ * @NFTA_NG_DREG: destination register (NLA_U32)
+ * @NFTA_NG_UNTIL: source value to increment the counter until reset (NLA_U32)
+ * @NFTA_NG_TYPE: operation type (NLA_U32)
  */
-enum nft_hash_attributes {
-	NFTA_HASH_UNSPEC,
-	NFTA_HASH_SREG,
-	NFTA_HASH_DREG,
-	NFTA_HASH_LEN,
-	NFTA_HASH_MODULUS,
-	NFTA_HASH_SEED,
-	__NFTA_HASH_MAX
+enum nft_ng_attributes {
+	NFTA_NG_UNSPEC,
+	NFTA_NG_DREG,
+	NFTA_NG_UNTIL,
+	NFTA_NG_TYPE,
+	__NFTA_NG_MAX
 };
-#define NFTA_HASH_MAX		(__NFTA_HASH_MAX - 1)
+#define NFTA_NG_MAX	(__NFTA_NG_MAX - 1)
+
+enum nft_ng_types {
+	NFT_NG_INCREMENTAL,
+	NFT_NG_RANDOM,
+	__NFT_NG_MAX
+};
+#define NFT_NG_MAX	(__NFT_NG_MAX - 1)
 
 #endif /* _LINUX_NF_TABLES_H */

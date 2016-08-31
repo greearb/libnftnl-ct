@@ -23,7 +23,7 @@
 struct nftnl_expr_ng {
 	enum nft_registers	dreg;
 	unsigned int		until;
-	enum nft_ng_type	type;
+	enum nft_ng_types	type;
 };
 
 static int
@@ -199,6 +199,8 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 		ret = snprintf(buf, len, "reg %u = random(%u) ", ng->dreg,
 			       ng->until);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		break;
+	default:
 		break;
 	}
 
