@@ -408,12 +408,12 @@ int nftnl_trace_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_trace *t)
 		t->flags |= (1 << NFTNL_TRACE_TRANSPORT_HEADER);
 
 	if (tb[NFTA_TRACE_NFPROTO]) {
-		t->nfproto = ntohs(mnl_attr_get_u16(tb[NFTA_TRACE_NFPROTO]));
+		t->nfproto = ntohl(mnl_attr_get_u32(tb[NFTA_TRACE_NFPROTO]));
 		t->flags |= (1 << NFTNL_TRACE_NFPROTO);
 	}
 
 	if (tb[NFTA_TRACE_POLICY]) {
-		t->policy = ntohs(mnl_attr_get_u16(tb[NFTA_TRACE_POLICY]));
+		t->policy = ntohl(mnl_attr_get_u32(tb[NFTA_TRACE_POLICY]));
 		t->flags |= (1 << NFTNL_TRACE_POLICY);
 	}
 
