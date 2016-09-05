@@ -26,6 +26,7 @@ struct nftnl_expr_hash {
 	unsigned int		len;
 	unsigned int		modulus;
 	unsigned int		seed;
+	unsigned int		offset;
 };
 
 static int
@@ -49,6 +50,9 @@ nftnl_expr_hash_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_HASH_SEED:
 		hash->seed = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_HASH_OFFSET:
+		hash->offset = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -78,6 +82,9 @@ nftnl_expr_hash_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_HASH_SEED:
 		*data_len = sizeof(hash->seed);
 		return &hash->seed;
+	case NFTNL_EXPR_HASH_OFFSET:
+		*data_len = sizeof(hash->offset);
+		return &hash->offset;
 	}
 	return NULL;
 }
@@ -96,6 +103,7 @@ static int nftnl_expr_hash_cb(const struct nlattr *attr, void *data)
 	case NFTA_HASH_LEN:
 	case NFTA_HASH_MODULUS:
 	case NFTA_HASH_SEED:
+	case NFTA_HASH_OFFSET:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -120,7 +128,8 @@ nftnl_expr_hash_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_HASH_MODULUS, htonl(hash->modulus));
 	if (e->flags & (1 << NFTNL_EXPR_HASH_SEED))
 		mnl_attr_put_u32(nlh, NFTA_HASH_SEED, htonl(hash->seed));
-
+	if (e->flags & (1 << NFTNL_EXPR_HASH_OFFSET))
+		mnl_attr_put_u32(nlh, NFTA_HASH_OFFSET, htonl(hash->offset));
 }
 
 static int
@@ -153,6 +162,10 @@ nftnl_expr_hash_parse(struct nftnl_expr *e, struct nlattr *attr)
 		hash->seed = ntohl(mnl_attr_get_u32(tb[NFTA_HASH_SEED]));
 		e->flags |= (1 << NFTNL_EXPR_HASH_SEED);
 	}
+	if (tb[NFTA_HASH_OFFSET]) {
+		hash->offset = ntohl(mnl_attr_get_u32(tb[NFTA_HASH_OFFSET]));
+		e->flags |= (1 << NFTNL_EXPR_HASH_OFFSET);
+	}
 
 	return ret;
 }
@@ -161,7 +174,7 @@ static int nftnl_expr_hash_json_parse(struct nftnl_expr *e, json_t *root,
 				      struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
-	uint32_t sreg, dreg, len, modulus, seed;
+	uint32_t sreg, dreg, len, modulus, seed, offset;
 
 	if (nftnl_jansson_parse_reg(root, "sreg", NFTNL_TYPE_U32,
 				    &sreg, err) == 0)
@@ -183,6 +196,10 @@ static int nftnl_expr_hash_json_parse(struct nftnl_expr *e, json_t *root,
 				    &seed, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_SEED, seed);
 
+	if (nftnl_jansson_parse_val(root, "offset", NFTNL_TYPE_U32,
+				    &offset, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_OFFSET, offset);
+
 	return 0;
 #else
 	errno = EOPNOTSUPP;
@@ -196,7 +213,7 @@ static int nftnl_expr_hash_xml_parse(struct nftnl_expr *e,
 				     struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
-	uint32_t sreg, dreg, len, modulus, seed;
+	uint32_t sreg, dreg, len, modulus, seed, offset;
 
 	if (nftnl_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
 				 NFTNL_XML_MAND, err) == 0)
@@ -221,6 +238,11 @@ static int nftnl_expr_hash_xml_parse(struct nftnl_expr *e,
 				 err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_SEED, seed);
 
+	if (nftnl_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
+				 &offset, NFTNL_TYPE_U32, NFTNL_XML_MAND,
+				 err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_OFFSET, offset);
+
 	return 0;
 #else
 	errno = EOPNOTSUPP;
@@ -235,9 +257,10 @@ nftnl_expr_hash_snprintf_default(char *buf, size_t size,
 	struct nftnl_expr_hash *hash = nftnl_expr_data(e);
 	int len = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "reg %u = jhash(reg %u, %u, 0x%x) %% mod %u ",
-		       hash->dreg, hash->sreg, hash->len, hash->seed,
-		       hash->modulus);
+	ret = snprintf(buf, len,
+		       "reg %u = %u + jhash(reg %u, %u, 0x%x) %% mod %u ",
+		       hash->offset, hash->dreg, hash->sreg, hash->len,
+		       hash->seed, hash->modulus);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -260,6 +283,8 @@ static int nftnl_expr_hash_export(char *buf, size_t size,
 		nftnl_buf_u32(&b, type, hash->modulus, MODULUS);
 	if (e->flags & (1 << NFTNL_EXPR_HASH_SEED))
 		nftnl_buf_u32(&b, type, hash->seed, SEED);
+	if (e->flags & (1 << NFTNL_EXPR_HASH_OFFSET))
+		nftnl_buf_u32(&b, type, hash->offset, OFFSET);
 
 	return nftnl_buf_done(&b);
 }
@@ -297,6 +322,8 @@ static bool nftnl_expr_hash_cmp(const struct nftnl_expr *e1,
                eq &= (h1->modulus == h2->modulus);
        if (e1->flags & (1 << NFTNL_EXPR_HASH_SEED))
                eq &= (h1->seed == h2->seed);
+	if (e1->flags & (1 << NFTNL_EXPR_HASH_OFFSET))
+		eq &= (h1->offset == h2->offset);
 
        return eq;
 }
