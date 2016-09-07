@@ -33,9 +33,9 @@ static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NG_DREG) !=
 	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NG_DREG))
 		print_err("Expr NFTNL_EXPR_NG_DREG mismatches");
-	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NG_UNTIL) !=
-	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NG_UNTIL))
-		print_err("Expr NFTNL_EXPR_NG_UNTIL mismatches");
+	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NG_MODULUS) !=
+	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NG_MODULUS))
+		print_err("Expr NFTNL_EXPR_NG_MODULUS mismatches");
 	if (nftnl_expr_get_u32(rule_a, NFTNL_EXPR_NG_TYPE) !=
 	    nftnl_expr_get_u32(rule_b, NFTNL_EXPR_NG_TYPE))
 		print_err("Expr NFTNL_EXPR_NG_TYPE mismatches");
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 		print_err("OOM");
 
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_NG_DREG, 0x1234568);
-	nftnl_expr_set_u32(ex, NFTNL_EXPR_NG_UNTIL, 0x78123456);
+	nftnl_expr_set_u32(ex, NFTNL_EXPR_NG_MODULUS, 0x78123456);
 	nftnl_expr_set_u32(ex, NFTNL_EXPR_NG_TYPE, NFT_NG_INCREMENTAL);
 
 	nftnl_rule_add_expr(a, ex);

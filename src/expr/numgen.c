@@ -22,7 +22,7 @@
 
 struct nftnl_expr_ng {
 	enum nft_registers	dreg;
-	unsigned int		until;
+	unsigned int		modulus;
 	enum nft_ng_types	type;
 };
 
@@ -36,8 +36,8 @@ nftnl_expr_ng_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_NG_DREG:
 		ng->dreg = *((uint32_t *)data);
 		break;
-	case NFTNL_EXPR_NG_UNTIL:
-		ng->until = *((uint32_t *)data);
+	case NFTNL_EXPR_NG_MODULUS:
+		ng->modulus = *((uint32_t *)data);
 		break;
 	case NFTNL_EXPR_NG_TYPE:
 		ng->type = *((uint32_t *)data);
@@ -58,9 +58,9 @@ nftnl_expr_ng_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_NG_DREG:
 		*data_len = sizeof(ng->dreg);
 		return &ng->dreg;
-	case NFTNL_EXPR_NG_UNTIL:
-		*data_len = sizeof(ng->until);
-		return &ng->until;
+	case NFTNL_EXPR_NG_MODULUS:
+		*data_len = sizeof(ng->modulus);
+		return &ng->modulus;
 	case NFTNL_EXPR_NG_TYPE:
 		*data_len = sizeof(ng->type);
 		return &ng->type;
@@ -78,7 +78,7 @@ static int nftnl_expr_ng_cb(const struct nlattr *attr, void *data)
 
 	switch (type) {
 	case NFTA_NG_DREG:
-	case NFTA_NG_UNTIL:
+	case NFTA_NG_MODULUS:
 	case NFTA_NG_TYPE:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
@@ -96,8 +96,8 @@ nftnl_expr_ng_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 
 	if (e->flags & (1 << NFTNL_EXPR_NG_DREG))
 		mnl_attr_put_u32(nlh, NFTA_NG_DREG, htonl(ng->dreg));
-	if (e->flags & (1 << NFTNL_EXPR_NG_UNTIL))
-		mnl_attr_put_u32(nlh, NFTA_NG_UNTIL, htonl(ng->until));
+	if (e->flags & (1 << NFTNL_EXPR_NG_MODULUS))
+		mnl_attr_put_u32(nlh, NFTA_NG_MODULUS, htonl(ng->modulus));
 	if (e->flags & (1 << NFTNL_EXPR_NG_TYPE))
 		mnl_attr_put_u32(nlh, NFTA_NG_TYPE, htonl(ng->type));
 }
@@ -116,9 +116,9 @@ nftnl_expr_ng_parse(struct nftnl_expr *e, struct nlattr *attr)
 		ng->dreg = ntohl(mnl_attr_get_u32(tb[NFTA_NG_DREG]));
 		e->flags |= (1 << NFTNL_EXPR_NG_DREG);
 	}
-	if (tb[NFTA_NG_UNTIL]) {
-		ng->until = ntohl(mnl_attr_get_u32(tb[NFTA_NG_UNTIL]));
-		e->flags |= (1 << NFTNL_EXPR_NG_UNTIL);
+	if (tb[NFTA_NG_MODULUS]) {
+		ng->modulus = ntohl(mnl_attr_get_u32(tb[NFTA_NG_MODULUS]));
+		e->flags |= (1 << NFTNL_EXPR_NG_MODULUS);
 	}
 	if (tb[NFTA_NG_TYPE]) {
 		ng->type = ntohl(mnl_attr_get_u32(tb[NFTA_NG_TYPE]));
@@ -132,15 +132,15 @@ static int nftnl_expr_ng_json_parse(struct nftnl_expr *e, json_t *root,
 				    struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
-	uint32_t dreg, until, type;
+	uint32_t dreg, modulus, type;
 
 	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32,
 				    &dreg, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_DREG, dreg);
 
-	if (nftnl_jansson_parse_val(root, "until", NFTNL_TYPE_U32,
-				    &until, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_UNTIL, until);
+	if (nftnl_jansson_parse_val(root, "modulus", NFTNL_TYPE_U32,
+				    &modulus, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_MODULUS, modulus);
 
 	if (nftnl_jansson_parse_val(root, "type", NFTNL_TYPE_U32,
 				    &type, err) == 0)
@@ -159,16 +159,16 @@ static int nftnl_expr_ng_xml_parse(struct nftnl_expr *e,
 				   struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
-	uint32_t dreg, until, type;
+	uint32_t dreg, modulus, type;
 
 	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
 				 NFTNL_XML_MAND, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_DREG, dreg);
 
-	if (nftnl_mxml_num_parse(tree, "until", MXML_DESCEND_FIRST, BASE_DEC,
-				 &until, NFTNL_TYPE_U32, NFTNL_XML_MAND,
+	if (nftnl_mxml_num_parse(tree, "modulus", MXML_DESCEND_FIRST, BASE_DEC,
+				 &modulus, NFTNL_TYPE_U32, NFTNL_XML_MAND,
 				 err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_UNTIL, until);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_MODULUS, modulus);
 
 	if (nftnl_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
 				 &type, NFTNL_TYPE_U32, NFTNL_XML_MAND,
@@ -191,13 +191,13 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 
 	switch (ng->type) {
 	case NFT_NG_INCREMENTAL:
-		ret = snprintf(buf, len, "reg %u = inc(%u) ", ng->dreg,
-			       ng->until);
+		ret = snprintf(buf, len, "reg %u = inc mod %u ", ng->dreg,
+			       ng->modulus);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	case NFT_NG_RANDOM:
-		ret = snprintf(buf, len, "reg %u = random(%u) ", ng->dreg,
-			       ng->until);
+		ret = snprintf(buf, len, "reg %u = random mod %u ", ng->dreg,
+			       ng->modulus);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	default:
@@ -216,8 +216,8 @@ static int nftnl_expr_ng_export(char *buf, size_t size,
 
 	if (e->flags & (1 << NFTNL_EXPR_NG_DREG))
 		nftnl_buf_u32(&b, type, ng->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_NG_UNTIL))
-		nftnl_buf_u32(&b, type, ng->until, UNTIL);
+	if (e->flags & (1 << NFTNL_EXPR_NG_MODULUS))
+		nftnl_buf_u32(&b, type, ng->modulus, MODULUS);
 	if (e->flags & (1 << NFTNL_EXPR_NG_TYPE))
 		nftnl_buf_u32(&b, type, ng->type, TYPE);
 
@@ -249,8 +249,8 @@ static bool nftnl_expr_ng_cmp(const struct nftnl_expr *e1,
 
 	if (e1->flags & (1 << NFTNL_EXPR_NG_DREG))
 		eq &= (n1->dreg == n2->dreg);
-	if (e1->flags & (1 << NFTNL_EXPR_NG_UNTIL))
-		eq &= (n1->until == n2->until);
+	if (e1->flags & (1 << NFTNL_EXPR_NG_MODULUS))
+		eq &= (n1->modulus == n2->modulus);
 	if (e1->flags & (1 << NFTNL_EXPR_NG_TYPE))
 		eq &= (n1->type == n2->type);
 

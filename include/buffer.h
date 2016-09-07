@@ -82,7 +82,6 @@ int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 #define TOTAL			"total"
 #define TYPE			"type"
 #define UNIT			"unit"
-#define UNTIL			"until"
 #define USE			"use"
 #define XOR			"xor"
 #define ADD			"add"
