@@ -39,6 +39,9 @@ static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
 	if (nftnl_expr_get_u16(rule_a, NFTNL_EXPR_QUEUE_TOTAL) !=
 	    nftnl_expr_get_u16(rule_b, NFTNL_EXPR_QUEUE_TOTAL))
 		print_err("Expr NFTNL_EXPR_QUEUE_TOTAL mismatches");
+	if (nftnl_expr_get_u16(rule_a, NFTNL_EXPR_QUEUE_FLAGS) !=
+	    nftnl_expr_get_u16(rule_b, NFTNL_EXPR_QUEUE_FLAGS))
+		print_err("Expr NFTNL_EXPR_QUEUE_FLAGS mismatches");
 }
 
 int main(int argc, char *argv[])
