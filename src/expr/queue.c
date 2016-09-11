@@ -136,7 +136,6 @@ nftnl_expr_queue_json_parse(struct nftnl_expr *e, json_t *root,
 
 	if (nftnl_jansson_parse_val(root, "num", NFTNL_TYPE_U16, &type, err) == 0)
 		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, type);
-	nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, type);
 
 	if (nftnl_jansson_parse_val(root, "total", NFTNL_TYPE_U16, &code, err) == 0)
 		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_TOTAL, code);
