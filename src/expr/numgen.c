@@ -24,6 +24,7 @@ struct nftnl_expr_ng {
 	enum nft_registers	dreg;
 	unsigned int		modulus;
 	enum nft_ng_types	type;
+	unsigned int		offset;
 };
 
 static int
@@ -41,6 +42,9 @@ nftnl_expr_ng_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_NG_TYPE:
 		ng->type = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_NG_OFFSET:
+		ng->offset = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -64,6 +68,9 @@ nftnl_expr_ng_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_NG_TYPE:
 		*data_len = sizeof(ng->type);
 		return &ng->type;
+	case NFTNL_EXPR_NG_OFFSET:
+		*data_len = sizeof(ng->offset);
+		return &ng->offset;
 	}
 	return NULL;
 }
@@ -80,6 +87,7 @@ static int nftnl_expr_ng_cb(const struct nlattr *attr, void *data)
 	case NFTA_NG_DREG:
 	case NFTA_NG_MODULUS:
 	case NFTA_NG_TYPE:
+	case NFTA_NG_OFFSET:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -100,6 +108,8 @@ nftnl_expr_ng_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_NG_MODULUS, htonl(ng->modulus));
 	if (e->flags & (1 << NFTNL_EXPR_NG_TYPE))
 		mnl_attr_put_u32(nlh, NFTA_NG_TYPE, htonl(ng->type));
+	if (e->flags & (1 << NFTNL_EXPR_NG_OFFSET))
+		mnl_attr_put_u32(nlh, NFTA_NG_OFFSET, htonl(ng->offset));
 }
 
 static int
@@ -124,6 +134,10 @@ nftnl_expr_ng_parse(struct nftnl_expr *e, struct nlattr *attr)
 		ng->type = ntohl(mnl_attr_get_u32(tb[NFTA_NG_TYPE]));
 		e->flags |= (1 << NFTNL_EXPR_NG_TYPE);
 	}
+	if (tb[NFTA_NG_OFFSET]) {
+		ng->offset = ntohl(mnl_attr_get_u32(tb[NFTA_NG_OFFSET]));
+		e->flags |= (1 << NFTNL_EXPR_NG_OFFSET);
+	}
 
 	return ret;
 }
@@ -132,7 +146,7 @@ static int nftnl_expr_ng_json_parse(struct nftnl_expr *e, json_t *root,
 				    struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
-	uint32_t dreg, modulus, type;
+	uint32_t dreg, modulus, type, offset;
 
 	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32,
 				    &dreg, err) == 0)
@@ -145,6 +159,10 @@ static int nftnl_expr_ng_json_parse(struct nftnl_expr *e, json_t *root,
 	if (nftnl_jansson_parse_val(root, "type", NFTNL_TYPE_U32,
 				    &type, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_TYPE, type);
+
+	if (nftnl_jansson_parse_val(root, "offset", NFTNL_TYPE_U32,
+				    &offset, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_OFFSET, offset);
 
 	return 0;
 #else
@@ -159,7 +177,7 @@ static int nftnl_expr_ng_xml_parse(struct nftnl_expr *e,
 				   struct nftnl_parse_err *err)
 {
 #ifdef XML_PARSING
-	uint32_t dreg, modulus, type;
+	uint32_t dreg, modulus, type, offset;
 
 	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
 				 NFTNL_XML_MAND, err) == 0)
@@ -174,6 +192,11 @@ static int nftnl_expr_ng_xml_parse(struct nftnl_expr *e,
 				 &type, NFTNL_TYPE_U32, NFTNL_XML_MAND,
 				 err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_TYPE, type);
+
+	if (nftnl_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
+				 &offset, NFTNL_TYPE_U32, NFTNL_XML_MAND,
+				 err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_OFFSET, offset);
 
 	return 0;
 #else
@@ -191,13 +214,13 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 
 	switch (ng->type) {
 	case NFT_NG_INCREMENTAL:
-		ret = snprintf(buf, len, "reg %u = inc mod %u ", ng->dreg,
-			       ng->modulus);
+		ret = snprintf(buf, len, "reg %u = %u + inc mod %u ", ng->dreg,
+			       ng->offset, ng->modulus);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	case NFT_NG_RANDOM:
-		ret = snprintf(buf, len, "reg %u = random mod %u ", ng->dreg,
-			       ng->modulus);
+		ret = snprintf(buf, len, "reg %u = %u + random mod %u ",
+			       ng->dreg, ng->offset, ng->modulus);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	default:
@@ -220,6 +243,8 @@ static int nftnl_expr_ng_export(char *buf, size_t size,
 		nftnl_buf_u32(&b, type, ng->modulus, MODULUS);
 	if (e->flags & (1 << NFTNL_EXPR_NG_TYPE))
 		nftnl_buf_u32(&b, type, ng->type, TYPE);
+	if (e->flags & (1 << NFTNL_EXPR_NG_OFFSET))
+		nftnl_buf_u32(&b, type, ng->type, OFFSET);
 
 	return nftnl_buf_done(&b);
 }
@@ -253,6 +278,8 @@ static bool nftnl_expr_ng_cmp(const struct nftnl_expr *e1,
 		eq &= (n1->modulus == n2->modulus);
 	if (e1->flags & (1 << NFTNL_EXPR_NG_TYPE))
 		eq &= (n1->type == n2->type);
+	if (e1->flags & (1 << NFTNL_EXPR_NG_OFFSET))
+		eq &= (n1->offset == n2->offset);
 
 	return eq;
 }
