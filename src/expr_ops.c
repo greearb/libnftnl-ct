@@ -31,6 +31,7 @@ extern struct expr_ops expr_ops_quota;
 extern struct expr_ops expr_ops_target;
 extern struct expr_ops expr_ops_dynset;
 extern struct expr_ops expr_ops_hash;
+extern struct expr_ops expr_ops_fib;
 
 static struct expr_ops expr_ops_notrack = {
 	.name	= "notrack",
@@ -65,6 +66,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_target,
 	&expr_ops_dynset,
 	&expr_ops_hash,
+	&expr_ops_fib,
 	NULL,
 };
 
