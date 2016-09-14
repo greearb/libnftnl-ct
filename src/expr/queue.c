@@ -21,6 +21,7 @@
 #include <libnftnl/rule.h>
 
 struct nftnl_expr_queue {
+	enum nft_registers	sreg_qnum;
 	uint16_t		queuenum;
 	uint16_t		queues_total;
 	uint16_t		flags;
@@ -40,6 +41,9 @@ static int nftnl_expr_queue_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_QUEUE_FLAGS:
 		queue->flags = *((uint16_t *)data);
+		break;
+	case NFTNL_EXPR_QUEUE_SREG_QNUM:
+		queue->sreg_qnum = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -63,6 +67,9 @@ nftnl_expr_queue_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_QUEUE_FLAGS:
 		*data_len = sizeof(queue->flags);
 		return &queue->flags;
+	case NFTNL_EXPR_QUEUE_SREG_QNUM:
+		*data_len = sizeof(queue->sreg_qnum);
+		return &queue->sreg_qnum;
 	}
 	return NULL;
 }
@@ -82,6 +89,10 @@ static int nftnl_expr_queue_cb(const struct nlattr *attr, void *data)
 		if (mnl_attr_validate(attr, MNL_TYPE_U16) < 0)
 			abi_breakage();
 		break;
+	case NFTA_QUEUE_SREG_QNUM:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
+		break;
 	}
 
 	tb[type] = attr;
@@ -99,6 +110,8 @@ nftnl_expr_queue_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u16(nlh, NFTA_QUEUE_TOTAL, htons(queue->queues_total));
 	if (e->flags & (1 << NFTNL_EXPR_QUEUE_FLAGS))
 		mnl_attr_put_u16(nlh, NFTA_QUEUE_FLAGS, htons(queue->flags));
+	if (e->flags & (1 << NFTNL_EXPR_QUEUE_SREG_QNUM))
+		mnl_attr_put_u32(nlh, NFTA_QUEUE_SREG_QNUM, htonl(queue->sreg_qnum));
 }
 
 static int
@@ -122,6 +135,10 @@ nftnl_expr_queue_parse(struct nftnl_expr *e, struct nlattr *attr)
 		queue->flags = ntohs(mnl_attr_get_u16(tb[NFTA_QUEUE_FLAGS]));
 		e->flags |= (1 << NFTNL_EXPR_QUEUE_FLAGS);
 	}
+	if (tb[NFTA_QUEUE_SREG_QNUM]) {
+		queue->sreg_qnum = ntohl(mnl_attr_get_u32(tb[NFTA_QUEUE_SREG_QNUM]));
+		e->flags |= (1 << NFTNL_EXPR_QUEUE_SREG_QNUM);
+	}
 
 	return 0;
 }
@@ -131,6 +148,7 @@ nftnl_expr_queue_json_parse(struct nftnl_expr *e, json_t *root,
 			       struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
+	uint32_t sreg_qnum;
 	uint16_t type;
 	uint16_t code;
 
@@ -142,6 +160,10 @@ nftnl_expr_queue_json_parse(struct nftnl_expr *e, json_t *root,
 
 	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U16, &code, err) == 0)
 		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_FLAGS, code);
+
+	if (nftnl_jansson_parse_val(root, "sreg_qnum", NFTNL_TYPE_U32, &sreg_qnum,
+				    err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_QUEUE_SREG_QNUM, sreg_qnum);
 
 	return 0;
 #else
@@ -156,6 +178,7 @@ nftnl_expr_queue_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 {
 #ifdef XML_PARSING
 	uint16_t queue_num, queue_total, flags;
+	uint32_t sreg_qnum;
 
 	if (nftnl_mxml_num_parse(tree, "num", MXML_DESCEND_FIRST, BASE_DEC,
 			       &queue_num, NFTNL_TYPE_U16, NFTNL_XML_MAND,
@@ -172,6 +195,11 @@ nftnl_expr_queue_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
 			       NFTNL_XML_MAND, err) == 0)
 		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_FLAGS, flags);
 
+	if (nftnl_mxml_num_parse(tree, "sreg_qnum", MXML_DESCEND_FIRST, BASE_DEC,
+			       &sreg_qnum, NFTNL_TYPE_U32,
+			       NFTNL_XML_MAND, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_QUEUE_SREG_QNUM, sreg_qnum);
+
 	return 0;
 #else
 	errno = EOPNOTSUPP;
@@ -186,23 +214,34 @@ static int nftnl_expr_queue_snprintf_default(char *buf, size_t len,
 	int ret, size = len, offset = 0;
 	uint16_t total_queues;
 
-	total_queues = queue->queuenum + queue->queues_total -1;
+	if (e->flags & (1 << NFTNL_EXPR_QUEUE_NUM)) {
+		total_queues = queue->queuenum + queue->queues_total - 1;
 
-	ret = snprintf(buf + offset, len, "num %u", queue->queuenum);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, len, "num %u", queue->queuenum);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
-	if (queue->queues_total && total_queues != queue->queuenum) {
-		ret = snprintf(buf + offset, len, "-%u", total_queues);
+		if (queue->queues_total && total_queues != queue->queuenum) {
+			ret = snprintf(buf + offset, len, "-%u", total_queues);
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		}
+
+		ret = snprintf(buf + offset, len, " ");
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+
+	if (e->flags & (1 << NFTNL_EXPR_QUEUE_SREG_QNUM)) {
+		ret = snprintf(buf + offset, len, "sreg_qnum %u ",
+			       queue->sreg_qnum);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_QUEUE_FLAGS)) {
 		if (queue->flags & (NFT_QUEUE_FLAG_BYPASS)) {
-			ret = snprintf(buf + offset, len, " bypass");
+			ret = snprintf(buf + offset, len, "bypass ");
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 		if (queue->flags & (NFT_QUEUE_FLAG_CPU_FANOUT)) {
-			ret = snprintf(buf + offset, len, " fanout");
+			ret = snprintf(buf + offset, len, "fanout ");
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 	}
@@ -221,6 +260,8 @@ static int nftnl_expr_queue_export(char *buf, size_t size,
 		nftnl_buf_u32(&b, type, queue->queues_total, TOTAL);
 	if (e->flags & (1 << NFTNL_EXPR_QUEUE_FLAGS))
 		nftnl_buf_u32(&b, type, queue->flags, FLAGS);
+	if (e->flags & (1 << NFTNL_EXPR_QUEUE_SREG_QNUM))
+		nftnl_buf_u32(&b, type, queue->sreg_qnum, SREG_QNUM);
 
 	return nftnl_buf_done(&b);
 }
@@ -255,6 +296,8 @@ static bool nftnl_expr_queue_cmp(const struct nftnl_expr *e1,
 		eq &= (q1->queues_total == q2->queues_total);
 	if (e1->flags & (1 << NFTNL_EXPR_QUEUE_FLAGS))
 		eq &= (q1->flags == q2->flags);
+	if (e1->flags & (1 << NFTNL_EXPR_QUEUE_SREG_QNUM))
+		eq &= (q1->sreg_qnum == q2->sreg_qnum);
 
 	return eq;
 }

@@ -77,6 +77,7 @@ int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 #define SREG_PROTO_MIN		"sreg_proto_min"
 #define SREG_KEY		"sreg_key"
 #define SREG_DATA		"sreg_data"
+#define SREG_QNUM		"sreg_qnum"
 #define SREG			"sreg"
 #define TABLE			"table"
 #define TOTAL			"total"
