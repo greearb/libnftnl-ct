@@ -27,6 +27,7 @@ check_PROGRAMS = 	nft-parsing-test		\
 			nft-expr_nat-test		\
 			nft-expr_payload-test		\
 			nft-expr_queue-test		\
+			nft-expr_range-test             \
 			nft-expr_quota-test		\
 			nft-expr_redir-test		\
 			nft-expr_reject-test		\
@@ -107,6 +108,9 @@ nft_expr_queue_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_quota_test_SOURCES = nft-expr_quota-test.c
 nft_expr_quota_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
+nft_expr_range_test_SOURCES = nft-expr_range-test.c
+nft_expr_range_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_reject_test_SOURCES = nft-expr_reject-test.c
 nft_expr_reject_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}

@@ -22,6 +22,7 @@ extern struct expr_ops expr_ops_meta;
 extern struct expr_ops expr_ops_ng;
 extern struct expr_ops expr_ops_nat;
 extern struct expr_ops expr_ops_payload;
+extern struct expr_ops expr_ops_range;
 extern struct expr_ops expr_ops_redir;
 extern struct expr_ops expr_ops_reject;
 extern struct expr_ops expr_ops_queue;
@@ -49,6 +50,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_ng,
 	&expr_ops_nat,
 	&expr_ops_payload,
+	&expr_ops_range,
 	&expr_ops_redir,
 	&expr_ops_reject,
 	&expr_ops_queue,

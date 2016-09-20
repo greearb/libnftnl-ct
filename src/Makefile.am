@@ -24,6 +24,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/bitwise.c	\
 		      expr/byteorder.c	\
 		      expr/cmp.c	\
+		      expr/range.c	\
 		      expr/counter.c	\
 		      expr/ct.c		\
 		      expr/data_reg.c	\
