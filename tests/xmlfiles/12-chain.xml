@@ -1,1 +1,0 @@
-<nftables><add><chain><name>foo</name><handle>100</handle><bytes>59264154979</bytes><packets>2548796325</packets><table>nat</table><family>ip</family><type>nat</type><hooknum>postrouting</hooknum><prio>0</prio><policy>accept</policy></chain></add></nftables>

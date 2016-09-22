@@ -209,47 +209,6 @@ nftnl_expr_bitwise_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_bitwise_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-				struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
-	uint32_t sreg, dreg, len;
-
-	if (nftnl_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BITWISE_SREG, sreg);
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BITWISE_DREG, dreg);
-
-	if (nftnl_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &len, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BITWISE_LEN, len);
-
-	if (nftnl_mxml_data_reg_parse(tree, "mask", &bitwise->mask, NFTNL_XML_MAND,
-				    err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_EXPR_BITWISE_MASK);
-
-	if (nftnl_mxml_data_reg_parse(tree, "xor", &bitwise->xor, NFTNL_XML_MAND,
-				    err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_EXPR_BITWISE_XOR);
-
-	/* Additional validation: mask and xor must use the same number of
-	 * data registers.
-	 */
-	if (bitwise->mask.len != bitwise->xor.len)
-		return -1;
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_bitwise_export(char *buf, size_t size,
 				     const struct nftnl_expr *e, int type)
 {
@@ -341,6 +300,5 @@ struct expr_ops expr_ops_bitwise = {
 	.parse		= nftnl_expr_bitwise_parse,
 	.build		= nftnl_expr_bitwise_build,
 	.snprintf	= nftnl_expr_bitwise_snprintf,
-	.xml_parse	= nftnl_expr_bitwise_xml_parse,
 	.json_parse	= nftnl_expr_bitwise_json_parse,
 };

@@ -236,9 +236,7 @@ int main(int argc, char *argv[])
 		type = NFTNL_OUTPUT_DEFAULT;
 		break;
 	case 2:
-		if (strcmp(argv[1], "xml") == 0) {
-			type = NFTNL_OUTPUT_XML;
-		} else if (strcmp(argv[1], "json") == 0) {
+		if (strcmp(argv[1], "json") == 0) {
 			type = NFTNL_OUTPUT_JSON;
 		} else if (strcmp(argv[1], "default") == 0) {
 			type = NFTNL_OUTPUT_DEFAULT;
@@ -248,7 +246,7 @@ int main(int argc, char *argv[])
 		}
 		break;
 	default:
-		fprintf(stderr, "%s [<default|xml|json>]\n", argv[0]);
+		fprintf(stderr, "%s [<default|json>]\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 

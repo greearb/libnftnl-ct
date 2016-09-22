@@ -263,53 +263,6 @@ err:
 }
 
 
-static int nftnl_expr_ct_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-				      struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	const char *key_str, *dir_str;
-	int key;
-	uint8_t dir;
-	uint32_t dreg, sreg;
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_OPT, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CT_DREG, dreg);
-
-	if (nftnl_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_OPT, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CT_SREG, sreg);
-
-	key_str = nftnl_mxml_str_parse(tree, "key", MXML_DESCEND_FIRST,
-				     NFTNL_XML_MAND, err);
-	if (key_str != NULL) {
-		key = str2ctkey(key_str);
-		if (key < 0)
-			return -1;
-
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CT_KEY, key);
-	}
-	dir_str = nftnl_mxml_str_parse(tree, "dir", MXML_DESCEND_FIRST,
-				     NFTNL_XML_OPT, err);
-	if (dir_str != NULL) {
-		if (str2ctdir(dir_str, &dir) != 0) {
-			err->node_name = "dir";
-			err->error = NFTNL_PARSE_EBADTYPE;
-			goto err;
-		}
-		nftnl_expr_set_u8(e, NFTNL_EXPR_CT_DIR, dir);
-	}
-
-	return 0;
-err:
-	errno = EINVAL;
-	return -1;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int
 nftnl_expr_ct_export(char *buf, size_t size, const struct nftnl_expr *e,
 		     int type)
@@ -402,6 +355,5 @@ struct expr_ops expr_ops_ct = {
 	.parse		= nftnl_expr_ct_parse,
 	.build		= nftnl_expr_ct_build,
 	.snprintf	= nftnl_expr_ct_snprintf,
-	.xml_parse	= nftnl_expr_ct_xml_parse,
 	.json_parse	= nftnl_expr_ct_json_parse,
 };

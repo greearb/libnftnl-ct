@@ -221,45 +221,6 @@ nftnl_expr_exthdr_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_exthdr_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-			       struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	const char *exthdr_type;
-	int type;
-	uint32_t dreg, len, offset;
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_DREG, dreg);
-
-	exthdr_type = nftnl_mxml_str_parse(tree, "exthdr_type",
-					 MXML_DESCEND_FIRST, NFTNL_XML_MAND, err);
-	if (exthdr_type != NULL) {
-		type = str2exthdr_type(exthdr_type);
-		if (type < 0)
-			return -1;
-		nftnl_expr_set_u8(e, NFTNL_EXPR_EXTHDR_TYPE, type);
-	}
-
-	/* Get and set <offset> */
-	if (nftnl_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
-			       &offset, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_OFFSET, offset);
-
-	/* Get and set <len> */
-	if (nftnl_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &len, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_LEN, len);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_exthdr_export(char *buf, size_t len,
 				    const struct nftnl_expr *e, int type)
 {
@@ -333,6 +294,5 @@ struct expr_ops expr_ops_exthdr = {
 	.parse		= nftnl_expr_exthdr_parse,
 	.build		= nftnl_expr_exthdr_build,
 	.snprintf	= nftnl_expr_exthdr_snprintf,
-	.xml_parse	= nftnl_expr_exthdr_xml_parse,
 	.json_parse	= nftnl_expr_exthdr_json_parse,
 };

@@ -15,15 +15,9 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl Dependencies
 PKG_CHECK_MODULES([LIBMNL], [libmnl >= 1.0.0])
-AC_ARG_WITH([xml-parsing],
-	AS_HELP_STRING([--with-xml-parsing], [XML parsing support]))
 AC_ARG_WITH([json-parsing],
 	AS_HELP_STRING([--with-json-parsing], [JSON parsing support]))
 
-AS_IF([test "x$with_xml_parsing" = "xyes"],
-	[PKG_CHECK_MODULES([LIBXML], [mxml >= 2.6])],
-	[with_xml_parsing="no"]
-)
 AS_IF([test "x$with_json_parsing" = "xyes"],
 	[PKG_CHECK_MODULES([LIBJSON], [jansson >= 2.3])],
 	[with_json_parsing="no"]
@@ -40,9 +34,6 @@ case "$host" in
 esac
 
 regular_CPPFLAGS="-D_FILE_OFFSET_BITS=64 -D_REENTRANT"
-AS_IF([test "x$with_xml_parsing" = "xyes"], [
-	regular_CPPFLAGS="$regular_CPPFLAGS -DXML_PARSING"
-])
 
 AS_IF([test "x$with_json_parsing" = "xyes"], [
 	regular_CPPFLAGS="$regular_CPPFLAGS -DJSON_PARSING"
@@ -57,5 +48,4 @@ AC_OUTPUT
 
 echo "
 libnftnl configuration:
-  XML support:				${with_xml_parsing}
   JSON support:				${with_json_parsing}"

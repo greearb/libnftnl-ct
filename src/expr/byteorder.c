@@ -234,48 +234,6 @@ nftnl_expr_byteorder_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_byteorder_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-				  struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	const char *op;
-	int32_t ntoh;
-	uint32_t sreg, dreg, len, size;
-
-	if (nftnl_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BYTEORDER_SREG, sreg);
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND, NFTNL_XML_MAND,
-			       err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BYTEORDER_DREG, dreg);
-
-	op = nftnl_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFTNL_XML_MAND,
-				err);
-	if (op != NULL) {
-		ntoh = nftnl_str2ntoh(op);
-		if (ntoh < 0)
-			return -1;
-
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BYTEORDER_OP, ntoh);
-	}
-
-	if (nftnl_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &len, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BYTEORDER_LEN, len);
-
-	if (nftnl_mxml_num_parse(tree, "size", MXML_DESCEND_FIRST, BASE_DEC,
-			       &size, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BYTEORDER_SIZE, size);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_byteorder_export(char *buf, size_t size,
 				       const struct nftnl_expr *e, int type)
 {
@@ -357,6 +315,5 @@ struct expr_ops expr_ops_byteorder = {
 	.parse		= nftnl_expr_byteorder_parse,
 	.build		= nftnl_expr_byteorder_build,
 	.snprintf	= nftnl_expr_byteorder_snprintf,
-	.xml_parse	= nftnl_expr_byteorder_xml_parse,
 	.json_parse	= nftnl_expr_byteorder_json_parse,
 };

@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 	int ret, family;
 
 	if (argc < 2 || argc > 5) {
-		fprintf(stderr, "Usage: %s <family> [<table> <chain>] [xml|json]\n",
+		fprintf(stderr, "Usage: %s <family> [<table> <chain>] [json]\n",
 			argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -102,11 +102,9 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	/* [xml|json] specified */
+	/* json specified */
 	if (argc == 3 || argc == 5) {
-		if (strcmp(argv[argc - 1], "xml") == 0)
-			type = NFTNL_OUTPUT_XML;
-		else if (strcmp(argv[argc - 1], "json") == 0)
+		if (strcmp(argv[argc - 1], "json") == 0)
 			type = NFTNL_OUTPUT_JSON;
 	}
 

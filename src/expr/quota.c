@@ -136,27 +136,6 @@ nftnl_expr_quota_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int nftnl_expr_quota_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-				      struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	uint64_t bytes;
-	uint32_t flags;
-
-	if (nftnl_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
-				 &bytes, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u64(e, NFTNL_EXPR_QUOTA_BYTES, bytes);
-	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-				 &flags, NFTNL_TYPE_U32, NFTNL_XML_MAND,  err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_QUOTA_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_quota_export(char *buf, size_t size,
 				   const struct nftnl_expr *e, int type)
 {
@@ -205,6 +184,5 @@ struct expr_ops expr_ops_quota = {
 	.parse		= nftnl_expr_quota_parse,
 	.build		= nftnl_expr_quota_build,
 	.snprintf	= nftnl_expr_quota_snprintf,
-	.xml_parse	= nftnl_expr_quota_xml_parse,
 	.json_parse	= nftnl_expr_quota_json_parse,
 };

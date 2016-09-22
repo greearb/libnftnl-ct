@@ -609,92 +609,6 @@ static int nftnl_rule_json_parse(struct nftnl_rule *r, const void *json,
 #endif
 }
 
-#ifdef XML_PARSING
-int nftnl_mxml_rule_parse(mxml_node_t *tree, struct nftnl_rule *r,
-			struct nftnl_parse_err *err,
-			struct nftnl_set_list *set_list)
-{
-	mxml_node_t *node;
-	struct nftnl_expr *e;
-	const char *table, *chain;
-	int family;
-
-	family = nftnl_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
-				       NFTNL_XML_MAND, err);
-	if (family >= 0)
-		nftnl_rule_set_u32(r, NFTNL_RULE_FAMILY, family);
-
-	table = nftnl_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
-				   NFTNL_XML_MAND, err);
-	if (table != NULL)
-		nftnl_rule_set_str(r, NFTNL_RULE_TABLE, table);
-
-	chain = nftnl_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST,
-				   NFTNL_XML_MAND, err);
-	if (chain != NULL)
-		nftnl_rule_set_str(r, NFTNL_RULE_CHAIN, chain);
-
-	if (nftnl_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
-			      &r->handle, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) >= 0)
-		r->flags |= (1 << NFTNL_RULE_HANDLE);
-
-	if (nftnl_mxml_num_parse(tree, "compat_proto", MXML_DESCEND_FIRST,
-			       BASE_DEC, &r->compat.proto, NFTNL_TYPE_U32,
-			       NFTNL_XML_OPT, err) >= 0)
-		r->flags |= (1 << NFTNL_RULE_COMPAT_PROTO);
-
-	if (nftnl_mxml_num_parse(tree, "compat_flags", MXML_DESCEND_FIRST,
-			       BASE_DEC, &r->compat.flags, NFTNL_TYPE_U32,
-			       NFTNL_XML_OPT, err) >= 0)
-		r->flags |= (1 << NFTNL_RULE_COMPAT_FLAGS);
-
-	if (nftnl_rule_is_set(r, NFTNL_RULE_COMPAT_PROTO) !=
-			nftnl_rule_is_set(r, NFTNL_RULE_COMPAT_FLAGS)) {
-		errno = EINVAL;
-	}
-
-	if (nftnl_mxml_num_parse(tree, "position", MXML_DESCEND_FIRST,
-			       BASE_DEC, &r->position, NFTNL_TYPE_U64,
-			       NFTNL_XML_OPT, err) >= 0)
-		r->flags |= (1 << NFTNL_RULE_POSITION);
-
-	/* Iterating over <expr> */
-	for (node = mxmlFindElement(tree, tree, "expr", "type",
-				    NULL, MXML_DESCEND);
-		node != NULL;
-		node = mxmlFindElement(node, tree, "expr", "type",
-				       NULL, MXML_DESCEND)) {
-		e = nftnl_mxml_expr_parse(node, err, set_list);
-		if (e == NULL)
-			return -1;
-
-		nftnl_rule_add_expr(r, e);
-	}
-
-	return 0;
-}
-#endif
-
-static int nftnl_rule_xml_parse(struct nftnl_rule *r, const void *xml,
-			      struct nftnl_parse_err *err,
-			      enum nftnl_parse_input input,
-			      struct nftnl_set_list *set_list)
-{
-#ifdef XML_PARSING
-	int ret;
-	mxml_node_t *tree = nftnl_mxml_build_tree(xml, "rule", err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_mxml_rule_parse(tree, r, err, set_list);
-	mxmlDelete(tree);
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_rule_do_parse(struct nftnl_rule *r, enum nftnl_parse_type type,
 			     const void *data, struct nftnl_parse_err *err,
 			     enum nftnl_parse_input input)
@@ -703,12 +617,10 @@ static int nftnl_rule_do_parse(struct nftnl_rule *r, enum nftnl_parse_type type,
 	struct nftnl_parse_err perr = {};
 
 	switch (type) {
-	case NFTNL_PARSE_XML:
-		ret = nftnl_rule_xml_parse(r, data, &perr, input, NULL);
-		break;
 	case NFTNL_PARSE_JSON:
 		ret = nftnl_rule_json_parse(r, data, &perr, input, NULL);
 		break;
+	case NFTNL_PARSE_XML:
 	default:
 		ret = -1;
 		errno = EOPNOTSUPP;
@@ -812,73 +724,6 @@ static int nftnl_rule_snprintf_json(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_rule_snprintf_xml(char *buf, size_t size,
-				   const struct nftnl_rule *r,
-				   uint32_t type, uint32_t flags)
-{
-	int ret, len = size, offset = 0;
-	struct nftnl_expr *expr;
-
-	ret = snprintf(buf, len, "<rule>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	if (r->flags & (1 << NFTNL_RULE_FAMILY)) {
-		ret = snprintf(buf+offset, len, "<family>%s</family>",
-			       nftnl_family2str(r->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (r->flags & (1 << NFTNL_RULE_TABLE)) {
-		ret = snprintf(buf+offset, len, "<table>%s</table>",
-			       r->table);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (r->flags & (1 << NFTNL_RULE_CHAIN)) {
-		ret = snprintf(buf+offset, len, "<chain>%s</chain>",
-			       r->chain);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (r->flags & (1 << NFTNL_RULE_HANDLE)) {
-		ret = snprintf(buf+offset, len, "<handle>%llu</handle>",
-			       (unsigned long long)r->handle);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (r->compat.flags != 0 || r->compat.proto != 0) {
-		ret = snprintf(buf+offset, len,
-			       "<compat_flags>%u</compat_flags>"
-			       "<compat_proto>%u</compat_proto>",
-			       r->compat.flags, r->compat.proto);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (r->flags & (1 << NFTNL_RULE_POSITION)) {
-		ret = snprintf(buf+offset, len,
-			       "<position>%"PRIu64"</position>",
-			       r->position);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	list_for_each_entry(expr, &r->expr_list, head) {
-		ret = snprintf(buf+offset, len,
-				"<expr type=\"%s\">", expr->ops->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		ret = nftnl_expr_snprintf(buf+offset, len, expr,
-					     type, flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		ret = snprintf(buf+offset, len, "</expr>");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	}
-	ret = snprintf(buf+offset, len, "</rule>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
-}
-
 static int nftnl_rule_snprintf_default(char *buf, size_t size,
 				       const struct nftnl_rule *r,
 				       uint32_t type, uint32_t flags)
@@ -967,14 +812,11 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
 		ret = nftnl_rule_snprintf_default(buf+offset, len, r, type,
 						inner_flags);
 		break;
-	case NFTNL_OUTPUT_XML:
-		ret = nftnl_rule_snprintf_xml(buf+offset, len, r, type,
-					    inner_flags);
-		break;
 	case NFTNL_OUTPUT_JSON:
 		ret = nftnl_rule_snprintf_json(buf+offset, len, r, type,
 					     inner_flags);
 		break;
+	case NFTNL_OUTPUT_XML:
 	default:
 		return -1;
 	}

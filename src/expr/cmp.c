@@ -209,41 +209,6 @@ static int nftnl_expr_cmp_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int nftnl_expr_cmp_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-				       struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	struct nftnl_expr_cmp *cmp = nftnl_expr_data(e);
-	const char *op;
-	int32_t op_value;
-	uint32_t sreg;
-
-	if (nftnl_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CMP_SREG, sreg);
-
-	op = nftnl_mxml_str_parse(tree, "op", MXML_DESCEND_FIRST, NFTNL_XML_MAND,
-				err);
-	if (op != NULL) {
-		op_value = nftnl_str2cmp(op);
-		if (op_value < 0)
-			return -1;
-
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CMP_OP, op_value);
-	}
-
-	if (nftnl_mxml_data_reg_parse(tree, "data",
-				    &cmp->data, NFTNL_XML_MAND,
-				    err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_EXPR_CMP_DATA);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_cmp_export(char *buf, size_t size,
 				 const struct nftnl_expr *e, int type)
 {
@@ -320,6 +285,5 @@ struct expr_ops expr_ops_cmp = {
 	.parse		= nftnl_expr_cmp_parse,
 	.build		= nftnl_expr_cmp_build,
 	.snprintf	= nftnl_expr_cmp_snprintf,
-	.xml_parse	= nftnl_expr_cmp_xml_parse,
 	.json_parse	= nftnl_expr_cmp_json_parse,
 };

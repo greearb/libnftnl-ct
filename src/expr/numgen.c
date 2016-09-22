@@ -171,40 +171,6 @@ static int nftnl_expr_ng_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-
-static int nftnl_expr_ng_xml_parse(struct nftnl_expr *e,
-				   mxml_node_t *tree,
-				   struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	uint32_t dreg, modulus, type, offset;
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
-				 NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_DREG, dreg);
-
-	if (nftnl_mxml_num_parse(tree, "modulus", MXML_DESCEND_FIRST, BASE_DEC,
-				 &modulus, NFTNL_TYPE_U32, NFTNL_XML_MAND,
-				 err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_MODULUS, modulus);
-
-	if (nftnl_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
-				 &type, NFTNL_TYPE_U32, NFTNL_XML_MAND,
-				 err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_TYPE, type);
-
-	if (nftnl_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
-				 &offset, NFTNL_TYPE_U32, NFTNL_XML_MAND,
-				 err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_OFFSET, offset);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int
 nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 			       const struct nftnl_expr *e)
@@ -294,6 +260,5 @@ struct expr_ops expr_ops_ng = {
 	.parse		= nftnl_expr_ng_parse,
 	.build		= nftnl_expr_ng_build,
 	.snprintf	= nftnl_expr_ng_snprintf,
-	.xml_parse	= nftnl_expr_ng_xml_parse,
 	.json_parse	= nftnl_expr_ng_json_parse,
 };

@@ -96,94 +96,6 @@ int nftnl_data_reg_json_parse(union nftnl_data_reg *reg, json_t *data,
 }
 #endif
 
-#ifdef XML_PARSING
-static int nftnl_data_reg_verdict_xml_parse(union nftnl_data_reg *reg,
-					  mxml_node_t *tree,
-					  struct nftnl_parse_err *err)
-{
-	int verdict;
-	const char *verdict_str;
-	const char *chain;
-
-	verdict_str = nftnl_mxml_str_parse(tree, "verdict", MXML_DESCEND_FIRST,
-					 NFTNL_XML_MAND, err);
-	if (verdict_str == NULL)
-		return DATA_NONE;
-
-	if (nftnl_str2verdict(verdict_str, &verdict) != 0) {
-		err->node_name = "verdict";
-		err->error = NFTNL_PARSE_EBADTYPE;
-		errno = EINVAL;
-		return DATA_NONE;
-	}
-
-	reg->verdict = (uint32_t)verdict;
-
-	chain = nftnl_mxml_str_parse(tree, "chain", MXML_DESCEND_FIRST,
-				   NFTNL_XML_OPT, err);
-	if (chain != NULL) {
-		if (reg->chain)
-			xfree(reg->chain);
-
-		reg->chain = strdup(chain);
-	}
-
-	return DATA_VERDICT;
-}
-
-static int nftnl_data_reg_value_xml_parse(union nftnl_data_reg *reg,
-					mxml_node_t *tree,
-					struct nftnl_parse_err *err)
-{
-	int i;
-	char node_name[6];
-
-	if (nftnl_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &reg->len, NFTNL_TYPE_U8, NFTNL_XML_MAND, err) != 0)
-		return DATA_NONE;
-
-	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		sprintf(node_name, "data%d", i);
-
-		if (nftnl_mxml_num_parse(tree, node_name, MXML_DESCEND_FIRST,
-				       BASE_HEX, &reg->val[i], NFTNL_TYPE_U32,
-				       NFTNL_XML_MAND, err) != 0)
-			return DATA_NONE;
-	}
-
-	return DATA_VALUE;
-}
-
-int nftnl_data_reg_xml_parse(union nftnl_data_reg *reg, mxml_node_t *tree,
-			   struct nftnl_parse_err *err)
-{
-	const char *type;
-	mxml_node_t *node;
-
-	node = mxmlFindElement(tree, tree, "reg", "type", NULL,
-			       MXML_DESCEND_FIRST);
-	if (node == NULL)
-		goto err;
-
-	type = mxmlElementGetAttr(node, "type");
-
-	if (type == NULL)
-		goto err;
-
-	if (strcmp(type, "value") == 0)
-		return nftnl_data_reg_value_xml_parse(reg, node, err);
-	else if (strcmp(type, "verdict") == 0)
-		return nftnl_data_reg_verdict_xml_parse(reg, node, err);
-
-	return DATA_NONE;
-err:
-	errno = EINVAL;
-	err->node_name = "reg";
-	err->error = NFTNL_PARSE_EMISSINGNODE;
-	return DATA_NONE;
-}
-#endif
-
 static int
 nftnl_data_reg_value_snprintf_json(char *buf, size_t size,
 				   const union nftnl_data_reg *reg,
@@ -216,43 +128,6 @@ nftnl_data_reg_value_snprintf_json(char *buf, size_t size,
 	}
 	offset--;
 	ret = snprintf(buf+offset, len, "}");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
-}
-
-static
-int nftnl_data_reg_value_snprintf_xml(char *buf, size_t size,
-				      const union nftnl_data_reg *reg,
-				      uint32_t flags)
-{
-	int len = size, offset = 0, ret, i, j;
-	uint32_t be;
-	uint8_t *tmp;
-
-	ret = snprintf(buf, len, "<reg type=\"value\">");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	ret = snprintf(buf+offset, len, "<len>%u</len>", reg->len);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		ret = snprintf(buf+offset, len, "<data%d>0x", i);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		be = htonl(reg->val[i]);
-		tmp = (uint8_t *)&be;
-
-		for (j = 0; j < sizeof(uint32_t); j++) {
-			ret = snprintf(buf+offset, len, "%.02x", tmp[j]);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-
-		ret = snprintf(buf+offset, len, "</data%d>", i);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	ret = snprintf(buf+offset, len, "</reg>");
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
@@ -292,29 +167,6 @@ nftnl_data_reg_verdict_snprintf_def(char *buf, size_t size,
 }
 
 static int
-nftnl_data_reg_verdict_snprintf_xml(char *buf, size_t size,
-				    const union nftnl_data_reg *reg,
-				    uint32_t flags)
-{
-	int len = size, offset = 0, ret = 0;
-
-	ret = snprintf(buf, size, "<reg type=\"verdict\">"
-		       "<verdict>%s</verdict>", nftnl_verdict2str(reg->verdict));
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	if (reg->chain != NULL) {
-		ret = snprintf(buf+offset, len, "<chain>%s</chain>",
-			       reg->chain);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	ret = snprintf(buf+offset, len, "</reg>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
-}
-
-static int
 nftnl_data_reg_verdict_snprintf_json(char *buf, size_t size,
 				     const union nftnl_data_reg *reg,
 				     uint32_t flags)
@@ -348,12 +200,10 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 		case NFTNL_OUTPUT_DEFAULT:
 			return nftnl_data_reg_value_snprintf_default(buf, size,
 								   reg, flags);
-		case NFTNL_OUTPUT_XML:
-			return nftnl_data_reg_value_snprintf_xml(buf, size,
-							       reg, flags);
 		case NFTNL_OUTPUT_JSON:
 			return nftnl_data_reg_value_snprintf_json(buf, size,
 							       reg, flags);
+		case NFTNL_OUTPUT_XML:
 		default:
 			break;
 		}
@@ -363,12 +213,10 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 		case NFTNL_OUTPUT_DEFAULT:
 			return nftnl_data_reg_verdict_snprintf_def(buf, size,
 								 reg, flags);
-		case NFTNL_OUTPUT_XML:
-			return nftnl_data_reg_verdict_snprintf_xml(buf, size,
-								 reg, flags);
 		case NFTNL_OUTPUT_JSON:
 			return nftnl_data_reg_verdict_snprintf_json(buf, size,
 								  reg, flags);
+		case NFTNL_OUTPUT_XML:
 		default:
 			break;
 		}

@@ -186,38 +186,6 @@ static int nftnl_expr_limit_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int nftnl_expr_limit_xml_parse(struct nftnl_expr *e,
-					 mxml_node_t *tree,
-					 struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	uint64_t rate, unit;
-	uint32_t burst, type, flags;
-
-	if (nftnl_mxml_num_parse(tree, "rate", MXML_DESCEND_FIRST, BASE_DEC,
-			       &rate, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u64(e, NFTNL_EXPR_LIMIT_RATE, rate);
-
-	if (nftnl_mxml_num_parse(tree, "unit", MXML_DESCEND_FIRST, BASE_DEC,
-			       &unit, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u64(e, NFTNL_EXPR_LIMIT_UNIT, unit);
-	if (nftnl_mxml_num_parse(tree, "burst", MXML_DESCEND_FIRST, BASE_DEC,
-			       &burst, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_BURST, burst);
-	if (nftnl_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &type, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_TYPE, type);
-	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &flags, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LIMIT_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static const char *get_unit(uint64_t u)
 {
 	switch (u) {
@@ -318,6 +286,5 @@ struct expr_ops expr_ops_limit = {
 	.parse		= nftnl_expr_limit_parse,
 	.build		= nftnl_expr_limit_build,
 	.snprintf	= nftnl_expr_limit_snprintf,
-	.xml_parse	= nftnl_expr_limit_xml_parse,
 	.json_parse	= nftnl_expr_limit_json_parse,
 };

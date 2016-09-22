@@ -708,109 +708,6 @@ static int nftnl_chain_json_parse(struct nftnl_chain *c, const void *json,
 #endif
 }
 
-#ifdef XML_PARSING
-int nftnl_mxml_chain_parse(mxml_node_t *tree, struct nftnl_chain *c,
-			 struct nftnl_parse_err *err)
-{
-	const char *table, *name, *hooknum_str, *policy_str, *type, *dev;
-	int family, hooknum, policy;
-	uint64_t handle, bytes, packets, prio, use;
-
-	name = nftnl_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
-				  NFTNL_XML_MAND, err);
-	if (name != NULL)
-		nftnl_chain_set_str(c, NFTNL_CHAIN_NAME, name);
-
-	if (nftnl_mxml_num_parse(tree, "handle", MXML_DESCEND_FIRST, BASE_DEC,
-			       &handle, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_chain_set_u64(c, NFTNL_CHAIN_HANDLE, handle);
-
-	if (nftnl_mxml_num_parse(tree, "bytes", MXML_DESCEND_FIRST, BASE_DEC,
-			       &bytes, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_chain_set_u64(c, NFTNL_CHAIN_BYTES, bytes);
-
-
-	if (nftnl_mxml_num_parse(tree, "packets", MXML_DESCEND_FIRST, BASE_DEC,
-			       &packets, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_chain_set_u64(c, NFTNL_CHAIN_PACKETS, packets);
-
-	table = nftnl_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
-				   NFTNL_XML_MAND, err);
-
-	if (table != NULL)
-		nftnl_chain_set_str(c, NFTNL_CHAIN_TABLE, table);
-
-	if (nftnl_mxml_num_parse(tree, "use", MXML_DESCEND_FIRST, BASE_DEC,
-			       &use, NFTNL_TYPE_U64, NFTNL_XML_MAND, err) == 0)
-		nftnl_chain_set_u64(c, NFTNL_CHAIN_PACKETS, use);
-
-	family = nftnl_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
-				       NFTNL_XML_MAND, err);
-	if (family >= 0)
-		nftnl_chain_set_u32(c, NFTNL_CHAIN_FAMILY, family);
-
-	hooknum_str = nftnl_mxml_str_parse(tree, "hooknum", MXML_DESCEND_FIRST,
-					 NFTNL_XML_OPT, err);
-	if (hooknum_str != NULL) {
-		hooknum = nftnl_str2hooknum(c->family, hooknum_str);
-		if (hooknum < 0)
-			return -1;
-		nftnl_chain_set_u32(c, NFTNL_CHAIN_HOOKNUM, hooknum);
-
-		type = nftnl_mxml_str_parse(tree, "type", MXML_DESCEND_FIRST,
-					  NFTNL_XML_MAND, err);
-
-		if (type != NULL)
-			nftnl_chain_set_str(c, NFTNL_CHAIN_TYPE, type);
-
-		if (nftnl_mxml_num_parse(tree, "prio", MXML_DESCEND, BASE_DEC,
-				       &prio, NFTNL_TYPE_S32, NFTNL_XML_MAND,
-				       err) == 0)
-			nftnl_chain_set_s32(c, NFTNL_CHAIN_PRIO, prio);
-
-		policy_str = nftnl_mxml_str_parse(tree, "policy",
-						MXML_DESCEND_FIRST,
-						NFTNL_XML_MAND, err);
-		if (policy_str != NULL) {
-			if (nftnl_str2verdict(policy_str, &policy) != 0) {
-				errno = EINVAL;
-				err->node_name = "policy";
-				err->error = NFTNL_PARSE_EBADTYPE;
-				return -1;
-			}
-			nftnl_chain_set_u32(c, NFTNL_CHAIN_POLICY,
-					       policy);
-		}
-
-		dev = nftnl_mxml_str_parse(tree, "device", MXML_DESCEND_FIRST,
-					   NFTNL_XML_MAND, err);
-		if (dev != NULL)
-			nftnl_chain_set_str(c, NFTNL_CHAIN_DEV, dev);
-	}
-
-	return 0;
-}
-#endif
-
-static int nftnl_chain_xml_parse(struct nftnl_chain *c, const void *xml,
-			       struct nftnl_parse_err *err,
-			       enum nftnl_parse_input input)
-{
-#ifdef XML_PARSING
-	int ret;
-	mxml_node_t *tree = nftnl_mxml_build_tree(xml, "chain", err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_mxml_chain_parse(tree, c, err);
-	mxmlDelete(tree);
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_chain_do_parse(struct nftnl_chain *c, enum nftnl_parse_type type,
 			      const void *data, struct nftnl_parse_err *err,
 			      enum nftnl_parse_input input)
@@ -819,12 +716,10 @@ static int nftnl_chain_do_parse(struct nftnl_chain *c, enum nftnl_parse_type typ
 	struct nftnl_parse_err perr = {};
 
 	switch (type) {
-	case NFTNL_PARSE_XML:
-		ret = nftnl_chain_xml_parse(c, data, &perr, input);
-		break;
 	case NFTNL_PARSE_JSON:
 		ret = nftnl_chain_json_parse(c, data, &perr, input);
 		break;
+	case NFTNL_PARSE_XML:
 	default:
 		ret = -1;
 		errno = EOPNOTSUPP;

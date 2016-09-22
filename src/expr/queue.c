@@ -172,41 +172,6 @@ nftnl_expr_queue_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_queue_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-			      struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	uint16_t queue_num, queue_total, flags;
-	uint32_t sreg_qnum;
-
-	if (nftnl_mxml_num_parse(tree, "num", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue_num, NFTNL_TYPE_U16, NFTNL_XML_MAND,
-			       err) == 0)
-		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_NUM, queue_num);
-
-	if (nftnl_mxml_num_parse(tree, "total", MXML_DESCEND_FIRST, BASE_DEC,
-			       &queue_total, NFTNL_TYPE_U16,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_TOTAL, queue_total);
-
-	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &flags, NFTNL_TYPE_U16,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u16(e, NFTNL_EXPR_QUEUE_FLAGS, flags);
-
-	if (nftnl_mxml_num_parse(tree, "sreg_qnum", MXML_DESCEND_FIRST, BASE_DEC,
-			       &sreg_qnum, NFTNL_TYPE_U32,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_QUEUE_SREG_QNUM, sreg_qnum);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_queue_snprintf_default(char *buf, size_t len,
 					     const struct nftnl_expr *e)
 {
@@ -312,6 +277,5 @@ struct expr_ops expr_ops_queue = {
 	.parse		= nftnl_expr_queue_parse,
 	.build		= nftnl_expr_queue_build,
 	.snprintf	= nftnl_expr_queue_snprintf,
-	.xml_parse	= nftnl_expr_queue_xml_parse,
 	.json_parse	= nftnl_expr_queue_json_parse,
 };

@@ -224,50 +224,6 @@ static int nftnl_expr_log_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int nftnl_expr_log_xml_parse(struct nftnl_expr *e,
-				       mxml_node_t *tree,
-				       struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	const char *prefix;
-	uint32_t snaplen, level, flags;
-	uint16_t group, qthreshold;
-
-	prefix = nftnl_mxml_str_parse(tree, "prefix", MXML_DESCEND_FIRST,
-				    NFTNL_XML_MAND, err);
-	if (prefix != NULL)
-		nftnl_expr_set_str(e, NFTNL_EXPR_LOG_PREFIX, prefix);
-
-	if (nftnl_mxml_num_parse(tree, "group", MXML_DESCEND_FIRST, BASE_DEC,
-			       &group, NFTNL_TYPE_U16, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u16(e, NFTNL_EXPR_LOG_GROUP, group);
-
-	if (nftnl_mxml_num_parse(tree, "snaplen", MXML_DESCEND_FIRST, BASE_DEC,
-			       &snaplen, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_SNAPLEN, snaplen);
-
-	if (nftnl_mxml_num_parse(tree, "qthreshold", MXML_DESCEND_FIRST, BASE_DEC,
-			       &qthreshold, NFTNL_TYPE_U16, NFTNL_XML_MAND,
-			       err) == 0)
-		nftnl_expr_set_u16(e, NFTNL_EXPR_LOG_QTHRESHOLD, qthreshold);
-
-	if (nftnl_mxml_num_parse(tree, "level", MXML_DESCEND_FIRST, BASE_DEC,
-			       &level, NFTNL_TYPE_U16, NFTNL_XML_MAND,
-			       err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_LEVEL, level);
-
-	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &flags, NFTNL_TYPE_U16, NFTNL_XML_MAND,
-			       err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LOG_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_log_snprintf_default(char *buf, size_t size,
 					   const struct nftnl_expr *e)
 {
@@ -370,6 +326,5 @@ struct expr_ops expr_ops_log = {
 	.parse		= nftnl_expr_log_parse,
 	.build		= nftnl_expr_log_build,
 	.snprintf	= nftnl_expr_log_snprintf,
-	.xml_parse	= nftnl_expr_log_xml_parse,
 	.json_parse	= nftnl_expr_log_json_parse,
 };

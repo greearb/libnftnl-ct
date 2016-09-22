@@ -182,27 +182,6 @@ nftnl_expr_target_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_target_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-			       struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	const char *name;
-
-	name = nftnl_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
-				  NFTNL_XML_MAND, err);
-	if (name != NULL)
-		nftnl_expr_set_str(e, NFTNL_EXPR_TG_NAME, name);
-
-	/* tg->info is ignored until other solution is reached */
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_rule_exp_target_export(char *buf, size_t size,
 				        const struct nftnl_expr *e, int type)
 {
@@ -271,6 +250,5 @@ struct expr_ops expr_ops_target = {
 	.parse		= nftnl_expr_target_parse,
 	.build		= nftnl_expr_target_build,
 	.snprintf	= nftnl_expr_target_snprintf,
-	.xml_parse	= nftnl_expr_target_xml_parse,
 	.json_parse	= nftnl_expr_target_json_parse,
 };

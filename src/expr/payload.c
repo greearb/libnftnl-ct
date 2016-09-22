@@ -251,45 +251,6 @@ nftnl_expr_payload_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_payload_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-				struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	const char *base_str;
-	int32_t base;
-	uint32_t dreg, offset, len;
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, dreg);
-
-	base_str = nftnl_mxml_str_parse(tree, "base", MXML_DESCEND_FIRST,
-				      NFTNL_XML_MAND, err);
-	if (base_str != NULL) {
-		base = nftnl_str2base(base_str);
-		if (base < 0)
-			return -1;
-
-		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
-	}
-
-	if (nftnl_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
-			       &offset, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, offset);
-
-
-	if (nftnl_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &len, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, len);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_payload_export(char *buf, size_t size, uint32_t flags,
 				     const struct nftnl_expr *e, int type)
 {
@@ -370,6 +331,5 @@ struct expr_ops expr_ops_payload = {
 	.parse		= nftnl_expr_payload_parse,
 	.build		= nftnl_expr_payload_build,
 	.snprintf	= nftnl_expr_payload_snprintf,
-	.xml_parse	= nftnl_expr_payload_xml_parse,
 	.json_parse	= nftnl_expr_payload_json_parse,
 };

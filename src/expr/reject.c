@@ -137,29 +137,6 @@ nftnl_expr_reject_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_reject_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-			       struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	uint32_t type;
-	uint8_t code;
-
-	if (nftnl_mxml_num_parse(tree, "type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &type, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_REJECT_TYPE, type);
-
-	if (nftnl_mxml_num_parse(tree, "code", MXML_DESCEND_FIRST, BASE_DEC,
-			       &code, NFTNL_TYPE_U8, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u8(e, NFTNL_EXPR_REJECT_CODE, code);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_reject_snprintf_default(char *buf, size_t len,
 					      const struct nftnl_expr *e)
 {
@@ -224,6 +201,5 @@ struct expr_ops expr_ops_reject = {
 	.parse		= nftnl_expr_reject_parse,
 	.build		= nftnl_expr_reject_build,
 	.snprintf	= nftnl_expr_reject_snprintf,
-	.xml_parse	= nftnl_expr_reject_xml_parse,
 	.json_parse	= nftnl_expr_reject_json_parse,
 };

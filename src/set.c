@@ -673,109 +673,6 @@ static int nftnl_set_json_parse(struct nftnl_set *s, const void *json,
 #endif
 }
 
-#ifdef XML_PARSING
-int nftnl_mxml_set_parse(mxml_node_t *tree, struct nftnl_set *s,
-		       struct nftnl_parse_err *err)
-{
-	mxml_node_t *node = NULL;
-	struct nftnl_set_elem *elem;
-	const char *name, *table;
-	int family;
-	uint32_t set_flags, key_type, key_len;
-	uint32_t data_type, data_len, policy, size;
-
-	name = nftnl_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
-				  NFTNL_XML_MAND, err);
-	if (name == NULL)
-		return -1;
-	nftnl_set_set_str(s, NFTNL_SET_NAME, name);
-
-	table = nftnl_mxml_str_parse(tree, "table", MXML_DESCEND_FIRST,
-				   NFTNL_XML_MAND, err);
-	if (table == NULL)
-		return -1;
-	nftnl_set_set_str(s, NFTNL_SET_TABLE, table);
-
-	family = nftnl_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
-				       NFTNL_XML_MAND, err);
-	if (family >= 0)
-		nftnl_set_set_u32(s, NFTNL_SET_FAMILY, family);
-
-	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &set_flags, NFTNL_TYPE_U32, NFTNL_XML_MAND,
-			       err) == 0)
-		nftnl_set_set_u32(s, NFTNL_SET_FLAGS, set_flags);
-
-	if (nftnl_mxml_num_parse(tree, "key_type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &key_type, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_set_set_u32(s, NFTNL_SET_KEY_TYPE, key_type);
-
-	if (nftnl_mxml_num_parse(tree, "key_len", MXML_DESCEND_FIRST, BASE_DEC,
-			       &key_len, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) < 0)
-		return -1;
-	nftnl_set_set_u32(s, NFTNL_SET_KEY_LEN, key_len);
-
-	if (nftnl_mxml_num_parse(tree, "data_type", MXML_DESCEND_FIRST, BASE_DEC,
-			       &data_type, NFTNL_TYPE_U32,
-			       NFTNL_XML_OPT, err) == 0) {
-		nftnl_set_set_u32(s, NFTNL_SET_DATA_TYPE, data_type);
-
-		if (nftnl_mxml_num_parse(tree, "data_len", MXML_DESCEND_FIRST,
-				       BASE_DEC, &data_len, NFTNL_TYPE_U32,
-				       NFTNL_XML_MAND, err) == 0)
-			nftnl_set_set_u32(s, NFTNL_SET_DATA_LEN, data_len);
-
-	}
-
-	if (nftnl_mxml_num_parse(tree, "policy", MXML_DESCEND_FIRST,
-			       BASE_DEC, &policy, NFTNL_TYPE_U32,
-			       NFTNL_XML_OPT, err) == 0)
-		nftnl_set_set_u32(s, NFTNL_SET_POLICY, policy);
-
-	if (nftnl_mxml_num_parse(tree, "desc_size", MXML_DESCEND_FIRST,
-			       BASE_DEC, &size, NFTNL_TYPE_U32,
-			       NFTNL_XML_OPT, err) == 0)
-		nftnl_set_set_u32(s, NFTNL_SET_DESC_SIZE, policy);
-
-	for (node = mxmlFindElement(tree, tree, "set_elem", NULL,
-				    NULL, MXML_DESCEND);
-		node != NULL;
-		node = mxmlFindElement(node, tree, "set_elem", NULL,
-				       NULL, MXML_DESCEND)) {
-
-		elem = nftnl_set_elem_alloc();
-		if (elem == NULL)
-			return -1;
-
-		if (nftnl_mxml_set_elem_parse(node, elem, err) < 0)
-			return -1;
-
-		list_add_tail(&elem->head, &s->element_list);
-	}
-
-	return 0;
-}
-#endif
-
-static int nftnl_set_xml_parse(struct nftnl_set *s, const void *xml,
-			     struct nftnl_parse_err *err,
-			     enum nftnl_parse_input input)
-{
-#ifdef XML_PARSING
-	int ret;
-	mxml_node_t *tree = nftnl_mxml_build_tree(xml, "set", err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_mxml_set_parse(tree, s, err);
-	mxmlDelete(tree);
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_set_do_parse(struct nftnl_set *s, enum nftnl_parse_type type,
 			    const void *data, struct nftnl_parse_err *err,
 			    enum nftnl_parse_input input)
@@ -784,12 +681,10 @@ static int nftnl_set_do_parse(struct nftnl_set *s, enum nftnl_parse_type type,
 	struct nftnl_parse_err perr = {};
 
 	switch (type) {
-	case NFTNL_PARSE_XML:
-		ret = nftnl_set_xml_parse(s, data, &perr, input);
-		break;
 	case NFTNL_PARSE_JSON:
 		ret = nftnl_set_json_parse(s, data, &perr, input);
 		break;
+	case NFTNL_PARSE_XML:
 	default:
 		ret = -1;
 		errno = EOPNOTSUPP;
@@ -959,93 +854,15 @@ static int nftnl_set_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_set_snprintf_xml(char *buf, size_t size,
-				  const struct nftnl_set *s, uint32_t flags)
-{
-	int ret;
-	int len = size, offset = 0;
-	struct nftnl_set_elem *elem;
-
-	ret = snprintf(buf, len, "<set>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	if (s->flags & (1 << NFTNL_SET_FAMILY)) {
-		ret = snprintf(buf + offset, len, "<family>%s</family>",
-			       nftnl_family2str(s->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (s->flags & (1 << NFTNL_SET_TABLE)) {
-		ret = snprintf(buf + offset, len, "<table>%s</table>",
-			       s->table);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (s->flags & (1 << NFTNL_SET_NAME)) {
-		ret = snprintf(buf + offset, len, "<name>%s</name>",
-			       s->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (s->flags & (1 << NFTNL_SET_FLAGS)) {
-		ret = snprintf(buf + offset, len, "<flags>%u</flags>",
-			       s->set_flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (s->flags & (1 << NFTNL_SET_KEY_TYPE)) {
-		ret = snprintf(buf + offset, len, "<key_type>%u</key_type>",
-			       s->key_type);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (s->flags & (1 << NFTNL_SET_KEY_LEN)) {
-		ret = snprintf(buf + offset, len, "<key_len>%u</key_len>",
-			       s->key_len);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (s->flags & (1 << NFTNL_SET_DATA_TYPE)) {
-		ret = snprintf(buf + offset, len, "<data_type>%u</data_type>",
-			       s->data_type);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (s->flags & (1 << NFTNL_SET_DATA_LEN)) {
-		ret = snprintf(buf + offset, len, "<data_len>%u</data_len>",
-			       s->data_len);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (s->flags & (1 << NFTNL_SET_POLICY)) {
-		ret = snprintf(buf + offset, len, "<policy>%u</policy>",
-			       s->policy);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (s->flags & (1 << NFTNL_SET_DESC_SIZE)) {
-		ret = snprintf(buf + offset, len, "<desc_size>%u</desc_size>",
-			       s->desc.size);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (!list_empty(&s->element_list)) {
-		list_for_each_entry(elem, &s->element_list, head) {
-			ret = nftnl_set_elem_snprintf(buf + offset, len, elem,
-						    NFTNL_OUTPUT_XML, flags);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-		}
-	}
-
-	ret = snprintf(buf + offset, len, "</set>");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
-}
-
 static int nftnl_set_cmd_snprintf(char *buf, size_t size,
 				  const struct nftnl_set *s, uint32_t cmd,
 				  uint32_t type, uint32_t flags)
 {
 	int ret, len = size, offset = 0;
 	uint32_t inner_flags = flags;
+
+	if (type == NFTNL_OUTPUT_XML)
+		return 0;
 
 	/* prevent set_elems to print as events */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
@@ -1057,9 +874,6 @@ static int nftnl_set_cmd_snprintf(char *buf, size_t size,
 	case NFTNL_OUTPUT_DEFAULT:
 		ret = nftnl_set_snprintf_default(buf+offset, len, s, type,
 					       inner_flags);
-		break;
-	case NFTNL_OUTPUT_XML:
-		ret = nftnl_set_snprintf_xml(buf+offset, len, s, inner_flags);
 		break;
 	case NFTNL_OUTPUT_JSON:
 		ret = nftnl_set_snprintf_json(buf+offset, len, s, type,

@@ -422,11 +422,8 @@ int main(int argc, char *argv[])
 	if (len >= 5 && strcmp(&filename[len - 5], ".json") == 0)
 		ret = nftnl_ruleset_parse_file_cb(NFTNL_PARSE_JSON, fp, err, NULL,
 						&ruleset_elems_cb);
-	else if (len >= 4 && strcmp(&filename[len - 4], ".xml") == 0)
-		ret = nftnl_ruleset_parse_file_cb(NFTNL_PARSE_XML, fp, err, NULL,
-						&ruleset_elems_cb);
 	else {
-		printf("the filename %s must to end in .xml or .json\n",
+		printf("the filename %s does not have a trailing .json\n",
 			filename);
 		exit(EXIT_FAILURE);
 	}

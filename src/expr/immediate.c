@@ -210,44 +210,6 @@ nftnl_expr_immediate_json_parse(struct nftnl_expr *e, json_t *root,
 }
 
 static int
-nftnl_expr_immediate_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-				  struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	struct nftnl_expr_immediate *imm = nftnl_expr_data(e);
-	int datareg_type;
-	uint32_t reg;
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &reg, MXML_DESCEND_FIRST,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_IMM_DREG, reg);
-
-	datareg_type = nftnl_mxml_data_reg_parse(tree, "data",
-					       &imm->data, NFTNL_XML_MAND, err);
-	if (datareg_type >= 0) {
-		switch (datareg_type) {
-		case DATA_VALUE:
-			e->flags |= (1 << NFTNL_EXPR_IMM_DATA);
-			break;
-		case DATA_VERDICT:
-			e->flags |= (1 << NFTNL_EXPR_IMM_VERDICT);
-			break;
-		case DATA_CHAIN:
-			e->flags |= (1 << NFTNL_EXPR_IMM_CHAIN);
-			break;
-		default:
-			return -1;
-		}
-	}
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int
 nftnl_expr_immediate_export(char *buf, size_t size, const struct nftnl_expr *e,
 			    int type)
 {
@@ -355,6 +317,5 @@ struct expr_ops expr_ops_immediate = {
 	.parse		= nftnl_expr_immediate_parse,
 	.build		= nftnl_expr_immediate_build,
 	.snprintf	= nftnl_expr_immediate_snprintf,
-	.xml_parse	= nftnl_expr_immediate_xml_parse,
 	.json_parse	= nftnl_expr_immediate_json_parse,
 };

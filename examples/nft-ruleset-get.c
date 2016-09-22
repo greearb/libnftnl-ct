@@ -344,18 +344,16 @@ int main(int argc, char *argv[])
 	int ret;
 
 	if (argc > 2) {
-		fprintf(stderr, "%s {xml|json}\n",
+		fprintf(stderr, "%s {json}\n",
 			argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
 	if (argc == 2) {
-		if (strcmp(argv[1], "xml") == 0)
-			type = NFTNL_OUTPUT_XML;
-		else if (strcmp(argv[1], "json") == 0)
+		if (strcmp(argv[1], "json") == 0)
 			type = NFTNL_OUTPUT_JSON;
 		else {
-			fprintf(stderr, "Unknown type: {xml|json}\n");
+			fprintf(stderr, "Unknown type: only json is supported\n");
 			exit(EXIT_FAILURE);
 		}
 	}

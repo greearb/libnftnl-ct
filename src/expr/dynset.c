@@ -242,43 +242,6 @@ nftnl_expr_dynset_json_parse(struct nftnl_expr *e, json_t *root,
 }
 
 static int
-nftnl_expr_dynset_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-			       struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	const char *set_name;
-	uint32_t uval32;
-	uint64_t uval64;
-
-	set_name = nftnl_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST,
-				      NFTNL_XML_MAND, err);
-	if (set_name != NULL)
-		nftnl_expr_set_str(e, NFTNL_EXPR_DYNSET_SET_NAME, set_name);
-
-	if (nftnl_mxml_reg_parse(tree, "sreg_key", &uval32, MXML_DESCEND,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_DYNSET_SREG_KEY, uval32);
-
-	if (nftnl_mxml_reg_parse(tree, "sreg_data", &uval32, MXML_DESCEND,
-			       NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_DYNSET_SREG_DATA, uval32);
-
-	if (nftnl_mxml_num_parse(tree, "op", MXML_DESCEND_FIRST, BASE_DEC,
-			       &uval32, NFTNL_TYPE_U32, NFTNL_XML_MAND,  err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_DYNSET_OP, uval32);
-
-	if (nftnl_mxml_num_parse(tree, "timeout", MXML_DESCEND_FIRST, BASE_DEC,
-			       &uval64, NFTNL_TYPE_U64, NFTNL_XML_MAND,  err) == 0)
-		nftnl_expr_set_u64(e, NFTNL_EXPR_DYNSET_TIMEOUT, uval64);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int
 nftnl_expr_dynset_export(char *buf, size_t size,
 			 const struct nftnl_expr *e, int type)
 {
@@ -406,6 +369,5 @@ struct expr_ops expr_ops_dynset = {
 	.parse		= nftnl_expr_dynset_parse,
 	.build		= nftnl_expr_dynset_build,
 	.snprintf	= nftnl_expr_dynset_snprintf,
-	.xml_parse	= nftnl_expr_dynset_xml_parse,
 	.json_parse	= nftnl_expr_dynset_json_parse,
 };

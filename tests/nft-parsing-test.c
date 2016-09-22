@@ -144,43 +144,6 @@ failparsing:
 	return -1;
 }
 
-static int test_xml(const char *filename, struct nftnl_parse_err *err)
-{
-	int ret = -1;
-	struct nftnl_ruleset *rs;
-	FILE *fp;
-
-	fp = fopen(filename, "r");
-	if (fp == NULL) {
-		printf("unable to open file %s: %s\n", filename,
-		       strerror(errno));
-		return -1;
-	}
-
-	rs = nftnl_ruleset_alloc();
-	if (rs == NULL) {
-		perror("nftnl_ruleset_alloc");
-		return -1;
-	}
-
-	if (nftnl_ruleset_parse_file(rs, NFTNL_PARSE_XML, fp, err) == 0)
-		ret = compare_test(TEST_XML_RULESET, rs, filename, fp);
-	else
-		goto failparsing;
-
-	nftnl_ruleset_free(rs);
-	fclose(fp);
-
-	return ret;
-
-failparsing:
-	fclose(fp);
-	printf("parsing %s: ", filename);
-	printf("\033[31mFAILED\e[0m (%s)\n", strerror(errno));
-	nftnl_parse_perror("Reason", err);
-	return -1;
-}
-
 static int execute_test(const char *dir_name)
 {
 	DIR *d;
@@ -210,16 +173,6 @@ static int execute_test(const char *dir_name)
 
 		snprintf(path, sizeof(path), "%s/%s", dir_name, dent->d_name);
 
-		if (strcmp(&dent->d_name[len-4], ".xml") == 0) {
-			if ((ret = test_xml(path, err)) == 0) {
-				if (!update) {
-					printf("parsing and validating %s: ",
-					       path);
-					printf("\033[32mOK\e[0m\n");
-				}
-			}
-			exit_code += ret;
-		}
 		if (strcmp(&dent->d_name[len-5], ".json") == 0) {
 			if ((ret = test_json(path, err)) == 0) {
 				if (!update) {
@@ -244,8 +197,8 @@ static int execute_test(const char *dir_name)
 static int execute_test_file(const char *filename)
 {
 	char path[PATH_MAX];
-	int ret = 0;
 	struct nftnl_parse_err *err;
+	int ret = 0, len;
 
 	err = nftnl_parse_err_alloc();
 	if (err == NULL) {
@@ -255,18 +208,7 @@ static int execute_test_file(const char *filename)
 
 	snprintf(path, sizeof(path), "%s", filename);
 
-	int len = strlen(filename);
-	if (strcmp(&filename[len-4], ".xml") == 0) {
-		if ((ret = test_xml(path, err)) == 0) {
-			if (!update) {
-				printf("parsing and validating %s: ",
-				       path);
-				printf("\033[32mOK\e[0m\n");
-			}
-		}
-		nftnl_parse_err_free(err);
-		exit(EXIT_FAILURE);
-	}
+	len = strlen(filename);
 	if (strcmp(&filename[len-5], ".json") == 0) {
 		if ((ret = test_json(path, err)) == 0) {
 			if (!update) {

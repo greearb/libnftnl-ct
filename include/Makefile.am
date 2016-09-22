@@ -7,7 +7,6 @@ noinst_HEADERS = internal.h	\
 		 expr_ops.h	\
 		 linux_list.h	\
 		 set.h		\
-		 xml.h		\
 		 common.h	\
 		 expr.h		\
 		 json.h		\

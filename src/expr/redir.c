@@ -157,32 +157,6 @@ nftnl_expr_redir_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_redir_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-			      struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	uint32_t reg, flags;
-
-	if (nftnl_mxml_reg_parse(tree, "sreg_proto_min", &reg,
-			       MXML_DESCEND, NFTNL_XML_OPT, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_REDIR_REG_PROTO_MIN, reg);
-
-	if (nftnl_mxml_reg_parse(tree, "sreg_proto_max", &reg,
-			       MXML_DESCEND, NFTNL_XML_OPT, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_REDIR_REG_PROTO_MAX, reg);
-
-	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &flags, NFTNL_TYPE_U32, NFTNL_XML_OPT, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_REDIR_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_redir_export(char *buf, size_t size,
 				   const struct nftnl_expr *e, int type)
 {
@@ -269,6 +243,5 @@ struct expr_ops expr_ops_redir = {
 	.parse		= nftnl_expr_redir_parse,
 	.build		= nftnl_expr_redir_build,
 	.snprintf	= nftnl_expr_redir_snprintf,
-	.xml_parse	= nftnl_expr_redir_xml_parse,
 	.json_parse	= nftnl_expr_redir_json_parse,
 };

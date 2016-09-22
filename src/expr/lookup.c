@@ -197,39 +197,6 @@ nftnl_expr_lookup_json_parse(struct nftnl_expr *e, json_t *root,
 }
 
 static int
-nftnl_expr_lookup_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-			       struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	const char *set_name;
-	uint32_t sreg, dreg, flags;
-
-	set_name = nftnl_mxml_str_parse(tree, "set", MXML_DESCEND_FIRST,
-				      NFTNL_XML_MAND, err);
-	if (set_name != NULL)
-		nftnl_expr_set_str(e, NFTNL_EXPR_LOOKUP_SET, set_name);
-
-	if (nftnl_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND, NFTNL_XML_MAND,
-			       err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SREG, sreg);
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND, NFTNL_XML_OPT,
-			       err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_DREG, dreg);
-
-        if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-				 &flags, NFTNL_TYPE_U32,
-				 NFTNL_XML_MAND, err) == 0)
-                nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int
 nftnl_expr_lookup_export(char *buf, size_t size,
 			 const struct nftnl_expr *e, int type)
 {
@@ -327,6 +294,5 @@ struct expr_ops expr_ops_lookup = {
 	.parse		= nftnl_expr_lookup_parse,
 	.build		= nftnl_expr_lookup_build,
 	.snprintf	= nftnl_expr_lookup_snprintf,
-	.xml_parse	= nftnl_expr_lookup_xml_parse,
 	.json_parse	= nftnl_expr_lookup_json_parse,
 };

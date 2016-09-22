@@ -251,55 +251,6 @@ int nftnl_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_table *t)
 }
 EXPORT_SYMBOL_ALIAS(nftnl_table_nlmsg_parse, nft_table_nlmsg_parse);
 
-#ifdef XML_PARSING
-int nftnl_mxml_table_parse(mxml_node_t *tree, struct nftnl_table *t,
-			 struct nftnl_parse_err *err)
-{
-	const char *name;
-	int family;
-	uint32_t flags, use;
-
-	name = nftnl_mxml_str_parse(tree, "name", MXML_DESCEND_FIRST,
-				  NFTNL_XML_MAND, err);
-	if (name != NULL)
-		nftnl_table_set_str(t, NFTNL_TABLE_NAME, name);
-
-	family = nftnl_mxml_family_parse(tree, "family", MXML_DESCEND_FIRST,
-				       NFTNL_XML_MAND, err);
-	if (family >= 0)
-		nftnl_table_set_u32(t, NFTNL_TABLE_FAMILY, family);
-
-	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND, BASE_DEC,
-			       &flags, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_table_set_u32(t, NFTNL_TABLE_FLAGS, flags);
-
-	if (nftnl_mxml_num_parse(tree, "use", MXML_DESCEND, BASE_DEC,
-			       &use, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_table_set_u32(t, NFTNL_TABLE_USE, use);
-
-	return 0;
-}
-#endif
-
-static int nftnl_table_xml_parse(struct nftnl_table *t, const void *data,
-			       struct nftnl_parse_err *err,
-			       enum nftnl_parse_input input)
-{
-#ifdef XML_PARSING
-	int ret;
-	mxml_node_t *tree = nftnl_mxml_build_tree(data, "table", err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_mxml_table_parse(tree, t, err);
-	mxmlDelete(tree);
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 #ifdef JSON_PARSING
 int nftnl_jansson_parse_table(struct nftnl_table *t, json_t *tree,
 			    struct nftnl_parse_err *err)
@@ -363,12 +314,10 @@ static int nftnl_table_do_parse(struct nftnl_table *t, enum nftnl_parse_type typ
 	struct nftnl_parse_err perr = {};
 
 	switch (type) {
-	case NFTNL_PARSE_XML:
-		ret = nftnl_table_xml_parse(t, data, &perr, input);
-		break;
 	case NFTNL_PARSE_JSON:
 		ret = nftnl_table_json_parse(t, data, &perr, input);
 		break;
+	case NFTNL_PARSE_XML:
 	default:
 		ret = -1;
 		errno = EOPNOTSUPP;

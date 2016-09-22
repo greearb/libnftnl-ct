@@ -1,1 +1,0 @@
-<nftables><add><table><name>filter</name><family>ip</family><flags>0</flags><use>0</use></table></add></nftables>

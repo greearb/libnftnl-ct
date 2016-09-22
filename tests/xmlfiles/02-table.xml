@@ -1,1 +1,0 @@
-<nftables><add><table><name>nat</name><family>ip6</family><flags>0</flags><use>0</use></table></add></nftables>

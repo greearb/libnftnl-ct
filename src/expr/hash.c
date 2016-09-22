@@ -207,49 +207,6 @@ static int nftnl_expr_hash_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-
-static int nftnl_expr_hash_xml_parse(struct nftnl_expr *e,
-				     mxml_node_t *tree,
-				     struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	uint32_t sreg, dreg, len, modulus, seed, offset;
-
-	if (nftnl_mxml_reg_parse(tree, "sreg", &sreg, MXML_DESCEND_FIRST,
-				 NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_SREG, sreg);
-
-	if (nftnl_mxml_reg_parse(tree, "dreg", &dreg, MXML_DESCEND_FIRST,
-				 NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_DREG, dreg);
-
-	if (nftnl_mxml_num_parse(tree, "len", MXML_DESCEND_FIRST, BASE_DEC,
-				 &len, NFTNL_TYPE_U32, NFTNL_XML_MAND,
-				 err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_LEN, len);
-
-	if (nftnl_mxml_num_parse(tree, "modulus", MXML_DESCEND_FIRST, BASE_DEC,
-				 &modulus, NFTNL_TYPE_U32, NFTNL_XML_MAND,
-				 err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_MODULUS, modulus);
-
-	if (nftnl_mxml_num_parse(tree, "seed", MXML_DESCEND_FIRST, BASE_DEC,
-				 &seed, NFTNL_TYPE_U32, NFTNL_XML_MAND,
-				 err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_SEED, seed);
-
-	if (nftnl_mxml_num_parse(tree, "offset", MXML_DESCEND_FIRST, BASE_DEC,
-				 &offset, NFTNL_TYPE_U32, NFTNL_XML_MAND,
-				 err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_HASH_OFFSET, offset);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int
 nftnl_expr_hash_snprintf_default(char *buf, size_t size,
 				 const struct nftnl_expr *e)
@@ -338,6 +295,5 @@ struct expr_ops expr_ops_hash = {
 	.parse		= nftnl_expr_hash_parse,
 	.build		= nftnl_expr_hash_build,
 	.snprintf	= nftnl_expr_hash_snprintf,
-	.xml_parse	= nftnl_expr_hash_xml_parse,
 	.json_parse	= nftnl_expr_hash_json_parse,
 };

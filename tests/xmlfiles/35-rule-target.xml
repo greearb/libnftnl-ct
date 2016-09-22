@@ -1,1 +1,0 @@
-<nftables><add><rule><family>ip</family><table>filter</table><chain>INPUT</chain><handle>100</handle><expr type="target"><name>LOG</name></expr></rule></add></nftables>

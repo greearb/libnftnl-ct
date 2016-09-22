@@ -155,32 +155,6 @@ nftnl_expr_masq_json_parse(struct nftnl_expr *e, json_t *root,
 #endif
 }
 
-static int
-nftnl_expr_masq_xml_parse(struct nftnl_expr *e, mxml_node_t *tree,
-			     struct nftnl_parse_err *err)
-{
-#ifdef XML_PARSING
-	uint32_t flags;
-	uint32_t reg_proto_min, reg_proto_max;
-
-	if (nftnl_mxml_num_parse(tree, "flags", MXML_DESCEND_FIRST, BASE_DEC,
-			       &flags, NFTNL_TYPE_U32, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_FLAGS, flags);
-	if (nftnl_mxml_reg_parse(tree, "sreg_proto_min", &reg_proto_min,
-				 MXML_DESCEND, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_REG_PROTO_MIN,
-				   reg_proto_min);
-	if (nftnl_mxml_reg_parse(tree, "sreg_proto_max", &reg_proto_max,
-				 MXML_DESCEND, NFTNL_XML_MAND, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_MASQ_REG_PROTO_MAX,
-				   reg_proto_max);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
 static int nftnl_expr_masq_export(char *buf, size_t size,
 				  const struct nftnl_expr *e, int type)
 {
@@ -255,6 +229,5 @@ struct expr_ops expr_ops_masq = {
 	.parse		= nftnl_expr_masq_parse,
 	.build		= nftnl_expr_masq_build,
 	.snprintf	= nftnl_expr_masq_snprintf,
-	.xml_parse	= nftnl_expr_masq_xml_parse,
 	.json_parse	= nftnl_expr_masq_json_parse,
 };

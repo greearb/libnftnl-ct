@@ -1,1 +1,0 @@
-<nftables><add><rule><family>ip6</family><table>filter</table><chain>test</chain><handle>129</handle><expr type="meta"><key>mark</key><sreg>1</sreg></expr></rule></add></nftables>

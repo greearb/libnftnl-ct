@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	int ret;
 
 	if (argc < 4 || argc > 5) {
-		fprintf(stderr, "%s <family> <table> <set> [<json|xml>]\n",
+		fprintf(stderr, "%s <family> <table> <set> [<json>]\n",
 			argv[0]);
 		return EXIT_FAILURE;
 	}
@@ -82,8 +82,6 @@ int main(int argc, char *argv[])
 
 	if (argc == 5 && strcmp(argv[4], "json") == 0 )
 		type = NFTNL_OUTPUT_JSON;
-	else if (argc == 5 && strcmp(argv[4], "xml") == 0)
-		type = NFTNL_OUTPUT_XML;
 
 	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
 					NLM_F_DUMP|NLM_F_ACK, seq);
