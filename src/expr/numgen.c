@@ -180,17 +180,22 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 
 	switch (ng->type) {
 	case NFT_NG_INCREMENTAL:
-		ret = snprintf(buf, len, "reg %u = %u + inc mod %u ", ng->dreg,
-			       ng->offset, ng->modulus);
+		ret = snprintf(buf, len, "reg %u = inc mod %u ",
+			       ng->dreg, ng->modulus);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	case NFT_NG_RANDOM:
-		ret = snprintf(buf, len, "reg %u = %u + random mod %u ",
-			       ng->dreg, ng->offset, ng->modulus);
+		ret = snprintf(buf, len, "reg %u = random mod %u ",
+			       ng->dreg, ng->modulus);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		break;
 	default:
-		break;
+		return 0;
+	}
+
+	if (ng->offset) {
+		ret = snprintf(buf, len, "offset %u ", ng->offset);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
 	return offset;
