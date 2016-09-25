@@ -264,7 +264,7 @@ static int nftnl_expr_log_export(char *buf, size_t size,
 	if (e->flags & (1 << NFTNL_EXPR_LOG_LEVEL))
 		nftnl_buf_u32(&b, type, log->level, LEVEL);
 	if (e->flags & (1 << NFTNL_EXPR_LOG_FLAGS))
-		nftnl_buf_u32(&b, type, log->level, FLAGS);
+		nftnl_buf_u32(&b, type, log->flags, FLAGS);
 
 	return nftnl_buf_done(&b);
 }
