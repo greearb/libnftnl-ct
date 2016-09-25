@@ -230,8 +230,10 @@ static int nftnl_expr_log_snprintf_default(char *buf, size_t size,
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
 	int ret, offset = 0, len = size;
 
-	ret = snprintf(buf, len, "prefix %s ", log->prefix);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	if (e->flags & (1 << NFTNL_EXPR_LOG_PREFIX)) {
+		ret = snprintf(buf, len, "prefix %s ", log->prefix);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
 
 	if (e->flags & (1 << NFTNL_EXPR_LOG_GROUP)) {
 		ret = snprintf(buf + offset, len,
