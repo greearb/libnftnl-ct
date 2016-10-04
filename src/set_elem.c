@@ -304,6 +304,9 @@ void nftnl_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set 
 
 	nftnl_set_elem_nlmsg_build_def(nlh, s);
 
+	if (list_empty(&s->element_list))
+		return;
+
 	nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_LIST_ELEMENTS);
 	list_for_each_entry(elem, &s->element_list, head)
 		nftnl_set_elem_build(nlh, elem, ++i);
