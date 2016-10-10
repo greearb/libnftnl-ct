@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Arturo Borrero Gonzalez <arturo.borrero.glez@gmail.com>
+ * Copyright (c) 2013 Arturo Borrero Gonzalez <arturo@debian.org>
  *
  * based on previous code from:
  *

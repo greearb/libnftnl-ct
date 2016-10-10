@@ -1,5 +1,5 @@
 /*
- * (C) 2014 by Arturo Borrero Gonzalez <arturo.borrero.glez@gmail.com>
+ * (C) 2014 by Arturo Borrero Gonzalez <arturo@debian.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
