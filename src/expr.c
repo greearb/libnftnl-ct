@@ -213,12 +213,14 @@ bool nftnl_expr_cmp(const struct nftnl_expr *e1, const struct nftnl_expr *e2)
 }
 EXPORT_SYMBOL(nftnl_expr_cmp);
 
-void
-nftnl_expr_build_payload(struct nlmsghdr *nlh, struct nftnl_expr *expr)
+void nftnl_expr_build_payload(struct nlmsghdr *nlh, struct nftnl_expr *expr)
 {
 	struct nlattr *nest;
 
 	mnl_attr_put_strz(nlh, NFTA_EXPR_NAME, expr->ops->name);
+
+	if (!expr->ops->build)
+		return;
 
 	nest = mnl_attr_nest_start(nlh, NFTA_EXPR_DATA);
 	expr->ops->build(nlh, expr);
@@ -261,6 +263,7 @@ struct nftnl_expr *nftnl_expr_parse(struct nlattr *attr)
 		goto err1;
 
 	if (tb[NFTA_EXPR_DATA] &&
+	    expr->ops->parse &&
 	    expr->ops->parse(expr, tb[NFTA_EXPR_DATA]) < 0)
 		goto err2;
 

@@ -31,6 +31,10 @@ extern struct expr_ops expr_ops_target;
 extern struct expr_ops expr_ops_dynset;
 extern struct expr_ops expr_ops_hash;
 
+static struct expr_ops expr_ops_notrack = {
+	.name	= "notrack",
+};
+
 static struct expr_ops *expr_ops[] = {
 	&expr_ops_bitwise,
 	&expr_ops_byteorder,
@@ -49,6 +53,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_meta,
 	&expr_ops_ng,
 	&expr_ops_nat,
+	&expr_ops_notrack,
 	&expr_ops_payload,
 	&expr_ops_range,
 	&expr_ops_redir,
