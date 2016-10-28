@@ -44,6 +44,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/queue.c	\
 		      expr/quota.c	\
 		      expr/reject.c	\
+		      expr/rt.c		\
 		      expr/target.c	\
 		      expr/masq.c	\
 		      expr/redir.c	\

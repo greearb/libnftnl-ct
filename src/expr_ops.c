@@ -25,6 +25,7 @@ extern struct expr_ops expr_ops_payload;
 extern struct expr_ops expr_ops_range;
 extern struct expr_ops expr_ops_redir;
 extern struct expr_ops expr_ops_reject;
+extern struct expr_ops expr_ops_rt;
 extern struct expr_ops expr_ops_queue;
 extern struct expr_ops expr_ops_quota;
 extern struct expr_ops expr_ops_target;
@@ -58,6 +59,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_range,
 	&expr_ops_redir,
 	&expr_ops_reject,
+	&expr_ops_rt,
 	&expr_ops_queue,
 	&expr_ops_quota,
 	&expr_ops_target,
