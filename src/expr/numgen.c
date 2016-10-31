@@ -194,7 +194,7 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 	}
 
 	if (ng->offset) {
-		ret = snprintf(buf, len, "offset %u ", ng->offset);
+		ret = snprintf(buf + offset, len, "offset %u ", ng->offset);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 

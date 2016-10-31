@@ -220,7 +220,7 @@ nftnl_expr_hash_snprintf_default(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (hash->offset) {
-		ret = snprintf(buf, len, "offset %u ", hash->offset);
+		ret = snprintf(buf + offset, len, "offset %u ", hash->offset);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
