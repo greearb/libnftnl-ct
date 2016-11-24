@@ -24,7 +24,7 @@ enum nft_registers {
 	__NFT_REG_MAX,
 
 	NFT_REG32_00	= 8,
-	MFT_REG32_01,
+	NFT_REG32_01,
 	NFT_REG32_02,
 	NFT_REG32_03,
 	NFT_REG32_04,
@@ -573,7 +573,7 @@ enum nft_range_attributes {
 	NFTA_RANGE_TO_DATA,
 	__NFTA_RANGE_MAX
 };
-#define NFTA_RANGE_MAX         (__NFTA_RANGE_MAX - 1)
+#define NFTA_RANGE_MAX		(__NFTA_RANGE_MAX - 1)
 
 enum nft_lookup_flags {
 	NFT_LOOKUP_F_INV = (1 << 0),
@@ -604,6 +604,10 @@ enum nft_dynset_ops {
 	NFT_DYNSET_OP_UPDATE,
 };
 
+enum nft_dynset_flags {
+	NFT_DYNSET_F_INV	= (1 << 0),
+};
+
 /**
  * enum nft_dynset_attributes - dynset expression attributes
  *
@@ -614,6 +618,7 @@ enum nft_dynset_ops {
  * @NFTA_DYNSET_SREG_DATA: source register of the data (NLA_U32)
  * @NFTA_DYNSET_TIMEOUT: timeout value for the new element (NLA_U64)
  * @NFTA_DYNSET_EXPR: expression (NLA_NESTED: nft_expr_attributes)
+ * @NFTA_DYNSET_FLAGS: flags (NLA_U32)
  */
 enum nft_dynset_attributes {
 	NFTA_DYNSET_UNSPEC,
@@ -625,6 +630,7 @@ enum nft_dynset_attributes {
 	NFTA_DYNSET_TIMEOUT,
 	NFTA_DYNSET_EXPR,
 	NFTA_DYNSET_PAD,
+	NFTA_DYNSET_FLAGS,
 	__NFTA_DYNSET_MAX,
 };
 #define NFTA_DYNSET_MAX		(__NFTA_DYNSET_MAX - 1)
@@ -773,7 +779,7 @@ enum nft_rt_keys {
  * @NFTA_HASH_LEN: source data length (NLA_U32)
  * @NFTA_HASH_MODULUS: modulus value (NLA_U32)
  * @NFTA_HASH_SEED: seed value (NLA_U32)
- * @NFTA_HASH_OFFSET: offset value to be added (NLA_U32)
+ * @NFTA_HASH_OFFSET: add this offset value to hash result (NLA_U32)
  */
 enum nft_hash_attributes {
 	NFTA_HASH_UNSPEC,
@@ -1222,7 +1228,7 @@ enum nft_trace_types {
  * enum nft_ng_attributes - nf_tables number generator expression netlink attributes
  *
  * @NFTA_NG_DREG: destination register (NLA_U32)
- * @NFTA_NG_MODULUS: maximum value to be returned (NLA_U32)
+ * @NFTA_NG_MODULUS: maximum counter value (NLA_U32)
  * @NFTA_NG_TYPE: operation type (NLA_U32)
  * @NFTA_NG_OFFSET: offset to be added to the counter (NLA_U32)
  */
