@@ -234,6 +234,11 @@ enum {
 	NFTNL_EXPR_FIB_FLAGS,
 };
 
+enum {
+	NFTNL_EXPR_OBJREF_IMM_TYPE	= NFTNL_EXPR_BASE,
+	NFTNL_EXPR_OBJREF_IMM_NAME,
+};
+
 /*
  * Compat
  */

@@ -276,6 +276,7 @@ static int nftnl_jansson_parse_obj(struct nftnl_obj *t, json_t *tree,
 			    struct nftnl_parse_err *err)
 {
 	const char *str;
+	uint32_t type;
 	json_t *root;
 
 	root = nftnl_jansson_get_node(tree, "obj", err);
@@ -289,6 +290,10 @@ static int nftnl_jansson_parse_obj(struct nftnl_obj *t, json_t *tree,
 	str = nftnl_jansson_parse_str(root, "name", err);
 	if (str != NULL)
 		nftnl_obj_set_str(t, NFTNL_OBJ_NAME, str);
+
+	if (nftnl_jansson_parse_val(root, "type", NFTNL_TYPE_U32, &type,
+				    err) < 0)
+		nftnl_obj_set_u32(t, NFTNL_OBJ_TYPE, type);
 
 	return 0;
 }
