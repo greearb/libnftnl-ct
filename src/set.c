@@ -80,6 +80,7 @@ void nftnl_set_unset(struct nftnl_set *s, uint16_t attr)
 	case NFTNL_SET_KEY_LEN:
 	case NFTNL_SET_DATA_TYPE:
 	case NFTNL_SET_DATA_LEN:
+	case NFTNL_SET_OBJ_TYPE:
 	case NFTNL_SET_FAMILY:
 	case NFTNL_SET_ID:
 	case NFTNL_SET_POLICY:
@@ -104,6 +105,7 @@ static uint32_t nftnl_set_validate[NFTNL_SET_MAX + 1] = {
 	[NFTNL_SET_KEY_LEN]		= sizeof(uint32_t),
 	[NFTNL_SET_DATA_TYPE]	= sizeof(uint32_t),
 	[NFTNL_SET_DATA_LEN]		= sizeof(uint32_t),
+	[NFTNL_SET_OBJ_TYPE]		= sizeof(uint32_t),
 	[NFTNL_SET_FAMILY]		= sizeof(uint32_t),
 	[NFTNL_SET_POLICY]		= sizeof(uint32_t),
 	[NFTNL_SET_DESC_SIZE]	= sizeof(uint32_t),
@@ -148,6 +150,9 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 		break;
 	case NFTNL_SET_DATA_LEN:
 		s->data_len = *((uint32_t *)data);
+		break;
+	case NFTNL_SET_OBJ_TYPE:
+		s->obj_type = *((uint32_t *)data);
 		break;
 	case NFTNL_SET_FAMILY:
 		s->family = *((uint32_t *)data);
@@ -235,6 +240,9 @@ const void *nftnl_set_get_data(const struct nftnl_set *s, uint16_t attr,
 	case NFTNL_SET_DATA_LEN:
 		*data_len = sizeof(uint32_t);
 		return &s->data_len;
+	case NFTNL_SET_OBJ_TYPE:
+		*data_len = sizeof(uint32_t);
+		return &s->obj_type;
 	case NFTNL_SET_FAMILY:
 		*data_len = sizeof(uint32_t);
 		return &s->family;
@@ -360,6 +368,8 @@ void nftnl_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set *s)
 		mnl_attr_put_u32(nlh, NFTA_SET_DATA_TYPE, htonl(s->data_type));
 	if (s->flags & (1 << NFTNL_SET_DATA_LEN))
 		mnl_attr_put_u32(nlh, NFTA_SET_DATA_LEN, htonl(s->data_len));
+	if (s->flags & (1 << NFTNL_SET_OBJ_TYPE))
+		mnl_attr_put_u32(nlh, NFTA_SET_OBJ_TYPE, htonl(s->obj_type));
 	if (s->flags & (1 << NFTNL_SET_ID))
 		mnl_attr_put_u32(nlh, NFTA_SET_ID, htonl(s->id));
 	if (s->flags & (1 << NFTNL_SET_POLICY))
@@ -498,6 +508,10 @@ int nftnl_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		s->data_len = ntohl(mnl_attr_get_u32(tb[NFTA_SET_DATA_LEN]));
 		s->flags |= (1 << NFTNL_SET_DATA_LEN);
 	}
+	if (tb[NFTA_SET_OBJ_TYPE]) {
+		s->obj_type = ntohl(mnl_attr_get_u32(tb[NFTA_SET_OBJ_TYPE]));
+		s->flags |= (1 << NFTNL_SET_OBJ_TYPE);
+	}
 	if (tb[NFTA_SET_ID]) {
 		s->id = ntohl(mnl_attr_get_u32(tb[NFTA_SET_ID]));
 		s->flags |= (1 << NFTNL_SET_ID);
@@ -584,6 +598,14 @@ static int nftnl_jansson_parse_set_info(struct nftnl_set *s, json_t *tree,
 			return -1;
 
 		nftnl_set_set_u32(s, NFTNL_SET_DATA_LEN, data_len);
+	}
+
+	if (nftnl_jansson_node_exist(root, "obj_type")) {
+		if (nftnl_jansson_parse_val(root, "obj_type", NFTNL_TYPE_U32,
+					  &data_type, err) < 0)
+			return -1;
+
+		nftnl_set_set_u32(s, NFTNL_SET_OBJ_TYPE, data_type);
 	}
 
 	if (nftnl_jansson_node_exist(root, "policy")) {
@@ -757,6 +779,11 @@ static int nftnl_set_snprintf_json(char *buf, size_t size,
 	}
 	if(s->flags & (1 << NFTNL_SET_DATA_LEN)) {
 		ret = snprintf(buf + offset, len, ",\"data_len\":%u", s->data_len);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	}
+	if (s->flags & (1 << NFTNL_SET_OBJ_TYPE)) {
+		ret = snprintf(buf + offset, len,
+				  ",\"obj_type\":%u", s->obj_type);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 

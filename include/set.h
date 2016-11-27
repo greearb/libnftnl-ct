@@ -14,6 +14,7 @@ struct nftnl_set {
 	uint32_t		key_len;
 	uint32_t		data_type;
 	uint32_t		data_len;
+	uint32_t		obj_type;
 	struct {
 		void		*data;
 		uint32_t	len;
