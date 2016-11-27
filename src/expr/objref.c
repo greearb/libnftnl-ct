@@ -25,6 +25,11 @@ struct nftnl_expr_objref {
 		uint32_t	type;
 		const char	*name;
 	} imm;
+	struct {
+		uint32_t	sreg;
+		const char	*name;
+		uint32_t	id;
+	} set;
 };
 
 static int nftnl_expr_objref_set(struct nftnl_expr *e, uint16_t type,
@@ -40,6 +45,17 @@ static int nftnl_expr_objref_set(struct nftnl_expr *e, uint16_t type,
 		objref->imm.name = strdup(data);
 		if (!objref->imm.name)
 			return -1;
+		break;
+	case NFTNL_EXPR_OBJREF_SET_SREG:
+		objref->set.sreg = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_OBJREF_SET_NAME:
+		objref->set.name = strdup(data);
+		if (!objref->set.name)
+			return -1;
+		break;
+	case NFTNL_EXPR_OBJREF_SET_ID:
+		objref->set.id = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -59,6 +75,15 @@ static const void *nftnl_expr_objref_get(const struct nftnl_expr *e,
 	case NFTNL_EXPR_OBJREF_IMM_NAME:
 		*data_len = strlen(objref->imm.name) + 1;
 		return objref->imm.name;
+	case NFTNL_EXPR_OBJREF_SET_SREG:
+		*data_len = sizeof(objref->set.sreg);
+		return &objref->set.sreg;
+	case NFTNL_EXPR_OBJREF_SET_NAME:
+		*data_len = strlen(objref->set.name) + 1;
+		return objref->set.name;
+	case NFTNL_EXPR_OBJREF_SET_ID:
+		*data_len = sizeof(objref->set.id);
+		return &objref->set.id;
 	}
 	return NULL;
 }
@@ -77,7 +102,13 @@ static int nftnl_expr_objref_cb(const struct nlattr *attr, void *data)
 			abi_breakage();
 		break;
 	case NFTA_OBJREF_IMM_NAME:
+	case NFTA_OBJREF_SET_NAME:
 		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
+		break;
+	case NFTA_OBJREF_SET_SREG:
+	case NFTA_OBJREF_SET_ID:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
 	}
@@ -96,6 +127,14 @@ static void nftnl_expr_objref_build(struct nlmsghdr *nlh,
 				 htonl(objref->imm.type));
 	if (e->flags & (1 << NFTNL_EXPR_OBJREF_IMM_NAME))
 		mnl_attr_put_str(nlh, NFTA_OBJREF_IMM_NAME, objref->imm.name);
+	if (e->flags & (1 << NFTNL_EXPR_OBJREF_SET_SREG))
+		mnl_attr_put_u32(nlh, NFTA_OBJREF_SET_SREG,
+				 htonl(objref->set.sreg));
+	if (e->flags & (1 << NFTNL_EXPR_OBJREF_SET_NAME))
+		mnl_attr_put_str(nlh, NFTA_OBJREF_SET_NAME, objref->set.name);
+	if (e->flags & (1 << NFTNL_EXPR_OBJREF_SET_ID))
+		mnl_attr_put_u32(nlh, NFTA_OBJREF_SET_ID,
+				 htonl(objref->set.id));
 }
 
 static int nftnl_expr_objref_parse(struct nftnl_expr *e, struct nlattr *attr)
@@ -115,6 +154,21 @@ static int nftnl_expr_objref_parse(struct nftnl_expr *e, struct nlattr *attr)
 		objref->imm.name =
 			strdup(mnl_attr_get_str(tb[NFTA_OBJREF_IMM_NAME]));
 		e->flags |= (1 << NFTNL_EXPR_OBJREF_IMM_NAME);
+	}
+	if (tb[NFTA_OBJREF_SET_SREG]) {
+		objref->set.sreg =
+			ntohl(mnl_attr_get_u32(tb[NFTA_OBJREF_SET_SREG]));
+		e->flags |= (1 << NFTNL_EXPR_OBJREF_SET_SREG);
+	}
+	if (tb[NFTA_OBJREF_SET_NAME]) {
+		objref->set.name =
+			strdup(mnl_attr_get_str(tb[NFTA_OBJREF_SET_NAME]));
+		e->flags |= (1 << NFTNL_EXPR_OBJREF_SET_NAME);
+	}
+	if (tb[NFTA_OBJREF_SET_ID]) {
+		objref->set.id =
+			ntohl(mnl_attr_get_u32(tb[NFTA_OBJREF_SET_ID]));
+		e->flags |= (1 << NFTNL_EXPR_OBJREF_SET_ID);
 	}
 
 	return 0;
@@ -157,6 +211,10 @@ static int nftnl_expr_objref_export(char *buf, size_t size,
 		nftnl_buf_u32(&b, type, objref->imm.type, BYTES);
 	if (e->flags & (1 << NFTNL_EXPR_OBJREF_IMM_NAME))
 		nftnl_buf_str(&b, type, objref->imm.name, NAME);
+	if (e->flags & (1 << NFTNL_EXPR_OBJREF_SET_SREG))
+		nftnl_buf_u32(&b, type, objref->set.sreg, SREG);
+	if (e->flags & (1 << NFTNL_EXPR_OBJREF_SET_NAME))
+		nftnl_buf_str(&b, type, objref->set.name, SET);
 
 	return nftnl_buf_done(&b);
 }
@@ -166,8 +224,12 @@ static int nftnl_expr_objref_snprintf_default(char *buf, size_t len,
 {
 	struct nftnl_expr_objref *objref = nftnl_expr_data(e);
 
-	return snprintf(buf, len, "type %u name %s ",
-			objref->imm.type, objref->imm.name);
+	if (e->flags & (1 << NFTNL_EXPR_OBJREF_SET_SREG))
+		return snprintf(buf, len, "sreg %u set %s id %u ",
+				objref->set.sreg, objref->set.name, objref->set.id);
+	else
+		return snprintf(buf, len, "type %u name %s ",
+				objref->imm.type, objref->imm.name);
 }
 
 static int nftnl_expr_objref_snprintf(char *buf, size_t len, uint32_t type,
@@ -197,6 +259,12 @@ static bool nftnl_expr_objref_cmp(const struct nftnl_expr *e1,
 		eq &= (c1->imm.type == c2->imm.type);
 	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_IMM_NAME))
 		eq &= !strcmp(c1->imm.name, c2->imm.name);
+	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_SET_SREG))
+		eq &= (c1->set.sreg == c2->set.sreg);
+	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_SET_NAME))
+		eq &= !strcmp(c1->set.name, c2->set.name);
+	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_SET_ID))
+		eq &= (c1->set.id == c2->set.id);
 
 	return eq;
 }
