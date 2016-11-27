@@ -12,6 +12,7 @@ struct nftnl_set_elem {
 	uint32_t		flags;
 	uint64_t		timeout;
 	uint64_t		expiration;
+	const char		*objref;
 	struct {
 		void		*data;
 		uint32_t	len;

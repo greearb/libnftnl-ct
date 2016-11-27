@@ -50,6 +50,9 @@ void nftnl_set_elem_free(struct nftnl_set_elem *s)
 	if (s->flags & (1 << NFTNL_SET_ELEM_USERDATA))
 		xfree(s->user.data);
 
+	if (s->flags & (1 << NFTNL_SET_ELEM_OBJREF))
+		xfree(s->objref);
+
 	xfree(s);
 }
 EXPORT_SYMBOL_ALIAS(nftnl_set_elem_free, nft_set_elem_free);
@@ -81,6 +84,9 @@ void nftnl_set_elem_unset(struct nftnl_set_elem *s, uint16_t attr)
 		break;
 	case NFTNL_SET_ELEM_EXPR:
 		nftnl_expr_free(s->expr);
+		break;
+	case NFTNL_SET_ELEM_OBJREF:
+		xfree(s->objref);
 		break;
 	default:
 		return;
@@ -128,6 +134,14 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 			return -1;
 		memcpy(s->user.data, data, data_len);
 		s->user.len = data_len;
+		break;
+	case NFTNL_SET_ELEM_OBJREF:
+		if (s->flags & (1 << NFTNL_SET_ELEM_OBJREF))
+			xfree(s->objref);
+
+		s->objref = strdup(data);
+		if (!s->objref)
+			return -1;
 		break;
 	}
 	s->flags |= (1 << attr);
@@ -185,6 +199,9 @@ const void *nftnl_set_elem_get(struct nftnl_set_elem *s, uint16_t attr, uint32_t
 		return s->user.data;
 	case NFTNL_SET_ELEM_EXPR:
 		return s->expr;
+	case NFTNL_SET_ELEM_OBJREF:
+		*data_len = strlen(s->objref) + 1;
+		return s->objref;
 	}
 	return NULL;
 }
@@ -271,6 +288,8 @@ void nftnl_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 	}
 	if (e->flags & (1 << NFTNL_SET_ELEM_USERDATA))
 		mnl_attr_put(nlh, NFTA_SET_ELEM_USERDATA, e->user.len, e->user.data);
+	if (e->flags & (1 << NFTNL_SET_ELEM_OBJREF))
+		mnl_attr_put_strz(nlh, NFTA_SET_ELEM_OBJREF, e->objref);
 }
 
 static void nftnl_set_elem_nlmsg_build_def(struct nlmsghdr *nlh,
@@ -422,6 +441,14 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 		}
 		memcpy(e->user.data, udata, e->user.len);
 		e->flags |= (1 << NFTNL_RULE_USERDATA);
+	}
+	if (tb[NFTA_SET_ELEM_OBJREF]) {
+		e->objref = strdup(mnl_attr_get_str(tb[NFTA_SET_ELEM_OBJREF]));
+		if (e->objref == NULL) {
+			ret = -1;
+			goto out_set_elem;
+		}
+		e->flags |= (1 << NFTNL_SET_ELEM_OBJREF);
 	}
 
 	/* Add this new element to this set */
