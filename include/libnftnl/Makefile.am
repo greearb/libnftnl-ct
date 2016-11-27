@@ -2,6 +2,7 @@ pkginclude_HEADERS = batch.h		\
 		     table.h		\
 		     trace.h		\
 		     chain.h		\
+		     object.h		\
 		     rule.h		\
 		     expr.h		\
 		     set.h		\

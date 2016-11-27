@@ -533,3 +533,34 @@ LIBNFTNL_4.2 {
 	nftnl_rule_cmp;
 	nftnl_expr_cmp;
 } LIBNFTNL_4.1;
+
+LIBNFTNL_4.3 {
+	nftnl_obj_alloc;
+	nftnl_obj_free;
+	nftnl_obj_is_set;
+	nftnl_obj_unset;
+	nftnl_obj_set;
+	nftnl_obj_get;
+	nftnl_obj_set_u32;
+	nftnl_obj_set_u64;
+	nftnl_obj_set_str;
+	nftnl_obj_get_u32;
+	nftnl_obj_get_str;
+	nftnl_obj_get_u64;
+	nftnl_obj_parse;
+	nftnl_obj_parse_file;
+	nftnl_obj_snprintf;
+	nftnl_obj_fprintf;
+	nftnl_obj_nlmsg_build_payload;
+	nftnl_obj_nlmsg_parse;
+	nftnl_obj_list_alloc;
+	nftnl_obj_list_free;
+	nftnl_obj_list_is_empty;
+	nftnl_obj_list_foreach;
+	nftnl_obj_list_add;
+	nftnl_obj_list_add_tail;
+	nftnl_obj_list_del;
+	nftnl_obj_list_iter_create;
+	nftnl_obj_list_iter_next;
+	nftnl_obj_list_iter_destroy;
+} LIBNFTNL_4.2;

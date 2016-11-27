@@ -41,6 +41,7 @@ int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 #define BURST			"burst"
 #define CHAIN			"chain"
 #define CODE			"code"
+#define CONSUMED		"consumed"
 #define DATA			"data"
 #define DEVICE			"device"
 #define DIR			"dir"

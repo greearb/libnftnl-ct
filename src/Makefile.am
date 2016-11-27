@@ -13,6 +13,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      table.c		\
 		      trace.c		\
 		      chain.c		\
+		      object.c		\
 		      rule.c		\
 		      set.c		\
 		      set_elem.c	\
@@ -50,4 +51,6 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/masq.c	\
 		      expr/redir.c	\
 		      expr/hash.c	\
+		      obj/counter.c	\
+		      obj/quota.c	\
 		      libnftnl.map
