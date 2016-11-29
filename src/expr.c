@@ -281,6 +281,9 @@ int nftnl_expr_snprintf(char *buf, size_t size, const struct nftnl_expr *expr,
 	int ret;
 	unsigned int offset = 0, len = size;
 
+	if (!expr->ops->snprintf)
+		return 0;
+
 	ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
