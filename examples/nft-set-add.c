@@ -42,9 +42,10 @@ static struct nftnl_set *setup_set(uint8_t family, const char *table,
 	nftnl_set_set_str(s, NFTNL_SET_TABLE, table);
 	nftnl_set_set_str(s, NFTNL_SET_NAME, name);
 	nftnl_set_set_u32(s, NFTNL_SET_FAMILY, family);
-	nftnl_set_set_u32(s, NFTNL_SET_KEY_LEN, 2);
+	nftnl_set_set_u32(s, NFTNL_SET_KEY_LEN, sizeof(uint16_t));
+	/* inet service type, see nftables/include/datatypes.h */
+	nftnl_set_set_u32(s, NFTNL_SET_KEY_TYPE, 13);
 	nftnl_set_set_u32(s, NFTNL_SET_ID, 1);
-	nftnl_set_set_u32(s, NFTNL_SET_FLAGS, NFT_SET_CONSTANT);
 
 	return s;
 }
