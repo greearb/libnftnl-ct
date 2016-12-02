@@ -22,6 +22,7 @@
 
 struct nftnl_expr_quota {
 	uint64_t	bytes;
+	uint64_t	consumed;
 	uint32_t	flags;
 };
 
@@ -33,6 +34,9 @@ static int nftnl_expr_quota_set(struct nftnl_expr *e, uint16_t type,
 	switch (type) {
 	case NFTNL_EXPR_QUOTA_BYTES:
 		quota->bytes = *((uint64_t *)data);
+		break;
+	case NFTNL_EXPR_QUOTA_CONSUMED:
+		quota->consumed = *((uint64_t *)data);
 		break;
 	case NFTNL_EXPR_QUOTA_FLAGS:
 		quota->flags = *((uint32_t *)data);
@@ -52,6 +56,9 @@ static const void *nftnl_expr_quota_get(const struct nftnl_expr *e,
 	case NFTNL_EXPR_QUOTA_BYTES:
 		*data_len = sizeof(quota->bytes);
 		return &quota->bytes;
+	case NFTNL_EXPR_QUOTA_CONSUMED:
+		*data_len = sizeof(quota->consumed);
+		return &quota->consumed;
 	case NFTNL_EXPR_QUOTA_FLAGS:
 		*data_len = sizeof(quota->flags);
 		return &quota->flags;
@@ -69,6 +76,7 @@ static int nftnl_expr_quota_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTA_QUOTA_BYTES:
+	case NFTA_QUOTA_CONSUMED:
 		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
 			abi_breakage();
 		break;
@@ -89,6 +97,8 @@ nftnl_expr_quota_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 
 	if (e->flags & (1 << NFTNL_EXPR_QUOTA_BYTES))
 		mnl_attr_put_u64(nlh, NFTA_QUOTA_BYTES, htobe64(quota->bytes));
+	if (e->flags & (1 << NFTNL_EXPR_QUOTA_CONSUMED))
+		mnl_attr_put_u64(nlh, NFTA_QUOTA_CONSUMED, htobe64(quota->consumed));
 	if (e->flags & (1 << NFTNL_EXPR_QUOTA_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_QUOTA_FLAGS, htonl(quota->flags));
 }
@@ -106,6 +116,10 @@ nftnl_expr_quota_parse(struct nftnl_expr *e, struct nlattr *attr)
 		quota->bytes = be64toh(mnl_attr_get_u64(tb[NFTA_QUOTA_BYTES]));
 		e->flags |= (1 << NFTNL_EXPR_QUOTA_BYTES);
 	}
+	if (tb[NFTA_QUOTA_CONSUMED]) {
+		quota->consumed = be64toh(mnl_attr_get_u64(tb[NFTA_QUOTA_CONSUMED]));
+		e->flags |= (1 << NFTNL_EXPR_QUOTA_CONSUMED);
+	}
 	if (tb[NFTA_QUOTA_FLAGS]) {
 		quota->flags = ntohl(mnl_attr_get_u32(tb[NFTA_QUOTA_FLAGS]));
 		e->flags |= (1 << NFTNL_EXPR_QUOTA_FLAGS);
@@ -119,12 +133,15 @@ nftnl_expr_quota_json_parse(struct nftnl_expr *e, json_t *root,
 				 struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
-	uint64_t bytes;
+	uint64_t bytes, consumed;
 	uint32_t flags;
 
 	if (nftnl_jansson_parse_val(root, "bytes", NFTNL_TYPE_U64, &bytes,
 				  err) == 0)
 		nftnl_expr_set_u64(e, NFTNL_EXPR_QUOTA_BYTES, bytes);
+	if (nftnl_jansson_parse_val(root, "consumed", NFTNL_TYPE_U64, &consumed,
+				  err) == 0)
+		nftnl_expr_set_u64(e, NFTNL_EXPR_QUOTA_CONSUMED, consumed);
 	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
 				  err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_QUOTA_FLAGS, flags);
@@ -144,6 +161,8 @@ static int nftnl_expr_quota_export(char *buf, size_t size,
 
 	if (e->flags & (1 << NFTNL_EXPR_QUOTA_BYTES))
 		nftnl_buf_u64(&b, type, quota->bytes, BYTES);
+	if (e->flags & (1 << NFTNL_EXPR_QUOTA_CONSUMED))
+		nftnl_buf_u64(&b, type, quota->consumed, CONSUMED);
 	if (e->flags & (1 << NFTNL_EXPR_QUOTA_FLAGS))
 		nftnl_buf_u32(&b, type, quota->flags, FLAGS);
 
@@ -155,8 +174,9 @@ static int nftnl_expr_quota_snprintf_default(char *buf, size_t len,
 {
 	struct nftnl_expr_quota *quota = nftnl_expr_data(e);
 
-	return snprintf(buf, len, "bytes %"PRIu64" flags %u ",
-			quota->bytes, quota->flags);
+	return snprintf(buf, len,
+			"bytes %"PRIu64" consumed %"PRIu64" flags %u ",
+			quota->bytes, quota->consumed, quota->flags);
 }
 
 static int nftnl_expr_quota_snprintf(char *buf, size_t len, uint32_t type,
