@@ -813,6 +813,10 @@ int nftnl_set_elems_nlmsg_build_payload_iter(struct nlmsghdr *nlh,
 
 	nftnl_set_elem_nlmsg_build_def(nlh, iter->set);
 
+	/* This set is empty, don't add an empty list element nest. */
+	if (list_empty(&iter->set->element_list))
+		return ret;
+
 	nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_LIST_ELEMENTS);
 	elem = nftnl_set_elems_iter_next(iter);
 	while (elem != NULL) {
