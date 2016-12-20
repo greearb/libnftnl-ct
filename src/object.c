@@ -419,14 +419,14 @@ static int nftnl_obj_cmd_snprintf(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	switch (type) {
-	case NFT_OUTPUT_DEFAULT:
+	case NFTNL_OUTPUT_DEFAULT:
 		ret = nftnl_obj_snprintf_dflt(buf + offset, len, obj, type,
 					      flags);
 		break;
-	case NFT_OUTPUT_JSON:
+	case NFTNL_OUTPUT_JSON:
 		ret = nftnl_obj_export(buf + offset, len, obj, type, flags);
 		break;
-	case NFT_OUTPUT_XML:
+	case NFTNL_OUTPUT_XML:
 	default:
 		return -1;
 	}
@@ -455,7 +455,7 @@ static int nftnl_obj_do_snprintf(char *buf, size_t size, const void *obj,
 int nftnl_obj_fprintf(FILE *fp, const struct nftnl_obj *obj, uint32_t type,
 		      uint32_t flags)
 {
-	return nftnl_fprintf(fp, obj, NFT_CMD_UNSPEC, type, flags,
+	return nftnl_fprintf(fp, obj, NFTNL_CMD_UNSPEC, type, flags,
 			     nftnl_obj_do_snprintf);
 }
 EXPORT_SYMBOL(nftnl_obj_fprintf);

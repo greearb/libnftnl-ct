@@ -43,7 +43,7 @@ struct nftnl_expr *nftnl_expr_alloc(const char *name)
 
 	return expr;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_alloc, nft_rule_expr_alloc);
+EXPORT_SYMBOL(nftnl_expr_alloc);
 
 void nftnl_expr_free(const struct nftnl_expr *expr)
 {
@@ -52,13 +52,13 @@ void nftnl_expr_free(const struct nftnl_expr *expr)
 
 	xfree(expr);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_free, nft_rule_expr_free);
+EXPORT_SYMBOL(nftnl_expr_free);
 
 bool nftnl_expr_is_set(const struct nftnl_expr *expr, uint16_t type)
 {
 	return expr->flags & (1 << type);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_is_set, nft_rule_expr_is_set);
+EXPORT_SYMBOL(nftnl_expr_is_set);
 
 int nftnl_expr_set(struct nftnl_expr *expr, uint16_t type,
 		   const void *data, uint32_t data_len)
@@ -73,41 +73,41 @@ int nftnl_expr_set(struct nftnl_expr *expr, uint16_t type,
 	expr->flags |= (1 << type);
 	return 0;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_set, nft_rule_expr_set);
+EXPORT_SYMBOL(nftnl_expr_set);
 
 void
 nftnl_expr_set_u8(struct nftnl_expr *expr, uint16_t type, uint8_t data)
 {
 	nftnl_expr_set(expr, type, &data, sizeof(uint8_t));
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_set_u8, nft_rule_expr_set_u8);
+EXPORT_SYMBOL(nftnl_expr_set_u8);
 
 void
 nftnl_expr_set_u16(struct nftnl_expr *expr, uint16_t type, uint16_t data)
 {
 	nftnl_expr_set(expr, type, &data, sizeof(uint16_t));
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_set_u16, nft_rule_expr_set_u16);
+EXPORT_SYMBOL(nftnl_expr_set_u16);
 
 void
 nftnl_expr_set_u32(struct nftnl_expr *expr, uint16_t type, uint32_t data)
 {
 	nftnl_expr_set(expr, type, &data, sizeof(uint32_t));
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_set_u32, nft_rule_expr_set_u32);
+EXPORT_SYMBOL(nftnl_expr_set_u32);
 
 void
 nftnl_expr_set_u64(struct nftnl_expr *expr, uint16_t type, uint64_t data)
 {
 	nftnl_expr_set(expr, type, &data, sizeof(uint64_t));
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_set_u64, nft_rule_expr_set_u64);
+EXPORT_SYMBOL(nftnl_expr_set_u64);
 
 int nftnl_expr_set_str(struct nftnl_expr *expr, uint16_t type, const char *str)
 {
 	return nftnl_expr_set(expr, type, str, strlen(str) + 1);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_set_str, nft_rule_expr_set_str);
+EXPORT_SYMBOL(nftnl_expr_set_str);
 
 const void *nftnl_expr_get(const struct nftnl_expr *expr,
 			      uint16_t type, uint32_t *data_len)
@@ -129,7 +129,7 @@ const void *nftnl_expr_get(const struct nftnl_expr *expr,
 
 	return ret;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_get, nft_rule_expr_get);
+EXPORT_SYMBOL(nftnl_expr_get);
 
 uint8_t nftnl_expr_get_u8(const struct nftnl_expr *expr, uint16_t type)
 {
@@ -145,7 +145,7 @@ uint8_t nftnl_expr_get_u8(const struct nftnl_expr *expr, uint16_t type)
 
 	return *((uint8_t *)data);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_get_u8, nft_rule_expr_get_u8);
+EXPORT_SYMBOL(nftnl_expr_get_u8);
 
 uint16_t nftnl_expr_get_u16(const struct nftnl_expr *expr, uint16_t type)
 {
@@ -161,7 +161,7 @@ uint16_t nftnl_expr_get_u16(const struct nftnl_expr *expr, uint16_t type)
 
 	return *((uint16_t *)data);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_get_u16, nft_rule_expr_get_u16);
+EXPORT_SYMBOL(nftnl_expr_get_u16);
 
 uint32_t nftnl_expr_get_u32(const struct nftnl_expr *expr, uint16_t type)
 {
@@ -177,7 +177,7 @@ uint32_t nftnl_expr_get_u32(const struct nftnl_expr *expr, uint16_t type)
 
 	return *((uint32_t *)data);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_get_u32, nft_rule_expr_get_u32);
+EXPORT_SYMBOL(nftnl_expr_get_u32);
 
 uint64_t nftnl_expr_get_u64(const struct nftnl_expr *expr, uint16_t type)
 {
@@ -193,7 +193,7 @@ uint64_t nftnl_expr_get_u64(const struct nftnl_expr *expr, uint16_t type)
 
 	return *((uint64_t *)data);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_get_u64, nft_rule_expr_get_u64);
+EXPORT_SYMBOL(nftnl_expr_get_u64);
 
 const char *nftnl_expr_get_str(const struct nftnl_expr *expr, uint16_t type)
 {
@@ -201,7 +201,7 @@ const char *nftnl_expr_get_str(const struct nftnl_expr *expr, uint16_t type)
 
 	return (const char *)nftnl_expr_get(expr, type, &data_len);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_get_str, nft_rule_expr_get_str);
+EXPORT_SYMBOL(nftnl_expr_get_str);
 
 bool nftnl_expr_cmp(const struct nftnl_expr *e1, const struct nftnl_expr *e2)
 {
@@ -289,4 +289,4 @@ int nftnl_expr_snprintf(char *buf, size_t size, const struct nftnl_expr *expr,
 
 	return offset;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_expr_snprintf, nft_rule_expr_snprintf);
+EXPORT_SYMBOL(nftnl_expr_snprintf);

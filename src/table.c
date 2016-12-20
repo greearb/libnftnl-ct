@@ -40,7 +40,7 @@ struct nftnl_table *nftnl_table_alloc(void)
 {
 	return calloc(1, sizeof(struct nftnl_table));
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_alloc, nft_table_alloc);
+EXPORT_SYMBOL(nftnl_table_alloc);
 
 void nftnl_table_free(const struct nftnl_table *t)
 {
@@ -49,13 +49,13 @@ void nftnl_table_free(const struct nftnl_table *t)
 
 	xfree(t);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_free, nft_table_free);
+EXPORT_SYMBOL(nftnl_table_free);
 
 bool nftnl_table_is_set(const struct nftnl_table *t, uint16_t attr)
 {
 	return t->flags & (1 << attr);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_is_set, nft_table_attr_is_set);
+EXPORT_SYMBOL(nftnl_table_is_set);
 
 void nftnl_table_unset(struct nftnl_table *t, uint16_t attr)
 {
@@ -74,7 +74,7 @@ void nftnl_table_unset(struct nftnl_table *t, uint16_t attr)
 	}
 	t->flags &= ~(1 << attr);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_unset, nft_table_attr_unset);
+EXPORT_SYMBOL(nftnl_table_unset);
 
 static uint32_t nftnl_table_validate[NFTNL_TABLE_MAX + 1] = {
 	[NFTNL_TABLE_FLAGS]	= sizeof(uint32_t),
@@ -109,31 +109,31 @@ int nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
 	t->flags |= (1 << attr);
 	return 0;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_set_data, nft_table_attr_set_data);
+EXPORT_SYMBOL(nftnl_table_set_data);
 
 void nftnl_table_set(struct nftnl_table *t, uint16_t attr, const void *data)
 {
 	nftnl_table_set_data(t, attr, data, nftnl_table_validate[attr]);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_set, nft_table_attr_set);
+EXPORT_SYMBOL(nftnl_table_set);
 
 void nftnl_table_set_u32(struct nftnl_table *t, uint16_t attr, uint32_t val)
 {
 	nftnl_table_set_data(t, attr, &val, sizeof(uint32_t));
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_set_u32, nft_table_attr_set_u32);
+EXPORT_SYMBOL(nftnl_table_set_u32);
 
 void nftnl_table_set_u8(struct nftnl_table *t, uint16_t attr, uint8_t val)
 {
 	nftnl_table_set_data(t, attr, &val, sizeof(uint8_t));
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_set_u8, nft_table_attr_set_u8);
+EXPORT_SYMBOL(nftnl_table_set_u8);
 
 int nftnl_table_set_str(struct nftnl_table *t, uint16_t attr, const char *str)
 {
 	return nftnl_table_set_data(t, attr, str, strlen(str) + 1);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_set_str, nft_table_attr_set_str);
+EXPORT_SYMBOL(nftnl_table_set_str);
 
 const void *nftnl_table_get_data(const struct nftnl_table *t, uint16_t attr,
 				 uint32_t *data_len)
@@ -157,34 +157,34 @@ const void *nftnl_table_get_data(const struct nftnl_table *t, uint16_t attr,
 	}
 	return NULL;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_get_data, nft_table_attr_get_data);
+EXPORT_SYMBOL(nftnl_table_get_data);
 
 const void *nftnl_table_get(const struct nftnl_table *t, uint16_t attr)
 {
 	uint32_t data_len;
 	return nftnl_table_get_data(t, attr, &data_len);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_get, nft_table_attr_get);
+EXPORT_SYMBOL(nftnl_table_get);
 
 uint32_t nftnl_table_get_u32(const struct nftnl_table *t, uint16_t attr)
 {
 	const void *ret = nftnl_table_get(t, attr);
 	return ret == NULL ? 0 : *((uint32_t *)ret);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_get_u32, nft_table_attr_get_u32);
+EXPORT_SYMBOL(nftnl_table_get_u32);
 
 uint8_t nftnl_table_get_u8(const struct nftnl_table *t, uint16_t attr)
 {
 	const void *ret = nftnl_table_get(t, attr);
 	return ret == NULL ? 0 : *((uint8_t *)ret);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_get_u8, nft_table_attr_get_u8);
+EXPORT_SYMBOL(nftnl_table_get_u8);
 
 const char *nftnl_table_get_str(const struct nftnl_table *t, uint16_t attr)
 {
 	return nftnl_table_get(t, attr);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_get_str, nft_table_attr_get_str);
+EXPORT_SYMBOL(nftnl_table_get_str);
 
 void nftnl_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_table *t)
 {
@@ -193,7 +193,7 @@ void nftnl_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_ta
 	if (t->flags & (1 << NFTNL_TABLE_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_TABLE_FLAGS, htonl(t->table_flags));
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_nlmsg_build_payload, nft_table_nlmsg_build_payload);
+EXPORT_SYMBOL(nftnl_table_nlmsg_build_payload);
 
 static int nftnl_table_parse_attr_cb(const struct nlattr *attr, void *data)
 {
@@ -249,7 +249,7 @@ int nftnl_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_table *t)
 
 	return 0;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_nlmsg_parse, nft_table_nlmsg_parse);
+EXPORT_SYMBOL(nftnl_table_nlmsg_parse);
 
 #ifdef JSON_PARSING
 int nftnl_jansson_parse_table(struct nftnl_table *t, json_t *tree,
@@ -335,14 +335,14 @@ int nftnl_table_parse(struct nftnl_table *t, enum nftnl_parse_type type,
 {
 	return nftnl_table_do_parse(t, type, data, err, NFTNL_PARSE_BUFFER);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_parse, nft_table_parse);
+EXPORT_SYMBOL(nftnl_table_parse);
 
 int nftnl_table_parse_file(struct nftnl_table *t, enum nftnl_parse_type type,
 			 FILE *fp, struct nftnl_parse_err *err)
 {
 	return nftnl_table_do_parse(t, type, fp, err, NFTNL_PARSE_FILE);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_parse_file, nft_table_parse_file);
+EXPORT_SYMBOL(nftnl_table_parse_file);
 
 static int nftnl_table_export(char *buf, size_t size,
 			      const struct nftnl_table *t, int type)
@@ -406,7 +406,7 @@ int nftnl_table_snprintf(char *buf, size_t size, const struct nftnl_table *t,
 	return nftnl_table_cmd_snprintf(buf, size, t, nftnl_flag2cmd(flags), type,
 				      flags);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_snprintf, nft_table_snprintf);
+EXPORT_SYMBOL(nftnl_table_snprintf);
 
 static int nftnl_table_do_snprintf(char *buf, size_t size, const void *t,
 				   uint32_t cmd, uint32_t type, uint32_t flags)
@@ -420,7 +420,7 @@ int nftnl_table_fprintf(FILE *fp, const struct nftnl_table *t, uint32_t type,
 	return nftnl_fprintf(fp, t, NFTNL_CMD_UNSPEC, type, flags,
 			   nftnl_table_do_snprintf);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_fprintf, nft_table_fprintf);
+EXPORT_SYMBOL(nftnl_table_fprintf);
 
 struct nftnl_table_list {
 	struct list_head list;
@@ -438,7 +438,7 @@ struct nftnl_table_list *nftnl_table_list_alloc(void)
 
 	return list;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_alloc, nft_table_list_alloc);
+EXPORT_SYMBOL(nftnl_table_list_alloc);
 
 void nftnl_table_list_free(struct nftnl_table_list *list)
 {
@@ -450,31 +450,31 @@ void nftnl_table_list_free(struct nftnl_table_list *list)
 	}
 	xfree(list);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_free, nft_table_list_free);
+EXPORT_SYMBOL(nftnl_table_list_free);
 
 int nftnl_table_list_is_empty(const struct nftnl_table_list *list)
 {
 	return list_empty(&list->list);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_is_empty, nft_table_list_is_empty);
+EXPORT_SYMBOL(nftnl_table_list_is_empty);
 
 void nftnl_table_list_add(struct nftnl_table *r, struct nftnl_table_list *list)
 {
 	list_add(&r->head, &list->list);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_add, nft_table_list_add);
+EXPORT_SYMBOL(nftnl_table_list_add);
 
 void nftnl_table_list_add_tail(struct nftnl_table *r, struct nftnl_table_list *list)
 {
 	list_add_tail(&r->head, &list->list);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_add_tail, nft_table_list_add_tail);
+EXPORT_SYMBOL(nftnl_table_list_add_tail);
 
 void nftnl_table_list_del(struct nftnl_table *t)
 {
 	list_del(&t->head);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_del, nft_table_list_del);
+EXPORT_SYMBOL(nftnl_table_list_del);
 
 int nftnl_table_list_foreach(struct nftnl_table_list *table_list,
 			   int (*cb)(struct nftnl_table *t, void *data),
@@ -490,7 +490,7 @@ int nftnl_table_list_foreach(struct nftnl_table_list *table_list,
 	}
 	return 0;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_foreach, nft_table_list_foreach);
+EXPORT_SYMBOL(nftnl_table_list_foreach);
 
 struct nftnl_table_list_iter {
 	const struct nftnl_table_list	*list;
@@ -514,7 +514,7 @@ nftnl_table_list_iter_create(const struct nftnl_table_list *l)
 
 	return iter;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_iter_create, nft_table_list_iter_create);
+EXPORT_SYMBOL(nftnl_table_list_iter_create);
 
 struct nftnl_table *nftnl_table_list_iter_next(struct nftnl_table_list_iter *iter)
 {
@@ -530,10 +530,10 @@ struct nftnl_table *nftnl_table_list_iter_next(struct nftnl_table_list_iter *ite
 
 	return r;
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_iter_next, nft_table_list_iter_next);
+EXPORT_SYMBOL(nftnl_table_list_iter_next);
 
 void nftnl_table_list_iter_destroy(const struct nftnl_table_list_iter *iter)
 {
 	xfree(iter);
 }
-EXPORT_SYMBOL_ALIAS(nftnl_table_list_iter_destroy, nft_table_list_iter_destroy);
+EXPORT_SYMBOL(nftnl_table_list_iter_destroy);
