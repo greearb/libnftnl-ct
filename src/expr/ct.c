@@ -32,7 +32,7 @@ struct nftnl_expr_ct {
 #define IP_CT_DIR_REPLY		1
 
 #ifndef NFT_CT_MAX
-#define NFT_CT_MAX (NFT_CT_BYTES + 1)
+#define NFT_CT_MAX (NFT_CT_AVGPKT + 1)
 #endif
 
 static int
@@ -169,6 +169,7 @@ static const char *ctkey2str_array[NFT_CT_MAX] = {
 	[NFT_CT_LABELS]		= "label",
 	[NFT_CT_PKTS]		= "packets",
 	[NFT_CT_BYTES]		= "bytes",
+	[NFT_CT_AVGPKT]		= "avgpkt",
 };
 
 static const char *ctkey2str(uint32_t ctkey)
