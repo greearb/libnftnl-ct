@@ -22,22 +22,6 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/rule.h>
 
-static void nftnl_mnl_batch_put(char *buf, uint16_t type, uint32_t seq)
-{
-	struct nlmsghdr *nlh;
-	struct nfgenmsg *nfg;
-
-	nlh = mnl_nlmsg_put_header(buf);
-	nlh->nlmsg_type = type;
-	nlh->nlmsg_flags = NLM_F_REQUEST;
-	nlh->nlmsg_seq = seq;
-
-	nfg = mnl_nlmsg_put_extra_header(nlh, sizeof(*nfg));
-	nfg->nfgen_family = AF_INET;
-	nfg->version = NFNETLINK_V0;
-	nfg->res_id = NFNL_SUBSYS_NFTABLES;
-}
-
 int main(int argc, char *argv[])
 {
 	struct mnl_socket *nl;
@@ -46,7 +30,7 @@ int main(int argc, char *argv[])
 	struct mnl_nlmsg_batch *batch;
 	uint32_t portid, seq;
 	struct nftnl_rule *r = NULL;
-	int ret, family;
+	int ret, batching, family;
 
 	if (argc < 4 || argc > 5) {
 		fprintf(stderr, "Usage: %s <family> <table> <chain> [<handle>]\n",
@@ -81,11 +65,18 @@ int main(int argc, char *argv[])
 	if (argc == 5)
 		nftnl_rule_set_u64(r, NFTNL_RULE_HANDLE, atoi(argv[4]));
 
+	batching = nftnl_batch_is_supported();
+	if (batching < 0) {
+		perror("cannot talk to nfnetlink");
+		exit(EXIT_FAILURE);
+	}
+
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	nftnl_mnl_batch_put(mnl_nlmsg_batch_current(batch),
-			  NFNL_MSG_BATCH_BEGIN, seq++);
-	mnl_nlmsg_batch_next(batch);
+	if (batching) {
+		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+		mnl_nlmsg_batch_next(batch);
+	}
 
 	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				NFT_MSG_DELRULE,
@@ -96,9 +87,10 @@ int main(int argc, char *argv[])
 	nftnl_rule_free(r);
 	mnl_nlmsg_batch_next(batch);
 
-	nftnl_mnl_batch_put(mnl_nlmsg_batch_current(batch), NFNL_MSG_BATCH_END,
-			  seq++);
-	mnl_nlmsg_batch_next(batch);
+	if (batching) {
+		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+		mnl_nlmsg_batch_next(batch);
+	}
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
