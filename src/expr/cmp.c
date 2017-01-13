@@ -139,7 +139,7 @@ nftnl_expr_cmp_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static char *expr_cmp_str[] = {
+static const char *expr_cmp_str[] = {
 	[NFT_CMP_EQ]	= "eq",
 	[NFT_CMP_NEQ]	= "neq",
 	[NFT_CMP_LT]	= "lt",

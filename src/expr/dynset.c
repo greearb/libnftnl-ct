@@ -258,7 +258,7 @@ nftnl_expr_dynset_export(char *buf, size_t size,
 	return nftnl_buf_done(&b);
 }
 
-static char *op2str_array[] = {
+static const char *op2str_array[] = {
 	[NFT_DYNSET_OP_ADD]		= "add",
 	[NFT_DYNSET_OP_UPDATE] 		= "update",
 };

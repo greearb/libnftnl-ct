@@ -159,7 +159,7 @@ nftnl_expr_range_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static char *expr_range_str[] = {
+static const char *expr_range_str[] = {
 	[NFT_RANGE_EQ]	= "eq",
 	[NFT_RANGE_NEQ]	= "neq",
 };

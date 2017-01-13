@@ -203,7 +203,7 @@ nftnl_expr_payload_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static char *base2str_array[NFT_PAYLOAD_TRANSPORT_HEADER+1] = {
+static const char *base2str_array[NFT_PAYLOAD_TRANSPORT_HEADER+1] = {
 	[NFT_PAYLOAD_LL_HEADER]		= "link",
 	[NFT_PAYLOAD_NETWORK_HEADER] 	= "network",
 	[NFT_PAYLOAD_TRANSPORT_HEADER]	= "transport",

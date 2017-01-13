@@ -172,7 +172,7 @@ nftnl_expr_byteorder_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static char *expr_byteorder_str[] = {
+static const char *expr_byteorder_str[] = {
 	[NFT_BYTEORDER_HTON] = "hton",
 	[NFT_BYTEORDER_NTOH] = "ntoh",
 };
