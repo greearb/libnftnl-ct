@@ -34,6 +34,7 @@ struct nftnl_expr_exthdr {
 	uint32_t		len;
 	uint8_t			type;
 	uint32_t		op;
+	uint32_t		flags;
 };
 
 static int
@@ -57,6 +58,9 @@ nftnl_expr_exthdr_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_EXTHDR_OP:
 		exthdr->op = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_EXTHDR_FLAGS:
+		exthdr->flags = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -86,6 +90,9 @@ nftnl_expr_exthdr_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_EXTHDR_OP:
 		*data_len = sizeof(exthdr->op);
 		return &exthdr->op;
+	case NFTNL_EXPR_EXTHDR_FLAGS:
+		*data_len = sizeof(exthdr->flags);
+		return &exthdr->flags;
 	}
 	return NULL;
 }
@@ -107,6 +114,7 @@ static int nftnl_expr_exthdr_cb(const struct nlattr *attr, void *data)
 	case NFTA_EXTHDR_OFFSET:
 	case NFTA_EXTHDR_LEN:
 	case NFTA_EXTHDR_OP:
+	case NFTA_EXTHDR_FLAGS:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -131,6 +139,8 @@ nftnl_expr_exthdr_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_EXTHDR_LEN, htonl(exthdr->len));
 	if (e->flags & (1 << NFTNL_EXPR_EXTHDR_OP))
 		mnl_attr_put_u32(nlh, NFTA_EXTHDR_OP, htonl(exthdr->op));
+	if (e->flags & (1 << NFTNL_EXPR_EXTHDR_FLAGS))
+		mnl_attr_put_u32(nlh, NFTA_EXTHDR_FLAGS, htonl(exthdr->flags));
 }
 
 static int
@@ -161,6 +171,10 @@ nftnl_expr_exthdr_parse(struct nftnl_expr *e, struct nlattr *attr)
 	if (tb[NFTA_EXTHDR_OP]) {
 		exthdr->op = ntohl(mnl_attr_get_u32(tb[NFTA_EXTHDR_OP]));
 		e->flags |= (1 << NFTNL_EXPR_EXTHDR_OP);
+	}
+	if (tb[NFTA_EXTHDR_FLAGS]) {
+		exthdr->flags = ntohl(mnl_attr_get_u32(tb[NFTA_EXTHDR_FLAGS]));
+		e->flags |= (1 << NFTNL_EXPR_EXTHDR_FLAGS);
 	}
 
 	return 0;
@@ -251,6 +265,9 @@ nftnl_expr_exthdr_json_parse(struct nftnl_expr *e, json_t *root,
 
 	if (nftnl_jansson_parse_val(root, "op", NFTNL_TYPE_U32, &uval32, err) == 0)
 		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_OP, uval32);
+
+	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &uval32, err) == 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_FLAGS, uval32);
 
 	return 0;
 #else
