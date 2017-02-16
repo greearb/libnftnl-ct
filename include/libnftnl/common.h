@@ -41,8 +41,8 @@ enum nftnl_parse_type {
 
 struct nftnl_parse_err;
 
-struct nlmsghdr *nftnl_nlmsg_build_hdr(char *buf, uint16_t cmd, uint16_t family,
-				     uint16_t type, uint32_t seq);
+struct nlmsghdr *nftnl_nlmsg_build_hdr(char *buf, uint16_t type, uint16_t family,
+				       uint16_t flags, uint32_t seq);
 
 struct nftnl_parse_err *nftnl_parse_err_alloc(void);
 void nftnl_parse_err_free(struct nftnl_parse_err *);
