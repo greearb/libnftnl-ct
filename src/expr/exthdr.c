@@ -292,6 +292,8 @@ static int nftnl_expr_exthdr_export(char *buf, size_t len,
 		nftnl_buf_u32(&b, type, exthdr->len, LEN);
 	if (e->flags & (1 << NFTNL_EXPR_EXTHDR_OP))
 		nftnl_buf_u32(&b, type, exthdr->op, OP);
+	if (e->flags & (1 << NFTNL_EXPR_EXTHDR_FLAGS))
+		nftnl_buf_u32(&b, type, exthdr->flags, FLAGS);
 
 	return nftnl_buf_done(&b);
 }
@@ -338,6 +340,8 @@ static bool nftnl_expr_exthdr_cmp(const struct nftnl_expr *e1,
 		eq &= (h1->type == h2->type);
 	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_OP))
 		eq &= (h1->op == h2->op);
+	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_FLAGS))
+		eq &= (h1->flags == h2->flags);
 
 	return eq;
 }
