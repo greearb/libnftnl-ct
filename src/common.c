@@ -165,17 +165,17 @@ int nftnl_cmd_footer_fprintf(FILE *fp, uint32_t cmd, uint32_t type,
 			   nftnl_cmd_footer_fprintf_cb);
 }
 
-void nftnl_batch_begin(char *buf, uint32_t seq)
+struct nlmsghdr *nftnl_batch_begin(char *buf, uint32_t seq)
 {
-	__nftnl_nlmsg_build_hdr(buf, NFNL_MSG_BATCH_BEGIN, AF_UNSPEC, 0, seq,
-				NFNL_SUBSYS_NFTABLES);
+	return __nftnl_nlmsg_build_hdr(buf, NFNL_MSG_BATCH_BEGIN, AF_UNSPEC,
+				       0, seq, NFNL_SUBSYS_NFTABLES);
 }
 EXPORT_SYMBOL(nftnl_batch_begin);
 
-void nftnl_batch_end(char *buf, uint32_t seq)
+struct nlmsghdr *nftnl_batch_end(char *buf, uint32_t seq)
 {
-	__nftnl_nlmsg_build_hdr(buf, NFNL_MSG_BATCH_END, AF_UNSPEC, 0, seq,
-				NFNL_SUBSYS_NFTABLES);
+	return __nftnl_nlmsg_build_hdr(buf, NFNL_MSG_BATCH_END, AF_UNSPEC,
+				       0, seq, NFNL_SUBSYS_NFTABLES);
 }
 EXPORT_SYMBOL(nftnl_batch_end);
 
