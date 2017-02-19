@@ -83,6 +83,8 @@ void nftnl_obj_set_data(struct nftnl_obj *obj, uint16_t attr,
 		break;
 	case NFTNL_OBJ_TYPE:
 		obj->ops = nftnl_obj_ops_lookup(*((uint32_t *)data));
+		if (!obj->ops)
+			return;
 		break;
 	case NFTNL_OBJ_FAMILY:
 		obj->family = *((uint32_t *)data);
@@ -250,7 +252,8 @@ int nftnl_obj_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_obj *obj)
 		uint32_t type = ntohl(mnl_attr_get_u32(tb[NFTA_OBJ_TYPE]));
 
 		obj->ops = nftnl_obj_ops_lookup(type);
-		obj->flags |= (1 << NFTNL_OBJ_TYPE);
+		if (obj->ops)
+			obj->flags |= (1 << NFTNL_OBJ_TYPE);
 	}
 	if (tb[NFTA_OBJ_DATA]) {
 		if (obj->ops) {
