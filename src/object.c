@@ -396,10 +396,11 @@ static int nftnl_obj_snprintf_dflt(char *buf, size_t size,
 				   const struct nftnl_obj *obj,
 				   uint32_t type, uint32_t flags)
 {
+	const char *name = obj->ops ? obj->ops->name : "(unknown)";
 	int ret, len = size, offset = 0;
 
 	ret = snprintf(buf, size, "table %s name %s use %u [ %s ",
-		       obj->table, obj->name, obj->use, obj->ops->name);
+		       obj->table, obj->name, obj->use, name);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (obj->ops) {
