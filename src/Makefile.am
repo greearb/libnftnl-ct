@@ -53,5 +53,6 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/redir.c	\
 		      expr/hash.c	\
 		      obj/counter.c	\
+		      obj/ct_helper.c	\
 		      obj/quota.c	\
 		      libnftnl.map

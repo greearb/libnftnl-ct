@@ -28,11 +28,12 @@
 static struct obj_ops *obj_ops[] = {
 	[NFT_OBJECT_COUNTER]	= &obj_ops_counter,
 	[NFT_OBJECT_QUOTA]	= &obj_ops_quota,
+	[NFT_OBJECT_CT_HELPER]	= &obj_ops_ct_helper,
 };
 
 static struct obj_ops *nftnl_obj_ops_lookup(uint32_t type)
 {
-	if (type > NFT_OBJECT_QUOTA)
+	if (type > NFT_OBJECT_CT_HELPER)
 		return NULL;
 
 	return obj_ops[type];

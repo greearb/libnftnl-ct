@@ -30,6 +30,11 @@ struct nftnl_obj {
 			uint64_t	consumed;
 			uint32_t        flags;
 		} quota;
+		struct nftnl_obj_ct_helper {
+			uint16_t	l3proto;
+			uint8_t		l4proto;
+			char		name[16];
+		} ct_helper;
 	} data;
 };
 
@@ -49,6 +54,7 @@ struct obj_ops {
 
 extern struct obj_ops obj_ops_counter;
 extern struct obj_ops obj_ops_quota;
+extern struct obj_ops obj_ops_ct_helper;
 
 #define nftnl_obj_data(obj) (void *)&obj->data
 

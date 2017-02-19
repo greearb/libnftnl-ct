@@ -34,6 +34,12 @@ enum {
 	NFTNL_OBJ_QUOTA_FLAGS,
 };
 
+enum {
+	NFTNL_OBJ_CT_HELPER_NAME = NFTNL_OBJ_BASE,
+	NFTNL_OBJ_CT_HELPER_L3PROTO,
+	NFTNL_OBJ_CT_HELPER_L4PROTO,
+};
+
 struct nftnl_obj;
 
 struct nftnl_obj *nftnl_obj_alloc(void);
