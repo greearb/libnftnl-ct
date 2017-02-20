@@ -278,9 +278,13 @@ global:
   nftnl_obj_unset;
   nftnl_obj_set;
   nftnl_obj_get;
+  nftnl_obj_set_u8;
+  nftnl_obj_set_u16;
   nftnl_obj_set_u32;
   nftnl_obj_set_u64;
   nftnl_obj_set_str;
+  nftnl_obj_get_u8;
+  nftnl_obj_get_u16;
   nftnl_obj_get_u32;
   nftnl_obj_get_str;
   nftnl_obj_get_u64;
