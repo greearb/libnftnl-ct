@@ -241,7 +241,6 @@ nftnl_expr_exthdr_json_parse(struct nftnl_expr *e, json_t *root,
 #ifdef JSON_PARSING
 	const char *exthdr_type;
 	uint32_t uval32;
-	uint8_t uval8;
 	int type;
 
 	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &uval32,
