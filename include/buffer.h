@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+struct nftnl_expr;
+
 struct nftnl_buf {
 	char		*buf;
 	size_t		size;
@@ -35,12 +37,18 @@ int nftnl_buf_u64(struct nftnl_buf *b, int type, uint64_t value, const char *tag
 int nftnl_buf_str(struct nftnl_buf *b, int type, const char *str, const char *tag);
 int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 		int reg_type, const char *tag);
+int nftnl_buf_expr_open(struct nftnl_buf *b, int type);
+int nftnl_buf_expr_close(struct nftnl_buf *b, int type);
+int nftnl_buf_expr(struct nftnl_buf *b, int type, uint32_t flags,
+		   struct nftnl_expr *expr);
 
 #define BASE			"base"
 #define BYTES			"bytes"
 #define BURST			"burst"
 #define CHAIN			"chain"
 #define CODE			"code"
+#define COMPAT_FLAGS		"compat_flags"
+#define COMPAT_PROTO		"compat_proto"
 #define CONSUMED		"consumed"
 #define DATA			"data"
 #define DEVICE			"device"
@@ -64,10 +72,12 @@ int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 #define PACKETS			"packets"
 #define PKTS			"pkts"
 #define POLICY			"policy"
+#define POSITION		"position"
 #define PREFIX			"prefix"
 #define PRIO			"prio"
 #define QTHRESH			"qthreshold"
 #define RATE			"rate"
+#define RULE			"rule"
 #define SET			"set"
 #define SET_NAME		"set_name"
 #define SIZE			"size"
@@ -93,5 +103,6 @@ int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 #define FLUSH			"flush"
 #define MODULUS			"modulus"
 #define SEED			"seed"
+#define ID			"id"
 
 #endif

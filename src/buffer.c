@@ -171,3 +171,49 @@ int nftnl_buf_reg(struct nftnl_buf *b, int type, union nftnl_data_reg *reg,
 	}
 	return 0;
 }
+
+int nftnl_buf_expr_open(struct nftnl_buf *b, int type)
+{
+	switch (type) {
+	case NFTNL_OUTPUT_XML:
+		return 0;
+	case NFTNL_OUTPUT_JSON:
+		return nftnl_buf_put(b, "\"expr\":[");
+	}
+	return 0;
+}
+
+int nftnl_buf_expr_close(struct nftnl_buf *b, int type)
+{
+	switch (type) {
+	case NFTNL_OUTPUT_XML:
+		return 0;
+	case NFTNL_OUTPUT_JSON:
+		nftnl_buf_done(b);
+		return nftnl_buf_put(b, "]");
+	}
+	return 0;
+}
+
+int nftnl_buf_expr(struct nftnl_buf *b, int type, uint32_t flags,
+		   struct nftnl_expr *expr)
+{
+	int ret;
+
+	switch (type) {
+	case NFTNL_OUTPUT_XML:
+		return 0;
+	case NFTNL_OUTPUT_JSON:
+		nftnl_buf_put(b, "{");
+		nftnl_buf_str(b, type, expr->ops->name, TYPE);
+		ret = expr->ops->snprintf(b->buf + b->off, b->len, type, flags,
+					  expr);
+		if (ret > 0)
+			nftnl_buf_update(b, ret);
+		else
+			nftnl_buf_done(b);
+
+		return nftnl_buf_put(b, "},");
+	}
+	return 0;
+}

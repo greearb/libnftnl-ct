@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <ctype.h>
+#include <buffer.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>
@@ -671,88 +672,41 @@ int nftnl_rule_parse_file(struct nftnl_rule *r, enum nftnl_parse_type type,
 }
 EXPORT_SYMBOL(nftnl_rule_parse_file);
 
-static int nftnl_rule_snprintf_json(char *buf, size_t size,
-				    const struct nftnl_rule *r,
-				    uint32_t type, uint32_t flags)
+static int nftnl_rule_export(char *buf, size_t size,
+			     const struct nftnl_rule *r,
+			     uint32_t type, uint32_t flags)
 {
-	int ret, len = size, offset = 0;
 	struct nftnl_expr *expr;
 
-	ret = snprintf(buf, len, "{\"rule\":{");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	NFTNL_BUF_INIT(b, buf, size);
 
-	if (r->flags & (1 << NFTNL_RULE_FAMILY)) {
-		ret = snprintf(buf+offset, len, "\"family\":\"%s\",",
-			       nftnl_family2str(r->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	nftnl_buf_open(&b, type, RULE);
 
-	if (r->flags & (1 << NFTNL_RULE_TABLE)) {
-		ret = snprintf(buf+offset, len, "\"table\":\"%s\",",
-			       r->table);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	if (r->flags & (1 << NFTNL_RULE_FAMILY))
+		nftnl_buf_str(&b, type, nftnl_family2str(r->family), FAMILY);
+	if (r->flags & (1 << NFTNL_RULE_TABLE))
+		nftnl_buf_str(&b, type, r->table, TABLE);
+	if (r->flags & (1 << NFTNL_RULE_CHAIN))
+		nftnl_buf_str(&b, type, r->chain, CHAIN);
+	if (r->flags & (1 << NFTNL_RULE_HANDLE))
+		nftnl_buf_u64(&b, type, r->handle, HANDLE);
+	if (r->flags & (1 << NFTNL_RULE_COMPAT_PROTO))
+		nftnl_buf_u32(&b, type, r->compat.proto, COMPAT_PROTO);
+	if (r->flags & (1 << NFTNL_RULE_COMPAT_FLAGS))
+		nftnl_buf_u32(&b, type, r->compat.flags, COMPAT_FLAGS);
+	if (r->flags & (1 << NFTNL_RULE_POSITION))
+		nftnl_buf_u64(&b, type, r->position, POSITION);
+	if (r->flags & (1 << NFTNL_RULE_ID))
+		nftnl_buf_u32(&b, type, r->id, ID);
 
-	if (r->flags & (1 << NFTNL_RULE_CHAIN)) {
-		ret = snprintf(buf+offset, len, "\"chain\":\"%s\",",
-			       r->chain);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-	if (r->flags & (1 << NFTNL_RULE_HANDLE)) {
-		ret = snprintf(buf+offset, len, "\"handle\":%llu,",
-			       (unsigned long long)r->handle);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	nftnl_buf_expr_open(&b, type);
+	list_for_each_entry(expr, &r->expr_list, head)
+		nftnl_buf_expr(&b, type, flags, expr);
+	nftnl_buf_expr_close(&b, type);
 
-	if (r->flags & (1 << NFTNL_RULE_COMPAT_PROTO) ||
-	    r->flags & (1 << NFTNL_RULE_COMPAT_FLAGS)) {
-		ret = snprintf(buf+offset, len, "\"compat_flags\":%u,"
-					        "\"compat_proto\":%u,",
-			       r->compat.flags, r->compat.proto);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
+	nftnl_buf_close(&b, type, RULE);
 
-	if (r->flags & (1 << NFTNL_RULE_POSITION)) {
-		ret = snprintf(buf+offset, len, "\"position\":%"PRIu64",",
-			       r->position);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	if (r->flags & (1 << NFTNL_RULE_ID)) {
-		ret = snprintf(buf+offset, len, "\"id\":%u,", r->id);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-	}
-
-	ret = snprintf(buf+offset, len, "\"expr\":[");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	list_for_each_entry(expr, &r->expr_list, head) {
-		ret = snprintf(buf+offset, len,
-			       "{\"type\":\"%s\",", expr->ops->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-		/*
-		 * Remove comma from the first element if there is type
-		 * key-value pair only. Example: "expr":[{"type":"log"}]
-		 */
-		if (ret == 0) {
-			offset--;
-			len--;
-		}
-
-		ret = snprintf(buf+offset, len, "},");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	}
-	/* Remove comma from last element */
-	offset--;
-	ret = snprintf(buf+offset, len, "]}}");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
-
-	return offset;
+	return nftnl_buf_done(&b);
 }
 
 static int nftnl_rule_snprintf_default(char *buf, size_t size,
@@ -849,7 +803,7 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
 						inner_flags);
 		break;
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_rule_snprintf_json(buf+offset, len, r, type,
+		ret = nftnl_rule_export(buf+offset, len, r, type,
 					     inner_flags);
 		break;
 	case NFTNL_OUTPUT_XML:
