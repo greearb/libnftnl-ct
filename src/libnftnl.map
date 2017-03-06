@@ -261,9 +261,11 @@ global:
   nftnl_udata_end;
   nftnl_udata_put;
   nftnl_udata_put_strz;
+  nftnl_udata_put_u32;
   nftnl_udata_type;
   nftnl_udata_len;
   nftnl_udata_get;
+  nftnl_udata_get_u32;
   nftnl_udata_next;
   nftnl_udata_parse;
 

@@ -94,6 +94,13 @@ bool nftnl_udata_put_strz(struct nftnl_udata_buf *buf, uint8_t type,
 }
 EXPORT_SYMBOL(nftnl_udata_put_strz);
 
+bool nftnl_udata_put_u32(struct nftnl_udata_buf *buf, uint8_t type,
+			 uint32_t data)
+{
+	return nftnl_udata_put(buf, type, sizeof(data), &data);
+}
+EXPORT_SYMBOL(nftnl_udata_put_u32);
+
 uint8_t nftnl_udata_type(const struct nftnl_udata *attr)
 {
 	return attr->type;
@@ -111,6 +118,14 @@ void *nftnl_udata_get(const struct nftnl_udata *attr)
 	return (void *)attr->value;
 }
 EXPORT_SYMBOL(nftnl_udata_get);
+
+uint32_t nftnl_udata_get_u32(const struct nftnl_udata *attr)
+{
+	uint32_t *data = (uint32_t *)attr->value;
+
+	return *data;
+}
+EXPORT_SYMBOL(nftnl_udata_get_u32);
 
 struct nftnl_udata *nftnl_udata_next(const struct nftnl_udata *attr)
 {
