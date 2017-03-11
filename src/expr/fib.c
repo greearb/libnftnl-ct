@@ -173,7 +173,8 @@ nftnl_expr_fib_snprintf_default(char *buf, size_t size,
 {
 	struct nftnl_expr_fib *fib = nftnl_expr_data(e);
 	int len = size, offset = 0, ret, i;
-	uint32_t flags = fib->flags;
+	uint32_t flags = fib->flags & ~NFTA_FIB_F_PRESENT;
+	uint32_t present_flag = fib->flags & NFTA_FIB_F_PRESENT;
 	static const struct {
 		int bit;
 		const char *name;
@@ -203,7 +204,10 @@ nftnl_expr_fib_snprintf_default(char *buf, size_t size,
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 	}
 
-	ret = snprintf(buf + offset, len, "%s => reg %d ", fib_type_str(fib->result), fib->dreg);
+	ret = snprintf(buf + offset, len, "%s%s => reg %d ",
+		       fib_type_str(fib->result),
+		       present_flag ? " present" : "",
+		       fib->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	return offset;
