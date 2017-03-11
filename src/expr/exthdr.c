@@ -301,9 +301,11 @@ static int nftnl_expr_exthdr_snprintf_default(char *buf, size_t len,
 					      const struct nftnl_expr *e)
 {
 	struct nftnl_expr_exthdr *exthdr = nftnl_expr_data(e);
-	return snprintf(buf, len, "load%s %ub @ %u + %u => reg %u ",
+	return snprintf(buf, len, "load%s %ub @ %u + %u%s => reg %u ",
 			op2str(exthdr->op), exthdr->len, exthdr->type,
-			exthdr->offset, exthdr->dreg);
+			exthdr->offset,
+			exthdr->flags & NFT_EXTHDR_F_PRESENT ? " present" : "",
+			exthdr->dreg);
 }
 
 static int
