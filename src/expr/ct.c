@@ -171,7 +171,7 @@ static const char *ctkey2str_array[NFT_CT_MAX] = {
 	[NFT_CT_BYTES]		= "bytes",
 	[NFT_CT_AVGPKT]		= "avgpkt",
 	[NFT_CT_ZONE]		= "zone",
-	[NFT_CT_EVENTMASK]	= "eventmask",
+	[NFT_CT_EVENTMASK]	= "event",
 };
 
 static const char *ctkey2str(uint32_t ctkey)
