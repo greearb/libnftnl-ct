@@ -48,6 +48,8 @@ void nftnl_set_free(const struct nftnl_set *s)
 		xfree(s->table);
 	if (s->flags & (1 << NFTNL_SET_NAME))
 		xfree(s->name);
+	if (s->flags & (1 << NFTNL_SET_USERDATA))
+		xfree(s->user.data);
 
 	list_for_each_entry_safe(elem, tmp, &s->element_list, head) {
 		list_del(&elem->head);
