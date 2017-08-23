@@ -55,4 +55,5 @@ libnftnl_la_SOURCES = utils.c		\
 		      obj/counter.c	\
 		      obj/ct_helper.c	\
 		      obj/quota.c	\
+		      obj/limit.c	\
 		      libnftnl.map

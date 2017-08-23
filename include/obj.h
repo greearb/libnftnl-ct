@@ -35,6 +35,13 @@ struct nftnl_obj {
 			uint8_t		l4proto;
 			char		name[16];
 		} ct_helper;
+		struct nftnl_obj_limit {
+			uint64_t	rate;
+			uint64_t	unit;
+			uint32_t	burst;
+			uint32_t	type;
+			uint32_t	flags;
+		} limit;
 	} data;
 };
 
@@ -55,6 +62,7 @@ struct obj_ops {
 extern struct obj_ops obj_ops_counter;
 extern struct obj_ops obj_ops_quota;
 extern struct obj_ops obj_ops_ct_helper;
+extern struct obj_ops obj_ops_limit;
 
 #define nftnl_obj_data(obj) (void *)&obj->data
 

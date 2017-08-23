@@ -40,6 +40,14 @@ enum {
 	NFTNL_OBJ_CT_HELPER_L4PROTO,
 };
 
+enum {
+	NFTNL_OBJ_LIMIT_RATE	= NFTNL_OBJ_BASE,
+	NFTNL_OBJ_LIMIT_UNIT,
+	NFTNL_OBJ_LIMIT_BURST,
+	NFTNL_OBJ_LIMIT_TYPE,
+	NFTNL_OBJ_LIMIT_FLAGS,
+};
+
 struct nftnl_obj;
 
 struct nftnl_obj *nftnl_obj_alloc(void);
