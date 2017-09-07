@@ -795,16 +795,24 @@ static int nftnl_chain_snprintf_default(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 	if (c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) {
-		ret = snprintf(buf+offset, len,
-			       " type %s hook %s prio %d policy %s "
-			       "packets %"PRIu64" bytes %"PRIu64"",
+		ret = snprintf(buf + offset, len, " type %s hook %s prio %d",
 			       c->type, nftnl_hooknum2str(c->family, c->hooknum),
-			       c->prio, nftnl_verdict2str(c->policy),
+			       c->prio);
+		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+
+		if (c->flags & (1 << NFTNL_CHAIN_POLICY)) {
+			ret = snprintf(buf + offset, len, " policy %s",
+				       nftnl_verdict2str(c->policy));
+			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		}
+
+		ret = snprintf(buf + offset, len,
+			       " packets %"PRIu64" bytes %"PRIu64"",
 			       c->packets, c->bytes);
 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 
 		if (c->flags & (1 << NFTNL_CHAIN_DEV)) {
-			ret = snprintf(buf+offset, len, " dev %s ", c->dev);
+			ret = snprintf(buf + offset, len, " dev %s ", c->dev);
 			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
 		}
 	}
