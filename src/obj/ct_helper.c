@@ -185,6 +185,9 @@ static int nftnl_obj_ct_helper_snprintf(char *buf, size_t len, uint32_t type,
 				       uint32_t flags,
 				       const struct nftnl_obj *e)
 {
+	if (len)
+		buf[0] = '\0';
+
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		return nftnl_obj_ct_helper_snprintf_default(buf, len, e);

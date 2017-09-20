@@ -448,6 +448,9 @@ static int nftnl_obj_cmd_snprintf(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0;
 
+	if (size)
+		buf[0] = '\0';
+
 	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
@@ -474,6 +477,9 @@ static int nftnl_obj_cmd_snprintf(char *buf, size_t size,
 int nftnl_obj_snprintf(char *buf, size_t size, const struct nftnl_obj *obj,
 		       uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_obj_cmd_snprintf(buf, size, obj, nftnl_flag2cmd(flags),
 				      type, flags);
 }
@@ -482,6 +488,9 @@ EXPORT_SYMBOL(nftnl_obj_snprintf);
 static int nftnl_obj_do_snprintf(char *buf, size_t size, const void *obj,
 				 uint32_t cmd, uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_obj_snprintf(buf, size, obj, type, flags);
 }
 

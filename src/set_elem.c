@@ -696,6 +696,8 @@ static int nftnl_set_elem_cmd_snprintf(char *buf, size_t size,
 
 	if (type == NFTNL_OUTPUT_XML)
 		return 0;
+	if (size)
+		buf[0] = '\0';
 
 	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
@@ -724,6 +726,9 @@ int nftnl_set_elem_snprintf(char *buf, size_t size,
 			    const struct nftnl_set_elem *e,
 			    uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_set_elem_cmd_snprintf(buf, size, e, nftnl_flag2cmd(flags),
 					 type, flags);
 }
@@ -733,6 +738,9 @@ static int nftnl_set_elem_do_snprintf(char *buf, size_t size, const void *e,
 				      uint32_t cmd, uint32_t type,
 				      uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_set_elem_snprintf(buf, size, e, type, flags);
 }
 

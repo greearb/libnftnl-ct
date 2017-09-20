@@ -846,6 +846,9 @@ nftnl_ruleset_do_snprintf(char *buf, size_t size, const struct nftnl_ruleset *rs
 	void *prev = NULL;
 	uint32_t inner_flags = flags;
 
+	if (size)
+		buf[0] = '\0';
+
 	/* dont pass events flags to child calls of _snprintf() */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
@@ -919,6 +922,9 @@ static int nftnl_ruleset_cmd_snprintf(char *buf, size_t size,
 				    const struct nftnl_ruleset *r, uint32_t cmd,
 				    uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 	case NFTNL_OUTPUT_JSON:
@@ -933,6 +939,9 @@ static int nftnl_ruleset_cmd_snprintf(char *buf, size_t size,
 int nftnl_ruleset_snprintf(char *buf, size_t size, const struct nftnl_ruleset *r,
 			 uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 	case NFTNL_OUTPUT_JSON:

@@ -200,6 +200,9 @@ nftnl_expr_target_snprintf(char *buf, size_t len, uint32_t type,
 {
 	struct nftnl_expr_target *target = nftnl_expr_data(e);
 
+	if (len)
+		buf[0] = '\0';
+
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		return snprintf(buf, len, "name %s rev %u ",

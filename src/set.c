@@ -895,6 +895,9 @@ static int nftnl_set_cmd_snprintf(char *buf, size_t size,
 	if (type == NFTNL_OUTPUT_XML)
 		return 0;
 
+	if (size)
+		buf[0] = '\0';
+
 	/* prevent set_elems to print as events */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
@@ -925,6 +928,9 @@ static int nftnl_set_cmd_snprintf(char *buf, size_t size,
 int nftnl_set_snprintf(char *buf, size_t size, const struct nftnl_set *s,
 		       uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_set_cmd_snprintf(buf, size, s, nftnl_flag2cmd(flags), type,
 				    flags);
 }
@@ -933,6 +939,9 @@ EXPORT_SYMBOL(nftnl_set_snprintf);
 static int nftnl_set_do_snprintf(char *buf, size_t size, const void *s,
 				 uint32_t cmd, uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_set_snprintf(buf, size, s, type, flags);
 }
 

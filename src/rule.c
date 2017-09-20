@@ -792,6 +792,9 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
 	int ret, remain = size, offset = 0;
 	uint32_t inner_flags = flags;
 
+	if (size)
+		buf[0] = '\0';
+
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
 	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
@@ -822,6 +825,9 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
 int nftnl_rule_snprintf(char *buf, size_t size, const struct nftnl_rule *r,
 			uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_rule_cmd_snprintf(buf, size, r, nftnl_flag2cmd(flags), type,
 				     flags);
 }
@@ -830,6 +836,9 @@ EXPORT_SYMBOL(nftnl_rule_snprintf);
 static int nftnl_rule_do_snprintf(char *buf, size_t size, const void *r,
 				  uint32_t cmd, uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_rule_snprintf(buf, size, r, type, flags);
 }
 

@@ -281,6 +281,9 @@ int nftnl_expr_snprintf(char *buf, size_t size, const struct nftnl_expr *expr,
 	int ret;
 	unsigned int offset = 0, remain = size;
 
+	if (size)
+		buf[0] = '\0';
+
 	if (!expr->ops->snprintf)
 		return 0;
 

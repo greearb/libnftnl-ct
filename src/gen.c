@@ -168,6 +168,9 @@ static int nftnl_gen_cmd_snprintf(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0;
 
+	if (size)
+		buf[0] = '\0';
+
 	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
@@ -188,7 +191,10 @@ static int nftnl_gen_cmd_snprintf(char *buf, size_t size,
 
 int nftnl_gen_snprintf(char *buf, size_t size, const struct nftnl_gen *gen,
 		       uint32_t type, uint32_t flags)
-{;
+{
+	if (size)
+		buf[0] = '\0';
+
 	return nftnl_gen_cmd_snprintf(buf, size, gen, nftnl_flag2cmd(flags), type,
 				    flags);
 }
@@ -197,6 +203,9 @@ EXPORT_SYMBOL(nftnl_gen_snprintf);
 static int nftnl_gen_do_snprintf(char *buf, size_t size, const void *gen,
 				 uint32_t cmd, uint32_t type, uint32_t flags)
 {
+	if (size)
+		buf = '\0';
+
 	return nftnl_gen_snprintf(buf, size, gen, type, flags);
 }
 

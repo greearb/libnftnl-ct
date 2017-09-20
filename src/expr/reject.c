@@ -164,6 +164,9 @@ static int
 nftnl_expr_reject_snprintf(char *buf, size_t len, uint32_t type,
 			   uint32_t flags, const struct nftnl_expr *e)
 {
+	if (len)
+		buf[0] = '\0';
+
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		return nftnl_expr_reject_snprintf_default(buf, len, e);
