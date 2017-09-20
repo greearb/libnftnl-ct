@@ -233,26 +233,26 @@ nftnl_expr_immediate_snprintf_default(char *buf, size_t len,
 				      const struct nftnl_expr *e,
 				      uint32_t flags)
 {
-	int size = len, offset = 0, ret;
+	int remain = len, offset = 0, ret;
 	struct nftnl_expr_immediate *imm = nftnl_expr_data(e);
 
-	ret = snprintf(buf, len, "reg %u ", imm->dreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf, remain, "reg %u ", imm->dreg);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (e->flags & (1 << NFTNL_EXPR_IMM_DATA)) {
-		ret = nftnl_data_reg_snprintf(buf+offset, len, &imm->data,
+		ret = nftnl_data_reg_snprintf(buf + offset, remain, &imm->data,
 					NFTNL_OUTPUT_DEFAULT, flags, DATA_VALUE);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	} else if (e->flags & (1 << NFTNL_EXPR_IMM_VERDICT)) {
-		ret = nftnl_data_reg_snprintf(buf+offset, len, &imm->data,
+		ret = nftnl_data_reg_snprintf(buf + offset, remain, &imm->data,
 				NFTNL_OUTPUT_DEFAULT, flags, DATA_VERDICT);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	} else if (e->flags & (1 << NFTNL_EXPR_IMM_CHAIN)) {
-		ret = nftnl_data_reg_snprintf(buf+offset, len, &imm->data,
+		ret = nftnl_data_reg_snprintf(buf + offset, remain, &imm->data,
 					NFTNL_OUTPUT_DEFAULT, flags, DATA_CHAIN);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;

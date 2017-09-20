@@ -425,18 +425,19 @@ static int nftnl_obj_snprintf_dflt(char *buf, size_t size,
 				   uint32_t type, uint32_t flags)
 {
 	const char *name = obj->ops ? obj->ops->name : "(unknown)";
-	int ret, len = size, offset = 0;
+	int ret, remain = size, offset = 0;
 
 	ret = snprintf(buf, size, "table %s name %s use %u [ %s ",
 		       obj->table, obj->name, obj->use, name);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (obj->ops) {
-		ret = obj->ops->snprintf(buf + offset, offset, type, flags, obj);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = obj->ops->snprintf(buf + offset, offset, type, flags,
+					 obj);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	ret = snprintf(buf + offset, offset, "]");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }
@@ -445,27 +446,27 @@ static int nftnl_obj_cmd_snprintf(char *buf, size_t size,
 				    const struct nftnl_obj *obj, uint32_t cmd,
 				    uint32_t type, uint32_t flags)
 {
-	int ret, len = size, offset = 0;
+	int ret, remain = size, offset = 0;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_obj_snprintf_dflt(buf + offset, len, obj, type,
+		ret = nftnl_obj_snprintf_dflt(buf + offset, remain, obj, type,
 					      flags);
 		break;
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_obj_export(buf + offset, len, obj, type, flags);
+		ret = nftnl_obj_export(buf + offset, remain, obj, type, flags);
 		break;
 	case NFTNL_OUTPUT_XML:
 	default:
 		return -1;
 	}
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

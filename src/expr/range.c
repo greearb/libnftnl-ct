@@ -243,19 +243,19 @@ static int nftnl_expr_range_snprintf_default(char *buf, size_t size,
 					   const struct nftnl_expr *e)
 {
 	struct nftnl_expr_range *range = nftnl_expr_data(e);
-	int len = size, offset = 0, ret;
+	int remain = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "%s reg %u ",
+	ret = snprintf(buf, remain, "%s reg %u ",
 		       expr_range_str[range->op], range->sreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_data_reg_snprintf(buf + offset, len, &range->data_from,
+	ret = nftnl_data_reg_snprintf(buf + offset, remain, &range->data_from,
 				      NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_data_reg_snprintf(buf + offset, len, &range->data_to,
+	ret = nftnl_data_reg_snprintf(buf + offset, remain, &range->data_to,
 				      NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

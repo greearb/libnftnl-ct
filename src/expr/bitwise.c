@@ -233,22 +233,22 @@ static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
 					       const struct nftnl_expr *e)
 {
 	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
-	int len = size, offset = 0, ret;
+	int remain = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "reg %u = (reg=%u & ",
+	ret = snprintf(buf, remain, "reg %u = (reg=%u & ",
 		       bitwise->dreg, bitwise->sreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_data_reg_snprintf(buf+offset, len, &bitwise->mask,
+	ret = nftnl_data_reg_snprintf(buf + offset, remain, &bitwise->mask,
 				    NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = snprintf(buf+offset, len, ") ^ ");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, ") ^ ");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_data_reg_snprintf(buf+offset, len, &bitwise->xor,
+	ret = nftnl_data_reg_snprintf(buf + offset, remain, &bitwise->xor,
 				    NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

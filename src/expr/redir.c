@@ -176,25 +176,25 @@ static int nftnl_expr_redir_export(char *buf, size_t size,
 static int nftnl_expr_redir_snprintf_default(char *buf, size_t len,
 					     const struct nftnl_expr *e)
 {
-	int ret, size = len, offset = 0;
+	int ret, remain = len, offset = 0;
 	struct nftnl_expr_redir *redir = nftnl_expr_data(e);
 
 	if (nftnl_expr_is_set(e, NFTNL_EXPR_REDIR_REG_PROTO_MIN)) {
 		ret = snprintf(buf + offset, len, "proto_min reg %u ",
 			       redir->sreg_proto_min);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (nftnl_expr_is_set(e, NFTNL_EXPR_REDIR_REG_PROTO_MAX)) {
 		ret = snprintf(buf + offset, len, "proto_max reg %u ",
 			       redir->sreg_proto_max);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (nftnl_expr_is_set(e, NFTNL_EXPR_REDIR_FLAGS)) {
-		ret = snprintf(buf + offset , len, "flags 0x%x ",
+		ret = snprintf(buf + offset, len, "flags 0x%x ",
 			       redir->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;

@@ -229,29 +229,31 @@ nftnl_expr_hash_snprintf_default(char *buf, size_t size,
 				 const struct nftnl_expr *e)
 {
 	struct nftnl_expr_hash *hash = nftnl_expr_data(e);
-	int len = size, offset = 0, ret;
+	int remain = size, offset = 0, ret;
 
 	switch (hash->type) {
 	case NFT_HASH_SYM:
 		ret =
-		snprintf(buf, len, "reg %u = symhash() %% mod %u ", hash->dreg,
+		snprintf(buf, remain, "reg %u = symhash() %% mod %u ",
+			 hash->dreg,
 			 hash->modulus);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		break;
 	case NFT_HASH_JENKINS:
 	default:
 		ret =
-		snprintf(buf, len,
+		snprintf(buf, remain,
 			 "reg %u = jhash(reg %u, %u, 0x%x) %% mod %u ",
 			 hash->dreg, hash->sreg, hash->len, hash->seed,
 			 hash->modulus);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		break;
 	}
 
 	if (hash->offset) {
-		ret = snprintf(buf + offset, len, "offset %u ", hash->offset);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "offset %u ",
+			       hash->offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;

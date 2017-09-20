@@ -714,71 +714,71 @@ static int nftnl_rule_snprintf_default(char *buf, size_t size,
 				       uint32_t type, uint32_t flags)
 {
 	struct nftnl_expr *expr;
-	int ret, len = size, offset = 0, i;
+	int ret, remain = size, offset = 0, i;
 
 	if (r->flags & (1 << NFTNL_RULE_FAMILY)) {
-		ret = snprintf(buf+offset, len, "%s ",
+		ret = snprintf(buf + offset, remain, "%s ",
 			       nftnl_family2str(r->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (r->flags & (1 << NFTNL_RULE_TABLE)) {
-		ret = snprintf(buf+offset, len, "%s ",
+		ret = snprintf(buf + offset, remain, "%s ",
 			       r->table);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (r->flags & (1 << NFTNL_RULE_CHAIN)) {
-		ret = snprintf(buf+offset, len, "%s ",
+		ret = snprintf(buf + offset, remain, "%s ",
 			       r->chain);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (r->flags & (1 << NFTNL_RULE_HANDLE)) {
-		ret = snprintf(buf+offset, len, "%llu ",
+		ret = snprintf(buf + offset, remain, "%llu ",
 			       (unsigned long long)r->handle);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (r->flags & (1 << NFTNL_RULE_POSITION)) {
-		ret = snprintf(buf+offset, len, "%llu ",
+		ret = snprintf(buf + offset, remain, "%llu ",
 			       (unsigned long long)r->position);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (r->flags & (1 << NFTNL_RULE_ID)) {
-		ret = snprintf(buf + offset, len, "%u ", r->id);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "%u ", r->id);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
-	ret = snprintf(buf+offset, len, "\n");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, "\n");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	list_for_each_entry(expr, &r->expr_list, head) {
-		ret = snprintf(buf+offset, len, "  [ %s ", expr->ops->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "  [ %s ", expr->ops->name);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-		ret = nftnl_expr_snprintf(buf+offset, len, expr,
+		ret = nftnl_expr_snprintf(buf + offset, remain, expr,
 					     type, flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-		ret = snprintf(buf+offset, len, "]\n");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "]\n");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (r->user.len) {
-		ret = snprintf(buf+offset, len, "  userdata = { ");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "  userdata = { ");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		for (i = 0; i < r->user.len; i++) {
 			char *c = r->user.data;
 
-			ret = snprintf(buf+offset, len, "%c",
+			ret = snprintf(buf + offset, remain, "%c",
 				       isalnum(c[i]) ? c[i] : 0);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 
-		ret = snprintf(buf+offset, len, " }\n");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, " }\n");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	}
 
@@ -789,21 +789,21 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
 				   const struct nftnl_rule *r, uint32_t cmd,
 				   uint32_t type, uint32_t flags)
 {
-	int ret, len = size, offset = 0;
+	int ret, remain = size, offset = 0;
 	uint32_t inner_flags = flags;
 
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_rule_snprintf_default(buf+offset, len, r, type,
+		ret = nftnl_rule_snprintf_default(buf + offset, remain, r, type,
 						inner_flags);
 		break;
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_rule_export(buf+offset, len, r, type,
+		ret = nftnl_rule_export(buf + offset, remain, r, type,
 					     inner_flags);
 		break;
 	case NFTNL_OUTPUT_XML:
@@ -811,10 +811,10 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
 		return -1;
 	}
 
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

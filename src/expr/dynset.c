@@ -276,34 +276,35 @@ nftnl_expr_dynset_snprintf_default(char *buf, size_t size,
 {
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
 	struct nftnl_expr *expr;
-	int len = size, offset = 0, ret;
+	int remain = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "%s reg_key %u set %s ",
+	ret = snprintf(buf, remain, "%s reg_key %u set %s ",
 		       op2str(dynset->op), dynset->sreg_key, dynset->set_name);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (e->flags & (1 << NFTNL_EXPR_DYNSET_SREG_DATA)) {
-		ret = snprintf(buf+offset, len, "sreg_data %u ", dynset->sreg_data);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "sreg_data %u ",
+			       dynset->sreg_data);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (e->flags & (1 << NFTNL_EXPR_DYNSET_TIMEOUT)) {
-		ret = snprintf(buf+offset, len, "timeout %"PRIu64"ms ",
+		ret = snprintf(buf + offset, remain, "timeout %"PRIu64"ms ",
 			       dynset->timeout);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (e->flags & (1 << NFTNL_EXPR_DYNSET_EXPR)) {
 		expr = dynset->expr;
-		ret = snprintf(buf+offset, len, "expr [ %s ",
+		ret = snprintf(buf + offset, remain, "expr [ %s ",
 			       expr->ops->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-		ret = nftnl_expr_snprintf(buf+offset, len, expr,
+		ret = nftnl_expr_snprintf(buf + offset, remain, expr,
 					     NFTNL_OUTPUT_DEFAULT,
 					     NFTNL_OF_EVENT_ANY);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-		ret = snprintf(buf+offset, len, "] ");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "] ");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;

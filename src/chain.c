@@ -788,32 +788,33 @@ static int nftnl_chain_export(char *buf, size_t size,
 static int nftnl_chain_snprintf_default(char *buf, size_t size,
 					const struct nftnl_chain *c)
 {
-	int ret, len = size, offset = 0;
+	int ret, remain = size, offset = 0;
 
-	ret = snprintf(buf, len, "%s %s %s use %u",
+	ret = snprintf(buf, remain, "%s %s %s use %u",
 		       nftnl_family2str(c->family), c->table, c->name, c->use);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) {
-		ret = snprintf(buf + offset, len, " type %s hook %s prio %d",
+		ret = snprintf(buf + offset, remain, " type %s hook %s prio %d",
 			       c->type, nftnl_hooknum2str(c->family, c->hooknum),
 			       c->prio);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		if (c->flags & (1 << NFTNL_CHAIN_POLICY)) {
-			ret = snprintf(buf + offset, len, " policy %s",
+			ret = snprintf(buf + offset, remain, " policy %s",
 				       nftnl_verdict2str(c->policy));
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 
-		ret = snprintf(buf + offset, len,
+		ret = snprintf(buf + offset, remain,
 			       " packets %"PRIu64" bytes %"PRIu64"",
 			       c->packets, c->bytes);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		if (c->flags & (1 << NFTNL_CHAIN_DEV)) {
-			ret = snprintf(buf + offset, len, " dev %s ", c->dev);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+			ret = snprintf(buf + offset, remain, " dev %s ",
+				       c->dev);
+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 	}
 
@@ -824,27 +825,27 @@ static int nftnl_chain_cmd_snprintf(char *buf, size_t size,
 				    const struct nftnl_chain *c, uint32_t cmd,
 				    uint32_t type, uint32_t flags)
 {
-	int ret, len = size, offset = 0;
+	int ret, remain = size, offset = 0;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_chain_snprintf_default(buf+offset, len, c);
+		ret = nftnl_chain_snprintf_default(buf + offset, remain, c);
 		break;
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_chain_export(buf+offset, len, c, type);
+		ret = nftnl_chain_export(buf + offset, remain, c, type);
 		break;
 	default:
 		return -1;
 	}
 
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

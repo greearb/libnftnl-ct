@@ -304,31 +304,32 @@ nftnl_expr_nat_snprintf_default(char *buf, size_t size,
 				const struct nftnl_expr *e)
 {
 	struct nftnl_expr_nat *nat = nftnl_expr_data(e);
-	int len = size, offset = 0, ret = 0;
+	int remain = size, offset = 0, ret = 0;
 
-	ret = snprintf(buf, len, "%s ", nat2str(nat->type));
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf, remain, "%s ", nat2str(nat->type));
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = snprintf(buf+offset, len, "%s ", nftnl_family2str(nat->family));
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, "%s ",
+		       nftnl_family2str(nat->family));
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (e->flags & (1 << NFTNL_EXPR_NAT_REG_ADDR_MIN)) {
-		ret = snprintf(buf+offset, len,
+		ret = snprintf(buf + offset, remain,
 			       "addr_min reg %u addr_max reg %u ",
 			       nat->sreg_addr_min, nat->sreg_addr_max);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_NAT_REG_PROTO_MIN)) {
-		ret = snprintf(buf+offset, len,
+		ret = snprintf(buf + offset, remain,
 			       "proto_min reg %u proto_max reg %u ",
 			       nat->sreg_proto_min, nat->sreg_proto_max);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_NAT_FLAGS)) {
-		ret = snprintf(buf+offset, len, "flags %u", nat->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "flags %u", nat->flags);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;

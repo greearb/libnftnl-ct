@@ -132,12 +132,13 @@ static int nftnl_expr_fwd_snprintf_default(char *buf, size_t len,
 					   const struct nftnl_expr *e,
 					   uint32_t flags)
 {
-	int size = len, offset = 0, ret;
+	int remain = len, offset = 0, ret;
 	struct nftnl_expr_fwd *fwd = nftnl_expr_data(e);
 
 	if (e->flags & (1 << NFTNL_EXPR_FWD_SREG_DEV)) {
-		ret = snprintf(buf + offset, len, "sreg_dev %u ", fwd->sreg_dev);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "sreg_dev %u ",
+			       fwd->sreg_dev);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;

@@ -219,20 +219,20 @@ static int
 nftnl_expr_lookup_snprintf_default(char *buf, size_t size,
 				   const struct nftnl_expr *e)
 {
-	int len = size, offset = 0, ret;
+	int remain = size, offset = 0, ret;
 	struct nftnl_expr_lookup *l = nftnl_expr_data(e);
 
-	ret = snprintf(buf, len, "reg %u set %s ", l->sreg, l->set_name);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf, remain, "reg %u set %s ", l->sreg, l->set_name);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_DREG)) {
-		ret = snprintf(buf+offset, len, "dreg %u ", l->dreg);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "dreg %u ", l->dreg);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_FLAGS)) {
-		ret = snprintf(buf + offset, len, "0x%x ", l->flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "0x%x ", l->flags);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;

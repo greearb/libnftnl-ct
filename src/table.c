@@ -376,26 +376,26 @@ static int nftnl_table_cmd_snprintf(char *buf, size_t size,
 				    const struct nftnl_table *t, uint32_t cmd,
 				    uint32_t type, uint32_t flags)
 {
-	int ret, len = size, offset = 0;
+	int ret, remain = size, offset = 0;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_table_snprintf_default(buf+offset, len, t);
+		ret = nftnl_table_snprintf_default(buf + offset, remain, t);
 		break;
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_table_export(buf+offset, len, t, type);
+		ret = nftnl_table_export(buf + offset, remain, t, type);
 		break;
 	default:
 		return -1;
 	}
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

@@ -229,15 +229,15 @@ static int nftnl_expr_cmp_snprintf_default(char *buf, size_t size,
 					   const struct nftnl_expr *e)
 {
 	struct nftnl_expr_cmp *cmp = nftnl_expr_data(e);
-	int len = size, offset = 0, ret;
+	int remain = size, offset = 0, ret;
 
-	ret = snprintf(buf, len, "%s reg %u ",
+	ret = snprintf(buf, remain, "%s reg %u ",
 		       cmp2str(cmp->op), cmp->sreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_data_reg_snprintf(buf+offset, len, &cmp->data,
+	ret = nftnl_data_reg_snprintf(buf + offset, remain, &cmp->data,
 				    NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

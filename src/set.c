@@ -738,95 +738,96 @@ static int nftnl_set_snprintf_json(char *buf, size_t size,
 				   const struct nftnl_set *s,
 				   uint32_t type, uint32_t flags)
 {
-	int len = size, offset = 0, ret;
+	int remain = size, offset = 0, ret;
 	struct nftnl_set_elem *elem;
 
-	ret = snprintf(buf, len, "{\"set\":{");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf, remain, "{\"set\":{");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (s->flags & (1 << NFTNL_SET_NAME)) {
-		ret = snprintf(buf + offset, len, "\"name\":\"%s\"",
+		ret = snprintf(buf + offset, remain, "\"name\":\"%s\"",
 			       s->name);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (s->flags & (1 << NFTNL_SET_TABLE)) {
-		ret = snprintf(buf + offset, len, ",\"table\":\"%s\"",
+		ret = snprintf(buf + offset, remain, ",\"table\":\"%s\"",
 			       s->table);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (s->flags & (1 << NFTNL_SET_FLAGS)) {
-		ret = snprintf(buf + offset, len, ",\"flags\":%u",
+		ret = snprintf(buf + offset, remain, ",\"flags\":%u",
 			       s->set_flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (s->flags & (1 << NFTNL_SET_FAMILY)) {
-		ret = snprintf(buf + offset, len, ",\"family\":\"%s\"",
+		ret = snprintf(buf + offset, remain, ",\"family\":\"%s\"",
 			       nftnl_family2str(s->family));
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (s->flags & (1 << NFTNL_SET_KEY_TYPE)) {
-		ret = snprintf(buf + offset, len, ",\"key_type\":%u",
+		ret = snprintf(buf + offset, remain, ",\"key_type\":%u",
 			       s->key_type);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (s->flags & (1 << NFTNL_SET_KEY_LEN)) {
-		ret = snprintf(buf + offset, len, ",\"key_len\":%u",
+		ret = snprintf(buf + offset, remain, ",\"key_len\":%u",
 			       s->key_len);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if(s->flags & (1 << NFTNL_SET_DATA_TYPE)) {
-		ret = snprintf(buf + offset, len,
+		ret = snprintf(buf + offset, remain,
 				  ",\"data_type\":%u", s->data_type);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if(s->flags & (1 << NFTNL_SET_DATA_LEN)) {
-		ret = snprintf(buf + offset, len, ",\"data_len\":%u", s->data_len);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, ",\"data_len\":%u",
+			       s->data_len);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (s->flags & (1 << NFTNL_SET_OBJ_TYPE)) {
-		ret = snprintf(buf + offset, len,
+		ret = snprintf(buf + offset, remain,
 				  ",\"obj_type\":%u", s->obj_type);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (s->flags & (1 << NFTNL_SET_POLICY)) {
-		ret = snprintf(buf + offset, len, ",\"policy\":%u",
+		ret = snprintf(buf + offset, remain, ",\"policy\":%u",
 			       s->policy);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (s->flags & (1 << NFTNL_SET_DESC_SIZE)) {
-		ret = snprintf(buf + offset, len, ",\"desc_size\":%u",
+		ret = snprintf(buf + offset, remain, ",\"desc_size\":%u",
 			       s->desc.size);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	/* Empty set? Skip printinf of elements */
 	if (list_empty(&s->element_list)){
-		ret = snprintf(buf + offset, len, "}}");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "}}");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		return offset;
 	}
 
-	ret = snprintf(buf + offset, len, ",\"set_elem\":[");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, ",\"set_elem\":[");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	list_for_each_entry(elem, &s->element_list, head) {
-		ret = snprintf(buf + offset, len, "{");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "{");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-		ret = nftnl_set_elem_snprintf(buf + offset, len, elem, type,
+		ret = nftnl_set_elem_snprintf(buf + offset, remain, elem, type,
 					    flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-		ret = snprintf(buf + offset, len, "},");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "},");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	/* Overwrite trailing ", " from last set element */
 	offset --;
 
-	ret = snprintf(buf + offset, len, "]}}");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, "]}}");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }
@@ -836,48 +837,49 @@ static int nftnl_set_snprintf_default(char *buf, size_t size,
 				      uint32_t type, uint32_t flags)
 {
 	int ret;
-	int len = size, offset = 0;
+	int remain = size, offset = 0;
 	struct nftnl_set_elem *elem;
 
-	ret = snprintf(buf, len, "%s %s %x",
+	ret = snprintf(buf, remain, "%s %s %x",
 			s->name, s->table, s->set_flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (s->flags & (1 << NFTNL_SET_TIMEOUT)) {
-		ret = snprintf(buf + offset, len, " timeout %"PRIu64"ms",
+		ret = snprintf(buf + offset, remain, " timeout %"PRIu64"ms",
 			       s->timeout);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (s->flags & (1 << NFTNL_SET_GC_INTERVAL)) {
-		ret = snprintf(buf + offset, len, " gc_interval %ums",
+		ret = snprintf(buf + offset, remain, " gc_interval %ums",
 			       s->gc_interval);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (s->flags & (1 << NFTNL_SET_POLICY)) {
-		ret = snprintf(buf + offset, len, " policy %u", s->policy);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, " policy %u", s->policy);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (s->flags & (1 << NFTNL_SET_DESC_SIZE)) {
-		ret = snprintf(buf + offset, len, " size %u", s->desc.size);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, " size %u", s->desc.size);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	/* Empty set? Skip printinf of elements */
 	if (list_empty(&s->element_list))
 		return offset;
 
-	ret = snprintf(buf+offset, len, "\n");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, "\n");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	list_for_each_entry(elem, &s->element_list, head) {
-		ret = snprintf(buf+offset, len, "\t");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "\t");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-		ret = nftnl_set_elem_snprintf(buf+offset, len, elem, type, flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = nftnl_set_elem_snprintf(buf + offset, remain, elem, type,
+					      flags);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;
@@ -887,7 +889,7 @@ static int nftnl_set_cmd_snprintf(char *buf, size_t size,
 				  const struct nftnl_set *s, uint32_t cmd,
 				  uint32_t type, uint32_t flags)
 {
-	int ret, len = size, offset = 0;
+	int ret, remain = size, offset = 0;
 	uint32_t inner_flags = flags;
 
 	if (type == NFTNL_OUTPUT_XML)
@@ -896,26 +898,26 @@ static int nftnl_set_cmd_snprintf(char *buf, size_t size,
 	/* prevent set_elems to print as events */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_set_snprintf_default(buf+offset, len, s, type,
+		ret = nftnl_set_snprintf_default(buf + offset, remain, s, type,
 					       inner_flags);
 		break;
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_set_snprintf_json(buf+offset, len, s, type,
+		ret = nftnl_set_snprintf_json(buf + offset, remain, s, type,
 					    inner_flags);
 		break;
 	default:
 		return -1;
 	}
 
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = nftnl_cmd_footer_snprintf(buf + offset, len, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

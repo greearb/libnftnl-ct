@@ -229,44 +229,45 @@ static int nftnl_expr_log_snprintf_default(char *buf, size_t size,
 					   const struct nftnl_expr *e)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
-	int ret, offset = 0, len = size;
+	int ret, offset = 0, remain = size;
 
 	if (e->flags & (1 << NFTNL_EXPR_LOG_PREFIX)) {
-		ret = snprintf(buf, len, "prefix %s ", log->prefix);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf, remain, "prefix %s ", log->prefix);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_LOG_GROUP)) {
-		ret = snprintf(buf + offset, len,
+		ret = snprintf(buf + offset, remain,
 			       "group %u snaplen %u qthreshold %u ",
 			       log->group, log->snaplen, log->qthreshold);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	} else {
 		if (e->flags & (1 << NFTNL_EXPR_LOG_LEVEL)) {
-			ret = snprintf(buf + offset, len, "level %u ",
+			ret = snprintf(buf + offset, remain, "level %u ",
 				       log->level);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 		if (e->flags & (1 << NFTNL_EXPR_LOG_FLAGS)) {
 			if (log->flags & NF_LOG_TCPSEQ) {
-				ret = snprintf(buf + offset, len, "tcpseq ");
-				SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+				ret = snprintf(buf + offset, remain, "tcpseq ");
+				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 			}
 			if (log->flags & NF_LOG_TCPOPT) {
-				ret = snprintf(buf + offset, len, "tcpopt ");
-				SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+				ret = snprintf(buf + offset, remain, "tcpopt ");
+				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 			}
 			if (log->flags & NF_LOG_IPOPT) {
-				ret = snprintf(buf + offset, len, "ipopt ");
-				SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+				ret = snprintf(buf + offset, remain, "ipopt ");
+				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 			}
 			if (log->flags & NF_LOG_UID) {
-				ret = snprintf(buf + offset, len, "uid ");
-				SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+				ret = snprintf(buf + offset, remain, "uid ");
+				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 			}
 			if (log->flags & NF_LOG_MACDECODE) {
-				ret = snprintf(buf + offset, len, "macdecode ");
-				SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+				ret = snprintf(buf + offset, remain,
+					       "macdecode ");
+				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 			}
 		}
 	}

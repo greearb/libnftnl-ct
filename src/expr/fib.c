@@ -172,7 +172,7 @@ nftnl_expr_fib_snprintf_default(char *buf, size_t size,
 				const struct nftnl_expr *e)
 {
 	struct nftnl_expr_fib *fib = nftnl_expr_data(e);
-	int len = size, offset = 0, ret, i;
+	int remain = size, offset = 0, ret, i;
 	uint32_t flags = fib->flags & ~NFTA_FIB_F_PRESENT;
 	uint32_t present_flag = fib->flags & NFTA_FIB_F_PRESENT;
 	static const struct {
@@ -188,27 +188,29 @@ nftnl_expr_fib_snprintf_default(char *buf, size_t size,
 
 	for (i = 0; i < (sizeof(tab) / sizeof(tab[0])); i++) {
 		if (flags & tab[i].bit) {
-			ret = snprintf(buf + offset, len, "%s ", tab[i].name);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+			ret = snprintf(buf + offset, remain, "%s ",
+				       tab[i].name);
+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 			flags &= ~tab[i].bit;
 			if (flags) {
-				ret = snprintf(buf + offset, len, ". ");
-				SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+				ret = snprintf(buf + offset, remain, ". ");
+				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 			}
 		}
 	}
 
 	if (flags) {
-		ret = snprintf(buf + offset, len, "unknown 0x%" PRIx32, flags);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "unknown 0x%" PRIx32,
+			       flags);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
-	ret = snprintf(buf + offset, len, "%s%s => reg %d ",
+	ret = snprintf(buf + offset, remain, "%s%s => reg %d ",
 		       fib_type_str(fib->result),
 		       present_flag ? " present" : "",
 		       fib->dreg);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

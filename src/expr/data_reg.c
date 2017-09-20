@@ -101,34 +101,34 @@ nftnl_data_reg_value_snprintf_json(char *buf, size_t size,
 				   const union nftnl_data_reg *reg,
 				   uint32_t flags)
 {
-	int len = size, offset = 0, ret, i, j;
+	int remain = size, offset = 0, ret, i, j;
 	uint32_t utemp;
 	uint8_t *tmp;
 
-	ret = snprintf(buf, len, "\"reg\":{\"type\":\"value\",");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf, remain, "\"reg\":{\"type\":\"value\",");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	ret = snprintf(buf+offset, len, "\"len\":%u,", reg->len);
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, "\"len\":%u,", reg->len);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		ret = snprintf(buf+offset, len, "\"data%d\":\"0x", i);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "\"data%d\":\"0x", i);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		utemp = htonl(reg->val[i]);
 		tmp = (uint8_t *)&utemp;
 
 		for (j = 0; j<sizeof(uint32_t); j++) {
-			ret = snprintf(buf+offset, len, "%.02x", tmp[j]);
-			SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+			ret = snprintf(buf + offset, remain, "%.02x", tmp[j]);
+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 
-		ret = snprintf(buf+offset, len, "\",");
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "\",");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	offset--;
-	ret = snprintf(buf+offset, len, "}");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, "}");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }
@@ -138,11 +138,11 @@ nftnl_data_reg_value_snprintf_default(char *buf, size_t size,
 				      const union nftnl_data_reg *reg,
 				      uint32_t flags)
 {
-	int len = size, offset = 0, ret, i;
+	int remain = size, offset = 0, ret, i;
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		ret = snprintf(buf+offset, len, "0x%.8x ", reg->val[i]);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "0x%.8x ", reg->val[i]);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;
@@ -153,14 +153,14 @@ nftnl_data_reg_verdict_snprintf_def(char *buf, size_t size,
 				    const union nftnl_data_reg *reg,
 				    uint32_t flags)
 {
-	int len = size, offset = 0, ret = 0;
+	int remain = size, offset = 0, ret = 0;
 
 	ret = snprintf(buf, size, "%s ", nftnl_verdict2str(reg->verdict));
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (reg->chain != NULL) {
-		ret = snprintf(buf+offset, len, "-> %s ", reg->chain);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		ret = snprintf(buf + offset, remain, "-> %s ", reg->chain);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	return offset;
@@ -171,20 +171,20 @@ nftnl_data_reg_verdict_snprintf_json(char *buf, size_t size,
 				     const union nftnl_data_reg *reg,
 				     uint32_t flags)
 {
-	int len = size, offset = 0, ret = 0;
+	int remain = size, offset = 0, ret = 0;
 
 	ret = snprintf(buf, size, "\"reg\":{\"type\":\"verdict\","
 		       "\"verdict\":\"%s\"", nftnl_verdict2str(reg->verdict));
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (reg->chain != NULL) {
-		ret = snprintf(buf+offset, len, ",\"chain\":\"%s\"",
+		ret = snprintf(buf + offset, remain, ",\"chain\":\"%s\"",
 			       reg->chain);
-		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
-	ret = snprintf(buf+offset, len, "}");
-	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+	ret = snprintf(buf + offset, remain, "}");
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }
