@@ -14,6 +14,7 @@
 #include <string.h>
 #include <buffer.h>
 #include <libnftnl/common.h>
+#include <libnftnl/expr.h>
 #include "internal.h"
 
 int nftnl_buf_update(struct nftnl_buf *b, int ret)
@@ -206,8 +207,8 @@ int nftnl_buf_expr(struct nftnl_buf *b, int type, uint32_t flags,
 	case NFTNL_OUTPUT_JSON:
 		nftnl_buf_put(b, "{");
 		nftnl_buf_str(b, type, expr->ops->name, TYPE);
-		ret = expr->ops->snprintf(b->buf + b->off, b->len, type, flags,
-					  expr);
+		ret = nftnl_expr_snprintf(b->buf + b->off, b->len, expr, type,
+					  flags);
 		if (ret > 0)
 			nftnl_buf_update(b, ret);
 		else
