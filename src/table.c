@@ -378,9 +378,6 @@ static int nftnl_table_cmd_snprintf(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0;
 
-	if (size)
-		buf[0] = '\0';
-
 	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 

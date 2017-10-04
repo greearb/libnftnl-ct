@@ -194,9 +194,6 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 			    uint32_t output_format, uint32_t flags,
 			    int reg_type)
 {
-	if (size)
-		buf[0] = '\0';
-
 	switch(reg_type) {
 	case DATA_VALUE:
 		switch(output_format) {

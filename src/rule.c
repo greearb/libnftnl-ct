@@ -792,9 +792,6 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
 	int ret, remain = size, offset = 0;
 	uint32_t inner_flags = flags;
 
-	if (size)
-		buf[0] = '\0';
-
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
 	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);

@@ -895,9 +895,6 @@ static int nftnl_set_cmd_snprintf(char *buf, size_t size,
 	if (type == NFTNL_OUTPUT_XML)
 		return 0;
 
-	if (size)
-		buf[0] = '\0';
-
 	/* prevent set_elems to print as events */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 

@@ -696,8 +696,6 @@ static int nftnl_set_elem_cmd_snprintf(char *buf, size_t size,
 
 	if (type == NFTNL_OUTPUT_XML)
 		return 0;
-	if (size)
-		buf[0] = '\0';
 
 	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
