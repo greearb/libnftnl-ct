@@ -290,9 +290,6 @@ nftnl_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 {
 	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
 
-	if (len)
-		buf[0] = '\0';
-
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		if (payload->sreg)

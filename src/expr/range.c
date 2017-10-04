@@ -263,9 +263,6 @@ static int nftnl_expr_range_snprintf_default(char *buf, size_t size,
 static int nftnl_expr_range_snprintf(char *buf, size_t size, uint32_t type,
 				     uint32_t flags, const struct nftnl_expr *e)
 {
-	if (size)
-		buf[0] = '\0';
-
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		return nftnl_expr_range_snprintf_default(buf, size, e);
