@@ -203,9 +203,6 @@ EXPORT_SYMBOL(nftnl_gen_snprintf);
 static int nftnl_gen_do_snprintf(char *buf, size_t size, const void *gen,
 				 uint32_t cmd, uint32_t type, uint32_t flags)
 {
-	if (size)
-		buf = '\0';
-
 	return nftnl_gen_snprintf(buf, size, gen, type, flags);
 }
 

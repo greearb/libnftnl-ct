@@ -488,9 +488,6 @@ EXPORT_SYMBOL(nftnl_obj_snprintf);
 static int nftnl_obj_do_snprintf(char *buf, size_t size, const void *obj,
 				 uint32_t cmd, uint32_t type, uint32_t flags)
 {
-	if (size)
-		buf[0] = '\0';
-
 	return nftnl_obj_snprintf(buf, size, obj, type, flags);
 }
 

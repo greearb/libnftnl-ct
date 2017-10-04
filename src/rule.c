@@ -836,9 +836,6 @@ EXPORT_SYMBOL(nftnl_rule_snprintf);
 static int nftnl_rule_do_snprintf(char *buf, size_t size, const void *r,
 				  uint32_t cmd, uint32_t type, uint32_t flags)
 {
-	if (size)
-		buf[0] = '\0';
-
 	return nftnl_rule_snprintf(buf, size, r, type, flags);
 }
 

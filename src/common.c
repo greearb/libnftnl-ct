@@ -94,9 +94,6 @@ EXPORT_SYMBOL(nftnl_parse_perror);
 int nftnl_cmd_header_snprintf(char *buf, size_t size, uint32_t cmd, uint32_t type,
 			    uint32_t flags)
 {
-	if (size)
-		buf[0] = '\0';
-
 	NFTNL_BUF_INIT(b, buf, size);
 
 	if (cmd == NFTNL_CMD_UNSPEC)
@@ -138,9 +135,6 @@ int nftnl_cmd_header_fprintf(FILE *fp, uint32_t cmd, uint32_t type,
 int nftnl_cmd_footer_snprintf(char *buf, size_t size, uint32_t cmd, uint32_t type,
 			    uint32_t flags)
 {
-	if (size)
-		buf[0] = '\0';
-
 	NFTNL_BUF_INIT(b, buf, size);
 
 	if (cmd == NFTNL_CMD_UNSPEC)

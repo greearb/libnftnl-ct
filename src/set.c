@@ -939,9 +939,6 @@ EXPORT_SYMBOL(nftnl_set_snprintf);
 static int nftnl_set_do_snprintf(char *buf, size_t size, const void *s,
 				 uint32_t cmd, uint32_t type, uint32_t flags)
 {
-	if (size)
-		buf[0] = '\0';
-
 	return nftnl_set_snprintf(buf, size, s, type, flags);
 }
 
