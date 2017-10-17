@@ -293,3 +293,17 @@ int nftnl_expr_snprintf(char *buf, size_t size, const struct nftnl_expr *expr,
 	return offset;
 }
 EXPORT_SYMBOL(nftnl_expr_snprintf);
+
+static int nftnl_expr_do_snprintf(char *buf, size_t size, const void *e,
+				  uint32_t cmd, uint32_t type, uint32_t flags)
+{
+	return nftnl_expr_snprintf(buf, size, e, type, flags);
+}
+
+int nftnl_expr_fprintf(FILE *fp, const struct nftnl_expr *expr, uint32_t type,
+		       uint32_t flags)
+{
+	return nftnl_fprintf(fp, expr, NFTNL_CMD_UNSPEC, type, flags,
+			     nftnl_expr_do_snprintf);
+}
+EXPORT_SYMBOL(nftnl_expr_fprintf);

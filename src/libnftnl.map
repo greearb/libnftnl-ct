@@ -307,3 +307,7 @@ global:
 
 local: *;
 };
+
+LIBNFTNL_6 {
+  nftnl_expr_fprintf;
+} LIBNFTNL_5;
