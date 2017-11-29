@@ -311,3 +311,34 @@ local: *;
 LIBNFTNL_6 {
   nftnl_expr_fprintf;
 } LIBNFTNL_5;
+
+LIBNFTNL_7 {
+  nftnl_flowtable_alloc;
+  nftnl_flowtable_free;
+  nftnl_flowtable_is_set;
+  nftnl_flowtable_unset;
+  nftnl_flowtable_set;
+  nftnl_flowtable_set_u32;
+  nftnl_flowtable_set_s32;
+  nftnl_flowtable_set_array;
+  nftnl_flowtable_set_str;
+  nftnl_flowtable_get;
+  nftnl_flowtable_get_u32;
+  nftnl_flowtable_get_s32;
+  nftnl_flowtable_get_array;
+  nftnl_flowtable_get_str;
+  nftnl_flowtable_parse;
+  nftnl_flowtable_parse_file;
+  nftnl_flowtable_snprintf;
+  nftnl_flowtable_fprintf;
+  nftnl_flowtable_nlmsg_build_payload;
+  nftnl_flowtable_nlmsg_parse;
+  nftnl_flowtable_list_alloc;
+  nftnl_flowtable_list_free;
+  nftnl_flowtable_list_is_empty;
+  nftnl_flowtable_list_add;
+  nftnl_flowtable_list_add_tail;
+  nftnl_flowtable_list_del;
+  nftnl_flowtable_list_foreach;
+
+} LIBNFTNL_6;

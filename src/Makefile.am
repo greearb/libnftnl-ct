@@ -8,6 +8,7 @@ libnftnl_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libnftnl.map	\
 libnftnl_la_SOURCES = utils.c		\
 		      batch.c		\
 		      buffer.c		\
+		      flowtable.c	\
 		      common.c		\
 		      gen.c		\
 		      table.c		\

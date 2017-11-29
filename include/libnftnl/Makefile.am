@@ -6,6 +6,7 @@ pkginclude_HEADERS = batch.h		\
 		     rule.h		\
 		     expr.h		\
 		     set.h		\
+		     flowtable.h	\
 		     ruleset.h		\
 		     common.h		\
 		     udata.h		\
