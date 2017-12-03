@@ -221,6 +221,10 @@ enum {
 };
 
 enum {
+	NFTNL_EXPR_FLOW_TABLE_NAME = NFTNL_EXPR_BASE,
+};
+
+enum {
 	NFTNL_EXPR_FWD_SREG_DEV = NFTNL_EXPR_BASE,
 };
 
