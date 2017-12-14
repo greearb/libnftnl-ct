@@ -519,11 +519,11 @@ static int nftnl_ruleset_json_parse(const void *json,
 	json_error_t error;
 	int i, len;
 	const char *key;
-	struct nftnl_parse_ctx ctx;
-
-	ctx.cb = cb;
-	ctx.format = type;
-	ctx.flags = 0;
+	struct nftnl_parse_ctx ctx = {
+		.cb = cb,
+		.format = type,
+		.flags = 0,
+	};
 
 	ctx.set_list = nftnl_set_list_alloc();
 	if (ctx.set_list == NULL)
