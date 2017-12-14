@@ -143,9 +143,9 @@ static int nftnl_gen_parse_attr_cb(const struct nlattr *attr, void *data)
 int nftnl_gen_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_gen *gen)
 {
 	struct nlattr *tb[NFTA_GEN_MAX + 1] = {};
-	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
 
-	if (mnl_attr_parse(nlh, sizeof(*nfg), nftnl_gen_parse_attr_cb, tb) < 0)
+	if (mnl_attr_parse(nlh, sizeof(struct nfgenmsg),
+			   nftnl_gen_parse_attr_cb, tb) < 0)
 		return -1;
 
 	if (tb[NFTA_GEN_ID]) {
