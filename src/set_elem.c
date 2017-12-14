@@ -490,7 +490,7 @@ nftnl_set_elem_list_parse_attr_cb(const struct nlattr *attr, void *data)
 static int nftnl_set_elems_parse(struct nftnl_set *s, const struct nlattr *nest)
 {
 	struct nlattr *attr;
-	int ret;
+	int ret = -1;
 
 	mnl_attr_for_each_nested(attr, nest) {
 		if (mnl_attr_get_type(attr) != NFTA_LIST_ELEM)
