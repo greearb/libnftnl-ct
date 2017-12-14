@@ -207,6 +207,7 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 		default:
 			break;
 		}
+		break;
 	case DATA_VERDICT:
 	case DATA_CHAIN:
 		switch(output_format) {
@@ -220,6 +221,7 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 		default:
 			break;
 		}
+		break;
 	default:
 		break;
 	}
