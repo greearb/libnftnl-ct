@@ -358,7 +358,7 @@ static int nftnl_obj_do_parse(struct nftnl_obj *obj, enum nftnl_parse_type type,
 			      const void *data, struct nftnl_parse_err *err,
 			      enum nftnl_parse_input input)
 {
-	struct nftnl_parse_err perr;
+	struct nftnl_parse_err perr = {};
 	int ret;
 
 	switch (type) {
