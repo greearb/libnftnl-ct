@@ -301,7 +301,8 @@ static int nftnl_trace_parse_verdict(const struct nlattr *attr,
 {
 	struct nlattr *tb[NFTA_VERDICT_MAX+1];
 
-	mnl_attr_parse_nested(attr, nftnl_trace_parse_verdict_cb, tb);
+	if (mnl_attr_parse_nested(attr, nftnl_trace_parse_verdict_cb, tb) < 0)
+		return -1;
 
 	if (!tb[NFTA_VERDICT_CODE])
 		abi_breakage();
