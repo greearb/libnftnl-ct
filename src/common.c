@@ -43,14 +43,15 @@ static struct nlmsghdr *__nftnl_nlmsg_build_hdr(char *buf, uint16_t type,
 	return nlh;
 }
 
+EXPORT_SYMBOL(nftnl_nlmsg_build_hdr);
 struct nlmsghdr *nftnl_nlmsg_build_hdr(char *buf, uint16_t type, uint16_t family,
 				       uint16_t flags, uint32_t seq)
 {
 	return __nftnl_nlmsg_build_hdr(buf, (NFNL_SUBSYS_NFTABLES << 8) | type,
 				       family, flags, seq, 0);
 }
-EXPORT_SYMBOL(nftnl_nlmsg_build_hdr);
 
+EXPORT_SYMBOL(nftnl_parse_err_alloc);
 struct nftnl_parse_err *nftnl_parse_err_alloc(void)
 {
 	struct nftnl_parse_err *err;
@@ -63,14 +64,14 @@ struct nftnl_parse_err *nftnl_parse_err_alloc(void)
 
 	return err;
 }
-EXPORT_SYMBOL(nftnl_parse_err_alloc);
 
+EXPORT_SYMBOL(nftnl_parse_err_free);
 void nftnl_parse_err_free(struct nftnl_parse_err *err)
 {
 	xfree(err);
 }
-EXPORT_SYMBOL(nftnl_parse_err_free);
 
+EXPORT_SYMBOL(nftnl_parse_perror);
 int nftnl_parse_perror(const char *msg, struct nftnl_parse_err *err)
 {
 	switch (err->error) {
@@ -89,7 +90,6 @@ int nftnl_parse_perror(const char *msg, struct nftnl_parse_err *err)
 		return fprintf(stderr, "%s: Undefined error\n", msg);
 	}
 }
-EXPORT_SYMBOL(nftnl_parse_perror);
 
 int nftnl_cmd_header_snprintf(char *buf, size_t size, uint32_t cmd, uint32_t type,
 			    uint32_t flags)
@@ -165,20 +165,21 @@ int nftnl_cmd_footer_fprintf(FILE *fp, uint32_t cmd, uint32_t type,
 			   nftnl_cmd_footer_fprintf_cb);
 }
 
+EXPORT_SYMBOL(nftnl_batch_begin);
 struct nlmsghdr *nftnl_batch_begin(char *buf, uint32_t seq)
 {
 	return __nftnl_nlmsg_build_hdr(buf, NFNL_MSG_BATCH_BEGIN, AF_UNSPEC,
 				       0, seq, NFNL_SUBSYS_NFTABLES);
 }
-EXPORT_SYMBOL(nftnl_batch_begin);
 
+EXPORT_SYMBOL(nftnl_batch_end);
 struct nlmsghdr *nftnl_batch_end(char *buf, uint32_t seq)
 {
 	return __nftnl_nlmsg_build_hdr(buf, NFNL_MSG_BATCH_END, AF_UNSPEC,
 				       0, seq, NFNL_SUBSYS_NFTABLES);
 }
-EXPORT_SYMBOL(nftnl_batch_end);
 
+EXPORT_SYMBOL(nftnl_batch_is_supported);
 int nftnl_batch_is_supported(void)
 {
 	struct mnl_socket *nl;
@@ -236,4 +237,3 @@ err:
 	mnl_nlmsg_batch_stop(b);
 	return -1;
 }
-EXPORT_SYMBOL(nftnl_batch_is_supported);

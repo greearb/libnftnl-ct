@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <string.h>
 
+EXPORT_SYMBOL(nftnl_udata_buf_alloc);
 struct nftnl_udata_buf *nftnl_udata_buf_alloc(uint32_t data_size)
 {
 	struct nftnl_udata_buf *buf;
@@ -28,46 +29,46 @@ struct nftnl_udata_buf *nftnl_udata_buf_alloc(uint32_t data_size)
 
 	return buf;
 }
-EXPORT_SYMBOL(nftnl_udata_buf_alloc);
 
+EXPORT_SYMBOL(nftnl_udata_buf_free);
 void nftnl_udata_buf_free(const struct nftnl_udata_buf *buf)
 {
 	xfree(buf);
 }
-EXPORT_SYMBOL(nftnl_udata_buf_free);
 
+EXPORT_SYMBOL(nftnl_udata_buf_len);
 uint32_t nftnl_udata_buf_len(const struct nftnl_udata_buf *buf)
 {
 	return (uint32_t)(buf->end - buf->data);
 }
-EXPORT_SYMBOL(nftnl_udata_buf_len);
 
+EXPORT_SYMBOL(nftnl_udata_buf_data);
 void *nftnl_udata_buf_data(const struct nftnl_udata_buf *buf)
 {
 	return (void *)buf->data;
 }
-EXPORT_SYMBOL(nftnl_udata_buf_data);
 
+EXPORT_SYMBOL(nftnl_udata_buf_put);
 void nftnl_udata_buf_put(struct nftnl_udata_buf *buf, const void *data,
 			 uint32_t len)
 {
 	memcpy(buf->data, data, len <= buf->size ? len : buf->size);
 	buf->end = buf->data + len;
 }
-EXPORT_SYMBOL(nftnl_udata_buf_put);
 
+EXPORT_SYMBOL(nftnl_udata_start);
 struct nftnl_udata *nftnl_udata_start(const struct nftnl_udata_buf *buf)
 {
 	return (struct nftnl_udata *)buf->data;
 }
-EXPORT_SYMBOL(nftnl_udata_start);
 
+EXPORT_SYMBOL(nftnl_udata_end);
 struct nftnl_udata *nftnl_udata_end(const struct nftnl_udata_buf *buf)
 {
 	return (struct nftnl_udata *)buf->end;
 }
-EXPORT_SYMBOL(nftnl_udata_end);
 
+EXPORT_SYMBOL(nftnl_udata_put);
 bool nftnl_udata_put(struct nftnl_udata_buf *buf, uint8_t type, uint32_t len,
 		     const void *value)
 {
@@ -85,54 +86,54 @@ bool nftnl_udata_put(struct nftnl_udata_buf *buf, uint8_t type, uint32_t len,
 
 	return true;
 }
-EXPORT_SYMBOL(nftnl_udata_put);
 
+EXPORT_SYMBOL(nftnl_udata_put_strz);
 bool nftnl_udata_put_strz(struct nftnl_udata_buf *buf, uint8_t type,
 			  const char *strz)
 {
 	return nftnl_udata_put(buf, type, strlen(strz) + 1, strz);
 }
-EXPORT_SYMBOL(nftnl_udata_put_strz);
 
+EXPORT_SYMBOL(nftnl_udata_put_u32);
 bool nftnl_udata_put_u32(struct nftnl_udata_buf *buf, uint8_t type,
 			 uint32_t data)
 {
 	return nftnl_udata_put(buf, type, sizeof(data), &data);
 }
-EXPORT_SYMBOL(nftnl_udata_put_u32);
 
+EXPORT_SYMBOL(nftnl_udata_type);
 uint8_t nftnl_udata_type(const struct nftnl_udata *attr)
 {
 	return attr->type;
 }
-EXPORT_SYMBOL(nftnl_udata_type);
 
+EXPORT_SYMBOL(nftnl_udata_len);
 uint8_t nftnl_udata_len(const struct nftnl_udata *attr)
 {
 	return attr->len;
 }
-EXPORT_SYMBOL(nftnl_udata_len);
 
+EXPORT_SYMBOL(nftnl_udata_get);
 void *nftnl_udata_get(const struct nftnl_udata *attr)
 {
 	return (void *)attr->value;
 }
-EXPORT_SYMBOL(nftnl_udata_get);
 
+EXPORT_SYMBOL(nftnl_udata_get_u32);
 uint32_t nftnl_udata_get_u32(const struct nftnl_udata *attr)
 {
 	uint32_t *data = (uint32_t *)attr->value;
 
 	return *data;
 }
-EXPORT_SYMBOL(nftnl_udata_get_u32);
 
+EXPORT_SYMBOL(nftnl_udata_next);
 struct nftnl_udata *nftnl_udata_next(const struct nftnl_udata *attr)
 {
 	return (struct nftnl_udata *)&attr->value[attr->len];
 }
-EXPORT_SYMBOL(nftnl_udata_next);
 
+EXPORT_SYMBOL(nftnl_udata_parse);
 int nftnl_udata_parse(const void *data, uint32_t data_len, nftnl_udata_cb_t cb,
 		      void *cb_data)
 {
@@ -147,4 +148,3 @@ int nftnl_udata_parse(const void *data, uint32_t data_len, nftnl_udata_cb_t cb,
 
 	return ret;
 }
-EXPORT_SYMBOL(nftnl_udata_parse);

@@ -57,6 +57,7 @@ static void nftnl_batch_add_page(struct nftnl_batch_page *page,
 	list_add_tail(&page->head, &batch->page_list);
 }
 
+EXPORT_SYMBOL(nftnl_batch_alloc);
 struct nftnl_batch *nftnl_batch_alloc(uint32_t pg_size, uint32_t pg_overrun_size)
 {
 	struct nftnl_batch *batch;
@@ -80,8 +81,8 @@ err1:
 	free(batch);
 	return NULL;
 }
-EXPORT_SYMBOL(nftnl_batch_alloc);
 
+EXPORT_SYMBOL(nftnl_batch_free);
 void nftnl_batch_free(struct nftnl_batch *batch)
 {
 	struct nftnl_batch_page *page, *next;
@@ -94,8 +95,8 @@ void nftnl_batch_free(struct nftnl_batch *batch)
 
 	free(batch);
 }
-EXPORT_SYMBOL(nftnl_batch_free);
 
+EXPORT_SYMBOL(nftnl_batch_update);
 int nftnl_batch_update(struct nftnl_batch *batch)
 {
 	struct nftnl_batch_page *page;
@@ -119,20 +120,20 @@ int nftnl_batch_update(struct nftnl_batch *batch)
 err1:
 	return -1;
 }
-EXPORT_SYMBOL(nftnl_batch_update);
 
+EXPORT_SYMBOL(nftnl_batch_buffer);
 void *nftnl_batch_buffer(struct nftnl_batch *batch)
 {
 	return mnl_nlmsg_batch_current(batch->current_page->batch);
 }
-EXPORT_SYMBOL(nftnl_batch_buffer);
 
+EXPORT_SYMBOL(nftnl_batch_buffer_len);
 uint32_t nftnl_batch_buffer_len(struct nftnl_batch *batch)
 {
 	return mnl_nlmsg_batch_size(batch->current_page->batch);
 }
-EXPORT_SYMBOL(nftnl_batch_buffer_len);
 
+EXPORT_SYMBOL(nftnl_batch_iovec_len);
 int nftnl_batch_iovec_len(struct nftnl_batch *batch)
 {
 	int num_pages = batch->num_pages;
@@ -143,8 +144,8 @@ int nftnl_batch_iovec_len(struct nftnl_batch *batch)
 
 	return num_pages;
 }
-EXPORT_SYMBOL(nftnl_batch_iovec_len);
 
+EXPORT_SYMBOL(nftnl_batch_iovec);
 void nftnl_batch_iovec(struct nftnl_batch *batch, struct iovec *iov,
 		       uint32_t iovlen)
 {
@@ -160,4 +161,3 @@ void nftnl_batch_iovec(struct nftnl_batch *batch, struct iovec *iov,
 		i++;
 	}
 }
-EXPORT_SYMBOL(nftnl_batch_iovec);

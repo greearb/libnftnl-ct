@@ -324,8 +324,8 @@ static int nftnl_trace_parse_verdict(const struct nlattr *attr,
 	}
 	return 0;
 }
-EXPORT_SYMBOL(nftnl_trace_nlmsg_parse);
 
+EXPORT_SYMBOL(nftnl_trace_nlmsg_parse);
 int nftnl_trace_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_trace *t)
 {
 	struct nfgenmsg *nfg = mnl_nlmsg_get_payload(nlh);
