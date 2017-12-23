@@ -32,6 +32,7 @@ struct nftnl_table {
 	const char	*name;
 	uint32_t	family;
 	uint32_t	table_flags;
+	uint64_t 	handle;
 	uint32_t	use;
 	uint32_t	flags;
 };
@@ -68,6 +69,7 @@ void nftnl_table_unset(struct nftnl_table *t, uint16_t attr)
 		xfree(t->name);
 		break;
 	case NFTNL_TABLE_FLAGS:
+	case NFTNL_TABLE_HANDLE:
 	case NFTNL_TABLE_FAMILY:
 		break;
 	case NFTNL_TABLE_USE:
@@ -79,6 +81,7 @@ void nftnl_table_unset(struct nftnl_table *t, uint16_t attr)
 static uint32_t nftnl_table_validate[NFTNL_TABLE_MAX + 1] = {
 	[NFTNL_TABLE_FLAGS]	= sizeof(uint32_t),
 	[NFTNL_TABLE_FAMILY]	= sizeof(uint32_t),
+	[NFTNL_TABLE_HANDLE]	= sizeof(uint64_t),
 };
 
 EXPORT_SYMBOL(nftnl_table_set_data);
@@ -96,6 +99,9 @@ int nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
 		t->name = strdup(data);
 		if (!t->name)
 			return -1;
+		break;
+	case NFTNL_TABLE_HANDLE:
+		t->handle = *((uint64_t *)data);
 		break;
 	case NFTNL_TABLE_FLAGS:
 		t->table_flags = *((uint32_t *)data);
@@ -123,6 +129,12 @@ void nftnl_table_set_u32(struct nftnl_table *t, uint16_t attr, uint32_t val)
 	nftnl_table_set_data(t, attr, &val, sizeof(uint32_t));
 }
 
+EXPORT_SYMBOL(nftnl_table_set_u64);
+void nftnl_table_set_u64(struct nftnl_table *t, uint16_t attr, uint64_t val)
+{
+	nftnl_table_set_data(t, attr, &val, sizeof(uint64_t));
+}
+
 EXPORT_SYMBOL(nftnl_table_set_u8);
 void nftnl_table_set_u8(struct nftnl_table *t, uint16_t attr, uint8_t val)
 {
@@ -146,6 +158,9 @@ const void *nftnl_table_get_data(const struct nftnl_table *t, uint16_t attr,
 	case NFTNL_TABLE_NAME:
 		*data_len = strlen(t->name) + 1;
 		return t->name;
+	case NFTNL_TABLE_HANDLE:
+		*data_len = sizeof(uint64_t);
+		return &t->handle;
 	case NFTNL_TABLE_FLAGS:
 		*data_len = sizeof(uint32_t);
 		return &t->table_flags;
@@ -173,6 +188,13 @@ uint32_t nftnl_table_get_u32(const struct nftnl_table *t, uint16_t attr)
 	return ret == NULL ? 0 : *((uint32_t *)ret);
 }
 
+EXPORT_SYMBOL(nftnl_table_get_u64);
+uint64_t nftnl_table_get_u64(const struct nftnl_table *t, uint16_t attr)
+{
+	const void *ret = nftnl_table_get(t, attr);
+	return ret == NULL ? 0 : *((uint64_t *)ret);
+}
+
 EXPORT_SYMBOL(nftnl_table_get_u8);
 uint8_t nftnl_table_get_u8(const struct nftnl_table *t, uint16_t attr)
 {
@@ -191,6 +213,8 @@ void nftnl_table_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_ta
 {
 	if (t->flags & (1 << NFTNL_TABLE_NAME))
 		mnl_attr_put_strz(nlh, NFTA_TABLE_NAME, t->name);
+	if (t->flags & (1 << NFTNL_TABLE_HANDLE))
+		mnl_attr_put_u64(nlh, NFTA_TABLE_HANDLE, htobe64(t->handle));
 	if (t->flags & (1 << NFTNL_TABLE_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_TABLE_FLAGS, htonl(t->table_flags));
 }
@@ -206,6 +230,10 @@ static int nftnl_table_parse_attr_cb(const struct nlattr *attr, void *data)
 	switch(type) {
 	case NFTA_TABLE_NAME:
 		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
+		break;
+	case NFTA_TABLE_HANDLE:
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
 			abi_breakage();
 		break;
 	case NFTA_TABLE_FLAGS:
@@ -243,6 +271,10 @@ int nftnl_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_table *t)
 	if (tb[NFTA_TABLE_USE]) {
 		t->use = ntohl(mnl_attr_get_u32(tb[NFTA_TABLE_USE]));
 		t->flags |= (1 << NFTNL_TABLE_USE);
+	}
+	if (tb[NFTA_TABLE_HANDLE]) {
+		t->handle = be64toh(mnl_attr_get_u64(tb[NFTA_TABLE_HANDLE]));
+		t->flags |= (1 << NFTNL_TABLE_HANDLE);
 	}
 
 	t->family = nfg->nfgen_family;
@@ -358,6 +390,8 @@ static int nftnl_table_export(char *buf, size_t size,
 		nftnl_buf_u32(&b, type, t->table_flags, FLAGS);
 	if (t->flags & (1 << NFTNL_TABLE_USE))
 		nftnl_buf_u32(&b, type, t->use, USE);
+	if (t->flags & (1 << NFTNL_TABLE_HANDLE))
+		nftnl_buf_u64(&b, type, t->handle, HANDLE);
 
 	nftnl_buf_close(&b, type, TABLE);
 
@@ -367,9 +401,9 @@ static int nftnl_table_export(char *buf, size_t size,
 static int nftnl_table_snprintf_default(char *buf, size_t size,
 					const struct nftnl_table *t)
 {
-	return snprintf(buf, size, "table %s %s flags %x use %d",
+	return snprintf(buf, size, "table %s %s flags %x use %d handle %llu",
 			t->name, nftnl_family2str(t->family),
-			t->table_flags, t->use);
+			t->table_flags, t->use, (unsigned long long)t->handle);
 }
 
 static int nftnl_table_cmd_snprintf(char *buf, size_t size,

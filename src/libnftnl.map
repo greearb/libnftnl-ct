@@ -8,9 +8,11 @@ global:
   nftnl_table_get;
   nftnl_table_set_u8;
   nftnl_table_set_u32;
+  nftnl_table_set_u64;
   nftnl_table_set_str;
   nftnl_table_get_u8;
   nftnl_table_get_u32;
+  nftnl_table_get_u64;
   nftnl_table_get_str;
   nftnl_table_parse;
   nftnl_table_parse_file;
