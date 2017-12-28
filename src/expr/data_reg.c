@@ -59,14 +59,15 @@ static int nftnl_data_reg_verdict_json_parse(union nftnl_data_reg *reg, json_t *
 static int nftnl_data_reg_value_json_parse(union nftnl_data_reg *reg, json_t *data,
 					 struct nftnl_parse_err *err)
 {
-	int i;
-	char node_name[6];
+	char node_name[8] = {};	/* strlen("data256") + 1 == 8 */
+	int ret, remain = sizeof(node_name), offset = 0, i;
 
 	if (nftnl_jansson_parse_val(data, "len", NFTNL_TYPE_U8, &reg->len, err) < 0)
 			return DATA_NONE;
 
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		sprintf(node_name, "data%d", i);
+		ret = snprintf(node_name, sizeof(node_name), "data%u", i);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		if (nftnl_jansson_str2num(data, node_name, BASE_HEX,
 					&reg->val[i], NFTNL_TYPE_U32, err) != 0)
