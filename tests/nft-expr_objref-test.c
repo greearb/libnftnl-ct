@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	char buf[4096];
 	struct nftnl_expr_iter *iter_a, *iter_b;
 	struct nftnl_expr *rule_a, *rule_b;
-	char *name = "test_set_01243";
+	const char *name = "test_set_01243";
 
 	a = nftnl_rule_alloc();
 	b = nftnl_rule_alloc();
