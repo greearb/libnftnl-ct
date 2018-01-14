@@ -78,6 +78,7 @@ void nftnl_set_unset(struct nftnl_set *s, uint16_t attr)
 	case NFTNL_SET_NAME:
 		xfree(s->name);
 		break;
+	case NFTNL_SET_HANDLE:
 	case NFTNL_SET_FLAGS:
 	case NFTNL_SET_KEY_TYPE:
 	case NFTNL_SET_KEY_LEN:
@@ -102,6 +103,7 @@ void nftnl_set_unset(struct nftnl_set *s, uint16_t attr)
 }
 
 static uint32_t nftnl_set_validate[NFTNL_SET_MAX + 1] = {
+	[NFTNL_SET_HANDLE]		= sizeof(uint64_t),
 	[NFTNL_SET_FLAGS]		= sizeof(uint32_t),
 	[NFTNL_SET_KEY_TYPE]		= sizeof(uint32_t),
 	[NFTNL_SET_KEY_LEN]		= sizeof(uint32_t),
@@ -138,6 +140,9 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 		s->name = strdup(data);
 		if (!s->name)
 			return -1;
+		break;
+	case NFTNL_SET_HANDLE:
+		s->handle = *((uint64_t *)data);
 		break;
 	case NFTNL_SET_FLAGS:
 		s->set_flags = *((uint32_t *)data);
@@ -228,6 +233,9 @@ const void *nftnl_set_get_data(const struct nftnl_set *s, uint16_t attr,
 	case NFTNL_SET_NAME:
 		*data_len = strlen(s->name) + 1;
 		return s->name;
+	case NFTNL_SET_HANDLE:
+		*data_len = sizeof(uint64_t);
+		return &s->handle;
 	case NFTNL_SET_FLAGS:
 		*data_len = sizeof(uint32_t);
 		return &s->set_flags;
@@ -360,6 +368,8 @@ void nftnl_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set *s)
 		mnl_attr_put_strz(nlh, NFTA_SET_TABLE, s->table);
 	if (s->flags & (1 << NFTNL_SET_NAME))
 		mnl_attr_put_strz(nlh, NFTA_SET_NAME, s->name);
+	if (s->handle & (1 << NFTNL_SET_HANDLE))
+		mnl_attr_put_u64(nlh, NFTA_SET_HANDLE, htobe64(s->handle));
 	if (s->flags & (1 << NFTNL_SET_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_SET_FLAGS, htonl(s->set_flags));
 	if (s->flags & (1 << NFTNL_SET_KEY_TYPE))
@@ -400,6 +410,10 @@ static int nftnl_set_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_SET_TABLE:
 	case NFTA_SET_NAME:
 		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
+		break;
+	case NFTA_SET_HANDLE:
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
 			abi_breakage();
 		break;
 	case NFTA_SET_FLAGS:
@@ -491,6 +505,10 @@ int nftnl_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		if (!s->name)
 			return -1;
 		s->flags |= (1 << NFTNL_SET_NAME);
+	}
+	if (tb[NFTA_SET_HANDLE]) {
+		s->handle = be64toh(mnl_attr_get_u64(tb[NFTA_SET_HANDLE]));
+		s->flags |= (1 << NFTNL_SET_HANDLE);
 	}
 	if (tb[NFTA_SET_FLAGS]) {
 		s->set_flags = ntohl(mnl_attr_get_u32(tb[NFTA_SET_FLAGS]));

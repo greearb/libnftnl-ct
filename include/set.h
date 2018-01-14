@@ -10,6 +10,7 @@ struct nftnl_set {
 	uint32_t		set_flags;
 	const char		*table;
 	const char		*name;
+	uint64_t		handle;
 	uint32_t		key_type;
 	uint32_t		key_len;
 	uint32_t		data_type;
