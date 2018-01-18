@@ -66,6 +66,7 @@ bool nftnl_obj_is_set(const struct nftnl_obj *obj, uint16_t attr)
 static uint32_t nftnl_obj_validate[NFTNL_OBJ_MAX + 1] = {
 	[NFTNL_OBJ_FAMILY]	= sizeof(uint32_t),
 	[NFTNL_OBJ_USE]		= sizeof(uint32_t),
+	[NFTNL_OBJ_HANDLE]	= sizeof(uint64_t),
 };
 
 EXPORT_SYMBOL(nftnl_obj_set_data);
@@ -94,6 +95,9 @@ void nftnl_obj_set_data(struct nftnl_obj *obj, uint16_t attr,
 		break;
 	case NFTNL_OBJ_USE:
 		obj->use = *((uint32_t *)data);
+		break;
+	case NFTNL_OBJ_HANDLE:
+		obj->handle = *((uint64_t *)data);
 		break;
 	default:
 		if (obj->ops)
@@ -163,6 +167,9 @@ const void *nftnl_obj_get_data(struct nftnl_obj *obj, uint16_t attr,
 	case NFTNL_OBJ_USE:
 		*data_len = sizeof(uint32_t);
 		return &obj->use;
+	case NFTNL_OBJ_HANDLE:
+		*data_len = sizeof(uint64_t);
+		return &obj->handle;
 	default:
 		if (obj->ops)
 			return obj->ops->get(obj, attr, data_len);
@@ -222,7 +229,8 @@ void nftnl_obj_nlmsg_build_payload(struct nlmsghdr *nlh,
 		mnl_attr_put_strz(nlh, NFTA_OBJ_NAME, obj->name);
 	if (obj->flags & (1 << NFTNL_OBJ_TYPE))
 		mnl_attr_put_u32(nlh, NFTA_OBJ_TYPE, htonl(obj->ops->type));
-
+	if (obj->flags & (1 << NFTNL_OBJ_HANDLE))
+		mnl_attr_put_u64(nlh, NFTA_OBJ_HANDLE, htobe64(obj->handle));
 	if (obj->ops) {
 		struct nlattr *nest = mnl_attr_nest_start(nlh, NFTA_OBJ_DATA);
 
@@ -243,6 +251,10 @@ static int nftnl_obj_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_OBJ_TABLE:
 	case NFTA_OBJ_NAME:
 		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
+			abi_breakage();
+		break;
+	case NFTA_OBJ_HANDLE:
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
 			abi_breakage();
 		break;
 	case NFTA_OBJ_DATA:
@@ -294,6 +306,10 @@ int nftnl_obj_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_obj *obj)
 	if (tb[NFTA_OBJ_USE]) {
 		obj->use = ntohl(mnl_attr_get_u32(tb[NFTA_OBJ_USE]));
 		obj->flags |= (1 << NFTNL_OBJ_USE);
+	}
+	if (tb[NFTA_OBJ_HANDLE]) {
+		obj->handle = be64toh(mnl_attr_get_u64(tb[NFTA_OBJ_HANDLE]));
+		obj->flags |= (1 << NFTNL_OBJ_HANDLE);
 	}
 
 	obj->family = nfg->nfgen_family;
@@ -409,6 +425,8 @@ static int nftnl_obj_export(char *buf, size_t size,
 		nftnl_buf_str(&b, type, nftnl_family2str(obj->family), FAMILY);
 	if (obj->flags & (1 << NFTNL_OBJ_USE))
 		nftnl_buf_u32(&b, type, obj->use, USE);
+	if (obj->flags & (1 << NFTNL_OBJ_HANDLE))
+		nftnl_buf_u64(&b, type, obj->handle, HANDLE);
 
 	if (obj->ops)
 		ret = obj->ops->snprintf(buf + b.len, size - b.len, type,

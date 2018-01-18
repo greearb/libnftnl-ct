@@ -19,6 +19,7 @@ struct nftnl_obj {
 	uint32_t		use;
 
 	uint32_t		flags;
+	uint64_t		handle;
 
 	union {
 		struct nftnl_obj_counter {
