@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, rule_seq;
 	struct nftnl_rule *r;
-	int ret, batching;
+	int ret;
 	uint16_t family, format, outformat;
 
 	if (argc < 3) {
@@ -103,19 +103,11 @@ int main(int argc, char *argv[])
 	nftnl_rule_fprintf(stdout, r, outformat, 0);
 	fprintf(stdout, "\n");
 
-	batching = nftnl_batch_is_supported();
-	if (batching < 0) {
-		perror("Cannot talk to nfnetlink");
-		exit(EXIT_FAILURE);
-	}
-
 	seq = time(NULL);
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	if (batching) {
-		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	rule_seq = seq;
 	family = nftnl_rule_get_u32(r, NFTNL_RULE_FAMILY);
@@ -127,10 +119,8 @@ int main(int argc, char *argv[])
 	nftnl_rule_free(r);
 	mnl_nlmsg_batch_next(batch);
 
-	if (batching) {
-		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

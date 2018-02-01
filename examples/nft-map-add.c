@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 	uint8_t family;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	uint32_t seq = time(NULL);
-	int ret, batching;
+	int ret;
 
 	if (argc != 4) {
 		fprintf(stderr, "Usage: %s <family> <table> <setname>\n", argv[0]);
@@ -96,18 +96,10 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	batching = nftnl_batch_is_supported();
-	if (batching < 0) {
-		perror("cannot talk to nfnetlink");
-		exit(EXIT_FAILURE);
-	}
-
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	if (batching) {
-		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nlh = nftnl_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				      NFT_MSG_NEWSET, family,
@@ -117,10 +109,8 @@ int main(int argc, char *argv[])
 	nftnl_set_free(s);
 	mnl_nlmsg_batch_next(batch);
 
-	if (batching) {
-		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	ret = mnl_socket_sendto(nl, mnl_nlmsg_batch_head(batch),
 				mnl_nlmsg_batch_size(batch));

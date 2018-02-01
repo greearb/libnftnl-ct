@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	struct mnl_nlmsg_batch *batch;
 	uint32_t portid, seq;
 	struct nftnl_rule *r = NULL;
-	int ret, batching, family;
+	int ret, family;
 
 	if (argc < 4 || argc > 5) {
 		fprintf(stderr, "Usage: %s <family> <table> <chain> [<handle>]\n",
@@ -65,18 +65,10 @@ int main(int argc, char *argv[])
 	if (argc == 5)
 		nftnl_rule_set_u64(r, NFTNL_RULE_HANDLE, atoi(argv[4]));
 
-	batching = nftnl_batch_is_supported();
-	if (batching < 0) {
-		perror("cannot talk to nfnetlink");
-		exit(EXIT_FAILURE);
-	}
-
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	if (batching) {
-		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
 				NFT_MSG_DELRULE,
@@ -87,10 +79,8 @@ int main(int argc, char *argv[])
 	nftnl_rule_free(r);
 	mnl_nlmsg_batch_next(batch);
 
-	if (batching) {
-		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

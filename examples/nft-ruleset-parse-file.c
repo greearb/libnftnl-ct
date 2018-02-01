@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
 	struct nftnl_parse_err *err;
 	const char *filename;
 	FILE *fp;
-	int ret = -1, len, batching, portid;
+	int ret = -1, len, portid;
 	uint32_t ruleset_seq;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct mnl_socket *nl;
@@ -402,19 +402,11 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	batching = nftnl_batch_is_supported();
-	if (batching < 0) {
-		perror("Cannot talk to nfnetlink");
-		exit(EXIT_FAILURE);
-	}
-
 	seq = time(NULL);
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	if (batching) {
-		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 	ruleset_seq = seq;
 
 	filename = argv[1];
@@ -435,10 +427,8 @@ int main(int argc, char *argv[])
 
 	fclose(fp);
 
-	if (batching) {
-		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

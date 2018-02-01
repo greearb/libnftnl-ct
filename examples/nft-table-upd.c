@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	uint32_t portid, seq, table_seq, family, flags;
 	struct nftnl_table *t = NULL;
 	struct mnl_nlmsg_batch *batch;
-	int ret, batching;
+	int ret;
 
 	if (argc != 4) {
 		fprintf(stderr, "%s <family> <name> <state>\n", argv[0]);
@@ -41,19 +41,11 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	batching = nftnl_batch_is_supported();
-	if (batching < 0) {
-		perror("cannot talk to nfnetlink");
-		exit(EXIT_FAILURE);
-	}
-
 	seq = time(NULL);
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	if (batching) {
-		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	if (strcmp(argv[1], "ip") == 0)
 		family = NFPROTO_IPV4;
@@ -91,10 +83,8 @@ int main(int argc, char *argv[])
 	nftnl_table_free(t);
 	mnl_nlmsg_batch_next(batch);
 
-	if (batching) {
-		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

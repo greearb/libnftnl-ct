@@ -75,9 +75,9 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, table_seq;
 	struct nftnl_table *t = NULL;
-	int ret, batching;
 	uint16_t family, format, outformat;
 	struct mnl_nlmsg_batch *batch;
+	int ret;
 
 	if (argc < 3) {
 		printf("Usage: %s {json} <file>\n", argv[0]);
@@ -100,18 +100,11 @@ int main(int argc, char *argv[])
 	fprintf(stdout, "\n");
 
 	seq = time(NULL);
-	batching = nftnl_batch_is_supported();
-	if (batching < 0) {
-		perror("cannot talk to nfnetlink");
-		exit(EXIT_FAILURE);
-	}
 
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	if (batching) {
-		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	family = nftnl_table_get_u32(t, NFTNL_TABLE_FAMILY);
 
@@ -123,10 +116,8 @@ int main(int argc, char *argv[])
 	nftnl_table_free(t);
 	mnl_nlmsg_batch_next(batch);
 
-	if (batching) {
-		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
