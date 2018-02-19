@@ -9,6 +9,7 @@ check_PROGRAMS = 	nft-parsing-test		\
 			nft-object-test			\
 			nft-rule-test			\
 			nft-set-test			\
+			nft-flowtable-test		\
 			nft-expr_bitwise-test		\
 			nft-expr_byteorder-test		\
 			nft-expr_counter-test		\
@@ -53,6 +54,9 @@ nft_rule_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_set_test_SOURCES = nft-set-test.c
 nft_set_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
+nft_flowtable_test_SOURCES = nft-flowtable-test.c
+nft_flowtable_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_expr_bitwise_test_SOURCES = nft-expr_bitwise-test.c
 nft_expr_bitwise_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
