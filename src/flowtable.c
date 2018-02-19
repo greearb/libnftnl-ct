@@ -26,6 +26,7 @@ struct nftnl_flowtable {
 	int			family;
 	uint32_t		hooknum;
 	int32_t			prio;
+	uint32_t		size;
 	const char		**dev_array;
 	uint32_t		dev_array_len;
 	uint32_t		use;
@@ -157,6 +158,9 @@ int nftnl_flowtable_set_data(struct nftnl_flowtable *c, uint16_t attr,
 
 		c->dev_array_len = len;
 		break;
+	case NFTNL_FLOWTABLE_SIZE:
+		memcpy(&c->size, data, sizeof(c->size));
+		break;
 	}
 	c->flags |= (1 << attr);
 	return 0;
@@ -217,6 +221,9 @@ const void *nftnl_flowtable_get_data(const struct nftnl_flowtable *c,
 		return &c->family;
 	case NFTNL_FLOWTABLE_DEVICES:
 		return &c->dev_array[0];
+	case NFTNL_FLOWTABLE_SIZE:
+		*data_len = sizeof(int32_t);
+		return &c->size;
 	}
 	return NULL;
 }
@@ -293,6 +300,8 @@ void nftnl_flowtable_nlmsg_build_payload(struct nlmsghdr *nlh,
 	}
 	if (c->flags & (1 << NFTNL_FLOWTABLE_USE))
 		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_USE, htonl(c->use));
+	if (c->flags & (1 << NFTNL_FLOWTABLE_SIZE))
+		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_SIZE, htonl(c->size));
 }
 EXPORT_SYMBOL(nftnl_flowtable_nlmsg_build_payload);
 
@@ -438,6 +447,10 @@ int nftnl_flowtable_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_flowtab
 		c->use = ntohl(mnl_attr_get_u32(tb[NFTA_FLOWTABLE_USE]));
 		c->flags |= (1 << NFTNL_FLOWTABLE_USE);
 	}
+	if (tb[NFTA_FLOWTABLE_SIZE]) {
+		c->size = ntohl(mnl_attr_get_u32(tb[NFTA_FLOWTABLE_SIZE]));
+		c->flags |= (1 << NFTNL_FLOWTABLE_SIZE);
+	}
 
 	c->family = nfg->nfgen_family;
 	c->flags |= (1 << NFTNL_FLOWTABLE_FAMILY);
@@ -504,6 +517,7 @@ static int nftnl_jansson_parse_flowtable(struct nftnl_flowtable *c,
 {
 	const char *name, *table, *hooknum_str;
 	int32_t family, prio, hooknum;
+	uint32_t size;
 	json_t *root;
 
 	root = nftnl_jansson_get_node(tree, "flowtable", err);
@@ -536,6 +550,9 @@ static int nftnl_jansson_parse_flowtable(struct nftnl_flowtable *c,
 					       hooknum);
 		}
 	}
+	if (nftnl_jansson_parse_val(root, "size", NFTNL_TYPE_U32,
+				    &size, err) == 0)
+		nftnl_flowtable_set_u32(c, NFTNL_FLOWTABLE_SIZE, size);
 
 	return 0;
 }
@@ -628,6 +645,8 @@ static int nftnl_flowtable_export(char *buf, size_t size,
 		if (c->flags & (1 << NFTNL_FLOWTABLE_PRIO))
 			nftnl_buf_s32(&b, type, c->prio, PRIO);
 	}
+	if (c->flags & (1 << NFTNL_FLOWTABLE_SIZE))
+		nftnl_buf_u32(&b, type, c->size, SIZE);
 
 	nftnl_buf_close(&b, type, CHAIN);
 
@@ -639,8 +658,8 @@ static int nftnl_flowtable_snprintf_default(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0, i;
 
-	ret = snprintf(buf, remain, "flow table %s %s use %u",
-		       c->table, c->name, c->use);
+	ret = snprintf(buf, remain, "flow table %s %s use %u size %u",
+		       c->table, c->name, c->use, c->size);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (c->flags & (1 << NFTNL_FLOWTABLE_HOOKNUM)) {
