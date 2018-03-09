@@ -32,7 +32,7 @@ struct nftnl_expr_ct {
 #define IP_CT_DIR_REPLY		1
 
 #ifndef NFT_CT_MAX
-#define NFT_CT_MAX (NFT_CT_EVENTMASK + 1)
+#define NFT_CT_MAX (NFT_CT_DST_IP6 + 1)
 #endif
 
 static int
@@ -172,6 +172,10 @@ static const char *ctkey2str_array[NFT_CT_MAX] = {
 	[NFT_CT_AVGPKT]		= "avgpkt",
 	[NFT_CT_ZONE]		= "zone",
 	[NFT_CT_EVENTMASK]	= "event",
+	[NFT_CT_SRC_IP]		= "src_ip",
+	[NFT_CT_DST_IP]		= "dst_ip",
+	[NFT_CT_SRC_IP6]	= "src_ip6",
+	[NFT_CT_DST_IP6]	= "dst_ip6",
 };
 
 static const char *ctkey2str(uint32_t ctkey)
