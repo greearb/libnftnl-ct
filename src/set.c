@@ -368,7 +368,7 @@ void nftnl_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set *s)
 		mnl_attr_put_strz(nlh, NFTA_SET_TABLE, s->table);
 	if (s->flags & (1 << NFTNL_SET_NAME))
 		mnl_attr_put_strz(nlh, NFTA_SET_NAME, s->name);
-	if (s->handle & (1 << NFTNL_SET_HANDLE))
+	if (s->flags & (1 << NFTNL_SET_HANDLE))
 		mnl_attr_put_u64(nlh, NFTA_SET_HANDLE, htobe64(s->handle));
 	if (s->flags & (1 << NFTNL_SET_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_SET_FLAGS, htonl(s->set_flags));
