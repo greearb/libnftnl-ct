@@ -322,12 +322,10 @@ LIBNFTNL_7 {
   nftnl_flowtable_set;
   nftnl_flowtable_set_u32;
   nftnl_flowtable_set_s32;
-  nftnl_flowtable_set_array;
   nftnl_flowtable_set_str;
   nftnl_flowtable_get;
   nftnl_flowtable_get_u32;
   nftnl_flowtable_get_s32;
-  nftnl_flowtable_get_array;
   nftnl_flowtable_get_str;
   nftnl_flowtable_parse;
   nftnl_flowtable_parse_file;

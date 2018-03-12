@@ -178,12 +178,6 @@ void nftnl_flowtable_set(struct nftnl_flowtable *c, uint16_t attr, const void *d
 }
 EXPORT_SYMBOL(nftnl_flowtable_set);
 
-void nftnl_flowtable_set_array(struct nftnl_flowtable *c, uint16_t attr, const char **data)
-{
-	nftnl_flowtable_set_data(c, attr, &data[0], nftnl_flowtable_validate[attr]);
-}
-EXPORT_SYMBOL(nftnl_flowtable_set_array);
-
 void nftnl_flowtable_set_u32(struct nftnl_flowtable *c, uint16_t attr, uint32_t data)
 {
 	nftnl_flowtable_set_data(c, attr, &data, sizeof(uint32_t));
@@ -271,12 +265,6 @@ int32_t nftnl_flowtable_get_s32(const struct nftnl_flowtable *c, uint16_t attr)
 	return val ? *val : 0;
 }
 EXPORT_SYMBOL(nftnl_flowtable_get_s32);
-
-const char **nftnl_flowtable_get_array(const struct nftnl_flowtable *c, uint16_t attr)
-{
-	return (const char **)nftnl_flowtable_get(c, attr);
-}
-EXPORT_SYMBOL(nftnl_flowtable_get_array);
 
 void nftnl_flowtable_nlmsg_build_payload(struct nlmsghdr *nlh,
 					 const struct nftnl_flowtable *c)
