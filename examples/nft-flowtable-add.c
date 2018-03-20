@@ -33,7 +33,7 @@ static struct nftnl_flowtable *flowtable_add_parse(int argc, char *argv[])
 		nftnl_flowtable_set_u32(t, NFTNL_FLOWTABLE_HOOKNUM, hooknum);
 		nftnl_flowtable_set_u32(t, NFTNL_FLOWTABLE_PRIO, atoi(argv[5]));
 	}
-	nftnl_flowtable_set_array(t, NFTNL_FLOWTABLE_DEVICES, dev_array);
+	nftnl_flowtable_set(t, NFTNL_FLOWTABLE_DEVICES, dev_array);
 
 	return t;
 }
