@@ -225,8 +225,8 @@ static int nftnl_expr_objref_snprintf_default(char *buf, size_t len,
 	struct nftnl_expr_objref *objref = nftnl_expr_data(e);
 
 	if (e->flags & (1 << NFTNL_EXPR_OBJREF_SET_SREG))
-		return snprintf(buf, len, "sreg %u set %s id %u ",
-				objref->set.sreg, objref->set.name, objref->set.id);
+		return snprintf(buf, len, "sreg %u set %s ",
+				objref->set.sreg, objref->set.name);
 	else
 		return snprintf(buf, len, "type %u name %s ",
 				objref->imm.type, objref->imm.name);
