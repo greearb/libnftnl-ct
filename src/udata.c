@@ -74,7 +74,7 @@ bool nftnl_udata_put(struct nftnl_udata_buf *buf, uint8_t type, uint32_t len,
 {
 	struct nftnl_udata *attr;
 
-	if (buf->size < len + sizeof(struct nftnl_udata))
+	if (len > UINT8_MAX || buf->size < len + sizeof(struct nftnl_udata))
 		return false;
 
 	attr = (struct nftnl_udata *)buf->end;
