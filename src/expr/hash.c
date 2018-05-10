@@ -28,6 +28,10 @@ struct nftnl_expr_hash {
 	unsigned int		modulus;
 	unsigned int		seed;
 	unsigned int		offset;
+	struct {
+		const char	*name;
+		uint32_t	id;
+	} map;
 };
 
 static int
@@ -56,6 +60,14 @@ nftnl_expr_hash_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_HASH_TYPE:
 		hash->type = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_HASH_SET_NAME:
+		hash->map.name = strdup(data);
+		if (!hash->map.name)
+			return -1;
+		break;
+	case NFTNL_EXPR_HASH_SET_ID:
+		hash->map.id = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -91,6 +103,12 @@ nftnl_expr_hash_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_HASH_TYPE:
 		*data_len = sizeof(hash->type);
 		return &hash->type;
+	case NFTNL_EXPR_HASH_SET_NAME:
+		*data_len = strlen(hash->map.name) + 1;
+		return hash->map.name;
+	case NFTNL_EXPR_HASH_SET_ID:
+		*data_len = sizeof(hash->map.id);
+		return &hash->map.id;
 	}
 	return NULL;
 }
@@ -111,7 +129,12 @@ static int nftnl_expr_hash_cb(const struct nlattr *attr, void *data)
 	case NFTA_HASH_SEED:
 	case NFTA_HASH_OFFSET:
 	case NFTA_HASH_TYPE:
+	case NFTA_HASH_SET_ID:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
+		break;
+	case NFTA_HASH_SET_NAME:
+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
 			abi_breakage();
 		break;
 	}
@@ -139,6 +162,10 @@ nftnl_expr_hash_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_HASH_OFFSET, htonl(hash->offset));
 	if (e->flags & (1 << NFTNL_EXPR_HASH_TYPE))
 		mnl_attr_put_u32(nlh, NFTA_HASH_TYPE, htonl(hash->type));
+	if (e->flags & (1 << NFTNL_EXPR_HASH_SET_NAME))
+		mnl_attr_put_str(nlh, NFTA_HASH_SET_NAME, hash->map.name);
+	if (e->flags & (1 << NFTNL_EXPR_HASH_SET_ID))
+		mnl_attr_put_u32(nlh, NFTA_HASH_SET_ID, htonl(hash->map.id));
 }
 
 static int
@@ -178,6 +205,16 @@ nftnl_expr_hash_parse(struct nftnl_expr *e, struct nlattr *attr)
 	if (tb[NFTA_HASH_TYPE]) {
 		hash->type = ntohl(mnl_attr_get_u32(tb[NFTA_HASH_TYPE]));
 		e->flags |= (1 << NFTNL_EXPR_HASH_TYPE);
+	}
+	if (tb[NFTA_HASH_SET_NAME]) {
+		hash->map.name =
+			  strdup(mnl_attr_get_str(tb[NFTA_HASH_SET_NAME]));
+		e->flags |= (1 << NFTNL_EXPR_HASH_SET_NAME);
+	}
+	if (tb[NFTA_HASH_SET_ID]) {
+		hash->map.id =
+			  ntohl(mnl_attr_get_u32(tb[NFTA_HASH_SET_ID]));
+		e->flags |= (1 << NFTNL_EXPR_HASH_SET_ID);
 	}
 
 	return ret;
@@ -256,6 +293,12 @@ nftnl_expr_hash_snprintf_default(char *buf, size_t size,
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
+	if (hash->map.id) {
+		ret = snprintf(buf + offset, remain, "set %s id %u ",
+			       hash->map.name, hash->map.id);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+	}
+
 	return offset;
 }
 
@@ -280,6 +323,8 @@ static int nftnl_expr_hash_export(char *buf, size_t size,
 		nftnl_buf_u32(&b, type, hash->offset, OFFSET);
 	if (e->flags & (1 << NFTNL_EXPR_HASH_TYPE))
 		nftnl_buf_u32(&b, type, hash->type, TYPE);
+	if (e->flags & (1 << NFTNL_EXPR_HASH_SET_NAME))
+		nftnl_buf_str(&b, type, hash->map.name, SET);
 
 	return nftnl_buf_done(&b);
 }
@@ -321,6 +366,10 @@ static bool nftnl_expr_hash_cmp(const struct nftnl_expr *e1,
 		eq &= (h1->offset == h2->offset);
 	if (e1->flags & (1 << NFTNL_EXPR_HASH_TYPE))
 		eq &= (h1->type == h2->type);
+	if (e1->flags & (1 << NFTNL_EXPR_HASH_SET_NAME))
+		eq &= !strcmp(h1->map.name, h2->map.name);
+	if (e1->flags & (1 << NFTNL_EXPR_HASH_SET_ID))
+		eq &= (h1->map.id == h2->map.id);
 
        return eq;
 }
