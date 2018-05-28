@@ -31,10 +31,6 @@ struct nftnl_expr_ct {
 #define IP_CT_DIR_ORIGINAL	0
 #define IP_CT_DIR_REPLY		1
 
-#ifndef NFT_CT_MAX
-#define NFT_CT_MAX (NFT_CT_DST_IP6 + 1)
-#endif
-
 static int
 nftnl_expr_ct_set(struct nftnl_expr *e, uint16_t type,
 		       const void *data, uint32_t data_len)
@@ -152,7 +148,7 @@ nftnl_expr_ct_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static const char *ctkey2str_array[NFT_CT_MAX] = {
+static const char *ctkey2str_array[NFT_CT_MAX + 1] = {
 	[NFT_CT_STATE]		= "state",
 	[NFT_CT_DIRECTION]	= "direction",
 	[NFT_CT_STATUS]		= "status",

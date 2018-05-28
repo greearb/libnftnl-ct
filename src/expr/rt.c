@@ -19,10 +19,6 @@
 #include <libnftnl/expr.h>
 #include <libnftnl/rule.h>
 
-#ifndef NFT_RT_MAX
-#define NFT_RT_MAX (NFT_RT_TCPMSS + 1)
-#endif
-
 struct nftnl_expr_rt {
 	enum nft_rt_keys	key;
 	enum nft_registers	dreg;
@@ -116,7 +112,7 @@ nftnl_expr_rt_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static const char *rt_key2str_array[NFT_RT_MAX] = {
+static const char *rt_key2str_array[NFT_RT_MAX + 1] = {
 	[NFT_RT_CLASSID]	= "classid",
 	[NFT_RT_NEXTHOP4]	= "nexthop4",
 	[NFT_RT_NEXTHOP6]	= "nexthop6",

@@ -1,10 +1,12 @@
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 #ifndef _LINUX_NF_TABLES_H
 #define _LINUX_NF_TABLES_H
 
-#define NFT_TABLE_MAXNAMELEN	32
-#define NFT_CHAIN_MAXNAMELEN	32
-#define NFT_SET_MAXNAMELEN	32
-#define NFT_OBJ_MAXNAMELEN	32
+#define NFT_NAME_MAXLEN		256
+#define NFT_TABLE_MAXNAMELEN	NFT_NAME_MAXLEN
+#define NFT_CHAIN_MAXNAMELEN	NFT_NAME_MAXLEN
+#define NFT_SET_MAXNAMELEN	NFT_NAME_MAXLEN
+#define NFT_OBJ_MAXNAMELEN	NFT_NAME_MAXLEN
 #define NFT_USERDATA_MAXLEN	256
 
 /**
@@ -317,7 +319,7 @@ enum nft_set_desc_attributes {
  * @NFTA_SET_GC_INTERVAL: garbage collection interval (NLA_U32)
  * @NFTA_SET_USERDATA: user data (NLA_BINARY)
  * @NFTA_SET_OBJ_TYPE: stateful object type (NLA_U32: NFT_OBJECT_*)
- * @NFTA_SET_HANDLE: numerical table handle (NLA_U64)
+ * @NFTA_SET_HANDLE: set handle (NLA_U64)
  */
 enum nft_set_attributes {
 	NFTA_SET_UNSPEC,
@@ -822,13 +824,16 @@ enum nft_meta_keys {
  * @NFT_RT_CLASSID: realm value of packet's route (skb->dst->tclassid)
  * @NFT_RT_NEXTHOP4: routing nexthop for IPv4
  * @NFT_RT_NEXTHOP6: routing nexthop for IPv6
+ * @NFT_RT_TCPMSS: fetch current path tcp mss
  */
 enum nft_rt_keys {
 	NFT_RT_CLASSID,
 	NFT_RT_NEXTHOP4,
 	NFT_RT_NEXTHOP6,
 	NFT_RT_TCPMSS,
+	__NFT_RT_MAX
 };
+#define NFT_RT_MAX		(__NFT_RT_MAX - 1)
 
 /**
  * enum nft_hash_types - nf_tables hash expression types
@@ -950,7 +955,9 @@ enum nft_ct_keys {
 	NFT_CT_DST_IP,
 	NFT_CT_SRC_IP6,
 	NFT_CT_DST_IP6,
+	__NFT_CT_MAX
 };
+#define NFT_CT_MAX		(__NFT_CT_MAX - 1)
 
 /**
  * enum nft_ct_attributes - nf_tables ct expression netlink attributes
@@ -1259,6 +1266,8 @@ enum nft_objref_attributes {
 enum nft_gen_attributes {
 	NFTA_GEN_UNSPEC,
 	NFTA_GEN_ID,
+	NFTA_GEN_PROC_PID,
+	NFTA_GEN_PROC_NAME,
 	__NFTA_GEN_MAX
 };
 #define NFTA_GEN_MAX		(__NFTA_GEN_MAX - 1)
@@ -1322,10 +1331,10 @@ enum nft_ct_helper_attributes {
  *
  * @NFTA_OBJ_TABLE: name of the table containing the expression (NLA_STRING)
  * @NFTA_OBJ_NAME: name of this expression type (NLA_STRING)
- * @NFTA_OBJ_HANDLE: numeric object handle (NLA_U64)
  * @NFTA_OBJ_TYPE: stateful object type (NLA_U32)
  * @NFTA_OBJ_DATA: stateful object data (NLA_NESTED)
  * @NFTA_OBJ_USE: number of references to this expression (NLA_U32)
+ * @NFTA_OBJ_HANDLE: object handle (NLA_U64)
  */
 enum nft_object_attributes {
 	NFTA_OBJ_UNSPEC,
@@ -1335,6 +1344,7 @@ enum nft_object_attributes {
 	NFTA_OBJ_DATA,
 	NFTA_OBJ_USE,
 	NFTA_OBJ_HANDLE,
+	NFTA_OBJ_PAD,
 	__NFTA_OBJ_MAX
 };
 #define NFTA_OBJ_MAX		(__NFTA_OBJ_MAX - 1)
@@ -1453,7 +1463,7 @@ enum nft_trace_types {
  * @NFTA_NG_TYPE: operation type (NLA_U32)
  * @NFTA_NG_OFFSET: offset to be added to the counter (NLA_U32)
  * @NFTA_NG_SET_NAME: name of the map to lookup (NLA_STRING)
- * @NFTA_NG_SET_ID: if of the map (NLA_U32)
+ * @NFTA_NG_SET_ID: id of the map (NLA_U32)
  */
 enum nft_ng_attributes {
 	NFTA_NG_UNSPEC,
