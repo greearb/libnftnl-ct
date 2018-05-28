@@ -342,3 +342,7 @@ LIBNFTNL_7 {
   nftnl_flowtable_list_foreach;
 
 } LIBNFTNL_6;
+
+LIBNFTNL_8 {
+  nftnl_rule_list_insert_at;
+} LIBNFTNL_7;

@@ -986,6 +986,12 @@ void nftnl_rule_list_add(struct nftnl_rule *r, struct nftnl_rule_list *list)
 	list_add(&r->head, &list->list);
 }
 
+EXPORT_SYMBOL(nftnl_rule_list_insert_at);
+void nftnl_rule_list_insert_at(struct nftnl_rule *r, struct nftnl_rule *pos)
+{
+	list_add(&r->head, &pos->head);
+}
+
 EXPORT_SYMBOL(nftnl_rule_list_add_tail);
 void nftnl_rule_list_add_tail(struct nftnl_rule *r, struct nftnl_rule_list *list)
 {

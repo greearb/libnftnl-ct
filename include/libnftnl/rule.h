@@ -84,6 +84,7 @@ void nftnl_rule_list_free(struct nftnl_rule_list *list);
 int nftnl_rule_list_is_empty(const struct nftnl_rule_list *list);
 void nftnl_rule_list_add(struct nftnl_rule *r, struct nftnl_rule_list *list);
 void nftnl_rule_list_add_tail(struct nftnl_rule *r, struct nftnl_rule_list *list);
+void nftnl_rule_list_insert_at(struct nftnl_rule *r, struct nftnl_rule *pos);
 void nftnl_rule_list_del(struct nftnl_rule *r);
 int nftnl_rule_list_foreach(struct nftnl_rule_list *rule_list, int (*cb)(struct nftnl_rule *t, void *data), void *data);
 
