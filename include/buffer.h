@@ -50,6 +50,7 @@ int nftnl_buf_expr(struct nftnl_buf *b, int type, uint32_t flags,
 #define COMPAT_FLAGS		"compat_flags"
 #define COMPAT_PROTO		"compat_proto"
 #define CONSUMED		"consumed"
+#define COUNT			"count"
 #define DATA			"data"
 #define DEVICE			"device"
 #define DIR			"dir"
