@@ -23,6 +23,8 @@
 
 struct nftnl_expr_fwd {
 	enum nft_registers	sreg_dev;
+	enum nft_registers	sreg_addr;
+	uint32_t		nfproto;
 };
 
 static int nftnl_expr_fwd_set(struct nftnl_expr *e, uint16_t type,
@@ -32,7 +34,13 @@ static int nftnl_expr_fwd_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_FWD_SREG_DEV:
-		fwd->sreg_dev= *((uint32_t *)data);
+		fwd->sreg_dev = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_FWD_SREG_ADDR:
+		fwd->sreg_addr = *((uint32_t *)data);
+		break;
+	case NFTNL_EXPR_FWD_NFPROTO:
+		fwd->nfproto = *((uint32_t *)data);
 		break;
 	default:
 		return -1;
@@ -49,6 +57,12 @@ static const void *nftnl_expr_fwd_get(const struct nftnl_expr *e,
 	case NFTNL_EXPR_FWD_SREG_DEV:
 		*data_len = sizeof(fwd->sreg_dev);
 		return &fwd->sreg_dev;
+	case NFTNL_EXPR_FWD_SREG_ADDR:
+		*data_len = sizeof(fwd->sreg_addr);
+		return &fwd->sreg_addr;
+	case NFTNL_EXPR_FWD_NFPROTO:
+		*data_len = sizeof(fwd->nfproto);
+		return &fwd->nfproto;
 	}
 	return NULL;
 }
@@ -63,6 +77,8 @@ static int nftnl_expr_fwd_cb(const struct nlattr *attr, void *data)
 
 	switch (type) {
 	case NFTA_FWD_SREG_DEV:
+	case NFTA_FWD_SREG_ADDR:
+	case NFTA_FWD_NFPROTO:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -79,6 +95,10 @@ static void nftnl_expr_fwd_build(struct nlmsghdr *nlh,
 
 	if (e->flags & (1 << NFTNL_EXPR_FWD_SREG_DEV))
 		mnl_attr_put_u32(nlh, NFTA_FWD_SREG_DEV, htonl(fwd->sreg_dev));
+	if (e->flags & (1 << NFTNL_EXPR_FWD_SREG_ADDR))
+		mnl_attr_put_u32(nlh, NFTA_FWD_SREG_ADDR, htonl(fwd->sreg_addr));
+	if (e->flags & (1 << NFTNL_EXPR_FWD_NFPROTO))
+		mnl_attr_put_u32(nlh, NFTA_FWD_NFPROTO, htonl(fwd->nfproto));
 }
 
 static int nftnl_expr_fwd_parse(struct nftnl_expr *e, struct nlattr *attr)
@@ -94,6 +114,14 @@ static int nftnl_expr_fwd_parse(struct nftnl_expr *e, struct nlattr *attr)
 		fwd->sreg_dev = ntohl(mnl_attr_get_u32(tb[NFTA_FWD_SREG_DEV]));
 		e->flags |= (1 << NFTNL_EXPR_FWD_SREG_DEV);
 	}
+	if (tb[NFTA_FWD_SREG_ADDR]) {
+		fwd->sreg_addr = ntohl(mnl_attr_get_u32(tb[NFTA_FWD_SREG_ADDR]));
+		e->flags |= (1 << NFTNL_EXPR_FWD_SREG_ADDR);
+	}
+	if (tb[NFTA_FWD_NFPROTO]) {
+		fwd->nfproto = ntohl(mnl_attr_get_u32(tb[NFTA_FWD_NFPROTO]));
+		e->flags |= (1 << NFTNL_EXPR_FWD_NFPROTO);
+	}
 
 	return ret;
 }
@@ -102,12 +130,18 @@ static int nftnl_expr_fwd_json_parse(struct nftnl_expr *e, json_t *root,
 				     struct nftnl_parse_err *err)
 {
 #ifdef JSON_PARSING
-	uint32_t sreg_dev;
+	uint32_t u32val;
 	int ret;
 
-	ret = nftnl_jansson_parse_val(root, "sreg_dev", NFTNL_TYPE_U32, &sreg_dev, err);
+	ret = nftnl_jansson_parse_val(root, "sreg_dev", NFTNL_TYPE_U32, &u32val, err);
 	if (ret >= 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_FWD_SREG_DEV, sreg_dev);
+		nftnl_expr_set_u32(e, NFTNL_EXPR_FWD_SREG_DEV, u32val);
+	ret = nftnl_jansson_parse_val(root, "sreg_addr", NFTNL_TYPE_U32, &u32val, err);
+	if (ret >= 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_FWD_SREG_ADDR, u32val);
+	ret = nftnl_jansson_parse_val(root, "nfproto", NFTNL_TYPE_U32, &u32val, err);
+	if (ret >= 0)
+		nftnl_expr_set_u32(e, NFTNL_EXPR_FWD_NFPROTO, u32val);
 
 	return 0;
 #else
@@ -124,6 +158,10 @@ static int nftnl_expr_fwd_export(char *buf, size_t size,
 
 	if (e->flags & (1 << NFTNL_EXPR_FWD_SREG_DEV))
 		nftnl_buf_u32(&b, type, fwd->sreg_dev, "sreg_dev");
+	if (e->flags & (1 << NFTNL_EXPR_FWD_SREG_ADDR))
+		nftnl_buf_u32(&b, type, fwd->sreg_dev, "sreg_addr");
+	if (e->flags & (1 << NFTNL_EXPR_FWD_NFPROTO))
+		nftnl_buf_u32(&b, type, fwd->nfproto, "nfproto");
 
 	return nftnl_buf_done(&b);
 }
@@ -138,6 +176,16 @@ static int nftnl_expr_fwd_snprintf_default(char *buf, size_t len,
 	if (e->flags & (1 << NFTNL_EXPR_FWD_SREG_DEV)) {
 		ret = snprintf(buf + offset, remain, "sreg_dev %u ",
 			       fwd->sreg_dev);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+	}
+	if (e->flags & (1 << NFTNL_EXPR_FWD_SREG_ADDR)) {
+		ret = snprintf(buf + offset, remain, "sreg_addr %u ",
+			       fwd->sreg_addr);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+	}
+	if (e->flags & (1 << NFTNL_EXPR_FWD_NFPROTO)) {
+		ret = snprintf(buf + offset, remain, "nfproto %u ",
+			       fwd->nfproto);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
@@ -168,6 +216,10 @@ static bool nftnl_expr_fwd_cmp(const struct nftnl_expr *e1,
 
 	if (e1->flags & (1 << NFTNL_EXPR_FWD_SREG_DEV))
 		eq &= (f1->sreg_dev == f2->sreg_dev);
+	if (e1->flags & (1 << NFTNL_EXPR_FWD_SREG_ADDR))
+		eq &= (f1->sreg_addr == f2->sreg_addr);
+	if (e1->flags & (1 << NFTNL_EXPR_FWD_NFPROTO))
+		eq &= (f1->nfproto == f2->nfproto);
 
 	return eq;
 }
