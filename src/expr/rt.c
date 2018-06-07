@@ -121,7 +121,7 @@ static const char *rt_key2str_array[NFT_RT_MAX + 1] = {
 
 static const char *rt_key2str(uint8_t key)
 {
-	if (key < NFT_RT_MAX)
+	if (key <= NFT_RT_MAX)
 		return rt_key2str_array[key];
 
 	return "unknown";
