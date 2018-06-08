@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to create configure.
 
-AC_INIT([libnftnl], [1.1.0])
+AC_INIT([libnftnl], [1.1.1])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CANONICAL_HOST
 AC_CONFIG_MACRO_DIR([m4])
@@ -14,7 +14,7 @@ dnl kernel style compile messages
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl Dependencies
-PKG_CHECK_MODULES([LIBMNL], [libmnl >= 1.0.0])
+PKG_CHECK_MODULES([LIBMNL], [libmnl >= 1.0.3])
 AC_ARG_WITH([json-parsing],
 	AS_HELP_STRING([--with-json-parsing], [JSON parsing support]))
 
