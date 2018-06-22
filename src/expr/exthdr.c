@@ -270,7 +270,7 @@ nftnl_expr_exthdr_json_parse(struct nftnl_expr *e, json_t *root,
 		type = str2exthdr_type(exthdr_type);
 		if (type < 0)
 			return -1;
-		nftnl_expr_set_u32(e, NFTNL_EXPR_EXTHDR_TYPE, type);
+		nftnl_expr_set_u8(e, NFTNL_EXPR_EXTHDR_TYPE, type);
 	}
 
 	if (nftnl_jansson_parse_val(root, "offset", NFTNL_TYPE_U32, &uval32,
