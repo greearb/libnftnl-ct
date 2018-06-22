@@ -72,6 +72,15 @@ static struct {
 
 int nftnl_get_value(enum nftnl_type type, void *val, void *out)
 {
+	union {
+		uint8_t u8;
+		uint16_t u16;
+		uint32_t u32;
+		int8_t s8;
+		int16_t s16;
+		int32_t s32;
+	} values;
+	void *valuep = NULL;
 	int64_t sval;
 	uint64_t uval;
 
@@ -85,7 +94,6 @@ int nftnl_get_value(enum nftnl_type type, void *val, void *out)
 			errno = ERANGE;
 			return -1;
 		}
-		memcpy(out, &uval, basetype[type].len);
 		break;
 	case NFTNL_TYPE_S8:
 	case NFTNL_TYPE_S16:
@@ -97,10 +105,42 @@ int nftnl_get_value(enum nftnl_type type, void *val, void *out)
 			errno = ERANGE;
 			return -1;
 		}
-		memcpy(out, &sval, basetype[type].len);
 		break;
 	}
 
+	switch (type) {
+	case NFTNL_TYPE_U8:
+		values.u8 = uval;
+		valuep = &values.u8;
+		break;
+	case NFTNL_TYPE_U16:
+		values.u16 = uval;
+		valuep = &values.u16;
+		break;
+	case NFTNL_TYPE_U32:
+		values.u32 = uval;
+		valuep = &values.u32;
+		break;
+	case NFTNL_TYPE_U64:
+		valuep = &uval;
+		break;
+	case NFTNL_TYPE_S8:
+		values.s8 = sval;
+		valuep = &values.s8;
+		break;
+	case NFTNL_TYPE_S16:
+		values.s16 = sval;
+		valuep = &values.s16;
+		break;
+	case NFTNL_TYPE_S32:
+		values.s32 = sval;
+		valuep = &values.s32;
+		break;
+	case NFTNL_TYPE_S64:
+		valuep = &sval;
+		break;
+	}
+	memcpy(out, valuep, basetype[type].len);
 	return 0;
 }
 
