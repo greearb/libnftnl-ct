@@ -5,6 +5,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * nftnl user data attributes API
  */
@@ -51,5 +55,9 @@ struct nftnl_udata *nftnl_udata_next(const struct nftnl_udata *attr);
 typedef int (*nftnl_udata_cb_t)(const struct nftnl_udata *attr, void *data);
 int nftnl_udata_parse(const void *data, uint32_t data_len, nftnl_udata_cb_t cb,
 		      void *cb_data);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* _LIBNFTNL_UDATA_H_ */

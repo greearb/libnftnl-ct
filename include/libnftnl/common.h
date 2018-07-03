@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum {
 	NFTNL_PARSE_EBADINPUT	= 0,
 	NFTNL_PARSE_EMISSINGNODE,
@@ -51,5 +55,9 @@ int nftnl_parse_perror(const char *str, struct nftnl_parse_err *err);
 int nftnl_batch_is_supported(void);
 struct nlmsghdr *nftnl_batch_begin(char *buf, uint32_t seq);
 struct nlmsghdr *nftnl_batch_end(char *buf, uint32_t seq);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif

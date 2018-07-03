@@ -8,6 +8,10 @@
 
 #include <libnftnl/common.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum nftnl_set_attr {
 	NFTNL_SET_TABLE,
 	NFTNL_SET_NAME,
@@ -143,5 +147,9 @@ void nftnl_set_elems_iter_destroy(struct nftnl_set_elems_iter *iter);
 
 int nftnl_set_elems_nlmsg_build_payload_iter(struct nlmsghdr *nlh,
 					   struct nftnl_set_elems_iter *iter);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* _LIBNFTNL_SET_H_ */
