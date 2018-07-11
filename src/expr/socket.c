@@ -114,6 +114,7 @@ nftnl_expr_socket_parse(struct nftnl_expr *e, struct nlattr *attr)
 
 static const char *socket_key2str_array[NFT_SOCKET_MAX + 1] = {
 	[NFT_SOCKET_TRANSPARENT] = "transparent",
+	[NFT_SOCKET_MARK] = "mark",
 };
 
 static const char *socket_key2str(uint8_t key)
