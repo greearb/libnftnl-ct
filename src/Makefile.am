@@ -45,6 +45,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/meta.c	\
 		      expr/numgen.c	\
 		      expr/nat.c	\
+		      expr/tproxy.c	\
 		      expr/objref.c	\
 		      expr/payload.c	\
 		      expr/queue.c	\

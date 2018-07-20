@@ -22,6 +22,7 @@ extern struct expr_ops expr_ops_match;
 extern struct expr_ops expr_ops_meta;
 extern struct expr_ops expr_ops_ng;
 extern struct expr_ops expr_ops_nat;
+extern struct expr_ops expr_ops_tproxy;
 extern struct expr_ops expr_ops_objref;
 extern struct expr_ops expr_ops_payload;
 extern struct expr_ops expr_ops_range;
@@ -60,6 +61,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_meta,
 	&expr_ops_ng,
 	&expr_ops_nat,
+	&expr_ops_tproxy,
 	&expr_ops_notrack,
 	&expr_ops_payload,
 	&expr_ops_range,
