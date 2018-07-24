@@ -932,6 +932,18 @@ enum nft_socket_keys {
 #define NFT_SOCKET_MAX	(__NFT_SOCKET_MAX - 1)
 
 /**
+ * enum nft_osf_attributes - nf_tables osf expression netlink attributes
+ *
+ * @NFTA_OSF_DREG: OS to match
+ */
+enum nft_osf_attributes {
+	NFTA_OSF_UNSPEC,
+	NFTA_OSF_DREG,
+	__NFTA_OSF_MAX,
+};
+#define NFTA_OSF_MAX (__NFTA_OSF_MAX - 1)
+
+/**
  * enum nft_ct_keys - nf_tables ct expression keys
  *
  * @NFT_CT_STATE: conntrack state (bitmask of enum ip_conntrack_info)

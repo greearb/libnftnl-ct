@@ -274,6 +274,10 @@ enum {
 	NFTNL_EXPR_OBJREF_SET_ID,
 };
 
+enum {
+	NFTNL_EXPR_OSF_DREG	= NFTNL_EXPR_BASE,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
