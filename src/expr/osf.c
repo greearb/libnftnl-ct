@@ -88,23 +88,6 @@ nftnl_expr_osf_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_expr_osf_json_parse(struct nftnl_expr *e, json_t *root,
-				     struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	__u32 dreg;
-
-	genre = nftnl_jansson_parse_u32(root, "dreg", err);
-	if (genre != NULL)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_OSF_DREG, );
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_expr_osf_snprintf_default(char *buf, size_t size,
 					   const struct nftnl_expr *e)
 {
@@ -170,5 +153,4 @@ struct expr_ops expr_ops_osf = {
 	.parse		= nftnl_expr_osf_parse,
 	.build		= nftnl_expr_osf_build,
 	.snprintf	= nftnl_expr_osf_snprintf,
-	.json_parse	= nftnl_expr_osf_json_parse,
 };
