@@ -53,6 +53,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/reject.c	\
 		      expr/rt.c		\
 		      expr/target.c	\
+		      expr/tunnel.c	\
 		      expr/masq.c	\
 		      expr/redir.c	\
 		      expr/hash.c	\
