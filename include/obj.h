@@ -43,6 +43,34 @@ struct nftnl_obj {
 			uint32_t	type;
 			uint32_t	flags;
 		} limit;
+		struct nftnl_obj_tunnel {
+			uint32_t	id;
+			uint32_t	src_v4;
+			uint32_t	dst_v4;
+			struct in6_addr src_v6;
+			struct in6_addr dst_v6;
+			uint16_t	sport;
+			uint16_t	dport;
+			uint32_t	flowlabel;
+			uint32_t	tun_flags;
+			uint8_t		tun_tos;
+			uint8_t		tun_ttl;
+			union {
+				struct {
+					uint32_t	gbp;
+				} tun_vxlan;
+				struct {
+					uint32_t	version;
+					union {
+						uint32_t	v1_index;
+						struct {
+							uint8_t	hwid;
+							uint8_t	dir;
+						} v2;
+					} u;
+				} tun_erspan;
+			} u;
+		} tunnel;
 	} data;
 };
 
@@ -64,6 +92,7 @@ extern struct obj_ops obj_ops_counter;
 extern struct obj_ops obj_ops_quota;
 extern struct obj_ops obj_ops_ct_helper;
 extern struct obj_ops obj_ops_limit;
+extern struct obj_ops obj_ops_tunnel;
 
 #define nftnl_obj_data(obj) (void *)&obj->data
 
