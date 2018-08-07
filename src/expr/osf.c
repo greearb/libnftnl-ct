@@ -95,7 +95,7 @@ static int nftnl_expr_osf_snprintf_default(char *buf, size_t size,
 	int ret, offset = 0, len = size;
 
 	if (e->flags & (1 << NFTNL_EXPR_OSF_DREG)) {
-		ret = snprintf(buf, len, "%u", osf->dreg);
+		ret = snprintf(buf, len, "dreg %u ", osf->dreg);
 		SNPRINTF_BUFFER_SIZE(ret, len, offset);
 	}
 
