@@ -37,7 +37,8 @@ check_PROGRAMS = nft-table-add		\
 		 nft-ct-helper-add	\
 		 nft-ct-helper-get	\
 		 nft-ct-helper-del	\
-		 nft-rule-ct-helper-add
+		 nft-rule-ct-helper-add \
+		 nft-rule-ct-timeout-add
 
 nft_table_add_SOURCES = nft-table-add.c
 nft_table_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
@@ -152,3 +153,6 @@ nft_ct_helper_del_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_rule_ct_helper_add_SOURCES = nft-rule-ct-helper-add.c
 nft_rule_ct_helper_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
+nft_rule_ct_timeout_add_SOURCES = nft-rule-ct-timeout-add.c
+nft_rule_ct_timeout_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
