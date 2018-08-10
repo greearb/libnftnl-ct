@@ -31,6 +31,7 @@ static struct obj_ops *obj_ops[] = {
 	[NFT_OBJECT_CT_HELPER]	= &obj_ops_ct_helper,
 	[NFT_OBJECT_LIMIT]	= &obj_ops_limit,
 	[NFT_OBJECT_TUNNEL]	= &obj_ops_tunnel,
+	[NFT_OBJECT_CT_TIMEOUT] = &obj_ops_ct_timeout,
 };
 
 static struct obj_ops *nftnl_obj_ops_lookup(uint32_t type)

@@ -36,6 +36,11 @@ struct nftnl_obj {
 			uint8_t		l4proto;
 			char		name[16];
 		} ct_helper;
+		struct nftnl_obj_ct_timeout {
+			uint16_t	l3proto;
+			uint8_t 	l4proto;
+			uint32_t	*timeout;
+		} ct_timeout;
 		struct nftnl_obj_limit {
 			uint64_t	rate;
 			uint64_t	unit;
@@ -91,6 +96,7 @@ struct obj_ops {
 extern struct obj_ops obj_ops_counter;
 extern struct obj_ops obj_ops_quota;
 extern struct obj_ops obj_ops_ct_helper;
+extern struct obj_ops obj_ops_ct_timeout;
 extern struct obj_ops obj_ops_limit;
 extern struct obj_ops obj_ops_tunnel;
 
