@@ -18,7 +18,6 @@
 #include "internal.h"
 #include <libmnl/libmnl.h>
 #include <libnftnl/object.h>
-#include <libnftnl/cttimeout.h>
 
 #include "obj.h"
 

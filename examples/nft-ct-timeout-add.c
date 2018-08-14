@@ -18,7 +18,6 @@
 #include <obj.h>
 #include <libmnl/libmnl.h>
 #include <libnftnl/object.h>
-#include <libnftnl/cttimeout.h>
 
 static struct nftnl_obj *obj_add_parse(int argc, char *argv[])
 {
