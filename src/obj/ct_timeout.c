@@ -86,27 +86,8 @@ nftnl_timeout_policy_attr_set_u32(struct nftnl_obj *e,
 				 uint32_t type, uint32_t data)
 {
 	struct nftnl_obj_ct_timeout *t = nftnl_obj_data(e);
-	size_t timeout_array_size;
 
-	/* Layer 4 protocol needs to be already set. */
-	if (!(e->flags & (1 << NFTNL_OBJ_CT_TIMEOUT_L4PROTO)))
-		return -1;
-	if (t->timeout == NULL) {
-		/* if not supported, default to generic protocol tracker. */
-		if (timeout_protocol[t->l4proto].attr_max != 0) {
-			timeout_array_size = sizeof(uint32_t) *
-					timeout_protocol[t->l4proto].attr_max;
-		} else {
-			timeout_array_size = sizeof(uint32_t) *
-					timeout_protocol[IPPROTO_RAW].attr_max;
-		}
-		t->timeout = calloc(1, timeout_array_size);
-		if (t->timeout == NULL)
-			return -1;
-	}
-
-	/* this state does not exists in this protocol tracker.*/
-	if (type > timeout_protocol[t->l4proto].attr_max)
+	if (type >= NFTNL_CTTIMEOUT_ARRAY_MAX)
 		return -1;
 
 	t->timeout[type] = data;
@@ -173,11 +154,12 @@ static int nftnl_obj_ct_timeout_set(struct nftnl_obj *e, uint16_t type,
 		timeout->l4proto = *((uint8_t *)data);
 		break;
 	case NFTNL_OBJ_CT_TIMEOUT_ARRAY:
-		timeout->timeout = ((uint32_t *)data);
+		memcpy(timeout->timeout, data,
+		       sizeof(uint32_t) * NFTNL_CTTIMEOUT_ARRAY_MAX);
 		break;
 	default:
 		return -1;
-		}
+	}
 	return 0;
 }
 
@@ -194,7 +176,7 @@ static const void *nftnl_obj_ct_timeout_get(const struct nftnl_obj *e,
 		*data_len = sizeof(timeout->l4proto);
 		return &timeout->l4proto;
 	case NFTNL_OBJ_CT_TIMEOUT_ARRAY:
-		*data_len = sizeof(timeout->timeout);
+		*data_len = sizeof(uint32_t) * NFTNL_CTTIMEOUT_ARRAY_MAX;
 		return timeout->timeout;
 	}
 	return NULL;

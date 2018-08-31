@@ -39,7 +39,7 @@ struct nftnl_obj {
 		struct nftnl_obj_ct_timeout {
 			uint16_t	l3proto;
 			uint8_t 	l4proto;
-			uint32_t	*timeout;
+			uint32_t	timeout[NFTNL_CTTIMEOUT_ARRAY_MAX];
 		} ct_timeout;
 		struct nftnl_obj_limit {
 			uint64_t	rate;
