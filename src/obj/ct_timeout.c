@@ -223,10 +223,9 @@ nftnl_obj_ct_timeout_build(struct nlmsghdr *nlh, const struct nftnl_obj *e)
 		int i;
 
 		nest = mnl_attr_nest_start(nlh, NFTA_CT_TIMEOUT_DATA);
-		for (i = 0; i < timeout_protocol[timeout->l4proto].attr_max; i++) {
-			if (timeout->timeout[i])
-				mnl_attr_put_u32(nlh, i+1, htonl(timeout->timeout[i]));
-		}
+		for (i = 0; i < timeout_protocol[timeout->l4proto].attr_max; i++)
+			mnl_attr_put_u32(nlh, i+1, htonl(timeout->timeout[i]));
+
 		mnl_attr_nest_end(nlh, nest);
 	}
 }
