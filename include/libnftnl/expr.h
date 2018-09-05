@@ -283,6 +283,14 @@ enum {
 	NFTNL_EXPR_OSF_DREG	= NFTNL_EXPR_BASE,
 };
 
+enum {
+	NFTNL_EXPR_XFRM_DREG	= NFTNL_EXPR_BASE,
+	NFTNL_EXPR_XFRM_SREG,
+	NFTNL_EXPR_XFRM_KEY,
+	NFTNL_EXPR_XFRM_DIR,
+	NFTNL_EXPR_XFRM_SPNUM,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
