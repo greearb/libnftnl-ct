@@ -117,6 +117,7 @@ static const char *rt_key2str_array[NFT_RT_MAX + 1] = {
 	[NFT_RT_NEXTHOP4]	= "nexthop4",
 	[NFT_RT_NEXTHOP6]	= "nexthop6",
 	[NFT_RT_TCPMSS]		= "tcpmss",
+	[NFT_RT_XFRM]		= "ipsec",
 };
 
 static const char *rt_key2str(uint8_t key)
