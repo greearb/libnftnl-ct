@@ -2,6 +2,7 @@
 #define _OBJ_OPS_H_
 
 #include <stdint.h>
+#include <libnftnl/object.h>	/* For NFTNL_CTTIMEOUT_ARRAY_MAX. */
 #include "internal.h"
 
 struct nlattr;
