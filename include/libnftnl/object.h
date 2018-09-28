@@ -97,6 +97,10 @@ enum {
 	NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR,
 };
 
+enum {
+	NFTNL_OBJ_SECMARK_CTX	= NFTNL_OBJ_BASE,
+};
+
 struct nftnl_obj;
 
 struct nftnl_obj *nftnl_obj_alloc(void);

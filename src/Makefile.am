@@ -66,4 +66,5 @@ libnftnl_la_SOURCES = utils.c		\
 		      obj/tunnel.c	\
 		      obj/limit.c	\
 		      obj/ct_timeout.c 	\
+		      obj/secmark.c	\
 		      libnftnl.map

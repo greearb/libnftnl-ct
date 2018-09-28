@@ -77,6 +77,9 @@ struct nftnl_obj {
 				} tun_erspan;
 			} u;
 		} tunnel;
+		struct nftnl_obj_secmark {
+			char		ctx[NFT_SECMARK_CTX_MAXLEN];
+		} secmark;
 	} data;
 };
 
@@ -100,6 +103,7 @@ extern struct obj_ops obj_ops_ct_helper;
 extern struct obj_ops obj_ops_ct_timeout;
 extern struct obj_ops obj_ops_limit;
 extern struct obj_ops obj_ops_tunnel;
+extern struct obj_ops obj_ops_secmark;
 
 #define nftnl_obj_data(obj) (void *)&obj->data
 
