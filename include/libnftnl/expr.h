@@ -281,6 +281,7 @@ enum {
 
 enum {
 	NFTNL_EXPR_OSF_DREG	= NFTNL_EXPR_BASE,
+	NFTNL_EXPR_OSF_TTL,
 };
 
 enum {
