@@ -174,61 +174,6 @@ nftnl_expr_bitwise_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static int
-nftnl_expr_bitwise_json_parse(struct nftnl_expr *e, json_t *root,
-				 struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
-	uint32_t reg, len;
-
-	if (nftnl_jansson_parse_reg(root, "sreg", NFTNL_TYPE_U32, &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BITWISE_SREG, reg);
-
-	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BITWISE_DREG, reg);
-
-	if (nftnl_jansson_parse_val(root, "len", NFTNL_TYPE_U32, &len, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_BITWISE_LEN, len);
-
-	if (nftnl_jansson_data_reg_parse(root, "mask", &bitwise->mask,
-				       err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_EXPR_BITWISE_MASK);
-
-	if (nftnl_jansson_data_reg_parse(root, "xor", &bitwise->xor,
-				       err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_EXPR_BITWISE_XOR);
-
-	if (bitwise->mask.len != bitwise->xor.len)
-		return -1;
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_expr_bitwise_export(char *buf, size_t size,
-				     const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_BITWISE_SREG))
-		nftnl_buf_u32(&b, type, bitwise->sreg, SREG);
-	if (e->flags & (1 << NFTNL_EXPR_BITWISE_DREG))
-		nftnl_buf_u32(&b, type, bitwise->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_BITWISE_LEN))
-		nftnl_buf_u32(&b, type, bitwise->len, LEN);
-	if (e->flags & (1 << NFTNL_EXPR_BITWISE_MASK))
-		nftnl_buf_reg(&b, type, &bitwise->mask, DATA_VALUE, MASK);
-	if (e->flags & (1 << NFTNL_EXPR_BITWISE_XOR))
-		nftnl_buf_reg(&b, type, &bitwise->xor, DATA_VALUE, XOR);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
 					       const struct nftnl_expr *e)
 {
@@ -260,9 +205,6 @@ nftnl_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		return nftnl_expr_bitwise_snprintf_default(buf, size, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_bitwise_export(buf, size, e, type);
 	default:
 		break;
 	}
@@ -300,5 +242,4 @@ struct expr_ops expr_ops_bitwise = {
 	.parse		= nftnl_expr_bitwise_parse,
 	.build		= nftnl_expr_bitwise_build,
 	.snprintf	= nftnl_expr_bitwise_snprintf,
-	.json_parse	= nftnl_expr_bitwise_json_parse,
 };

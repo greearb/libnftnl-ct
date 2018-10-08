@@ -232,59 +232,6 @@ static inline int nftnl_str2base(const char *base)
 }
 
 static int
-nftnl_expr_payload_json_parse(struct nftnl_expr *e, json_t *root,
-				 struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	const char *base_str;
-	uint32_t reg, uval32;
-	int base;
-
-	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_DREG, reg);
-
-	base_str = nftnl_jansson_parse_str(root, "base", err);
-	if (base_str != NULL) {
-		base = nftnl_str2base(base_str);
-		if (base < 0)
-			return -1;
-
-		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_BASE, base);
-	}
-
-	if (nftnl_jansson_parse_val(root, "offset", NFTNL_TYPE_U32, &uval32,
-				  err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_OFFSET, uval32);
-
-	if (nftnl_jansson_parse_val(root, "len", NFTNL_TYPE_U32, &uval32, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_PAYLOAD_LEN, uval32);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_expr_payload_export(char *buf, size_t size, uint32_t flags,
-				     const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_PAYLOAD_DREG))
-		nftnl_buf_u32(&b, type, payload->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_PAYLOAD_OFFSET))
-		nftnl_buf_u32(&b, type, payload->offset, OFFSET);
-	if (e->flags & (1 << NFTNL_EXPR_PAYLOAD_LEN))
-		nftnl_buf_u32(&b, type, payload->len, LEN);
-	if (e->flags & (1 << NFTNL_EXPR_PAYLOAD_BASE))
-		nftnl_buf_str(&b, type, base2str(payload->base), BASE);
-
-	return nftnl_buf_done(&b);
-}
-
-static int
 nftnl_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 			    uint32_t flags, const struct nftnl_expr *e)
 {
@@ -305,7 +252,6 @@ nftnl_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
 					payload->offset, payload->dreg);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_payload_export(buf, len, flags, e, type);
 	default:
 		break;
 	}
@@ -349,5 +295,4 @@ struct expr_ops expr_ops_payload = {
 	.parse		= nftnl_expr_payload_parse,
 	.build		= nftnl_expr_payload_build,
 	.snprintf	= nftnl_expr_payload_snprintf,
-	.json_parse	= nftnl_expr_payload_json_parse,
 };

@@ -128,47 +128,6 @@ nftnl_expr_quota_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int
-nftnl_expr_quota_json_parse(struct nftnl_expr *e, json_t *root,
-				 struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	uint64_t bytes, consumed;
-	uint32_t flags;
-
-	if (nftnl_jansson_parse_val(root, "bytes", NFTNL_TYPE_U64, &bytes,
-				  err) == 0)
-		nftnl_expr_set_u64(e, NFTNL_EXPR_QUOTA_BYTES, bytes);
-	if (nftnl_jansson_parse_val(root, "consumed", NFTNL_TYPE_U64, &consumed,
-				  err) == 0)
-		nftnl_expr_set_u64(e, NFTNL_EXPR_QUOTA_CONSUMED, consumed);
-	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
-				  err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_QUOTA_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_expr_quota_export(char *buf, size_t size,
-				   const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_quota *quota = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_QUOTA_BYTES))
-		nftnl_buf_u64(&b, type, quota->bytes, BYTES);
-	if (e->flags & (1 << NFTNL_EXPR_QUOTA_CONSUMED))
-		nftnl_buf_u64(&b, type, quota->consumed, CONSUMED);
-	if (e->flags & (1 << NFTNL_EXPR_QUOTA_FLAGS))
-		nftnl_buf_u32(&b, type, quota->flags, FLAGS);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_expr_quota_snprintf_default(char *buf, size_t len,
 					       const struct nftnl_expr *e)
 {
@@ -188,7 +147,6 @@ static int nftnl_expr_quota_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_quota_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_quota_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -204,5 +162,4 @@ struct expr_ops expr_ops_quota = {
 	.parse		= nftnl_expr_quota_parse,
 	.build		= nftnl_expr_quota_build,
 	.snprintf	= nftnl_expr_quota_snprintf,
-	.json_parse	= nftnl_expr_quota_json_parse,
 };

@@ -10,7 +10,6 @@ noinst_HEADERS = internal.h	\
 		 set.h		\
 		 common.h	\
 		 expr.h		\
-		 json.h		\
 		 set_elem.h	\
 		 udata.h	\
 		 utils.h

@@ -283,81 +283,20 @@ int nftnl_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_table *t)
 	return 0;
 }
 
-#ifdef JSON_PARSING
-int nftnl_jansson_parse_table(struct nftnl_table *t, json_t *tree,
-			    struct nftnl_parse_err *err)
-{
-	json_t *root;
-	uint32_t flags, use;
-	const char *str;
-	int family;
-
-	root = nftnl_jansson_get_node(tree, "table", err);
-	if (root == NULL)
-		return -1;
-
-	str = nftnl_jansson_parse_str(root, "name", err);
-	if (str != NULL)
-		nftnl_table_set_str(t, NFTNL_TABLE_NAME, str);
-
-	if (nftnl_jansson_parse_family(root, &family, err) == 0)
-		nftnl_table_set_u32(t, NFTNL_TABLE_FAMILY, family);
-
-	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
-				  err) == 0)
-		nftnl_table_set_u32(t, NFTNL_TABLE_FLAGS, flags);
-
-	if (nftnl_jansson_parse_val(root, "use", NFTNL_TYPE_U32, &use, err) == 0)
-		nftnl_table_set_u32(t, NFTNL_TABLE_USE, use);
-
-	return 0;
-}
-#endif
-
-static int nftnl_table_json_parse(struct nftnl_table *t, const void *json,
-				struct nftnl_parse_err *err,
-				enum nftnl_parse_input input)
-{
-#ifdef JSON_PARSING
-	json_t *tree;
-	json_error_t error;
-	int ret;
-
-	tree = nftnl_jansson_create_root(json, &error, err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_jansson_parse_table(t, tree, err);
-
-	nftnl_jansson_free_root(tree);
-
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_table_do_parse(struct nftnl_table *t, enum nftnl_parse_type type,
 			      const void *data, struct nftnl_parse_err *err,
 			      enum nftnl_parse_input input)
 {
 	int ret;
-	struct nftnl_parse_err perr = {};
 
 	switch (type) {
 	case NFTNL_PARSE_JSON:
-		ret = nftnl_table_json_parse(t, data, &perr, input);
-		break;
 	case NFTNL_PARSE_XML:
 	default:
 		ret = -1;
 		errno = EOPNOTSUPP;
 		break;
 	}
-
-	if (err != NULL)
-		*err = perr;
 
 	return ret;
 }
@@ -376,28 +315,6 @@ int nftnl_table_parse_file(struct nftnl_table *t, enum nftnl_parse_type type,
 	return nftnl_table_do_parse(t, type, fp, err, NFTNL_PARSE_FILE);
 }
 
-static int nftnl_table_export(char *buf, size_t size,
-			      const struct nftnl_table *t, int type)
-{
-	NFTNL_BUF_INIT(b, buf, size);
-
-	nftnl_buf_open(&b, type, TABLE);
-	if (t->flags & (1 << NFTNL_TABLE_NAME))
-		nftnl_buf_str(&b, type, t->name, NAME);
-	if (t->flags & (1 << NFTNL_TABLE_FAMILY))
-		nftnl_buf_str(&b, type, nftnl_family2str(t->family), FAMILY);
-	if (t->flags & (1 << NFTNL_TABLE_FLAGS))
-		nftnl_buf_u32(&b, type, t->table_flags, FLAGS);
-	if (t->flags & (1 << NFTNL_TABLE_USE))
-		nftnl_buf_u32(&b, type, t->use, USE);
-	if (t->flags & (1 << NFTNL_TABLE_HANDLE))
-		nftnl_buf_u64(&b, type, t->handle, HANDLE);
-
-	nftnl_buf_close(&b, type, TABLE);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_table_snprintf_default(char *buf, size_t size,
 					const struct nftnl_table *t)
 {
@@ -412,24 +329,16 @@ static int nftnl_table_cmd_snprintf(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		ret = nftnl_table_snprintf_default(buf + offset, remain, t);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		break;
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_table_export(buf + offset, remain, t, type);
-		break;
 	default:
 		return -1;
 	}
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

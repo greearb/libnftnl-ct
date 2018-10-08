@@ -182,40 +182,6 @@ static inline int str2meta_key(const char *str)
 	return -1;
 }
 
-static int nftnl_expr_meta_json_parse(struct nftnl_expr *e, json_t *root,
-					 struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	const char *key_str;
-	uint32_t reg;
-	int key;
-
-	key_str = nftnl_jansson_parse_str(root, "key", err);
-	if (key_str != NULL) {
-		key = str2meta_key(key_str);
-		if (key >= 0)
-			nftnl_expr_set_u32(e, NFTNL_EXPR_META_KEY, key);
-	}
-
-	if (nftnl_jansson_node_exist(root, "dreg")) {
-		if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &reg,
-					  err) == 0)
-			nftnl_expr_set_u32(e, NFTNL_EXPR_META_DREG, reg);
-	}
-
-	if (nftnl_jansson_node_exist(root, "sreg")) {
-		if (nftnl_jansson_parse_reg(root, "sreg", NFTNL_TYPE_U32, &reg,
-					  err) == 0)
-			nftnl_expr_set_u32(e, NFTNL_EXPR_META_SREG, reg);
-	}
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int
 nftnl_expr_meta_snprintf_default(char *buf, size_t len,
 				 const struct nftnl_expr *e)
@@ -233,22 +199,6 @@ nftnl_expr_meta_snprintf_default(char *buf, size_t len,
 	return 0;
 }
 
-static int nftnl_expr_meta_export(char *buf, size_t size,
-				  const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_meta *meta = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_META_DREG))
-		nftnl_buf_u32(&b, type, meta->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_META_KEY))
-		nftnl_buf_str(&b, type, meta_key2str(meta->key), KEY);
-	if (e->flags & (1 << NFTNL_EXPR_META_SREG))
-		nftnl_buf_u32(&b, type, meta->sreg, SREG);
-
-	return nftnl_buf_done(&b);
-}
-
 static int
 nftnl_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 			 uint32_t flags, const struct nftnl_expr *e)
@@ -258,7 +208,6 @@ nftnl_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_meta_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_meta_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -292,5 +241,4 @@ struct expr_ops expr_ops_meta = {
 	.parse		= nftnl_expr_meta_parse,
 	.build		= nftnl_expr_meta_build,
 	.snprintf	= nftnl_expr_meta_snprintf,
-	.json_parse 	= nftnl_expr_meta_json_parse,
 };

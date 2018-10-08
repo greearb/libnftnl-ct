@@ -184,61 +184,6 @@ static inline int nftnl_str2range(const char *op)
 	}
 }
 
-static int nftnl_expr_range_json_parse(struct nftnl_expr *e, json_t *root,
-				       struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	struct nftnl_expr_range *range = nftnl_expr_data(e);
-	const char *op;
-	uint32_t uval32;
-	int base;
-
-	if (nftnl_jansson_parse_val(root, "sreg", NFTNL_TYPE_U32, &uval32,
-				  err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_RANGE_SREG, uval32);
-
-	op = nftnl_jansson_parse_str(root, "op", err);
-	if (op != NULL) {
-		base = nftnl_str2range(op);
-		if (base < 0)
-			return -1;
-
-		nftnl_expr_set_u32(e, NFTNL_EXPR_RANGE_OP, base);
-	}
-
-	if (nftnl_jansson_data_reg_parse(root, "data_from",
-					 &range->data_from, err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_EXPR_RANGE_FROM_DATA);
-
-	if (nftnl_jansson_data_reg_parse(root, "data_to",
-					 &range->data_to, err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_EXPR_RANGE_TO_DATA);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_expr_range_export(char *buf, size_t size,
-				 const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_range *range = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_RANGE_SREG))
-		nftnl_buf_u32(&b, type, range->sreg, SREG);
-	if (e->flags & (1 << NFTNL_EXPR_RANGE_OP))
-		nftnl_buf_str(&b, type, range2str(range->op), OP);
-	if (e->flags & (1 << NFTNL_EXPR_RANGE_FROM_DATA))
-		nftnl_buf_reg(&b, type, &range->data_from, DATA_VALUE, DATA);
-	if (e->flags & (1 << NFTNL_EXPR_RANGE_TO_DATA))
-		nftnl_buf_reg(&b, type, &range->data_to, DATA_VALUE, DATA);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_expr_range_snprintf_default(char *buf, size_t size,
 					   const struct nftnl_expr *e)
 {
@@ -246,7 +191,7 @@ static int nftnl_expr_range_snprintf_default(char *buf, size_t size,
 	int remain = size, offset = 0, ret;
 
 	ret = snprintf(buf, remain, "%s reg %u ",
-		       expr_range_str[range->op], range->sreg);
+		       range2str(range->op), range->sreg);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = nftnl_data_reg_snprintf(buf + offset, remain, &range->data_from,
@@ -268,7 +213,6 @@ static int nftnl_expr_range_snprintf(char *buf, size_t size, uint32_t type,
 		return nftnl_expr_range_snprintf_default(buf, size, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_range_export(buf, size, e, type);
 	default:
 		break;
 	}
@@ -284,5 +228,4 @@ struct expr_ops expr_ops_range = {
 	.parse		= nftnl_expr_range_parse,
 	.build		= nftnl_expr_range_build,
 	.snprintf	= nftnl_expr_range_snprintf,
-	.json_parse	= nftnl_expr_range_json_parse,
 };

@@ -131,47 +131,6 @@ nftnl_obj_ct_helper_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int
-nftnl_obj_quota_json_parse(struct nftnl_obj *e, json_t *root,
-				 struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	uint64_t bytes;
-	uint32_t flags;
-
-	if (nftnl_jansson_parse_val(root, "bytes", NFTNL_TYPE_U64, &bytes,
-				  err) == 0)
-		nftnl_obj_set_u64(e, NFTNL_OBJ_QUOTA_BYTES, bytes);
-	if (nftnl_jansson_parse_val(root, "consumed", NFTNL_TYPE_U64, &bytes,
-				    err) == 0)
-		nftnl_obj_set_u64(e, NFTNL_OBJ_QUOTA_CONSUMED, bytes);
-	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &flags,
-				  err) == 0)
-		nftnl_obj_set_u32(e, NFTNL_OBJ_QUOTA_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_obj_ct_helper_export(char *buf, size_t size,
-				   const struct nftnl_obj *e, int type)
-{
-	struct nftnl_obj_ct_helper *helper = nftnl_obj_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_OBJ_CT_HELPER_NAME))
-		nftnl_buf_str(&b, type, helper->name, NAME);
-	if (e->flags & (1 << NFTNL_OBJ_CT_HELPER_L3PROTO))
-		nftnl_buf_u32(&b, type, helper->l3proto, FAMILY);
-	if (e->flags & (1 << NFTNL_OBJ_CT_HELPER_L4PROTO))
-		nftnl_buf_u32(&b, type, helper->l4proto, "service");
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_obj_ct_helper_snprintf_default(char *buf, size_t len,
 					       const struct nftnl_obj *e)
 {
@@ -192,7 +151,6 @@ static int nftnl_obj_ct_helper_snprintf(char *buf, size_t len, uint32_t type,
 	case NFTNL_OUTPUT_DEFAULT:
 		return nftnl_obj_ct_helper_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_obj_ct_helper_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -209,5 +167,4 @@ struct obj_ops obj_ops_ct_helper = {
 	.parse		= nftnl_obj_ct_helper_parse,
 	.build		= nftnl_obj_ct_helper_build,
 	.snprintf	= nftnl_obj_ct_helper_snprintf,
-	.json_parse	= nftnl_obj_quota_json_parse,
 };

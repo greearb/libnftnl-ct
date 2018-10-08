@@ -548,101 +548,20 @@ int nftnl_set_elems_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 	return 0;
 }
 
-static int nftnl_set_elem_json_parse(struct nftnl_set_elem *e, const void *json,
-				   struct nftnl_parse_err *err,
-				   enum nftnl_parse_input input)
-{
-#ifdef JSON_PARSING
-	json_t *tree;
-	json_error_t error;
-
-	tree = nftnl_jansson_create_root(json, &error, err, input);
-	if (tree == NULL)
-		return -1;
-
-	return nftnl_jansson_set_elem_parse(e, tree, err);
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int
-nftnl_set_elem_do_parse(struct nftnl_set_elem *e, enum nftnl_parse_type type,
-		      const void *data, struct nftnl_parse_err *err,
-		      enum nftnl_parse_input input)
-{
-	int ret;
-
-	switch (type) {
-	case NFTNL_PARSE_JSON:
-		ret = nftnl_set_elem_json_parse(e, data, err, input);
-		break;
-	case NFTNL_PARSE_XML:
-	default:
-		errno = EOPNOTSUPP;
-		ret = -1;
-		break;
-	}
-
-	return ret;
-}
-
 EXPORT_SYMBOL(nftnl_set_elem_parse);
 int nftnl_set_elem_parse(struct nftnl_set_elem *e, enum nftnl_parse_type type,
 		       const char *data, struct nftnl_parse_err *err)
 {
-	return nftnl_set_elem_do_parse(e, type, data, err, NFTNL_PARSE_BUFFER);
+	errno = EOPNOTSUPP;
+	return -1;
 }
 
 EXPORT_SYMBOL(nftnl_set_elem_parse_file);
 int nftnl_set_elem_parse_file(struct nftnl_set_elem *e, enum nftnl_parse_type type,
 			    FILE *fp, struct nftnl_parse_err *err)
 {
-	return nftnl_set_elem_do_parse(e, type, fp, err, NFTNL_PARSE_FILE);
-}
-
-static int nftnl_set_elem_snprintf_json(char *buf, size_t size,
-					const struct nftnl_set_elem *e,
-					uint32_t flags)
-{
-	int ret, remain = size, offset = 0, type = -1;
-
-	if (e->flags & (1 << NFTNL_SET_ELEM_FLAGS)) {
-		ret = snprintf(buf, remain, "\"flags\":%u,", e->set_elem_flags);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-	}
-
-	ret = snprintf(buf + offset, remain, "\"key\":{");
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->key,
-				    NFTNL_OUTPUT_JSON, flags, DATA_VALUE);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = snprintf(buf + offset, remain, "}");
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	if (e->flags & (1 << NFTNL_SET_ELEM_DATA))
-		type = DATA_VALUE;
-	else if (e->flags & (1 << NFTNL_SET_ELEM_CHAIN))
-		type = DATA_CHAIN;
-	else if (e->flags & (1 << NFTNL_SET_ELEM_VERDICT))
-		type = DATA_VERDICT;
-
-	if (type != -1) {
-		ret = snprintf(buf + offset, remain, ",\"data\":{");
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-		ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->data,
-					    NFTNL_OUTPUT_JSON, flags, type);
-			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-		ret = snprintf(buf + offset, remain, "}");
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-	}
-
-	return offset;
+	errno = EOPNOTSUPP;
+	return -1;
 }
 
 static int nftnl_set_elem_snprintf_default(char *buf, size_t size,
@@ -695,28 +614,17 @@ static int nftnl_set_elem_cmd_snprintf(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0;
 
-	if (type == NFTNL_OUTPUT_XML)
-		return 0;
-
-	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		ret = nftnl_set_elem_snprintf_default(buf + offset, remain, e);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		break;
+	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_set_elem_snprintf_json(buf + offset, remain, e,
-						   flags);
 		break;
 	default:
 		return -1;
 	}
-
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

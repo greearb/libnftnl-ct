@@ -117,42 +117,6 @@ nftnl_expr_connlimit_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int
-nftnl_expr_connlimit_json_parse(struct nftnl_expr *e, json_t *root,
-				 struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	uint32_t uval32;
-
-	if (nftnl_jansson_parse_val(root, "count", NFTNL_TYPE_U32, &uval32,
-				    err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CONNLIMIT_COUNT, uval32);
-
-	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &uval32,
-				    err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CONNLIMIT_FLAGS, uval32);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_expr_connlimit_export(char *buf, size_t size,
-				     const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_connlimit *connlimit = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_CONNLIMIT_COUNT))
-		nftnl_buf_u32(&b, type, connlimit->count, COUNT);
-	if (e->flags & (1 << NFTNL_EXPR_CONNLIMIT_FLAGS))
-		nftnl_buf_u32(&b, type, connlimit->flags, FLAGS);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_expr_connlimit_snprintf_default(char *buf, size_t len,
 					       const struct nftnl_expr *e)
 {
@@ -171,7 +135,6 @@ static int nftnl_expr_connlimit_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_connlimit_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_connlimit_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -203,5 +166,4 @@ struct expr_ops expr_ops_connlimit = {
 	.parse		= nftnl_expr_connlimit_parse,
 	.build		= nftnl_expr_connlimit_build,
 	.snprintf	= nftnl_expr_connlimit_snprintf,
-	.json_parse	= nftnl_expr_connlimit_json_parse,
 };

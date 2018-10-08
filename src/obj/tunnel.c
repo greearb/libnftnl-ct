@@ -530,18 +530,6 @@ nftnl_obj_tunnel_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_obj_tunnel_export(char *buf, size_t size,
-				   const struct nftnl_obj *e, int type)
-{
-	struct nftnl_obj_tunnel *tun = nftnl_obj_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_OBJ_TUNNEL_ID))
-		nftnl_buf_u64(&b, type, tun->id, ID);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_obj_tunnel_snprintf_default(char *buf, size_t len,
 					     const struct nftnl_obj *e)
 {
@@ -561,7 +549,6 @@ static int nftnl_obj_tunnel_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_obj_tunnel_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_obj_tunnel_export(buf, len, e, type);
 	default:
 		break;
 	}

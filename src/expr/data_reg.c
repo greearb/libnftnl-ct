@@ -24,116 +24,6 @@
 #include <libnftnl/rule.h>
 #include "internal.h"
 
-#ifdef JSON_PARSING
-static int nftnl_data_reg_verdict_json_parse(union nftnl_data_reg *reg, json_t *data,
-					   struct nftnl_parse_err *err)
-{
-	int verdict;
-	const char *verdict_str;
-	const char *chain;
-
-	verdict_str = nftnl_jansson_parse_str(data, "verdict", err);
-	if (verdict_str == NULL)
-		return DATA_NONE;
-
-	if (nftnl_str2verdict(verdict_str, &verdict) != 0) {
-		err->node_name = "verdict";
-		err->error = NFTNL_PARSE_EBADTYPE;
-		errno = EINVAL;
-		return -1;
-	}
-
-	reg->verdict = (uint32_t)verdict;
-
-	if (nftnl_jansson_node_exist(data, "chain")) {
-		chain = nftnl_jansson_parse_str(data, "chain", err);
-		if (chain == NULL)
-			return DATA_NONE;
-
-		reg->chain = strdup(chain);
-	}
-
-	return DATA_VERDICT;
-}
-
-static int nftnl_data_reg_value_json_parse(union nftnl_data_reg *reg, json_t *data,
-					 struct nftnl_parse_err *err)
-{
-	char node_name[32] = {};
-	int ret, remain = sizeof(node_name), offset = 0, i;
-
-	if (nftnl_jansson_parse_val(data, "len", NFTNL_TYPE_U32, &reg->len, err) < 0)
-			return DATA_NONE;
-
-	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		ret = snprintf(node_name, sizeof(node_name), "data%u", i);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-		if (nftnl_jansson_str2num(data, node_name, BASE_HEX,
-					&reg->val[i], NFTNL_TYPE_U32, err) != 0)
-			return DATA_NONE;
-	}
-
-	return DATA_VALUE;
-}
-
-int nftnl_data_reg_json_parse(union nftnl_data_reg *reg, json_t *data,
-			    struct nftnl_parse_err *err)
-{
-
-	const char *type;
-
-	type = nftnl_jansson_parse_str(data, "type", err);
-	if (type == NULL)
-		return -1;
-
-	/* Select what type of parsing is needed */
-	if (strcmp(type, "value") == 0)
-		return nftnl_data_reg_value_json_parse(reg, data, err);
-	else if (strcmp(type, "verdict") == 0)
-		return nftnl_data_reg_verdict_json_parse(reg, data, err);
-
-	return DATA_NONE;
-}
-#endif
-
-static int
-nftnl_data_reg_value_snprintf_json(char *buf, size_t size,
-				   const union nftnl_data_reg *reg,
-				   uint32_t flags)
-{
-	int remain = size, offset = 0, ret, i, j;
-	uint32_t utemp;
-	uint8_t *tmp;
-
-	ret = snprintf(buf, remain, "\"reg\":{\"type\":\"value\",");
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = snprintf(buf + offset, remain, "\"len\":%u,", reg->len);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		ret = snprintf(buf + offset, remain, "\"data%d\":\"0x", i);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-		utemp = htonl(reg->val[i]);
-		tmp = (uint8_t *)&utemp;
-
-		for (j = 0; j<sizeof(uint32_t); j++) {
-			ret = snprintf(buf + offset, remain, "%.02x", tmp[j]);
-			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-		}
-
-		ret = snprintf(buf + offset, remain, "\",");
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-	}
-	offset--;
-	ret = snprintf(buf + offset, remain, "}");
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	return offset;
-}
-
 static int
 nftnl_data_reg_value_snprintf_default(char *buf, size_t size,
 				      const union nftnl_data_reg *reg,
@@ -167,29 +57,6 @@ nftnl_data_reg_verdict_snprintf_def(char *buf, size_t size,
 	return offset;
 }
 
-static int
-nftnl_data_reg_verdict_snprintf_json(char *buf, size_t size,
-				     const union nftnl_data_reg *reg,
-				     uint32_t flags)
-{
-	int remain = size, offset = 0, ret = 0;
-
-	ret = snprintf(buf, size, "\"reg\":{\"type\":\"verdict\","
-		       "\"verdict\":\"%s\"", nftnl_verdict2str(reg->verdict));
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	if (reg->chain != NULL) {
-		ret = snprintf(buf + offset, remain, ",\"chain\":\"%s\"",
-			       reg->chain);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-	}
-
-	ret = snprintf(buf + offset, remain, "}");
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	return offset;
-}
-
 int nftnl_data_reg_snprintf(char *buf, size_t size,
 			    const union nftnl_data_reg *reg,
 			    uint32_t output_format, uint32_t flags,
@@ -202,8 +69,6 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 			return nftnl_data_reg_value_snprintf_default(buf, size,
 								   reg, flags);
 		case NFTNL_OUTPUT_JSON:
-			return nftnl_data_reg_value_snprintf_json(buf, size,
-							       reg, flags);
 		case NFTNL_OUTPUT_XML:
 		default:
 			break;
@@ -216,8 +81,6 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 			return nftnl_data_reg_verdict_snprintf_def(buf, size,
 								 reg, flags);
 		case NFTNL_OUTPUT_JSON:
-			return nftnl_data_reg_verdict_snprintf_json(buf, size,
-								  reg, flags);
 		case NFTNL_OUTPUT_XML:
 		default:
 			break;

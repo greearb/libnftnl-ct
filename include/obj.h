@@ -93,8 +93,6 @@ struct obj_ops {
 	int	(*parse)(struct nftnl_obj *e, struct nlattr *attr);
 	void	(*build)(struct nlmsghdr *nlh, const struct nftnl_obj *e);
 	int	(*snprintf)(char *buf, size_t len, uint32_t type, uint32_t flags, const struct nftnl_obj *e);
-	int	(*json_parse)(struct nftnl_obj *e, json_t *data,
-			      struct nftnl_parse_err *err);
 };
 
 extern struct obj_ops obj_ops_counter;

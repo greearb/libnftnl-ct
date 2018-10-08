@@ -321,58 +321,6 @@ int nftnl_obj_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_obj *obj)
 	return 0;
 }
 
-#ifdef JSON_PARSING
-static int nftnl_jansson_parse_obj(struct nftnl_obj *t, json_t *tree,
-			    struct nftnl_parse_err *err)
-{
-	const char *str;
-	uint32_t type;
-	json_t *root;
-
-	root = nftnl_jansson_get_node(tree, "obj", err);
-	if (root == NULL)
-		return -1;
-
-	str = nftnl_jansson_parse_str(root, "table", err);
-	if (str != NULL)
-		nftnl_obj_set_str(t, NFTNL_OBJ_TABLE, str);
-
-	str = nftnl_jansson_parse_str(root, "name", err);
-	if (str != NULL)
-		nftnl_obj_set_str(t, NFTNL_OBJ_NAME, str);
-
-	if (nftnl_jansson_parse_val(root, "type", NFTNL_TYPE_U32, &type,
-				    err) < 0)
-		nftnl_obj_set_u32(t, NFTNL_OBJ_TYPE, type);
-
-	return 0;
-}
-#endif
-
-static int nftnl_obj_json_parse(struct nftnl_obj *t, const void *json,
-				struct nftnl_parse_err *err,
-				enum nftnl_parse_input input)
-{
-#ifdef JSON_PARSING
-	json_t *tree;
-	json_error_t error;
-	int ret;
-
-	tree = nftnl_jansson_create_root(json, &error, err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_jansson_parse_obj(t, tree, err);
-
-	nftnl_jansson_free_root(tree);
-
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_obj_do_parse(struct nftnl_obj *obj, enum nftnl_parse_type type,
 			      const void *data, struct nftnl_parse_err *err,
 			      enum nftnl_parse_input input)
@@ -382,8 +330,6 @@ static int nftnl_obj_do_parse(struct nftnl_obj *obj, enum nftnl_parse_type type,
 
 	switch (type) {
 	case NFTNL_PARSE_JSON:
-		ret = nftnl_obj_json_parse(obj, data, &perr, input);
-		break;
 	case NFTNL_PARSE_XML:
 	default:
 		ret = -1;
@@ -409,36 +355,6 @@ int nftnl_obj_parse_file(struct nftnl_obj *obj, enum nftnl_parse_type type,
 			   FILE *fp, struct nftnl_parse_err *err)
 {
 	return nftnl_obj_do_parse(obj, type, fp, err, NFTNL_PARSE_FILE);
-}
-
-static int nftnl_obj_export(char *buf, size_t size,
-			    const struct nftnl_obj *obj,
-			    uint32_t type, uint32_t flags)
-{
-	int ret = 0;
-
-	NFTNL_BUF_INIT(b, buf, size);
-
-	nftnl_buf_open(&b, type, TABLE);
-	if (obj->flags & (1 << NFTNL_OBJ_TABLE))
-		nftnl_buf_str(&b, type, obj->name, NAME);
-	if (obj->flags & (1 << NFTNL_OBJ_NAME))
-		nftnl_buf_str(&b, type, obj->name, NAME);
-	if (obj->flags & (1 << NFTNL_OBJ_FAMILY))
-		nftnl_buf_str(&b, type, nftnl_family2str(obj->family), FAMILY);
-	if (obj->flags & (1 << NFTNL_OBJ_USE))
-		nftnl_buf_u32(&b, type, obj->use, USE);
-	if (obj->flags & (1 << NFTNL_OBJ_HANDLE))
-		nftnl_buf_u64(&b, type, obj->handle, HANDLE);
-
-	if (obj->ops)
-		ret = obj->ops->snprintf(buf + b.len, size - b.len, type,
-					 flags, obj);
-
-	b.len += ret;
-	nftnl_buf_close(&b, type, TABLE);
-
-	return nftnl_buf_done(&b);
 }
 
 static int nftnl_obj_snprintf_dflt(char *buf, size_t size,
@@ -469,24 +385,16 @@ static int nftnl_obj_cmd_snprintf(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		ret = nftnl_obj_snprintf_dflt(buf + offset, remain, obj, type,
 					      flags);
 		break;
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_obj_export(buf + offset, remain, obj, type, flags);
-		break;
 	case NFTNL_OUTPUT_XML:
 	default:
 		return -1;
 	}
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;

@@ -102,18 +102,6 @@ static int nftnl_expr_osf_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_expr_osf_export(char *buf, size_t size,
-				 const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_osf *osf = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_OSF_DREG))
-		nftnl_buf_u32(&b, type, osf->dreg, "dreg");
-
-	return nftnl_buf_done(&b);
-}
-
 static int
 nftnl_expr_osf_snprintf(char *buf, size_t len, uint32_t type,
 			uint32_t flags, const struct nftnl_expr *e)
@@ -123,7 +111,6 @@ nftnl_expr_osf_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_osf_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_osf_export(buf, len, e, type);
 	default:
 		break;
 	}

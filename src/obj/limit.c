@@ -148,56 +148,6 @@ static int nftnl_obj_limit_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_obj_limit_json_parse(struct nftnl_obj *e, json_t *root,
-				      struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	uint64_t uval64;
-	uint32_t uval32;
-
-	if (nftnl_jansson_parse_val(root, "rate", NFTNL_TYPE_U64, &uval64,
-				    err) == 0)
-		nftnl_obj_set_u64(e, NFTNL_OBJ_LIMIT_RATE, uval64);
-	if (nftnl_jansson_parse_val(root, "unit", NFTNL_TYPE_U64, &uval64,
-				    err) == 0)
-		nftnl_obj_set_u64(e, NFTNL_OBJ_LIMIT_UNIT, uval64);
-	if (nftnl_jansson_parse_val(root, "burst", NFTNL_TYPE_U32, &uval32,
-				    err) == 0)
-		nftnl_obj_set_u32(e, NFTNL_OBJ_LIMIT_BURST, uval32);
-	if (nftnl_jansson_parse_val(root, "type", NFTNL_TYPE_U32, &uval32,
-				    err) == 0)
-		nftnl_obj_set_u32(e, NFTNL_OBJ_LIMIT_TYPE, uval32);
-	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32, &uval32,
-				    err) == 0)
-		nftnl_obj_set_u32(e, NFTNL_OBJ_LIMIT_FLAGS, uval32);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_obj_limit_export(char *buf, size_t size,
-				  const struct nftnl_obj *e, int type)
-{
-	struct nftnl_obj_limit *limit = nftnl_obj_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_OBJ_LIMIT_RATE))
-		nftnl_buf_u64(&b, type, limit->rate, RATE);
-	if (e->flags & (1 << NFTNL_OBJ_LIMIT_UNIT))
-		nftnl_buf_u64(&b, type, limit->unit, UNIT);
-	if (e->flags & (1 << NFTNL_OBJ_LIMIT_BURST))
-		nftnl_buf_u32(&b, type, limit->burst, BURST);
-	if (e->flags & (1 << NFTNL_OBJ_LIMIT_TYPE))
-		nftnl_buf_u32(&b, type, limit->type, TYPE);
-	if (e->flags & (1 << NFTNL_OBJ_LIMIT_FLAGS))
-		nftnl_buf_u32(&b, type, limit->flags, FLAGS);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_obj_limit_snprintf_default(char *buf, size_t len,
 					    const struct nftnl_obj *e)
 {
@@ -220,7 +170,6 @@ static int nftnl_obj_limit_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_obj_limit_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_obj_limit_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -237,5 +186,4 @@ struct obj_ops obj_ops_limit = {
 	.parse		= nftnl_obj_limit_parse,
 	.build		= nftnl_obj_limit_build,
 	.snprintf	= nftnl_obj_limit_snprintf,
-	.json_parse	= nftnl_obj_limit_json_parse,
 };

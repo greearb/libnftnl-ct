@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 	int ret, family;
 
 	if (argc < 2 || argc > 5) {
-		fprintf(stderr, "Usage: %s <family> [<table> <chain>] [json]\n",
+		fprintf(stderr, "Usage: %s <family> [<table> <chain>]\n",
 			argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -100,12 +100,6 @@ int main(int argc, char *argv[])
 	else {
 		fprintf(stderr, "Unknown family: ip, ip6, bridge, arp, unspec\n");
 		exit(EXIT_FAILURE);
-	}
-
-	/* json specified */
-	if (argc == 3 || argc == 5) {
-		if (strcmp(argv[argc - 1], "json") == 0)
-			type = NFTNL_OUTPUT_JSON;
 	}
 
 	/* at least [<table> <chain>] specified */

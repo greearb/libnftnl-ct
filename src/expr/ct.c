@@ -221,70 +221,6 @@ static inline int str2ctdir(const char *str, uint8_t *ctdir)
 	return -1;
 }
 
-static int nftnl_expr_ct_json_parse(struct nftnl_expr *e, json_t *root,
-				       struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	const char *key_str, *dir_str;
-	uint32_t reg;
-	uint8_t dir;
-	int key;
-
-	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CT_DREG, reg);
-
-	if (nftnl_jansson_parse_reg(root, "sreg", NFTNL_TYPE_U32, &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CT_SREG, reg);
-
-	key_str = nftnl_jansson_parse_str(root, "key", err);
-	if (key_str != NULL) {
-		key = str2ctkey(key_str);
-		if (key < 0)
-			return -1;
-
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CT_KEY, key);
-	}
-
-	dir_str = nftnl_jansson_parse_str(root, "dir", err);
-	if (dir_str != NULL) {
-		if (str2ctdir(dir_str, &dir) != 0) {
-			err->node_name = "dir";
-			err->error = NFTNL_PARSE_EBADTYPE;
-			goto err;
-		}
-		nftnl_expr_set_u8(e, NFTNL_EXPR_CT_DIR, dir);
-	}
-
-	return 0;
-err:
-	errno = EINVAL;
-	return -1;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-
-static int
-nftnl_expr_ct_export(char *buf, size_t size, const struct nftnl_expr *e,
-		     int type)
-{
-	struct nftnl_expr_ct *ct = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_CT_SREG))
-		nftnl_buf_u32(&b, type, ct->sreg, SREG);
-	if (e->flags & (1 << NFTNL_EXPR_CT_DREG))
-		nftnl_buf_u32(&b, type, ct->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_CT_KEY))
-		nftnl_buf_str(&b, type, ctkey2str(ct->key), KEY);
-	if (e->flags & (1 << NFTNL_EXPR_CT_DIR))
-		nftnl_buf_str(&b, type, ctdir2str(ct->dir), DIR);
-
-	return nftnl_buf_done(&b);
-}
-
 static int
 nftnl_expr_ct_snprintf_default(char *buf, size_t size,
 			       const struct nftnl_expr *e)
@@ -322,7 +258,6 @@ nftnl_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_ct_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_ct_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -358,5 +293,4 @@ struct expr_ops expr_ops_ct = {
 	.parse		= nftnl_expr_ct_parse,
 	.build		= nftnl_expr_ct_build,
 	.snprintf	= nftnl_expr_ct_snprintf,
-	.json_parse	= nftnl_expr_ct_json_parse,
 };

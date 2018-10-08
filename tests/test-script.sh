@@ -29,4 +29,3 @@
 ./nft-set-test
 ./nft-table-test
 ./nft-object-test
-./nft-parsing-test -d jsonfiles

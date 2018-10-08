@@ -109,42 +109,6 @@ nftnl_obj_counter_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int
-nftnl_obj_counter_json_parse(struct nftnl_obj *e, json_t *root,
-				 struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	uint64_t uval64;
-
-	if (nftnl_jansson_parse_val(root, "pkts", NFTNL_TYPE_U64, &uval64,
-				  err) == 0)
-		nftnl_obj_set_u64(e, NFTNL_OBJ_CTR_PKTS, uval64);
-
-	if (nftnl_jansson_parse_val(root, "bytes", NFTNL_TYPE_U64, &uval64,
-				  err) == 0)
-		nftnl_obj_set_u64(e, NFTNL_OBJ_CTR_BYTES, uval64);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_obj_counter_export(char *buf, size_t size,
-				    const struct nftnl_obj *e, int type)
-{
-	struct nftnl_obj_counter *ctr = nftnl_obj_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_OBJ_CTR_PKTS))
-		nftnl_buf_u64(&b, type, ctr->pkts, PKTS);
-	if (e->flags & (1 << NFTNL_OBJ_CTR_BYTES))
-		nftnl_buf_u64(&b, type, ctr->bytes, BYTES);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_obj_counter_snprintf_default(char *buf, size_t len,
 					       const struct nftnl_obj *e)
 {
@@ -166,7 +130,6 @@ static int nftnl_obj_counter_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_obj_counter_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_obj_counter_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -183,5 +146,4 @@ struct obj_ops obj_ops_counter = {
 	.parse		= nftnl_obj_counter_parse,
 	.build		= nftnl_obj_counter_build,
 	.snprintf	= nftnl_obj_counter_snprintf,
-	.json_parse	= nftnl_obj_counter_json_parse,
 };

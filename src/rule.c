@@ -512,130 +512,6 @@ int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *r)
 	return 0;
 }
 
-#ifdef JSON_PARSING
-int nftnl_jansson_parse_rule(struct nftnl_rule *r, json_t *tree,
-			   struct nftnl_parse_err *err,
-			   struct nftnl_set_list *set_list)
-{
-	json_t *root, *array;
-	struct nftnl_expr *e;
-	const char *str = NULL;
-	uint64_t uval64;
-	uint32_t uval32;
-	int i, family;
-
-	root = nftnl_jansson_get_node(tree, "rule", err);
-	if (root == NULL)
-		return -1;
-
-	if (nftnl_jansson_node_exist(root, "family")) {
-		if (nftnl_jansson_parse_family(root, &family, err) != 0)
-			goto err;
-
-		nftnl_rule_set_u32(r, NFTNL_RULE_FAMILY, family);
-	}
-
-	if (nftnl_jansson_node_exist(root, "table")) {
-		str = nftnl_jansson_parse_str(root, "table", err);
-		if (str == NULL)
-			goto err;
-
-		nftnl_rule_set_str(r, NFTNL_RULE_TABLE, str);
-	}
-
-	if (nftnl_jansson_node_exist(root, "chain")) {
-		str = nftnl_jansson_parse_str(root, "chain", err);
-		if (str == NULL)
-			goto err;
-
-		nftnl_rule_set_str(r, NFTNL_RULE_CHAIN, str);
-	}
-
-	if (nftnl_jansson_node_exist(root, "handle")) {
-		if (nftnl_jansson_parse_val(root, "handle", NFTNL_TYPE_U64, &uval64,
-					  err) < 0)
-			goto err;
-
-		nftnl_rule_set_u64(r, NFTNL_RULE_HANDLE, uval64);
-	}
-
-	if (nftnl_jansson_node_exist(root, "compat_proto") ||
-	    nftnl_jansson_node_exist(root, "compat_flags")) {
-		if (nftnl_jansson_parse_val(root, "compat_proto", NFTNL_TYPE_U32,
-					  &uval32, err) < 0)
-			goto err;
-
-		nftnl_rule_set_u32(r, NFTNL_RULE_COMPAT_PROTO, uval32);
-
-		if (nftnl_jansson_parse_val(root, "compat_flags", NFTNL_TYPE_U32,
-					  &uval32, err) < 0)
-			goto err;
-
-		nftnl_rule_set_u32(r, NFTNL_RULE_COMPAT_FLAGS, uval32);
-	}
-
-	if (nftnl_jansson_node_exist(root, "position")) {
-		if (nftnl_jansson_parse_val(root, "position", NFTNL_TYPE_U64,
-					  &uval64, err) < 0)
-			goto err;
-
-		nftnl_rule_set_u64(r, NFTNL_RULE_POSITION, uval64);
-	}
-
-	if (nftnl_jansson_node_exist(root, "id")) {
-		if (nftnl_jansson_parse_val(root, "id", NFTNL_TYPE_U32,
-					    &uval32, err) < 0)
-			goto err;
-		nftnl_rule_set_u32(r, NFTNL_RULE_COMPAT_PROTO, uval32);
-	}
-
-	array = json_object_get(root, "expr");
-	if (array == NULL) {
-		err->error = NFTNL_PARSE_EMISSINGNODE;
-		err->node_name = "expr";
-		goto err;
-	}
-
-	for (i = 0; i < json_array_size(array); ++i) {
-
-		e = nftnl_jansson_expr_parse(json_array_get(array, i), err,
-					   set_list);
-		if (e == NULL)
-			goto err;
-
-		nftnl_rule_add_expr(r, e);
-	}
-
-	return 0;
-err:
-	return -1;
-}
-#endif
-
-static int nftnl_rule_json_parse(struct nftnl_rule *r, const void *json,
-			       struct nftnl_parse_err *err,
-			       enum nftnl_parse_input input,
-			       struct nftnl_set_list *set_list)
-{
-#ifdef JSON_PARSING
-	json_t *tree;
-	json_error_t error;
-	int ret;
-
-	tree = nftnl_jansson_create_root(json, &error, err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_jansson_parse_rule(r, tree, err, set_list);
-
-	nftnl_jansson_free_root(tree);
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int nftnl_rule_do_parse(struct nftnl_rule *r, enum nftnl_parse_type type,
 			     const void *data, struct nftnl_parse_err *err,
 			     enum nftnl_parse_input input)
@@ -645,8 +521,6 @@ static int nftnl_rule_do_parse(struct nftnl_rule *r, enum nftnl_parse_type type,
 
 	switch (type) {
 	case NFTNL_PARSE_JSON:
-		ret = nftnl_rule_json_parse(r, data, &perr, input, NULL);
-		break;
 	case NFTNL_PARSE_XML:
 	default:
 		ret = -1;
@@ -671,43 +545,6 @@ int nftnl_rule_parse_file(struct nftnl_rule *r, enum nftnl_parse_type type,
 			FILE *fp, struct nftnl_parse_err *err)
 {
 	return nftnl_rule_do_parse(r, type, fp, err, NFTNL_PARSE_FILE);
-}
-
-static int nftnl_rule_export(char *buf, size_t size,
-			     const struct nftnl_rule *r,
-			     uint32_t type, uint32_t flags)
-{
-	struct nftnl_expr *expr;
-
-	NFTNL_BUF_INIT(b, buf, size);
-
-	nftnl_buf_open(&b, type, RULE);
-
-	if (r->flags & (1 << NFTNL_RULE_FAMILY))
-		nftnl_buf_str(&b, type, nftnl_family2str(r->family), FAMILY);
-	if (r->flags & (1 << NFTNL_RULE_TABLE))
-		nftnl_buf_str(&b, type, r->table, TABLE);
-	if (r->flags & (1 << NFTNL_RULE_CHAIN))
-		nftnl_buf_str(&b, type, r->chain, CHAIN);
-	if (r->flags & (1 << NFTNL_RULE_HANDLE))
-		nftnl_buf_u64(&b, type, r->handle, HANDLE);
-	if (r->flags & (1 << NFTNL_RULE_COMPAT_PROTO))
-		nftnl_buf_u32(&b, type, r->compat.proto, COMPAT_PROTO);
-	if (r->flags & (1 << NFTNL_RULE_COMPAT_FLAGS))
-		nftnl_buf_u32(&b, type, r->compat.flags, COMPAT_FLAGS);
-	if (r->flags & (1 << NFTNL_RULE_POSITION))
-		nftnl_buf_u64(&b, type, r->position, POSITION);
-	if (r->flags & (1 << NFTNL_RULE_ID))
-		nftnl_buf_u32(&b, type, r->id, ID);
-
-	nftnl_buf_expr_open(&b, type);
-	list_for_each_entry(expr, &r->expr_list, head)
-		nftnl_buf_expr(&b, type, flags, expr);
-	nftnl_buf_expr_close(&b, type);
-
-	nftnl_buf_close(&b, type, RULE);
-
-	return nftnl_buf_done(&b);
 }
 
 static int nftnl_rule_snprintf_default(char *buf, size_t size,
@@ -795,27 +632,17 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
 
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		ret = nftnl_rule_snprintf_default(buf + offset, remain, r, type,
 						inner_flags);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		break;
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_rule_export(buf + offset, remain, r, type,
-					     inner_flags);
-		break;
 	case NFTNL_OUTPUT_XML:
 	default:
 		return -1;
 	}
-
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

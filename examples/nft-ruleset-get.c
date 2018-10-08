@@ -344,18 +344,8 @@ int main(int argc, char *argv[])
 	int ret;
 
 	if (argc > 2) {
-		fprintf(stderr, "%s {json}\n",
-			argv[0]);
+		fprintf(stderr, "%s\n", argv[0]);
 		exit(EXIT_FAILURE);
-	}
-
-	if (argc == 2) {
-		if (strcmp(argv[1], "json") == 0)
-			type = NFTNL_OUTPUT_JSON;
-		else {
-			fprintf(stderr, "Unknown type: only json is supported\n");
-			exit(EXIT_FAILURE);
-		}
 	}
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);

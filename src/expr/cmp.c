@@ -176,55 +176,6 @@ static inline int nftnl_str2cmp(const char *op)
 	}
 }
 
-static int nftnl_expr_cmp_json_parse(struct nftnl_expr *e, json_t *root,
-					struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	struct nftnl_expr_cmp *cmp = nftnl_expr_data(e);
-	const char *op;
-	uint32_t uval32;
-	int base;
-
-	if (nftnl_jansson_parse_val(root, "sreg", NFTNL_TYPE_U32, &uval32,
-				  err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CMP_SREG, uval32);
-
-	op = nftnl_jansson_parse_str(root, "op", err);
-	if (op != NULL) {
-		base = nftnl_str2cmp(op);
-		if (base < 0)
-			return -1;
-
-		nftnl_expr_set_u32(e, NFTNL_EXPR_CMP_OP, base);
-	}
-
-	if (nftnl_jansson_data_reg_parse(root, "data",
-				       &cmp->data, err) == DATA_VALUE)
-		e->flags |= (1 << NFTNL_EXPR_CMP_DATA);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_expr_cmp_export(char *buf, size_t size,
-				 const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_cmp *cmp = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_CMP_SREG))
-		nftnl_buf_u32(&b, type, cmp->sreg, SREG);
-	if (e->flags & (1 << NFTNL_EXPR_CMP_OP))
-		nftnl_buf_str(&b, type, cmp2str(cmp->op), OP);
-	if (e->flags & (1 << NFTNL_EXPR_CMP_DATA))
-		nftnl_buf_reg(&b, type, &cmp->data, DATA_VALUE, DATA);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_expr_cmp_snprintf_default(char *buf, size_t size,
 					   const struct nftnl_expr *e)
 {
@@ -251,7 +202,6 @@ nftnl_expr_cmp_snprintf(char *buf, size_t size, uint32_t type,
 		return nftnl_expr_cmp_snprintf_default(buf, size, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_cmp_export(buf, size, e, type);
 	default:
 		break;
 	}
@@ -285,5 +235,4 @@ struct expr_ops expr_ops_cmp = {
 	.parse		= nftnl_expr_cmp_parse,
 	.build		= nftnl_expr_cmp_build,
 	.snprintf	= nftnl_expr_cmp_snprintf,
-	.json_parse	= nftnl_expr_cmp_json_parse,
 };

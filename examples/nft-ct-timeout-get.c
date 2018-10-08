@@ -58,8 +58,7 @@ int main(int argc, char *argv[])
 	uint32_t type = NFTNL_OUTPUT_DEFAULT;
 
 	if (argc < 3 || argc > 5) {
-		fprintf(stderr, "%s <family> <table> [<obj>] [<default|xml|json>]\n",
-			argv[0]);
+		fprintf(stderr, "%s <family> <table> [<obj>]\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 
@@ -74,18 +73,6 @@ int main(int argc, char *argv[])
 	else {
 		fprintf(stderr, "Unknown family: ip, ip6, inet, unspec");
 		exit(EXIT_FAILURE);
-	}
-
-	if (strcmp(argv[argc-1], "xml") == 0) {
-		type = NFTNL_OUTPUT_XML;
-		argv[argc-1] = NULL;
-		argc--;
-	} else if (strcmp(argv[argc-1], "json") == 0) {
-		type = NFTNL_OUTPUT_JSON;
-		argv[argc-1] = NULL;
-		argc--;
-	} else if (strcmp(argv[argc - 1], "default") == 0) {
-		argc--;
 	}
 
 	if (argc == 3 || argc == 4) {

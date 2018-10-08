@@ -179,35 +179,6 @@ nftnl_expr_ng_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static int nftnl_expr_ng_json_parse(struct nftnl_expr *e, json_t *root,
-				    struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	uint32_t dreg, modulus, type, offset;
-
-	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32,
-				    &dreg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_DREG, dreg);
-
-	if (nftnl_jansson_parse_val(root, "modulus", NFTNL_TYPE_U32,
-				    &modulus, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_MODULUS, modulus);
-
-	if (nftnl_jansson_parse_val(root, "type", NFTNL_TYPE_U32,
-				    &type, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_TYPE, type);
-
-	if (nftnl_jansson_parse_val(root, "offset", NFTNL_TYPE_U32,
-				    &offset, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NG_OFFSET, offset);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static int
 nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 			       const struct nftnl_expr *e)
@@ -244,27 +215,6 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_expr_ng_export(char *buf, size_t size,
-				const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_ng *ng = nftnl_expr_data(e);
-
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_NG_DREG))
-		nftnl_buf_u32(&b, type, ng->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_NG_MODULUS))
-		nftnl_buf_u32(&b, type, ng->modulus, MODULUS);
-	if (e->flags & (1 << NFTNL_EXPR_NG_TYPE))
-		nftnl_buf_u32(&b, type, ng->type, TYPE);
-	if (e->flags & (1 << NFTNL_EXPR_NG_OFFSET))
-		nftnl_buf_u32(&b, type, ng->type, OFFSET);
-	if (e->flags & (1 << NFTNL_EXPR_NG_SET_NAME))
-		nftnl_buf_str(&b, type, ng->map.name, SET);
-
-	return nftnl_buf_done(&b);
-}
-
 static int
 nftnl_expr_ng_snprintf(char *buf, size_t len, uint32_t type,
 		       uint32_t flags, const struct nftnl_expr *e)
@@ -274,7 +224,6 @@ nftnl_expr_ng_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_ng_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_ng_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -314,5 +263,4 @@ struct expr_ops expr_ops_ng = {
 	.parse		= nftnl_expr_ng_parse,
 	.build		= nftnl_expr_ng_build,
 	.snprintf	= nftnl_expr_ng_snprintf,
-	.json_parse	= nftnl_expr_ng_json_parse,
 };

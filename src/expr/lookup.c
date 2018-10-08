@@ -168,54 +168,6 @@ nftnl_expr_lookup_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_lookup_json_parse(struct nftnl_expr *e, json_t *root,
-				struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	const char *set_name;
-	uint32_t sreg, dreg, flags;
-
-	set_name = nftnl_jansson_parse_str(root, "set", err);
-	if (set_name != NULL)
-		nftnl_expr_set_str(e, NFTNL_EXPR_LOOKUP_SET, set_name);
-
-	if (nftnl_jansson_parse_reg(root, "sreg", NFTNL_TYPE_U32, &sreg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_SREG, sreg);
-
-	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &dreg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_DREG, dreg);
-
-	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32,
-				    &flags, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_LOOKUP_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int
-nftnl_expr_lookup_export(char *buf, size_t size,
-			 const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_lookup *l = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_SET))
-		nftnl_buf_str(&b, type, l->set_name, SET);
-	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_SREG))
-		nftnl_buf_u32(&b, type, l->sreg, SREG);
-	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_DREG))
-		nftnl_buf_u32(&b, type, l->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_LOOKUP_FLAGS))
-		nftnl_buf_u32(&b, type, l->flags, FLAGS);
-
-	return nftnl_buf_done(&b);
-}
-
-static int
 nftnl_expr_lookup_snprintf_default(char *buf, size_t size,
 				   const struct nftnl_expr *e)
 {
@@ -247,7 +199,6 @@ nftnl_expr_lookup_snprintf(char *buf, size_t size, uint32_t type,
 		return nftnl_expr_lookup_snprintf_default(buf, size, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_lookup_export(buf, size, e, type);
 	default:
 		break;
 	}
@@ -293,5 +244,4 @@ struct expr_ops expr_ops_lookup = {
 	.parse		= nftnl_expr_lookup_parse,
 	.build		= nftnl_expr_lookup_build,
 	.snprintf	= nftnl_expr_lookup_snprintf,
-	.json_parse	= nftnl_expr_lookup_json_parse,
 };

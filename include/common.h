@@ -18,15 +18,4 @@ enum nftnl_parse_input {
 	NFTNL_PARSE_FILE,
 };
 
-#include <stdio.h>
-
-int nftnl_cmd_header_snprintf(char *buf, size_t bufsize, uint32_t cmd,
-			   uint32_t format, uint32_t flags);
-int nftnl_cmd_header_fprintf(FILE *fp, uint32_t cmd, uint32_t format,
-			  uint32_t flags);
-int nftnl_cmd_footer_snprintf(char *buf, size_t bufsize, uint32_t cmd,
-			   uint32_t format, uint32_t flags);
-int nftnl_cmd_footer_fprintf(FILE *fp, uint32_t cmd, uint32_t format,
-			  uint32_t flags);
-
 #endif

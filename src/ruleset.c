@@ -45,8 +45,6 @@ struct nftnl_parse_ctx {
 	void *data;
 
 	/* These fields below are not exposed to the user */
-	json_t *json;
-
 	uint32_t format;
 	uint32_t set_id;
 	struct nftnl_set_list *set_list;
@@ -212,393 +210,14 @@ uint32_t nftnl_ruleset_ctx_get_u32(const struct nftnl_parse_ctx *ctx, uint16_t a
 	return ret == NULL ? 0 : *((uint32_t *)ret);
 }
 
-#if defined(JSON_PARSING)
-static void nftnl_ruleset_ctx_set(struct nftnl_parse_ctx *ctx, uint16_t attr,
-				void *data)
-{
-	switch (attr) {
-	case NFTNL_RULESET_CTX_CMD:
-		ctx->cmd = *((uint32_t *)data);
-		break;
-	case NFTNL_RULESET_CTX_TYPE:
-		ctx->type = *((uint32_t *)data);
-		break;
-	case NFTNL_RULESET_CTX_TABLE:
-		ctx->table = data;
-		break;
-	case NFTNL_RULESET_CTX_CHAIN:
-		ctx->chain = data;
-		break;
-	case NFTNL_RULESET_CTX_RULE:
-		ctx->rule = data;
-		break;
-	case NFTNL_RULESET_CTX_SET:
-		ctx->set = data;
-		break;
-	case NFTNL_RULESET_CTX_DATA:
-		ctx->data = data;
-		break;
-	}
-	ctx->flags |= (1 << attr);
-}
-
-static void nftnl_ruleset_ctx_set_u32(struct nftnl_parse_ctx *ctx, uint16_t attr,
-				    uint32_t val)
-{
-	nftnl_ruleset_ctx_set(ctx, attr, &val);
-}
-
-static int nftnl_ruleset_parse_tables(struct nftnl_parse_ctx *ctx,
-				    struct nftnl_parse_err *err)
-{
-	struct nftnl_table *table;
-
-	table = nftnl_table_alloc();
-	if (table == NULL)
-		return -1;
-
-	switch (ctx->format) {
-	case NFTNL_OUTPUT_JSON:
-#ifdef JSON_PARSING
-		if (nftnl_jansson_parse_table(table, ctx->json, err) < 0)
-			goto err;
-#endif
-		break;
-	case NFTNL_OUTPUT_XML:
-	default:
-		errno = EOPNOTSUPP;
-		goto err;
-	}
-
-	nftnl_ruleset_ctx_set_u32(ctx, NFTNL_RULESET_CTX_TYPE, NFTNL_RULESET_TABLE);
-	nftnl_ruleset_ctx_set(ctx, NFTNL_RULESET_CTX_TABLE, table);
-	if (ctx->cb(ctx) < 0)
-		goto err;
-
-	return 0;
-err:
-	nftnl_table_free(table);
-	return -1;
-}
-
-static int nftnl_ruleset_parse_chains(struct nftnl_parse_ctx *ctx,
-				    struct nftnl_parse_err *err)
-{
-	struct nftnl_chain *chain;
-
-	chain = nftnl_chain_alloc();
-	if (chain == NULL)
-		return -1;
-
-	switch (ctx->format) {
-	case NFTNL_OUTPUT_JSON:
-#ifdef JSON_PARSING
-		if (nftnl_jansson_parse_chain(chain, ctx->json, err) < 0)
-			goto err;
-#endif
-		break;
-	case NFTNL_OUTPUT_XML:
-	default:
-		errno = EOPNOTSUPP;
-		goto err;
-	}
-
-	nftnl_ruleset_ctx_set_u32(ctx, NFTNL_RULESET_CTX_TYPE, NFTNL_RULESET_CHAIN);
-	nftnl_ruleset_ctx_set(ctx, NFTNL_RULESET_CTX_CHAIN, chain);
-	if (ctx->cb(ctx) < 0)
-		goto err;
-
-	return 0;
-err:
-	nftnl_chain_free(chain);
-	return -1;
-}
-
-static int nftnl_ruleset_parse_set(struct nftnl_parse_ctx *ctx,
-				 struct nftnl_set *set, uint32_t type,
-				 struct nftnl_parse_err *err)
-{
-	struct nftnl_set *newset;
-
-	nftnl_set_set_u32(set, NFTNL_SET_ID, ctx->set_id++);
-
-	newset = nftnl_set_clone(set);
-	if (newset == NULL)
-		goto err;
-
-	nftnl_set_list_add_tail(newset, ctx->set_list);
-
-	nftnl_ruleset_ctx_set_u32(ctx, NFTNL_RULESET_CTX_TYPE, type);
-	nftnl_ruleset_ctx_set(ctx, NFTNL_RULESET_CTX_SET, set);
-	if (ctx->cb(ctx) < 0)
-		goto err;
-
-	return 0;
-err:
-	return -1;
-}
-
-static int nftnl_ruleset_parse_set_elems(struct nftnl_parse_ctx *ctx,
-				       struct nftnl_parse_err *err)
-{
-	struct nftnl_set *set;
-
-	set = nftnl_set_alloc();
-	if (set == NULL)
-		return -1;
-
-	switch (ctx->format) {
-	case NFTNL_OUTPUT_JSON:
-#ifdef JSON_PARSING
-		if (nftnl_jansson_parse_elem(set, ctx->json, err) < 0)
-			goto err;
-#endif
-		break;
-	case NFTNL_OUTPUT_XML:
-	default:
-		errno = EOPNOTSUPP;
-		goto err;
-	}
-
-	if (nftnl_ruleset_parse_set(ctx, set, NFTNL_RULESET_SET_ELEMS, err) < 0)
-		goto err;
-
-	return 0;
-err:
-	nftnl_set_free(set);
-	return -1;
-}
-
-static int nftnl_ruleset_parse_sets(struct nftnl_parse_ctx *ctx,
-				  struct nftnl_parse_err *err)
-{
-	struct nftnl_set *set;
-
-	set = nftnl_set_alloc();
-	if (set == NULL)
-		return -1;
-
-	switch (ctx->format) {
-	case NFTNL_OUTPUT_JSON:
-#ifdef JSON_PARSING
-		if (nftnl_jansson_parse_set(set, ctx->json, err) < 0)
-			goto err;
-#endif
-		break;
-	case NFTNL_OUTPUT_XML:
-	default:
-		errno = EOPNOTSUPP;
-		goto err;
-	}
-
-	if (nftnl_ruleset_parse_set(ctx, set, NFTNL_RULESET_SET, err) < 0)
-		goto err;
-
-	return 0;
-err:
-	nftnl_set_free(set);
-	return -1;
-}
-
-static int nftnl_ruleset_parse_rules(struct nftnl_parse_ctx *ctx,
-				   struct nftnl_parse_err *err)
-{
-	struct nftnl_rule *rule;
-
-	rule = nftnl_rule_alloc();
-	if (rule == NULL)
-		return -1;
-
-	switch (ctx->format) {
-	case NFTNL_OUTPUT_JSON:
-#ifdef JSON_PARSING
-		if (nftnl_jansson_parse_rule(rule, ctx->json, err,
-					   ctx->set_list) < 0)
-			goto err;
-#endif
-		break;
-	case NFTNL_OUTPUT_XML:
-	default:
-		errno = EOPNOTSUPP;
-		goto err;
-	}
-
-	nftnl_ruleset_ctx_set_u32(ctx, NFTNL_RULESET_CTX_TYPE, NFTNL_RULESET_RULE);
-	nftnl_ruleset_ctx_set(ctx, NFTNL_RULESET_CTX_RULE, rule);
-	if (ctx->cb(ctx) < 0)
-		goto err;
-
-	return 0;
-err:
-	nftnl_rule_free(rule);
-	return -1;
-}
-#endif
-
-#ifdef JSON_PARSING
-static int nftnl_ruleset_json_parse_ruleset(struct nftnl_parse_ctx *ctx,
-					  struct nftnl_parse_err *err)
-{
-	json_t *node, *array = ctx->json;
-	int len, i, ret;
-
-	len = json_array_size(array);
-	for (i = 0; i < len; i++) {
-		node = json_array_get(array, i);
-		if (node == NULL) {
-			errno = EINVAL;
-			return -1;
-		}
-
-		ctx->json = node;
-		if (nftnl_jansson_node_exist(node, "table"))
-			ret = nftnl_ruleset_parse_tables(ctx, err);
-		else if (nftnl_jansson_node_exist(node, "chain"))
-			ret = nftnl_ruleset_parse_chains(ctx, err);
-		else if (nftnl_jansson_node_exist(node, "set"))
-			ret = nftnl_ruleset_parse_sets(ctx, err);
-		else if (nftnl_jansson_node_exist(node, "rule"))
-			ret = nftnl_ruleset_parse_rules(ctx, err);
-		else if (nftnl_jansson_node_exist(node, "element"))
-			ret = nftnl_ruleset_parse_set_elems(ctx, err);
-		else
-			return -1;
-
-		if (ret < 0)
-			return ret;
-	}
-
-	if (len == 0 && ctx->cmd == NFTNL_CMD_FLUSH) {
-		nftnl_ruleset_ctx_set_u32(ctx, NFTNL_RULESET_CTX_TYPE,
-					NFTNL_RULESET_RULESET);
-		if (ctx->cb(ctx) < 0)
-			return -1;
-	}
-
-	return 0;
-}
-
-static int nftnl_ruleset_json_parse_cmd(const char *cmd,
-				      struct nftnl_parse_err *err,
-				      struct nftnl_parse_ctx *ctx)
-{
-	uint32_t cmdnum;
-	json_t *nodecmd;
-
-	cmdnum = nftnl_str2cmd(cmd);
-	if (cmdnum == NFTNL_CMD_UNSPEC) {
-		err->error = NFTNL_PARSE_EMISSINGNODE;
-		err->node_name = strdup(cmd);
-		return -1;
-	}
-
-	nftnl_ruleset_ctx_set_u32(ctx, NFTNL_RULESET_CTX_CMD, cmdnum);
-
-	nodecmd = json_object_get(ctx->json, cmd);
-	if (nodecmd == NULL)
-		return 0;
-
-	ctx->json = nodecmd;
-	if (nftnl_ruleset_json_parse_ruleset(ctx, err) != 0)
-		goto err;
-
-	return 0;
-err:
-	return -1;
-}
-#endif
-
-static int nftnl_ruleset_json_parse(const void *json,
-				  struct nftnl_parse_err *err,
-				  enum nftnl_parse_input input,
-				  enum nftnl_parse_type type, void *arg,
-				  int (*cb)(const struct nftnl_parse_ctx *ctx))
-{
-#ifdef JSON_PARSING
-	json_t *root, *array, *node;
-	json_error_t error;
-	int i, len;
-	const char *key;
-	struct nftnl_parse_ctx ctx = {
-		.cb = cb,
-		.format = type,
-		.flags = 0,
-	};
-
-	ctx.set_list = nftnl_set_list_alloc();
-	if (ctx.set_list == NULL)
-		return -1;
-
-	if (arg != NULL)
-		nftnl_ruleset_ctx_set(&ctx, NFTNL_RULESET_CTX_DATA, arg);
-
-	root = nftnl_jansson_create_root(json, &error, err, input);
-	if (root == NULL)
-		goto err1;
-
-	array = json_object_get(root, "nftables");
-	if (array == NULL) {
-		errno = EINVAL;
-		goto err2;
-	}
-
-	len = json_array_size(array);
-	for (i = 0; i < len; i++) {
-		node = json_array_get(array, i);
-		if (node == NULL) {
-			errno = EINVAL;
-			goto err2;
-		}
-		ctx.json = node;
-		key = json_object_iter_key(json_object_iter(node));
-		if (key == NULL)
-			goto err2;
-
-		if (nftnl_ruleset_json_parse_cmd(key, err, &ctx) < 0)
-			goto err2;
-	}
-
-	nftnl_set_list_free(ctx.set_list);
-	nftnl_jansson_free_root(root);
-	return 0;
-err2:
-	nftnl_jansson_free_root(root);
-err1:
-	nftnl_set_list_free(ctx.set_list);
-	return -1;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int
-nftnl_ruleset_do_parse(enum nftnl_parse_type type, const void *data,
-		     struct nftnl_parse_err *err, enum nftnl_parse_input input,
-		     void *arg, int (*cb)(const struct nftnl_parse_ctx *ctx))
-{
-	int ret;
-
-	switch (type) {
-	case NFTNL_PARSE_JSON:
-		ret = nftnl_ruleset_json_parse(data, err, input, type, arg, cb);
-		break;
-	case NFTNL_PARSE_XML:
-	default:
-		ret = -1;
-		errno = EOPNOTSUPP;
-		break;
-	}
-
-	return ret;
-}
 
 EXPORT_SYMBOL(nftnl_ruleset_parse_file_cb);
 int nftnl_ruleset_parse_file_cb(enum nftnl_parse_type type, FILE *fp,
 			      struct nftnl_parse_err *err, void *data,
 			      int (*cb)(const struct nftnl_parse_ctx *ctx))
 {
-	return nftnl_ruleset_do_parse(type, fp, err, NFTNL_PARSE_FILE, data, cb);
+	errno = EOPNOTSUPP;
+	return -1;
 }
 
 EXPORT_SYMBOL(nftnl_ruleset_parse_buffer_cb);
@@ -606,8 +225,8 @@ int nftnl_ruleset_parse_buffer_cb(enum nftnl_parse_type type, const char *buffer
 				struct nftnl_parse_err *err, void *data,
 				int (*cb)(const struct nftnl_parse_ctx *ctx))
 {
-	return nftnl_ruleset_do_parse(type, buffer, err, NFTNL_PARSE_BUFFER, data,
-				    cb);
+	errno = EOPNOTSUPP;
+	return -1;
 }
 
 static int nftnl_ruleset_cb(const struct nftnl_parse_ctx *ctx)
@@ -675,7 +294,8 @@ EXPORT_SYMBOL(nftnl_ruleset_parse);
 int nftnl_ruleset_parse(struct nftnl_ruleset *r, enum nftnl_parse_type type,
 		      const char *data, struct nftnl_parse_err *err)
 {
-	return nftnl_ruleset_parse_buffer_cb(type, data, err, r, nftnl_ruleset_cb);
+	errno = EOPNOTSUPP;
+	return -1;
 }
 
 EXPORT_SYMBOL(nftnl_ruleset_parse_file);
@@ -849,13 +469,6 @@ nftnl_ruleset_do_snprintf(char *buf, size_t size, const struct nftnl_ruleset *rs
 	/* dont pass events flags to child calls of _snprintf() */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
-	ret = snprintf(buf + offset, remain, "%s",
-		       nftnl_ruleset_o_opentag(type));
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
 	if (nftnl_ruleset_is_set(rs, NFTNL_RULESET_TABLELIST) &&
 	    (!nftnl_table_list_is_empty(rs->table_list))) {
 		ret = nftnl_ruleset_snprintf_table(buf + offset, remain, rs,
@@ -904,13 +517,6 @@ nftnl_ruleset_do_snprintf(char *buf, size_t size, const struct nftnl_ruleset *rs
 						type, inner_flags);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
-
-	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = snprintf(buf + offset, remain, "%s",
-		       nftnl_ruleset_o_closetag(type));
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }
@@ -1108,9 +714,6 @@ static int nftnl_ruleset_cmd_fprintf(FILE *fp, const struct nftnl_ruleset *rs,
 	ret = fprintf(fp, "%s", nftnl_ruleset_o_opentag(type));
 	NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
-	ret = nftnl_cmd_header_fprintf(fp, cmd, type, flags);
-	NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
-
 	if ((nftnl_ruleset_is_set(rs, NFTNL_RULESET_TABLELIST)) &&
 	    (!nftnl_table_list_is_empty(rs->table_list))) {
 		ret = nftnl_ruleset_fprintf_tables(fp, rs, type, inner_flags);
@@ -1152,9 +755,6 @@ static int nftnl_ruleset_cmd_fprintf(FILE *fp, const struct nftnl_ruleset *rs,
 		ret = nftnl_ruleset_fprintf_rules(fp, rs, type, inner_flags);
 		NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 	}
-
-	ret = nftnl_cmd_footer_fprintf(fp, cmd, type, flags);
-	NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 	ret = fprintf(fp, "%s", nftnl_ruleset_o_closetag(type));
 	NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);

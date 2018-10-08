@@ -19,8 +19,6 @@ struct expr_ops {
 	int 	(*parse)(struct nftnl_expr *e, struct nlattr *attr);
 	void	(*build)(struct nlmsghdr *nlh, const struct nftnl_expr *e);
 	int	(*snprintf)(char *buf, size_t len, uint32_t type, uint32_t flags, const struct nftnl_expr *e);
-	int	(*json_parse)(struct nftnl_expr *e, json_t *data,
-			      struct nftnl_parse_err *err);
 };
 
 struct expr_ops *nftnl_expr_ops_lookup(const char *name);

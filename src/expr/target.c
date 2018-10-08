@@ -165,36 +165,6 @@ static int nftnl_expr_target_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_target_json_parse(struct nftnl_expr *e, json_t *root,
-				struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	const char *name;
-
-	name = nftnl_jansson_parse_str(root, "name", err);
-	if (name != NULL)
-		nftnl_expr_set_str(e, NFTNL_EXPR_TG_NAME, name);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_rule_exp_target_export(char *buf, size_t size,
-				        const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_target *target = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_TG_NAME))
-		nftnl_buf_str(&b, type, target->name, NAME);
-
-	return nftnl_buf_done(&b);
-}
-
-static int
 nftnl_expr_target_snprintf(char *buf, size_t len, uint32_t type,
 			   uint32_t flags, const struct nftnl_expr *e)
 {
@@ -206,7 +176,6 @@ nftnl_expr_target_snprintf(char *buf, size_t len, uint32_t type,
 				target->name, target->rev);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_rule_exp_target_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -250,5 +219,4 @@ struct expr_ops expr_ops_target = {
 	.parse		= nftnl_expr_target_parse,
 	.build		= nftnl_expr_target_build,
 	.snprintf	= nftnl_expr_target_snprintf,
-	.json_parse	= nftnl_expr_target_json_parse,
 };

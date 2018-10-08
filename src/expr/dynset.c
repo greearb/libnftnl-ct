@@ -205,59 +205,6 @@ nftnl_expr_dynset_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static int
-nftnl_expr_dynset_json_parse(struct nftnl_expr *e, json_t *root,
-				struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	const char *set_name;
-	uint32_t uval32;
-	uint64_t uval64;
-
-	set_name = nftnl_jansson_parse_str(root, "set", err);
-	if (set_name != NULL)
-		nftnl_expr_set_str(e, NFTNL_EXPR_DYNSET_SET_NAME, set_name);
-
-	if (nftnl_jansson_parse_reg(root, "sreg_key",
-				  NFTNL_TYPE_U32, &uval32, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_DYNSET_SREG_KEY, uval32);
-
-	if (nftnl_jansson_parse_reg(root, "sreg_data",
-				  NFTNL_TYPE_U32, &uval32, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_DYNSET_SREG_DATA, uval32);
-
-	if (nftnl_jansson_parse_val(root, "op", NFTNL_TYPE_U32, &uval32,
-				  err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_DYNSET_OP, uval32);
-
-	if (nftnl_jansson_parse_val(root, "timeout", NFTNL_TYPE_U64, &uval64,
-				  err) == 0)
-		nftnl_expr_set_u64(e, NFTNL_EXPR_DYNSET_TIMEOUT, uval64);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int
-nftnl_expr_dynset_export(char *buf, size_t size,
-			 const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_DYNSET_SET_NAME))
-		nftnl_buf_str(&b, type, dynset->set_name, SET_NAME);
-	if (e->flags & (1 << NFTNL_EXPR_DYNSET_SREG_KEY))
-		nftnl_buf_u32(&b, type, dynset->sreg_key, SREG_KEY);
-	if (e->flags & (1 << NFTNL_EXPR_DYNSET_SREG_DATA))
-		nftnl_buf_u32(&b, type, dynset->sreg_data, SREG_DATA);
-
-	return nftnl_buf_done(&b);
-}
-
 static const char *op2str_array[] = {
 	[NFT_DYNSET_OP_ADD]		= "add",
 	[NFT_DYNSET_OP_UPDATE] 		= "update",
@@ -319,7 +266,6 @@ nftnl_expr_dynset_snprintf(char *buf, size_t size, uint32_t type,
 		return nftnl_expr_dynset_snprintf_default(buf, size, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_dynset_export(buf, size, e, type);
 	default:
 		break;
 	}
@@ -369,5 +315,4 @@ struct expr_ops expr_ops_dynset = {
 	.parse		= nftnl_expr_dynset_parse,
 	.build		= nftnl_expr_dynset_build,
 	.snprintf	= nftnl_expr_dynset_snprintf,
-	.json_parse	= nftnl_expr_dynset_json_parse,
 };

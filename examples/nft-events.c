@@ -235,18 +235,8 @@ int main(int argc, char *argv[])
 	case 1:
 		type = NFTNL_OUTPUT_DEFAULT;
 		break;
-	case 2:
-		if (strcmp(argv[1], "json") == 0) {
-			type = NFTNL_OUTPUT_JSON;
-		} else if (strcmp(argv[1], "default") == 0) {
-			type = NFTNL_OUTPUT_DEFAULT;
-		} else {
-			fprintf(stderr, "unknown format type `%s'\n", argv[1]);
-			return EXIT_FAILURE;
-		}
-		break;
 	default:
-		fprintf(stderr, "%s [<default|json>]\n", argv[0]);
+		fprintf(stderr, "%s\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 

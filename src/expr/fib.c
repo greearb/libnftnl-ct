@@ -128,31 +128,6 @@ nftnl_expr_fib_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static int nftnl_expr_fib_json_parse(struct nftnl_expr *e, json_t *root,
-				      struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	uint32_t result, flags, dreg;
-
-	if (nftnl_jansson_parse_reg(root, "result", NFTNL_TYPE_U32,
-				    &result, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_FIB_RESULT, result);
-
-	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32,
-				    &dreg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_FIB_DREG, dreg);
-
-	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32,
-				    &flags, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_FIB_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
 static const char *fib_type[NFT_FIB_RESULT_MAX + 1] = {
 	[NFT_FIB_RESULT_OIF] = "oif",
 	[NFT_FIB_RESULT_OIFNAME] = "oifname",
@@ -215,23 +190,6 @@ nftnl_expr_fib_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_expr_fib_export(char *buf, size_t size,
-				  const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_fib *fib = nftnl_expr_data(e);
-
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_FIB_RESULT))
-		nftnl_buf_u32(&b, type, fib->result, OP);
-	if (e->flags & (1 << NFTNL_EXPR_FIB_DREG))
-		nftnl_buf_u32(&b, type, fib->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_FIB_FLAGS))
-		nftnl_buf_u32(&b, type, fib->flags, FLAGS);
-
-	return nftnl_buf_done(&b);
-}
-
 static int
 nftnl_expr_fib_snprintf(char *buf, size_t len, uint32_t type,
 			 uint32_t flags, const struct nftnl_expr *e)
@@ -241,7 +199,6 @@ nftnl_expr_fib_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_fib_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_fib_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -275,5 +232,4 @@ struct expr_ops expr_ops_fib = {
 	.parse		= nftnl_expr_fib_parse,
 	.build		= nftnl_expr_fib_build,
 	.snprintf	= nftnl_expr_fib_snprintf,
-	.json_parse	= nftnl_expr_fib_json_parse,
 };

@@ -513,109 +513,11 @@ static inline int nftnl_str2hooknum(int family, const char *hook)
 	return -1;
 }
 
-#ifdef JSON_PARSING
-static int nftnl_jansson_parse_flowtable(struct nftnl_flowtable *c,
-					 json_t *tree,
-					 struct nftnl_parse_err *err)
-{
-	const char *name, *table, *hooknum_str;
-	int32_t family, prio, hooknum;
-	uint32_t size;
-	json_t *root;
-
-	root = nftnl_jansson_get_node(tree, "flowtable", err);
-	if (root == NULL)
-		return -1;
-
-	name = nftnl_jansson_parse_str(root, "name", err);
-	if (name != NULL)
-		nftnl_flowtable_set_str(c, NFTNL_FLOWTABLE_NAME, name);
-
-	if (nftnl_jansson_parse_family(root, &family, err) == 0)
-		nftnl_flowtable_set_u32(c, NFTNL_FLOWTABLE_FAMILY, family);
-
-	table = nftnl_jansson_parse_str(root, "table", err);
-
-	if (table != NULL)
-		nftnl_flowtable_set_str(c, NFTNL_FLOWTABLE_TABLE, table);
-
-	if (nftnl_jansson_node_exist(root, "hooknum")) {
-		if (nftnl_jansson_parse_val(root, "prio", NFTNL_TYPE_S32,
-					  &prio, err) == 0)
-			nftnl_flowtable_set_s32(c, NFTNL_FLOWTABLE_PRIO, prio);
-
-		hooknum_str = nftnl_jansson_parse_str(root, "hooknum", err);
-		if (hooknum_str != NULL) {
-			hooknum = nftnl_str2hooknum(c->family, hooknum_str);
-			if (hooknum == -1)
-				return -1;
-			nftnl_flowtable_set_u32(c, NFTNL_FLOWTABLE_HOOKNUM,
-					       hooknum);
-		}
-	}
-	if (nftnl_jansson_parse_val(root, "size", NFTNL_TYPE_U32,
-				    &size, err) == 0)
-		nftnl_flowtable_set_u32(c, NFTNL_FLOWTABLE_SIZE, size);
-
-	return 0;
-}
-#endif
-
-static int nftnl_flowtable_json_parse(struct nftnl_flowtable *c,
-				      const void *json,
-				      struct nftnl_parse_err *err,
-				      enum nftnl_parse_input input)
-{
-#ifdef JSON_PARSING
-	json_t *tree;
-	json_error_t error;
-	int ret;
-
-	tree = nftnl_jansson_create_root(json, &error, err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_jansson_parse_flowtable(c, tree, err);
-
-	nftnl_jansson_free_root(tree);
-
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_flowtable_do_parse(struct nftnl_flowtable *c,
-				    enum nftnl_parse_type type,
-				    const void *data,
-				    struct nftnl_parse_err *err,
-				    enum nftnl_parse_input input)
-{
-	int ret;
-	struct nftnl_parse_err perr = {};
-
-	switch (type) {
-	case NFTNL_PARSE_JSON:
-		ret = nftnl_flowtable_json_parse(c, data, &perr, input);
-		break;
-	case NFTNL_PARSE_XML:
-	default:
-		ret = -1;
-		errno = EOPNOTSUPP;
-		break;
-	}
-
-	if (err != NULL)
-		*err = perr;
-
-	return ret;
-}
-
 int nftnl_flowtable_parse(struct nftnl_flowtable *c, enum nftnl_parse_type type,
 			  const char *data, struct nftnl_parse_err *err)
 {
-	return nftnl_flowtable_do_parse(c, type, data, err, NFTNL_PARSE_BUFFER);
+	errno = EOPNOTSUPP;
+	return -1;
 }
 EXPORT_SYMBOL(nftnl_flowtable_parse);
 
@@ -623,40 +525,10 @@ int nftnl_flowtable_parse_file(struct nftnl_flowtable *c,
 			       enum nftnl_parse_type type,
 			       FILE *fp, struct nftnl_parse_err *err)
 {
-	return nftnl_flowtable_do_parse(c, type, fp, err, NFTNL_PARSE_FILE);
+	errno = EOPNOTSUPP;
+	return -1;
 }
 EXPORT_SYMBOL(nftnl_flowtable_parse_file);
-
-static int nftnl_flowtable_export(char *buf, size_t size,
-				  const struct nftnl_flowtable *c, int type)
-{
-	NFTNL_BUF_INIT(b, buf, size);
-
-	nftnl_buf_open(&b, type, CHAIN);
-	if (c->flags & (1 << NFTNL_FLOWTABLE_NAME))
-		nftnl_buf_str(&b, type, c->name, NAME);
-	if (c->flags & (1 << NFTNL_FLOWTABLE_TABLE))
-		nftnl_buf_str(&b, type, c->table, TABLE);
-	if (c->flags & (1 << NFTNL_FLOWTABLE_FAMILY))
-		nftnl_buf_str(&b, type, nftnl_family2str(c->family), FAMILY);
-	if (c->flags & (1 << NFTNL_FLOWTABLE_USE))
-		nftnl_buf_u32(&b, type, c->use, USE);
-	if (c->flags & (1 << NFTNL_FLOWTABLE_HOOKNUM)) {
-		if (c->flags & (1 << NFTNL_FLOWTABLE_HOOKNUM))
-			nftnl_buf_str(&b, type, nftnl_hooknum2str(c->family,
-					 c->hooknum), HOOKNUM);
-		if (c->flags & (1 << NFTNL_FLOWTABLE_PRIO))
-			nftnl_buf_s32(&b, type, c->prio, PRIO);
-	}
-	if (c->flags & (1 << NFTNL_FLOWTABLE_SIZE))
-		nftnl_buf_u32(&b, type, c->size, SIZE);
-	if (c->flags & (1 << NFTNL_FLOWTABLE_FLAGS))
-		nftnl_buf_u32(&b, type, c->ft_flags, FLAGS);
-
-	nftnl_buf_close(&b, type, CHAIN);
-
-	return nftnl_buf_done(&b);
-}
 
 static int nftnl_flowtable_snprintf_default(char *buf, size_t size,
 					    const struct nftnl_flowtable *c)
@@ -697,25 +569,17 @@ static int nftnl_flowtable_cmd_snprintf(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		ret = nftnl_flowtable_snprintf_default(buf + offset, remain, c);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		break;
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_flowtable_export(buf + offset, remain, c, type);
 		break;
 	default:
 		return -1;
 	}
-
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

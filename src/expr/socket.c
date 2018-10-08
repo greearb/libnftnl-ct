@@ -151,20 +151,6 @@ nftnl_expr_socket_snprintf_default(char *buf, size_t len,
 	return 0;
 }
 
-static int nftnl_expr_socket_export(char *buf, size_t size,
-				  const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_socket *socket = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_SOCKET_DREG))
-		nftnl_buf_u32(&b, type, socket->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_SOCKET_KEY))
-		nftnl_buf_str(&b, type, socket_key2str(socket->key), KEY);
-
-	return nftnl_buf_done(&b);
-}
-
 static int
 nftnl_expr_socket_snprintf(char *buf, size_t len, uint32_t type,
 		       uint32_t flags, const struct nftnl_expr *e)
@@ -174,7 +160,6 @@ nftnl_expr_socket_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_socket_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_socket_export(buf, len, e, type);
 	default:
 		break;
 	}

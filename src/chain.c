@@ -603,188 +603,6 @@ static inline int nftnl_str2hooknum(int family, const char *hook)
 	return -1;
 }
 
-#ifdef JSON_PARSING
-int nftnl_jansson_parse_chain(struct nftnl_chain *c, json_t *tree,
-			    struct nftnl_parse_err *err)
-{
-	json_t *root;
-	uint64_t handle, bytes, packets;
-	int policy_num;
-	int32_t family, prio, hooknum, use;
-	const char *name, *table, *type, *hooknum_str, *policy, *dev;
-
-	root = nftnl_jansson_get_node(tree, "chain", err);
-	if (root == NULL)
-		return -1;
-
-	name = nftnl_jansson_parse_str(root, "name", err);
-	if (name != NULL)
-		nftnl_chain_set_str(c, NFTNL_CHAIN_NAME, name);
-
-	if (nftnl_jansson_parse_val(root, "handle", NFTNL_TYPE_U64, &handle,
-				  err) == 0)
-		nftnl_chain_set_u64(c,NFTNL_CHAIN_HANDLE, handle);
-
-	if (nftnl_jansson_parse_val(root, "bytes", NFTNL_TYPE_U64, &bytes,
-				  err) == 0)
-		nftnl_chain_set_u64(c, NFTNL_CHAIN_BYTES, bytes);
-
-	if (nftnl_jansson_parse_val(root, "packets", NFTNL_TYPE_U64, &packets,
-				  err) == 0)
-		nftnl_chain_set_u64(c, NFTNL_CHAIN_PACKETS, packets);
-
-	if (nftnl_jansson_parse_family(root, &family, err) == 0)
-		nftnl_chain_set_u32(c, NFTNL_CHAIN_FAMILY, family);
-
-	table = nftnl_jansson_parse_str(root, "table", err);
-
-	if (table != NULL)
-		nftnl_chain_set_str(c, NFTNL_CHAIN_TABLE, table);
-
-	if (nftnl_jansson_parse_val(root, "use", NFTNL_TYPE_U32, &use, err) == 0)
-		nftnl_chain_set_u32(c, NFTNL_CHAIN_USE, use);
-
-	if (nftnl_jansson_node_exist(root, "hooknum")) {
-		type = nftnl_jansson_parse_str(root, "type", err);
-
-		if (type != NULL)
-			nftnl_chain_set_str(c, NFTNL_CHAIN_TYPE, type);
-
-		if (nftnl_jansson_parse_val(root, "prio", NFTNL_TYPE_S32,
-					  &prio, err) == 0)
-			nftnl_chain_set_s32(c, NFTNL_CHAIN_PRIO, prio);
-
-		hooknum_str = nftnl_jansson_parse_str(root, "hooknum", err);
-		if (hooknum_str != NULL) {
-			hooknum = nftnl_str2hooknum(c->family, hooknum_str);
-			if (hooknum == -1)
-				return -1;
-			nftnl_chain_set_u32(c, NFTNL_CHAIN_HOOKNUM,
-					       hooknum);
-		}
-
-		policy = nftnl_jansson_parse_str(root, "policy", err);
-		if (policy != NULL) {
-			if (nftnl_str2verdict(policy, &policy_num) != 0) {
-				errno = EINVAL;
-				err->node_name = "policy";
-				err->error = NFTNL_PARSE_EBADTYPE;
-				return -1;
-			}
-			nftnl_chain_set_u32(c, NFTNL_CHAIN_POLICY,
-					       policy_num);
-		}
-
-		dev = nftnl_jansson_parse_str(root, "device", err);
-		if (dev != NULL)
-			nftnl_chain_set_str(c, NFTNL_CHAIN_DEV, dev);
-	}
-
-	return 0;
-}
-#endif
-
-static int nftnl_chain_json_parse(struct nftnl_chain *c, const void *json,
-				struct nftnl_parse_err *err,
-				enum nftnl_parse_input input)
-{
-#ifdef JSON_PARSING
-	json_t *tree;
-	json_error_t error;
-	int ret;
-
-	tree = nftnl_jansson_create_root(json, &error, err, input);
-	if (tree == NULL)
-		return -1;
-
-	ret = nftnl_jansson_parse_chain(c, tree, err);
-
-	nftnl_jansson_free_root(tree);
-
-	return ret;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_chain_do_parse(struct nftnl_chain *c, enum nftnl_parse_type type,
-			      const void *data, struct nftnl_parse_err *err,
-			      enum nftnl_parse_input input)
-{
-	int ret;
-	struct nftnl_parse_err perr = {};
-
-	switch (type) {
-	case NFTNL_PARSE_JSON:
-		ret = nftnl_chain_json_parse(c, data, &perr, input);
-		break;
-	case NFTNL_PARSE_XML:
-	default:
-		ret = -1;
-		errno = EOPNOTSUPP;
-		break;
-	}
-
-	if (err != NULL)
-		*err = perr;
-
-	return ret;
-}
-
-EXPORT_SYMBOL(nftnl_chain_parse);
-int nftnl_chain_parse(struct nftnl_chain *c, enum nftnl_parse_type type,
-		    const char *data, struct nftnl_parse_err *err)
-{
-	return nftnl_chain_do_parse(c, type, data, err, NFTNL_PARSE_BUFFER);
-}
-
-EXPORT_SYMBOL(nftnl_chain_parse_file);
-int nftnl_chain_parse_file(struct nftnl_chain *c, enum nftnl_parse_type type,
-			 FILE *fp, struct nftnl_parse_err *err)
-{
-	return nftnl_chain_do_parse(c, type, fp, err, NFTNL_PARSE_FILE);
-}
-
-static int nftnl_chain_export(char *buf, size_t size,
-			      const struct nftnl_chain *c, int type)
-{
-	NFTNL_BUF_INIT(b, buf, size);
-
-	nftnl_buf_open(&b, type, CHAIN);
-	if (c->flags & (1 << NFTNL_CHAIN_NAME))
-		nftnl_buf_str(&b, type, c->name, NAME);
-	if (c->flags & (1 << NFTNL_CHAIN_HANDLE))
-		nftnl_buf_u64(&b, type, c->handle, HANDLE);
-	if (c->flags & (1 << NFTNL_CHAIN_BYTES))
-		nftnl_buf_u64(&b, type, c->bytes, BYTES);
-	if (c->flags & (1 << NFTNL_CHAIN_PACKETS))
-		nftnl_buf_u64(&b, type, c->packets, PACKETS);
-	if (c->flags & (1 << NFTNL_CHAIN_TABLE))
-		nftnl_buf_str(&b, type, c->table, TABLE);
-	if (c->flags & (1 << NFTNL_CHAIN_FAMILY))
-		nftnl_buf_str(&b, type, nftnl_family2str(c->family), FAMILY);
-	if (c->flags & (1 << NFTNL_CHAIN_USE))
-		nftnl_buf_u32(&b, type, c->use, USE);
-	if (c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) {
-		if (c->flags & (1 << NFTNL_CHAIN_TYPE))
-			nftnl_buf_str(&b, type, c->type, TYPE);
-		if (c->flags & (1 << NFTNL_CHAIN_HOOKNUM))
-			nftnl_buf_str(&b, type, nftnl_hooknum2str(c->family,
-					 c->hooknum), HOOKNUM);
-		if (c->flags & (1 << NFTNL_CHAIN_PRIO))
-			nftnl_buf_s32(&b, type, c->prio, PRIO);
-		if (c->flags & (1 << NFTNL_CHAIN_POLICY))
-			nftnl_buf_str(&b, type, nftnl_verdict2str(c->policy), POLICY);
-		if (c->flags & (1 << NFTNL_CHAIN_DEV))
-			nftnl_buf_str(&b, type, c->dev, DEVICE);
-	}
-
-	nftnl_buf_close(&b, type, CHAIN);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_chain_snprintf_default(char *buf, size_t size,
 					const struct nftnl_chain *c)
 {
@@ -827,25 +645,16 @@ static int nftnl_chain_cmd_snprintf(char *buf, size_t size,
 {
 	int ret, remain = size, offset = 0;
 
-	ret = nftnl_cmd_header_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:
 		ret = nftnl_chain_snprintf_default(buf + offset, remain, c);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		break;
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		ret = nftnl_chain_export(buf + offset, remain, c, type);
-		break;
 	default:
 		return -1;
 	}
-
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
-	ret = nftnl_cmd_footer_snprintf(buf + offset, remain, cmd, type, flags);
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
 }

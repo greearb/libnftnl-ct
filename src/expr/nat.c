@@ -220,85 +220,6 @@ static inline int nftnl_str2nat(const char *nat)
 	}
 }
 
-static int nftnl_expr_nat_json_parse(struct nftnl_expr *e, json_t *root,
-					struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	const char *nat_type, *family_str;
-	uint32_t reg, flags;
-	int val32;
-
-	nat_type = nftnl_jansson_parse_str(root, "nat_type", err);
-	if (nat_type == NULL)
-		return -1;
-
-	val32 = nftnl_str2nat(nat_type);
-	if (val32 < 0)
-		return -1;
-
-	nftnl_expr_set_u32(e, NFTNL_EXPR_NAT_TYPE, val32);
-
-	family_str = nftnl_jansson_parse_str(root, "family", err);
-	if (family_str == NULL)
-		return -1;
-
-	val32 = nftnl_str2family(family_str);
-	if (val32 < 0)
-		return -1;
-
-	nftnl_expr_set_u32(e, NFTNL_EXPR_NAT_FAMILY, val32);
-
-	if (nftnl_jansson_parse_reg(root, "sreg_addr_min", NFTNL_TYPE_U32,
-				  &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NAT_REG_ADDR_MIN, reg);
-
-	if (nftnl_jansson_parse_reg(root, "sreg_addr_max", NFTNL_TYPE_U32,
-				  &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NAT_REG_ADDR_MAX, reg);
-
-	if (nftnl_jansson_parse_reg(root, "sreg_proto_min", NFTNL_TYPE_U32,
-				  &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NAT_REG_PROTO_MIN, reg);
-
-	if (nftnl_jansson_parse_reg(root, "sreg_proto_max", NFTNL_TYPE_U32,
-				  &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NAT_REG_PROTO_MAX, reg);
-
-	if (nftnl_jansson_parse_val(root, "flags", NFTNL_TYPE_U32,
-				  &flags, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_NAT_FLAGS, flags);
-
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int nftnl_expr_nat_export(char *buf, size_t size,
-				 const struct nftnl_expr *e, int type)
-{
-	struct nftnl_expr_nat *nat = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_NAT_TYPE))
-		nftnl_buf_str(&b, type, nat2str(nat->type), NAT_TYPE);
-	if (e->flags & (1 << NFTNL_EXPR_NAT_FAMILY))
-		nftnl_buf_str(&b, type, nftnl_family2str(nat->family), FAMILY);
-	if (e->flags & (1 << NFTNL_EXPR_NAT_REG_ADDR_MIN))
-		nftnl_buf_u32(&b, type, nat->sreg_addr_min, SREG_ADDR_MIN);
-	if (e->flags & (1 << NFTNL_EXPR_NAT_REG_ADDR_MAX))
-		nftnl_buf_u32(&b, type, nat->sreg_addr_max, SREG_ADDR_MAX);
-	if (e->flags & (1 << NFTNL_EXPR_NAT_REG_PROTO_MIN))
-		nftnl_buf_u32(&b, type, nat->sreg_proto_min, SREG_PROTO_MIN);
-	if (e->flags & (1 << NFTNL_EXPR_NAT_REG_PROTO_MAX))
-		nftnl_buf_u32(&b, type, nat->sreg_proto_max, SREG_PROTO_MAX);
-	if (e->flags & (1 << NFTNL_EXPR_NAT_FLAGS))
-		nftnl_buf_u32(&b, type, nat->flags, FLAGS);
-
-	return nftnl_buf_done(&b);
-}
-
 static int
 nftnl_expr_nat_snprintf_default(char *buf, size_t size,
 				const struct nftnl_expr *e)
@@ -344,7 +265,6 @@ nftnl_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
 		return nftnl_expr_nat_snprintf_default(buf, size, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_nat_export(buf, size, e, type);
 	default:
 		break;
 	}
@@ -385,5 +305,4 @@ struct expr_ops expr_ops_nat = {
 	.parse		= nftnl_expr_nat_parse,
 	.build		= nftnl_expr_nat_build,
 	.snprintf	= nftnl_expr_nat_snprintf,
-	.json_parse	= nftnl_expr_nat_json_parse,
 };

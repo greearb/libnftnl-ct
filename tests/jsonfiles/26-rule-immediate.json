@@ -1,1 +1,0 @@
-{"nftables":[{"add":[{"rule":{"family":"ip","table":"filter","chain":"input","handle":26,"expr":[{"type":"immediate","dreg":0,"data":{"reg":{"type":"verdict","verdict":"accept"}}}]}}]}]}

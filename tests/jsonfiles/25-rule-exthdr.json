@@ -1,1 +1,0 @@
-{"nftables":[{"add":[{"rule":{"family":"ip","table":"filter","chain":"input","handle":25,"expr":[{"type":"exthdr","dreg":1,"exthdr_type":"mh","offset":2,"len":16}]}}]}]}

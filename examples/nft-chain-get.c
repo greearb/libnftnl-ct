@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	seq = time(NULL);
 
 	if (argc < 2 || argc > 5) {
-		fprintf(stderr, "Usage: %s <family> [<table> <chain>] [json]\n",
+		fprintf(stderr, "Usage: %s <family> [<table> <chain>]\n",
 			argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -94,9 +94,6 @@ int main(int argc, char *argv[])
 		nlh = nftnl_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
 						NLM_F_DUMP, seq);
 	}
-
-	if (strcmp(argv[argc-1], "json") == 0)
-		type = NFTNL_OUTPUT_JSON;
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {

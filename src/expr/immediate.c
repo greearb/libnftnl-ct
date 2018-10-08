@@ -174,61 +174,6 @@ nftnl_expr_immediate_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_immediate_json_parse(struct nftnl_expr *e, json_t *root,
-				   struct nftnl_parse_err *err)
-{
-#ifdef JSON_PARSING
-	struct nftnl_expr_immediate *imm = nftnl_expr_data(e);
-	int datareg_type;
-	uint32_t reg;
-
-	if (nftnl_jansson_parse_reg(root, "dreg", NFTNL_TYPE_U32, &reg, err) == 0)
-		nftnl_expr_set_u32(e, NFTNL_EXPR_IMM_DREG, reg);
-
-	datareg_type = nftnl_jansson_data_reg_parse(root, "data",
-						  &imm->data, err);
-	if (datareg_type >= 0) {
-		switch (datareg_type) {
-		case DATA_VALUE:
-			e->flags |= (1 << NFTNL_EXPR_IMM_DATA);
-			break;
-		case DATA_VERDICT:
-			e->flags |= (1 << NFTNL_EXPR_IMM_VERDICT);
-			break;
-		case DATA_CHAIN:
-			e->flags |= (1 << NFTNL_EXPR_IMM_CHAIN);
-			break;
-		default:
-			return -1;
-		}
-	}
-	return 0;
-#else
-	errno = EOPNOTSUPP;
-	return -1;
-#endif
-}
-
-static int
-nftnl_expr_immediate_export(char *buf, size_t size, const struct nftnl_expr *e,
-			    int type)
-{
-	struct nftnl_expr_immediate *imm = nftnl_expr_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_EXPR_IMM_DREG))
-		nftnl_buf_u32(&b, type, imm->dreg, DREG);
-	if (e->flags & (1 << NFTNL_EXPR_IMM_DATA))
-		nftnl_buf_reg(&b, type, &imm->data, DATA_VALUE, DATA);
-	if (e->flags & (1 << NFTNL_EXPR_IMM_VERDICT))
-		nftnl_buf_reg(&b, type, &imm->data, DATA_VERDICT, DATA);
-	if (e->flags & (1 << NFTNL_EXPR_IMM_CHAIN))
-		nftnl_buf_reg(&b, type, &imm->data, DATA_CHAIN, DATA);
-
-	return nftnl_buf_done(&b);
-}
-
-static int
 nftnl_expr_immediate_snprintf_default(char *buf, size_t len,
 				      const struct nftnl_expr *e,
 				      uint32_t flags)
@@ -267,7 +212,6 @@ nftnl_expr_immediate_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_expr_immediate_snprintf_default(buf, len, e, flags);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_expr_immediate_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -317,5 +261,4 @@ struct expr_ops expr_ops_immediate = {
 	.parse		= nftnl_expr_immediate_parse,
 	.build		= nftnl_expr_immediate_build,
 	.snprintf	= nftnl_expr_immediate_snprintf,
-	.json_parse	= nftnl_expr_immediate_json_parse,
 };
