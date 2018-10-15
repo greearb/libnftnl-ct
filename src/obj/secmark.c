@@ -98,26 +98,6 @@ nftnl_obj_secmark_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int
-nftnl_obj_secmark_json_parse(struct nftnl_obj *e, json_t *root,
-				 struct nftnl_parse_err *err)
-{
-	errno = EOPNOTSUPP;
-	return -1;
-}
-
-static int nftnl_obj_secmark_export(char *buf, size_t size,
-				    const struct nftnl_obj *e, int type)
-{
-	struct nftnl_obj_secmark *secmark = nftnl_obj_data(e);
-	NFTNL_BUF_INIT(b, buf, size);
-
-	if (e->flags & (1 << NFTNL_OBJ_SECMARK_CTX))
-		nftnl_buf_str(&b, type, secmark->ctx, NAME);
-
-	return nftnl_buf_done(&b);
-}
-
 static int nftnl_obj_secmark_snprintf_default(char *buf, size_t len,
 					       const struct nftnl_obj *e)
 {
@@ -138,7 +118,6 @@ static int nftnl_obj_secmark_snprintf(char *buf, size_t len, uint32_t type,
 		return nftnl_obj_secmark_snprintf_default(buf, len, e);
 	case NFTNL_OUTPUT_XML:
 	case NFTNL_OUTPUT_JSON:
-		return nftnl_obj_secmark_export(buf, len, e, type);
 	default:
 		break;
 	}
@@ -155,5 +134,4 @@ struct obj_ops obj_ops_secmark = {
 	.parse		= nftnl_obj_secmark_parse,
 	.build		= nftnl_obj_secmark_build,
 	.snprintf	= nftnl_obj_secmark_snprintf,
-	.json_parse	= nftnl_obj_secmark_json_parse,
 };
