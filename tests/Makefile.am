@@ -35,6 +35,8 @@ check_PROGRAMS = 	nft-table-test			\
 			nft-expr_target-test		\
 			nft-expr_hash-test
 
+TESTS = $(check_PROGRAMS)
+
 nft_table_test_SOURCES = nft-table-test.c
 nft_table_test_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
