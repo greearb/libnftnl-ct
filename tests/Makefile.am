@@ -1,7 +1,5 @@
 include $(top_srcdir)/Make_global.am
 
-EXTRA_DIST =		test-script.sh
-
 check_PROGRAMS = 	nft-table-test			\
 			nft-chain-test			\
 			nft-object-test			\
