@@ -102,14 +102,14 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 {
 	switch(attr) {
 	case NFTNL_SET_ELEM_FLAGS:
-		s->set_elem_flags = *((uint32_t *)data);
+		memcpy(&s->set_elem_flags, data, sizeof(s->set_elem_flags));
 		break;
 	case NFTNL_SET_ELEM_KEY:	/* NFTA_SET_ELEM_KEY */
 		memcpy(&s->key.val, data, data_len);
 		s->key.len = data_len;
 		break;
 	case NFTNL_SET_ELEM_VERDICT:	/* NFTA_SET_ELEM_DATA */
-		s->data.verdict = *((uint32_t *)data);
+		memcpy(&s->data.verdict, data, sizeof(s->data.verdict));
 		break;
 	case NFTNL_SET_ELEM_CHAIN:	/* NFTA_SET_ELEM_DATA */
 		if (s->flags & (1 << NFTNL_SET_ELEM_CHAIN))
@@ -124,7 +124,7 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 		s->data.len = data_len;
 		break;
 	case NFTNL_SET_ELEM_TIMEOUT:	/* NFTA_SET_ELEM_TIMEOUT */
-		s->timeout = *((uint64_t *)data);
+		memcpy(&s->timeout, data, sizeof(s->timeout));
 		break;
 	case NFTNL_SET_ELEM_USERDATA: /* NFTA_SET_ELEM_USERDATA */
 		if (s->flags & (1 << NFTNL_SET_ELEM_USERDATA))
@@ -218,8 +218,10 @@ const char *nftnl_set_elem_get_str(struct nftnl_set_elem *s, uint16_t attr)
 EXPORT_SYMBOL(nftnl_set_elem_get_u32);
 uint32_t nftnl_set_elem_get_u32(struct nftnl_set_elem *s, uint16_t attr)
 {
-	uint32_t size;
-	uint32_t val = *((uint32_t *)nftnl_set_elem_get(s, attr, &size));
+	uint32_t size, val;
+
+	memcpy(&val, nftnl_set_elem_get(s, attr, &size), sizeof(val));
+
 	return val;
 }
 
@@ -227,7 +229,10 @@ EXPORT_SYMBOL(nftnl_set_elem_get_u64);
 uint64_t nftnl_set_elem_get_u64(struct nftnl_set_elem *s, uint16_t attr)
 {
 	uint32_t size;
-	uint64_t val = *((uint64_t *)nftnl_set_elem_get(s, attr, &size));
+	uint64_t val;
+
+	memcpy(&val, nftnl_set_elem_get(s, attr, &size), sizeof(val));
+
 	return val;
 }
 

@@ -34,10 +34,10 @@ static int nftnl_expr_range_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_RANGE_SREG:
-		range->sreg = *((uint32_t *)data);
+		memcpy(&range->sreg, data, sizeof(range->sreg));
 		break;
 	case NFTNL_EXPR_RANGE_OP:
-		range->op = *((uint32_t *)data);
+		memcpy(&range->op, data, sizeof(range->op));
 		break;
 	case NFTNL_EXPR_RANGE_FROM_DATA:
 		memcpy(&range->data_from.val, data, data_len);

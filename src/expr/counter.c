@@ -35,10 +35,10 @@ nftnl_expr_counter_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_CTR_BYTES:
-		ctr->bytes = *((uint64_t *)data);
+		memcpy(&ctr->bytes, data, sizeof(ctr->bytes));
 		break;
 	case NFTNL_EXPR_CTR_PACKETS:
-		ctr->pkts = *((uint64_t *)data);
+		memcpy(&ctr->pkts, data, sizeof(ctr->pkts));
 		break;
 	default:
 		return -1;

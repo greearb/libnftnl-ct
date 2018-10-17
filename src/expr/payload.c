@@ -43,28 +43,28 @@ nftnl_expr_payload_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_PAYLOAD_SREG:
-		payload->sreg = *((uint32_t *)data);
+		memcpy(&payload->sreg, data, sizeof(payload->sreg));
 		break;
 	case NFTNL_EXPR_PAYLOAD_DREG:
-		payload->dreg = *((uint32_t *)data);
+		memcpy(&payload->dreg, data, sizeof(payload->dreg));
 		break;
 	case NFTNL_EXPR_PAYLOAD_BASE:
-		payload->base = *((uint32_t *)data);
+		memcpy(&payload->base, data, sizeof(payload->base));
 		break;
 	case NFTNL_EXPR_PAYLOAD_OFFSET:
-		payload->offset = *((unsigned int *)data);
+		memcpy(&payload->offset, data, sizeof(payload->offset));
 		break;
 	case NFTNL_EXPR_PAYLOAD_LEN:
-		payload->len = *((unsigned int *)data);
+		memcpy(&payload->len, data, sizeof(payload->len));
 		break;
 	case NFTNL_EXPR_PAYLOAD_CSUM_TYPE:
-		payload->csum_type = *((uint32_t *)data);
+		memcpy(&payload->csum_type, data, sizeof(payload->csum_type));
 		break;
 	case NFTNL_EXPR_PAYLOAD_CSUM_OFFSET:
-		payload->csum_offset = *((uint32_t *)data);
+		memcpy(&payload->csum_offset, data, sizeof(payload->csum_offset));
 		break;
 	case NFTNL_EXPR_PAYLOAD_FLAGS:
-		payload->csum_flags = *((uint32_t *)data);
+		memcpy(&payload->csum_flags, data, sizeof(payload->csum_flags));
 		break;
 	default:
 		return -1;

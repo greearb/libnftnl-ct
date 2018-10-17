@@ -142,43 +142,43 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 			return -1;
 		break;
 	case NFTNL_SET_HANDLE:
-		s->handle = *((uint64_t *)data);
+		memcpy(&s->handle, data, sizeof(s->handle));
 		break;
 	case NFTNL_SET_FLAGS:
-		s->set_flags = *((uint32_t *)data);
+		memcpy(&s->set_flags, data, sizeof(s->set_flags));
 		break;
 	case NFTNL_SET_KEY_TYPE:
-		s->key_type = *((uint32_t *)data);
+		memcpy(&s->key_type, data, sizeof(s->key_type));
 		break;
 	case NFTNL_SET_KEY_LEN:
-		s->key_len = *((uint32_t *)data);
+		memcpy(&s->key_len, data, sizeof(s->key_len));
 		break;
 	case NFTNL_SET_DATA_TYPE:
-		s->data_type = *((uint32_t *)data);
+		memcpy(&s->data_type, data, sizeof(s->data_type));
 		break;
 	case NFTNL_SET_DATA_LEN:
-		s->data_len = *((uint32_t *)data);
+		memcpy(&s->data_len, data, sizeof(s->data_len));
 		break;
 	case NFTNL_SET_OBJ_TYPE:
-		s->obj_type = *((uint32_t *)data);
+		memcpy(&s->obj_type, data, sizeof(s->obj_type));
 		break;
 	case NFTNL_SET_FAMILY:
-		s->family = *((uint32_t *)data);
+		memcpy(&s->family, data, sizeof(s->family));
 		break;
 	case NFTNL_SET_ID:
-		s->id = *((uint32_t *)data);
+		memcpy(&s->id, data, sizeof(s->id));
 		break;
 	case NFTNL_SET_POLICY:
-		s->policy = *((uint32_t *)data);
+		memcpy(&s->policy, data, sizeof(s->policy));
 		break;
 	case NFTNL_SET_DESC_SIZE:
-		s->desc.size = *((uint32_t *)data);
+		memcpy(&s->desc.size, data, sizeof(s->desc.size));
 		break;
 	case NFTNL_SET_TIMEOUT:
-		s->timeout = *((uint64_t *)data);
+		memcpy(&s->timeout, data, sizeof(s->timeout));
 		break;
 	case NFTNL_SET_GC_INTERVAL:
-		s->gc_interval = *((uint32_t *)data);
+		memcpy(&s->gc_interval, data, sizeof(s->gc_interval));
 		break;
 	case NFTNL_SET_USERDATA:
 		if (s->flags & (1 << NFTNL_SET_USERDATA))

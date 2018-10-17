@@ -152,19 +152,19 @@ int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 			return -1;
 		break;
 	case NFTNL_RULE_HANDLE:
-		r->handle = *((uint64_t *)data);
+		memcpy(&r->handle, data, sizeof(r->handle));
 		break;
 	case NFTNL_RULE_COMPAT_PROTO:
-		r->compat.proto = *((uint32_t *)data);
+		memcpy(&r->compat.proto, data, sizeof(r->compat.proto));
 		break;
 	case NFTNL_RULE_COMPAT_FLAGS:
-		r->compat.flags = *((uint32_t *)data);
+		memcpy(&r->compat.flags, data, sizeof(r->compat.flags));
 		break;
 	case NFTNL_RULE_FAMILY:
-		r->family = *((uint32_t *)data);
+		memcpy(&r->family, data, sizeof(r->family));
 		break;
 	case NFTNL_RULE_POSITION:
-		r->position = *((uint64_t *)data);
+		memcpy(&r->position, data, sizeof(r->position));
 		break;
 	case NFTNL_RULE_USERDATA:
 		if (r->flags & (1 << NFTNL_RULE_USERDATA))
@@ -178,7 +178,7 @@ int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 		r->user.len = data_len;
 		break;
 	case NFTNL_RULE_ID:
-		r->id = *((uint32_t *)data);
+		memcpy(&r->id, data, sizeof(r->id));
 		break;
 	}
 	r->flags |= (1 << attr);

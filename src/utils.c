@@ -89,7 +89,7 @@ int nftnl_get_value(enum nftnl_type type, void *val, void *out)
 	case NFTNL_TYPE_U16:
 	case NFTNL_TYPE_U32:
 	case NFTNL_TYPE_U64:
-		uval = *((uint64_t *)val);
+		memcpy(&uval, val, sizeof(uval));
 		if (uval > basetype[type].max) {
 			errno = ERANGE;
 			return -1;
@@ -99,7 +99,7 @@ int nftnl_get_value(enum nftnl_type type, void *val, void *out)
 	case NFTNL_TYPE_S16:
 	case NFTNL_TYPE_S32:
 	case NFTNL_TYPE_S64:
-		sval = *((int64_t *)val);
+		memcpy(&sval, val, sizeof(sval));
 		if (sval < basetype[type].min ||
 		    sval > (int64_t)basetype[type].max) {
 			errno = ERANGE;

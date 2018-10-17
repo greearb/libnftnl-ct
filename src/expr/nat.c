@@ -42,25 +42,25 @@ nftnl_expr_nat_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_NAT_TYPE:
-		nat->type = *((uint32_t *)data);
+		memcpy(&nat->type, data, sizeof(nat->type));
 		break;
 	case NFTNL_EXPR_NAT_FAMILY:
-		nat->family = *((uint32_t *)data);
+		memcpy(&nat->family, data, sizeof(nat->family));
 		break;
 	case NFTNL_EXPR_NAT_REG_ADDR_MIN:
-		nat->sreg_addr_min = *((uint32_t *)data);
+		memcpy(&nat->sreg_addr_min, data, sizeof(nat->sreg_addr_min));
 		break;
 	case NFTNL_EXPR_NAT_REG_ADDR_MAX:
-		nat->sreg_addr_max = *((uint32_t *)data);
+		memcpy(&nat->sreg_addr_max, data, sizeof(nat->sreg_addr_max));
 		break;
 	case NFTNL_EXPR_NAT_REG_PROTO_MIN:
-		nat->sreg_proto_min = *((uint32_t *)data);
+		memcpy(&nat->sreg_proto_min, data, sizeof(nat->sreg_proto_min));
 		break;
 	case NFTNL_EXPR_NAT_REG_PROTO_MAX:
-		nat->sreg_proto_max = *((uint32_t *)data);
+		memcpy(&nat->sreg_proto_max, data, sizeof(nat->sreg_proto_max));
 		break;
 	case NFTNL_EXPR_NAT_FLAGS:
-		nat->flags = *((uint32_t *)data);
+		memcpy(&nat->flags, data, sizeof(nat->flags));
 		break;
 	default:
 		return -1;

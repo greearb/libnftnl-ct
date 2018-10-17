@@ -73,7 +73,7 @@ int nftnl_gen_set_data(struct nftnl_gen *gen, uint16_t attr,
 
 	switch (attr) {
 	case NFTNL_GEN_ID:
-		gen->id = *((uint32_t *)data);
+		memcpy(&gen->id, data, sizeof(gen->id));
 		break;
 	}
 	gen->flags |= (1 << attr);

@@ -33,10 +33,10 @@ static int nftnl_expr_dup_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_DUP_SREG_ADDR:
-		dup->sreg_addr = *((uint32_t *)data);
+		memcpy(&dup->sreg_addr, data, sizeof(dup->sreg_addr));
 		break;
 	case NFTNL_EXPR_DUP_SREG_DEV:
-		dup->sreg_dev= *((uint32_t *)data);
+		memcpy(&dup->sreg_dev, data, sizeof(dup->sreg_dev));
 		break;
 	default:
 		return -1;

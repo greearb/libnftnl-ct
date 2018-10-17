@@ -190,22 +190,22 @@ int nftnl_chain_set_data(struct nftnl_chain *c, uint16_t attr,
 		memcpy(&c->prio, data, sizeof(c->prio));
 		break;
 	case NFTNL_CHAIN_POLICY:
-		c->policy = *((uint32_t *)data);
+		memcpy(&c->policy, data, sizeof(c->policy));
 		break;
 	case NFTNL_CHAIN_USE:
-		c->use = *((uint32_t *)data);
+		memcpy(&c->use, data, sizeof(c->use));
 		break;
 	case NFTNL_CHAIN_BYTES:
-		c->bytes = *((uint64_t *)data);
+		memcpy(&c->bytes, data, sizeof(c->bytes));
 		break;
 	case NFTNL_CHAIN_PACKETS:
-		c->packets = *((uint64_t *)data);
+		memcpy(&c->packets, data, sizeof(c->packets));
 		break;
 	case NFTNL_CHAIN_HANDLE:
-		c->handle = *((uint64_t *)data);
+		memcpy(&c->handle, data, sizeof(c->handle));
 		break;
 	case NFTNL_CHAIN_FAMILY:
-		c->family = *((uint32_t *)data);
+		memcpy(&c->family, data, sizeof(c->family));
 		break;
 	case NFTNL_CHAIN_TYPE:
 		if (c->flags & (1 << NFTNL_CHAIN_TYPE))

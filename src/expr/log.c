@@ -46,19 +46,19 @@ static int nftnl_expr_log_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_LOG_GROUP:
-		log->group = *((uint16_t *)data);
+		memcpy(&log->group, data, sizeof(log->group));
 		break;
 	case NFTNL_EXPR_LOG_SNAPLEN:
-		log->snaplen = *((uint32_t *)data);
+		memcpy(&log->snaplen, data, sizeof(log->snaplen));
 		break;
 	case NFTNL_EXPR_LOG_QTHRESHOLD:
-		log->qthreshold = *((uint16_t *)data);
+		memcpy(&log->qthreshold, data, sizeof(log->qthreshold));
 		break;
 	case NFTNL_EXPR_LOG_LEVEL:
-		log->level = *((uint32_t *)data);
+		memcpy(&log->level, data, sizeof(log->level));
 		break;
 	case NFTNL_EXPR_LOG_FLAGS:
-		log->flags = *((uint32_t *)data);
+		memcpy(&log->flags, data, sizeof(log->flags));
 		break;
 	default:
 		return -1;

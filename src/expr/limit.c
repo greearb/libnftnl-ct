@@ -38,19 +38,19 @@ nftnl_expr_limit_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_LIMIT_RATE:
-		limit->rate = *((uint64_t *)data);
+		memcpy(&limit->rate, data, sizeof(limit->rate));
 		break;
 	case NFTNL_EXPR_LIMIT_UNIT:
-		limit->unit = *((uint64_t *)data);
+		memcpy(&limit->unit, data, sizeof(limit->unit));
 		break;
 	case NFTNL_EXPR_LIMIT_BURST:
-		limit->burst = *((uint32_t *)data);
+		memcpy(&limit->burst, data, sizeof(limit->burst));
 		break;
 	case NFTNL_EXPR_LIMIT_TYPE:
-		limit->type = *((uint32_t *)data);
+		memcpy(&limit->type, data, sizeof(limit->type));
 		break;
 	case NFTNL_EXPR_LIMIT_FLAGS:
-		limit->flags = *((uint32_t *)data);
+		memcpy(&limit->flags, data, sizeof(limit->flags));
 		break;
 	default:
 		return -1;

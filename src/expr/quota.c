@@ -33,13 +33,13 @@ static int nftnl_expr_quota_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_QUOTA_BYTES:
-		quota->bytes = *((uint64_t *)data);
+		memcpy(&quota->bytes, data, sizeof(quota->bytes));
 		break;
 	case NFTNL_EXPR_QUOTA_CONSUMED:
-		quota->consumed = *((uint64_t *)data);
+		memcpy(&quota->consumed, data, sizeof(quota->consumed));
 		break;
 	case NFTNL_EXPR_QUOTA_FLAGS:
-		quota->flags = *((uint32_t *)data);
+		memcpy(&quota->flags, data, sizeof(quota->flags));
 		break;
 	default:
 		return -1;

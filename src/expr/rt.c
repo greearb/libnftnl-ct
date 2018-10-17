@@ -32,10 +32,10 @@ nftnl_expr_rt_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_RT_KEY:
-		rt->key = *((uint32_t *)data);
+		memcpy(&rt->key, data, sizeof(rt->key));
 		break;
 	case NFTNL_EXPR_RT_DREG:
-		rt->dreg = *((uint32_t *)data);
+		memcpy(&rt->dreg, data, sizeof(rt->dreg));
 		break;
 	default:
 		return -1;

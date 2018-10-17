@@ -46,25 +46,25 @@ nftnl_expr_exthdr_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_EXTHDR_DREG:
-		exthdr->dreg = *((uint32_t *)data);
+		memcpy(&exthdr->dreg, data, sizeof(exthdr->dreg));
 		break;
 	case NFTNL_EXPR_EXTHDR_TYPE:
-		exthdr->type = *((uint8_t *)data);
+		memcpy(&exthdr->type, data, sizeof(exthdr->type));
 		break;
 	case NFTNL_EXPR_EXTHDR_OFFSET:
-		exthdr->offset = *((uint32_t *)data);
+		memcpy(&exthdr->offset, data, sizeof(exthdr->offset));
 		break;
 	case NFTNL_EXPR_EXTHDR_LEN:
-		exthdr->len = *((uint32_t *)data);
+		memcpy(&exthdr->len, data, sizeof(exthdr->len));
 		break;
 	case NFTNL_EXPR_EXTHDR_OP:
-		exthdr->op = *((uint32_t *)data);
+		memcpy(&exthdr->op, data, sizeof(exthdr->op));
 		break;
 	case NFTNL_EXPR_EXTHDR_FLAGS:
-		exthdr->flags = *((uint32_t *)data);
+		memcpy(&exthdr->flags, data, sizeof(exthdr->flags));
 		break;
 	case NFTNL_EXPR_EXTHDR_SREG:
-		exthdr->sreg = *((uint32_t *)data);
+		memcpy(&exthdr->sreg, data, sizeof(exthdr->sreg));
 		break;
 	default:
 		return -1;

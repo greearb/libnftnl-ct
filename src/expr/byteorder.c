@@ -37,19 +37,19 @@ nftnl_expr_byteorder_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_BYTEORDER_SREG:
-		byteorder->sreg = *((uint32_t *)data);
+		memcpy(&byteorder->sreg, data, sizeof(byteorder->sreg));
 		break;
 	case NFTNL_EXPR_BYTEORDER_DREG:
-		byteorder->dreg = *((uint32_t *)data);
+		memcpy(&byteorder->dreg, data, sizeof(byteorder->dreg));
 		break;
 	case NFTNL_EXPR_BYTEORDER_OP:
-		byteorder->op = *((uint32_t *)data);
+		memcpy(&byteorder->op, data, sizeof(byteorder->op));
 		break;
 	case NFTNL_EXPR_BYTEORDER_LEN:
-		byteorder->len = *((unsigned int *)data);
+		memcpy(&byteorder->len, data, sizeof(byteorder->len));
 		break;
 	case NFTNL_EXPR_BYTEORDER_SIZE:
-		byteorder->size = *((unsigned int *)data);
+		memcpy(&byteorder->size, data, sizeof(byteorder->size));
 		break;
 	default:
 		return -1;

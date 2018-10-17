@@ -101,16 +101,16 @@ int nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
 			return -1;
 		break;
 	case NFTNL_TABLE_HANDLE:
-		t->handle = *((uint64_t *)data);
+		memcpy(&t->handle, data, sizeof(t->handle));
 		break;
 	case NFTNL_TABLE_FLAGS:
-		t->table_flags = *((uint32_t *)data);
+		memcpy(&t->table_flags, data, sizeof(t->table_flags));
 		break;
 	case NFTNL_TABLE_FAMILY:
-		t->family = *((uint32_t *)data);
+		memcpy(&t->family, data, sizeof(t->family));
 		break;
 	case NFTNL_TABLE_USE:
-		t->use = *((uint32_t *)data);
+		memcpy(&t->use, data, sizeof(t->use));
 		break;
 	}
 	t->flags |= (1 << attr);

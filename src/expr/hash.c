@@ -41,25 +41,25 @@ nftnl_expr_hash_set(struct nftnl_expr *e, uint16_t type,
 	struct nftnl_expr_hash *hash = nftnl_expr_data(e);
 	switch (type) {
 	case NFTNL_EXPR_HASH_SREG:
-		hash->sreg = *((uint32_t *)data);
+		memcpy(&hash->sreg, data, sizeof(hash->sreg));
 		break;
 	case NFTNL_EXPR_HASH_DREG:
-		hash->dreg = *((uint32_t *)data);
+		memcpy(&hash->dreg, data, sizeof(hash->dreg));
 		break;
 	case NFTNL_EXPR_HASH_LEN:
-		hash->len = *((uint32_t *)data);
+		memcpy(&hash->len, data, sizeof(hash->len));
 		break;
 	case NFTNL_EXPR_HASH_MODULUS:
-		hash->modulus = *((uint32_t *)data);
+		memcpy(&hash->modulus, data, sizeof(hash->modulus));
 		break;
 	case NFTNL_EXPR_HASH_SEED:
-		hash->seed = *((uint32_t *)data);
+		memcpy(&hash->seed, data, sizeof(hash->seed));
 		break;
 	case NFTNL_EXPR_HASH_OFFSET:
-		hash->offset = *((uint32_t *)data);
+		memcpy(&hash->offset, data, sizeof(hash->offset));
 		break;
 	case NFTNL_EXPR_HASH_TYPE:
-		hash->type = *((uint32_t *)data);
+		memcpy(&hash->type, data, sizeof(hash->type));
 		break;
 	case NFTNL_EXPR_HASH_SET_NAME:
 		hash->map.name = strdup(data);
@@ -67,7 +67,7 @@ nftnl_expr_hash_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_HASH_SET_ID:
-		hash->map.id = *((uint32_t *)data);
+		memcpy(&hash->map.id, data, sizeof(hash->map.id));
 		break;
 	default:
 		return -1;

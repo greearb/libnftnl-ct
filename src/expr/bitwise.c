@@ -37,13 +37,13 @@ nftnl_expr_bitwise_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_BITWISE_SREG:
-		bitwise->sreg = *((uint32_t *)data);
+		memcpy(&bitwise->sreg, data, sizeof(bitwise->sreg));
 		break;
 	case NFTNL_EXPR_BITWISE_DREG:
-		bitwise->dreg = *((uint32_t *)data);
+		memcpy(&bitwise->dreg, data, sizeof(bitwise->dreg));
 		break;
 	case NFTNL_EXPR_BITWISE_LEN:
-		bitwise->len = *((unsigned int *)data);
+		memcpy(&bitwise->len, data, sizeof(bitwise->len));
 		break;
 	case NFTNL_EXPR_BITWISE_MASK:
 		memcpy(&bitwise->mask.val, data, data_len);

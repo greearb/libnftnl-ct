@@ -39,16 +39,16 @@ nftnl_expr_ng_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_NG_DREG:
-		ng->dreg = *((uint32_t *)data);
+		memcpy(&ng->dreg, data, sizeof(ng->dreg));
 		break;
 	case NFTNL_EXPR_NG_MODULUS:
-		ng->modulus = *((uint32_t *)data);
+		memcpy(&ng->modulus, data, sizeof(ng->modulus));
 		break;
 	case NFTNL_EXPR_NG_TYPE:
-		ng->type = *((uint32_t *)data);
+		memcpy(&ng->type, data, sizeof(ng->type));
 		break;
 	case NFTNL_EXPR_NG_OFFSET:
-		ng->offset = *((uint32_t *)data);
+		memcpy(&ng->offset, data, sizeof(ng->offset));
 		break;
 	case NFTNL_EXPR_NG_SET_NAME:
 		ng->map.name = strdup(data);
@@ -56,7 +56,7 @@ nftnl_expr_ng_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_NG_SET_ID:
-		ng->map.id = *((uint32_t *)data);
+		memcpy(&ng->map.id, data, sizeof(ng->map.id));
 		break;
 	default:
 		return -1;

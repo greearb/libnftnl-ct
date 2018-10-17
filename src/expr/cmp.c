@@ -36,10 +36,10 @@ nftnl_expr_cmp_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_CMP_SREG:
-		cmp->sreg = *((uint32_t *)data);
+		memcpy(&cmp->sreg, data, sizeof(cmp->sreg));
 		break;
 	case NFTNL_EXPR_CMP_OP:
-		cmp->op = *((uint32_t *)data);
+		memcpy(&cmp->op, data, sizeof(cmp->op));
 		break;
 	case NFTNL_EXPR_CMP_DATA:
 		memcpy(&cmp->data.val, data, data_len);

@@ -94,13 +94,13 @@ void nftnl_obj_set_data(struct nftnl_obj *obj, uint16_t attr,
 			return;
 		break;
 	case NFTNL_OBJ_FAMILY:
-		obj->family = *((uint32_t *)data);
+		memcpy(&obj->family, data, sizeof(obj->family));
 		break;
 	case NFTNL_OBJ_USE:
-		obj->use = *((uint32_t *)data);
+		memcpy(&obj->use, data, sizeof(obj->use));
 		break;
 	case NFTNL_OBJ_HANDLE:
-		obj->handle = *((uint64_t *)data);
+		memcpy(&obj->handle, data, sizeof(obj->handle));
 		break;
 	default:
 		if (obj->ops)

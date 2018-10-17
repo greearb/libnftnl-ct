@@ -39,7 +39,7 @@ static int nftnl_expr_objref_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_OBJREF_IMM_TYPE:
-		objref->imm.type = *((uint32_t *)data);
+		memcpy(&objref->imm.type, data, sizeof(objref->imm.type));
 		break;
 	case NFTNL_EXPR_OBJREF_IMM_NAME:
 		objref->imm.name = strdup(data);
@@ -47,7 +47,7 @@ static int nftnl_expr_objref_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_OBJREF_SET_SREG:
-		objref->set.sreg = *((uint32_t *)data);
+		memcpy(&objref->set.sreg, data, sizeof(objref->set.sreg));
 		break;
 	case NFTNL_EXPR_OBJREF_SET_NAME:
 		objref->set.name = strdup(data);
@@ -55,7 +55,7 @@ static int nftnl_expr_objref_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_OBJREF_SET_ID:
-		objref->set.id = *((uint32_t *)data);
+		memcpy(&objref->set.id, data, sizeof(objref->set.id));
 		break;
 	default:
 		return -1;

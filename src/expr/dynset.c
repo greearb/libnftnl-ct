@@ -40,16 +40,16 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_DYNSET_SREG_KEY:
-		dynset->sreg_key = *((uint32_t *)data);
+		memcpy(&dynset->sreg_key, data, sizeof(dynset->sreg_key));
 		break;
 	case NFTNL_EXPR_DYNSET_SREG_DATA:
-		dynset->sreg_data = *((uint32_t *)data);
+		memcpy(&dynset->sreg_data, data, sizeof(dynset->sreg_data));
 		break;
 	case NFTNL_EXPR_DYNSET_OP:
-		dynset->op = *((uint32_t *)data);
+		memcpy(&dynset->op, data, sizeof(dynset->op));
 		break;
 	case NFTNL_EXPR_DYNSET_TIMEOUT:
-		dynset->timeout = *((uint64_t *)data);
+		memcpy(&dynset->timeout, data, sizeof(dynset->timeout));
 		break;
 	case NFTNL_EXPR_DYNSET_SET_NAME:
 		dynset->set_name = strdup((const char *)data);
@@ -57,7 +57,7 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_DYNSET_SET_ID:
-		dynset->set_id = *((uint32_t *)data);
+		memcpy(&dynset->set_id, data, sizeof(dynset->set_id));
 		break;
 	case NFTNL_EXPR_DYNSET_EXPR:
 		dynset->expr = (void *)data;

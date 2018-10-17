@@ -34,13 +34,13 @@ nftnl_expr_masq_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_MASQ_FLAGS:
-		masq->flags = *((uint32_t *)data);
+		memcpy(&masq->flags, data, sizeof(masq->flags));
 		break;
 	case NFTNL_EXPR_MASQ_REG_PROTO_MIN:
-		masq->sreg_proto_min = *((uint32_t *)data);
+		memcpy(&masq->sreg_proto_min, data, sizeof(masq->sreg_proto_min));
 		break;
 	case NFTNL_EXPR_MASQ_REG_PROTO_MAX:
-		masq->sreg_proto_max = *((uint32_t *)data);
+		memcpy(&masq->sreg_proto_max, data, sizeof(masq->sreg_proto_max));
 		break;
 	default:
 		return -1;

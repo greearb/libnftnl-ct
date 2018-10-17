@@ -32,10 +32,10 @@ static int nftnl_obj_ct_helper_set(struct nftnl_obj *e, uint16_t type,
 		snprintf(helper->name, sizeof(helper->name), "%s", (const char *)data);
 		break;
 	case NFTNL_OBJ_CT_HELPER_L3PROTO:
-		helper->l3proto = *((uint16_t *)data);
+		memcpy(&helper->l3proto, data, sizeof(helper->l3proto));
 		break;
 	case NFTNL_OBJ_CT_HELPER_L4PROTO:
-		helper->l4proto = *((uint8_t *)data);
+		memcpy(&helper->l4proto, data, sizeof(helper->l4proto));
 		break;
 	default:
 		return -1;

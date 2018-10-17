@@ -29,10 +29,10 @@ nftnl_obj_counter_set(struct nftnl_obj *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_OBJ_CTR_BYTES:
-		ctr->bytes = *((uint64_t *)data);
+		memcpy(&ctr->bytes, data, sizeof(ctr->bytes));
 		break;
 	case NFTNL_OBJ_CTR_PKTS:
-		ctr->pkts = *((uint64_t *)data);
+		memcpy(&ctr->pkts, data, sizeof(ctr->pkts));
 		break;
 	default:
 		return -1;

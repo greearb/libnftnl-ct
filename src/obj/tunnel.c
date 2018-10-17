@@ -29,13 +29,13 @@ nftnl_obj_tunnel_set(struct nftnl_obj *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_OBJ_TUNNEL_ID:
-		tun->id = *((uint32_t *)data);
+		memcpy(&tun->id, data, sizeof(tun->id));
 		break;
 	case NFTNL_OBJ_TUNNEL_IPV4_SRC:
-		tun->src_v4 = *((uint32_t *)data);
+		memcpy(&tun->src_v4, data, sizeof(tun->src_v4));
 		break;
 	case NFTNL_OBJ_TUNNEL_IPV4_DST:
-		tun->dst_v4 = *((uint32_t *)data);
+		memcpy(&tun->dst_v4, data, sizeof(tun->dst_v4));
 		break;
 	case NFTNL_OBJ_TUNNEL_IPV6_SRC:
 		memcpy(&tun->src_v6, data, sizeof(struct in6_addr));
@@ -44,37 +44,37 @@ nftnl_obj_tunnel_set(struct nftnl_obj *e, uint16_t type,
 		memcpy(&tun->dst_v6, data, sizeof(struct in6_addr));
 		break;
 	case NFTNL_OBJ_TUNNEL_IPV6_FLOWLABEL:
-		tun->flowlabel = (*(uint32_t *)data);
+		memcpy(&tun->flowlabel, data, sizeof(tun->flowlabel));
 		break;
 	case NFTNL_OBJ_TUNNEL_SPORT:
-		tun->sport = (*(uint16_t *)data);
+		memcpy(&tun->sport, data, sizeof(tun->sport));
 		break;
 	case NFTNL_OBJ_TUNNEL_DPORT:
-		tun->dport = (*(uint16_t *)data);
+		memcpy(&tun->dport, data, sizeof(tun->dport));
 		break;
 	case NFTNL_OBJ_TUNNEL_FLAGS:
-		tun->tun_flags = (*(uint32_t *)data);
+		memcpy(&tun->tun_flags, data, sizeof(tun->tun_flags));
 		break;
 	case NFTNL_OBJ_TUNNEL_TOS:
-		tun->tun_tos = (*(uint8_t *)data);
+		memcpy(&tun->tun_tos, data, sizeof(tun->tun_tos));
 		break;
 	case NFTNL_OBJ_TUNNEL_TTL:
-		tun->tun_ttl = (*(uint8_t *)data);
+		memcpy(&tun->tun_ttl, data, sizeof(tun->tun_ttl));
 		break;
 	case NFTNL_OBJ_TUNNEL_VXLAN_GBP:
-		tun->u.tun_vxlan.gbp = (*(uint32_t *)data);
+		memcpy(&tun->u.tun_vxlan.gbp, data, sizeof(tun->u.tun_vxlan.gbp));
 		break;
 	case NFTNL_OBJ_TUNNEL_ERSPAN_VERSION:
-		tun->u.tun_erspan.version = (*(uint32_t *)data);
+		memcpy(&tun->u.tun_erspan.version, data, sizeof(tun->u.tun_erspan.version));
 		break;
 	case NFTNL_OBJ_TUNNEL_ERSPAN_V1_INDEX:
-		tun->u.tun_erspan.u.v1_index = (*(uint32_t *)data);
+		memcpy(&tun->u.tun_erspan.u.v1_index, data, sizeof(tun->u.tun_erspan.u.v1_index));
 		break;
 	case NFTNL_OBJ_TUNNEL_ERSPAN_V2_HWID:
-		tun->u.tun_erspan.u.v2.hwid = (*(uint8_t *)data);
+		memcpy(&tun->u.tun_erspan.u.v2.hwid, data, sizeof(tun->u.tun_erspan.u.v2.hwid));
 		break;
 	case NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR:
-		tun->u.tun_erspan.u.v2.dir = (*(uint8_t *)data);
+		memcpy(&tun->u.tun_erspan.u.v2.dir, data, sizeof(tun->u.tun_erspan.u.v2.dir));
 		break;
 	default:
 		return -1;

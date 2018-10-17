@@ -39,13 +39,13 @@ nftnl_expr_meta_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_META_KEY:
-		meta->key = *((uint32_t *)data);
+		memcpy(&meta->key, data, sizeof(meta->key));
 		break;
 	case NFTNL_EXPR_META_DREG:
-		meta->dreg = *((uint32_t *)data);
+		memcpy(&meta->dreg, data, sizeof(meta->dreg));
 		break;
 	case NFTNL_EXPR_META_SREG:
-		meta->sreg = *((uint32_t *)data);
+		memcpy(&meta->sreg, data, sizeof(meta->sreg));
 		break;
 	default:
 		return -1;
