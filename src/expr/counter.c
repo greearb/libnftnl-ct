@@ -139,26 +139,10 @@ static int nftnl_expr_counter_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_counter_cmp(const struct nftnl_expr *e1,
-				   const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_counter *c1 = nftnl_expr_data(e1);
-	struct nftnl_expr_counter *c2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_CTR_PACKETS))
-		eq &= (c1->pkts == c2->pkts);
-	if (e1->flags & (1 << NFTNL_EXPR_CTR_BYTES))
-		eq &= (c1->pkts == c2->pkts);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_counter = {
 	.name		= "counter",
 	.alloc_len	= sizeof(struct nftnl_expr_counter),
 	.max_attr	= NFTA_COUNTER_MAX,
-	.cmp		= nftnl_expr_counter_cmp,
 	.set		= nftnl_expr_counter_set,
 	.get		= nftnl_expr_counter_get,
 	.parse		= nftnl_expr_counter_parse,

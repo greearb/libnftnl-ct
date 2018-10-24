@@ -211,32 +211,10 @@ nftnl_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_bitwise_cmp(const struct nftnl_expr *e1,
-				   const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_bitwise *b1 = nftnl_expr_data(e1);
-	struct nftnl_expr_bitwise *b2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_BITWISE_SREG))
-		eq &= (b1->sreg == b2->sreg);
-	if (e1->flags & (1 << NFTNL_EXPR_BITWISE_DREG))
-		eq &= (b1->dreg == b2->dreg);
-	if (e1->flags & (1 << NFTNL_EXPR_BITWISE_LEN))
-		eq &= (b1->len == b2->len);
-	if (e1->flags & (1 << NFTNL_EXPR_BITWISE_MASK))
-		eq &= nftnl_data_reg_cmp(&b1->mask, &b2->mask, DATA_VALUE);
-	if (e1->flags & (1 << NFTNL_EXPR_BITWISE_XOR))
-		eq &= nftnl_data_reg_cmp(&b1->xor, &b2->xor, DATA_VALUE);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_bitwise = {
 	.name		= "bitwise",
 	.alloc_len	= sizeof(struct nftnl_expr_bitwise),
 	.max_attr	= NFTA_BITWISE_MAX,
-	.cmp		= nftnl_expr_bitwise_cmp,
 	.set		= nftnl_expr_bitwise_set,
 	.get		= nftnl_expr_bitwise_get,
 	.parse		= nftnl_expr_bitwise_parse,

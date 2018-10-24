@@ -208,28 +208,10 @@ nftnl_expr_cmp_snprintf(char *buf, size_t size, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_cmp_cmp(const struct nftnl_expr *e1,
-			       const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_cmp *c1 = nftnl_expr_data(e1);
-	struct nftnl_expr_cmp *c2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_CMP_DATA))
-		eq &= nftnl_data_reg_cmp(&c1->data, &c2->data, DATA_VALUE);
-	if (e1->flags & (1 << NFTNL_EXPR_CMP_SREG))
-		eq &= (c1->sreg == c2->sreg);
-	if (e1->flags & (1 << NFTNL_EXPR_CMP_OP))
-		eq &= (c1->op == c2->op);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_cmp = {
 	.name		= "cmp",
 	.alloc_len	= sizeof(struct nftnl_expr_cmp),
 	.max_attr	= NFTA_CMP_MAX,
-	.cmp		= nftnl_expr_cmp_cmp,
 	.set		= nftnl_expr_cmp_set,
 	.get		= nftnl_expr_cmp_get,
 	.parse		= nftnl_expr_cmp_parse,

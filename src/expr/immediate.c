@@ -226,36 +226,11 @@ static void nftnl_expr_immediate_free(const struct nftnl_expr *e)
 		nftnl_free_verdict(&imm->data);
 }
 
-static bool nftnl_expr_immediate_cmp(const struct nftnl_expr *e1,
-				     const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_immediate *i1 = nftnl_expr_data(e1);
-	struct nftnl_expr_immediate *i2 = nftnl_expr_data(e2);
-	bool eq = true;
-	int type = DATA_NONE;
-
-	if (e1->flags & (1 << NFTNL_EXPR_IMM_DREG))
-		eq &= (i1->dreg == i2->dreg);
-	if (e1->flags & (1 << NFTNL_EXPR_IMM_VERDICT))
-		if (e1->flags & (1 << NFTNL_EXPR_IMM_CHAIN))
-			type = DATA_CHAIN;
-		else
-			type = DATA_VERDICT;
-	else if (e1->flags & (1 << NFTNL_EXPR_IMM_DATA))
-		type = DATA_VALUE;
-
-	if (type != DATA_NONE)
-		eq &= nftnl_data_reg_cmp(&i1->data, &i2->data, type);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_immediate = {
 	.name		= "immediate",
 	.alloc_len	= sizeof(struct nftnl_expr_immediate),
 	.max_attr	= NFTA_IMMEDIATE_MAX,
 	.free		= nftnl_expr_immediate_free,
-	.cmp		= nftnl_expr_immediate_cmp,
 	.set		= nftnl_expr_immediate_set,
 	.get		= nftnl_expr_immediate_get,
 	.parse		= nftnl_expr_immediate_parse,

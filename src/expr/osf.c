@@ -136,27 +136,10 @@ nftnl_expr_osf_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_osf_cmp(const struct nftnl_expr *e1,
-			       const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_osf *l1 = nftnl_expr_data(e1);
-	struct nftnl_expr_osf *l2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_OSF_DREG))
-		eq &= (l1->dreg == l2->dreg);
-
-	if (e1->flags & (1 << NFTNL_EXPR_OSF_TTL))
-		eq &= (l1->ttl == l2->ttl);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_osf = {
 	.name		= "osf",
 	.alloc_len	= sizeof(struct nftnl_expr_osf),
 	.max_attr	= NFTA_OSF_MAX,
-	.cmp		= nftnl_expr_osf_cmp,
 	.set		= nftnl_expr_osf_set,
 	.get		= nftnl_expr_osf_get,
 	.parse		= nftnl_expr_osf_parse,

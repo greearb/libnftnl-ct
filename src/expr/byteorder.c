@@ -226,32 +226,10 @@ nftnl_expr_byteorder_snprintf(char *buf, size_t size, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_byteorder_cmp(const struct nftnl_expr *e1,
-				     const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_byteorder *b1 = nftnl_expr_data(e1);
-	struct nftnl_expr_byteorder *b2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_BYTEORDER_SREG))
-		eq &= (b1->sreg == b2->sreg);
-	if (e1->flags & (1 << NFTNL_EXPR_BYTEORDER_DREG))
-		eq &= (b1->dreg == b2->dreg);
-	if (e1->flags & (1 << NFTNL_EXPR_BYTEORDER_OP))
-		eq &= (b1->op == b2->op);
-	if (e1->flags & (1 << NFTNL_EXPR_BYTEORDER_LEN))
-		eq &= (b1->len == b2->len);
-	if (e1->flags & (1 << NFTNL_EXPR_BYTEORDER_SIZE))
-		eq &= (b1->size == b2->size);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_byteorder = {
 	.name		= "byteorder",
 	.alloc_len	= sizeof(struct nftnl_expr_byteorder),
 	.max_attr	= NFTA_BYTEORDER_MAX,
-	.cmp		= nftnl_expr_byteorder_cmp,
 	.set		= nftnl_expr_byteorder_set,
 	.get		= nftnl_expr_byteorder_get,
 	.parse		= nftnl_expr_byteorder_parse,

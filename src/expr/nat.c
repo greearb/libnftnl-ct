@@ -271,35 +271,10 @@ nftnl_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_nat_cmp(const struct nftnl_expr *e1,
-			       const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_nat *n1 = nftnl_expr_data(e1);
-	struct nftnl_expr_nat *n2 = nftnl_expr_data(e2);
-	bool eq = true;
-	if (e1->flags & (1 << NFTNL_EXPR_NAT_REG_ADDR_MIN))
-		eq &= (n1->sreg_addr_min == n2->sreg_addr_min);
-	if (e1->flags & (1 << NFTNL_EXPR_NAT_REG_ADDR_MAX))
-		eq &= (n1->sreg_addr_max == n2->sreg_addr_max);
-	if (e1->flags & (1 << NFTNL_EXPR_NAT_REG_PROTO_MIN))
-		eq &= (n1->sreg_proto_min == n2->sreg_proto_min);
-	if (e1->flags & (1 << NFTNL_EXPR_NAT_REG_PROTO_MAX))
-		eq &= (n1->sreg_proto_max == n2->sreg_proto_max);
-	if (e1->flags & (1 << NFTNL_EXPR_NAT_FAMILY))
-		eq &= (n1->family == n2->family);
-	if (e1->flags & (1 << NFTNL_EXPR_NAT_TYPE))
-		eq &= (n1->type == n2->type);
-	if (e1->flags & (1 << NFTNL_EXPR_NAT_FLAGS))
-		eq &= (n1->flags == n2->flags);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_nat = {
 	.name		= "nat",
 	.alloc_len	= sizeof(struct nftnl_expr_nat),
 	.max_attr	= NFTA_NAT_MAX,
-	.cmp		= nftnl_expr_nat_cmp,
 	.set		= nftnl_expr_nat_set,
 	.get		= nftnl_expr_nat_get,
 	.parse		= nftnl_expr_nat_parse,

@@ -263,36 +263,10 @@ nftnl_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_exthdr_cmp(const struct nftnl_expr *e1,
-				  const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_exthdr *h1 = nftnl_expr_data(e1);
-	struct nftnl_expr_exthdr *h2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_DREG))
-		eq &= (h1->dreg == h2->dreg);
-	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_SREG))
-		eq &= (h1->sreg == h2->sreg);
-	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_OFFSET))
-		eq &= (h1->offset == h2->offset);
-	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_LEN))
-		eq &= (h1->len == h2->len);
-	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_TYPE))
-		eq &= (h1->type == h2->type);
-	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_OP))
-		eq &= (h1->op == h2->op);
-	if (e1->flags & (1 << NFTNL_EXPR_EXTHDR_FLAGS))
-		eq &= (h1->flags == h2->flags);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_exthdr = {
 	.name		= "exthdr",
 	.alloc_len	= sizeof(struct nftnl_expr_exthdr),
 	.max_attr	= NFTA_EXTHDR_MAX,
-	.cmp		= nftnl_expr_exthdr_cmp,
 	.set		= nftnl_expr_exthdr_set,
 	.get		= nftnl_expr_exthdr_get,
 	.parse		= nftnl_expr_exthdr_parse,

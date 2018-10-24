@@ -205,28 +205,10 @@ nftnl_expr_fib_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_fib_cmp(const struct nftnl_expr *e1,
-				const struct nftnl_expr *e2)
-{
-       struct nftnl_expr_fib *h1 = nftnl_expr_data(e1);
-       struct nftnl_expr_fib *h2 = nftnl_expr_data(e2);
-       bool eq = true;
-
-       if (e1->flags & (1 << NFTNL_EXPR_FIB_RESULT))
-               eq &= (h1->result == h2->result);
-       if (e1->flags & (1 << NFTNL_EXPR_FIB_DREG))
-               eq &= (h1->dreg == h2->dreg);
-       if (e1->flags & (1 << NFTNL_EXPR_FIB_FLAGS))
-               eq &= (h1->flags == h2->flags);
-
-       return eq;
-}
-
 struct expr_ops expr_ops_fib = {
 	.name		= "fib",
 	.alloc_len	= sizeof(struct nftnl_expr_fib),
 	.max_attr	= NFTA_FIB_MAX,
-	.cmp		= nftnl_expr_fib_cmp,
 	.set		= nftnl_expr_fib_set,
 	.get		= nftnl_expr_fib_get,
 	.parse		= nftnl_expr_fib_parse,

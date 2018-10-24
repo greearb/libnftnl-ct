@@ -140,26 +140,10 @@ nftnl_expr_reject_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_reject_cmp(const struct nftnl_expr *e1,
-				  const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_reject *r1 = nftnl_expr_data(e1);
-	struct nftnl_expr_reject *r2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_REJECT_TYPE))
-		eq &= (r1->type == r2->type);
-	if (e1->flags & (1 << NFTNL_EXPR_REJECT_CODE))
-		eq &= (r1->icmp_code == r2->icmp_code);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_reject = {
 	.name		= "reject",
 	.alloc_len	= sizeof(struct nftnl_expr_reject),
 	.max_attr	= NFTA_REJECT_MAX,
-	.cmp		= nftnl_expr_reject_cmp,
 	.set		= nftnl_expr_reject_set,
 	.get		= nftnl_expr_reject_get,
 	.parse		= nftnl_expr_reject_parse,

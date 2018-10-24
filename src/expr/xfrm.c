@@ -231,30 +231,10 @@ nftnl_expr_xfrm_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_xfrm_cmp(const struct nftnl_expr *e1,
-				const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_xfrm *x1 = nftnl_expr_data(e1);
-	struct nftnl_expr_xfrm *x2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_XFRM_KEY))
-		eq &= (x1->key == x2->key);
-	if (e1->flags & (1 << NFTNL_EXPR_XFRM_DIR))
-		eq &= (x1->dir == x2->dir);
-	if (e1->flags & (1 << NFTNL_EXPR_XFRM_SPNUM))
-		eq &= (x1->spnum == x2->spnum);
-	if (e1->flags & (1 << NFTNL_EXPR_XFRM_DREG))
-		eq &= (x1->dreg == x2->dreg);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_xfrm = {
 	.name		= "xfrm",
 	.alloc_len	= sizeof(struct nftnl_expr_xfrm),
 	.max_attr	= NFTA_XFRM_MAX,
-	.cmp		= nftnl_expr_xfrm_cmp,
 	.set		= nftnl_expr_xfrm_set,
 	.get		= nftnl_expr_xfrm_get,
 	.parse		= nftnl_expr_xfrm_parse,

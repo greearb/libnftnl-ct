@@ -264,30 +264,10 @@ nftnl_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_ct_cmp(const struct nftnl_expr *e1,
-			      const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_ct *c1 = nftnl_expr_data(e1);
-	struct nftnl_expr_ct *c2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_CT_KEY))
-		eq &= (c1->key == c2->key);
-	if (e1->flags & (1 << NFTNL_EXPR_CT_DREG))
-		eq &= (c1->dreg == c2->dreg);
-	if (e1->flags & (1 << NFTNL_EXPR_CT_SREG))
-		eq &= (c1->sreg == c2->sreg);
-	if (e1->flags & (1 << NFTNL_EXPR_CT_DIR))
-		eq &= (c1->dir == c2->dir);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_ct = {
 	.name		= "ct",
 	.alloc_len	= sizeof(struct nftnl_expr_ct),
 	.max_attr	= NFTA_CT_MAX,
-	.cmp		= nftnl_expr_ct_cmp,
 	.set		= nftnl_expr_ct_set,
 	.get		= nftnl_expr_ct_get,
 	.parse		= nftnl_expr_ct_parse,

@@ -258,35 +258,11 @@ static void nftnl_expr_log_free(const struct nftnl_expr *e)
 	xfree(log->prefix);
 }
 
-static bool nftnl_expr_log_cmp(const struct nftnl_expr *e1,
-				     const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_log *l1 = nftnl_expr_data(e1);
-	struct nftnl_expr_log *l2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_LOG_SNAPLEN))
-		eq &= (l1->snaplen == l2->snaplen);
-	if (e1->flags & (1 << NFTNL_EXPR_LOG_GROUP))
-		eq &= (l1->group == l2->group);
-	if (e1->flags & (1 << NFTNL_EXPR_LOG_QTHRESHOLD))
-		eq &= (l1->qthreshold == l2->qthreshold);
-	if (e1->flags & (1 << NFTNL_EXPR_LOG_LEVEL))
-		eq &= (l1->level == l2->level);
-	if (e1->flags & (1 << NFTNL_EXPR_LOG_FLAGS))
-		eq &= (l1->flags == l2->flags);
-	if (e1->flags & (1 << NFTNL_EXPR_LOG_PREFIX))
-		eq &= !strcmp(l1->prefix, l2->prefix);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_log = {
 	.name		= "log",
 	.alloc_len	= sizeof(struct nftnl_expr_log),
 	.max_attr	= NFTA_LOG_MAX,
 	.free		= nftnl_expr_log_free,
-	.cmp		= nftnl_expr_log_cmp,
 	.set		= nftnl_expr_log_set,
 	.get		= nftnl_expr_log_get,
 	.parse		= nftnl_expr_log_parse,

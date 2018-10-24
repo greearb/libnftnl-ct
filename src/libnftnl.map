@@ -1,4 +1,4 @@
-LIBNFTNL_5 {
+LIBNFTNL_11 {
 global:
   nftnl_table_alloc;
   nftnl_table_free;
@@ -271,9 +271,6 @@ global:
   nftnl_udata_next;
   nftnl_udata_parse;
 
-  nftnl_rule_cmp;
-  nftnl_expr_cmp;
-
   nftnl_obj_alloc;
   nftnl_obj_free;
   nftnl_obj_is_set;
@@ -307,14 +304,8 @@ global:
   nftnl_obj_list_iter_next;
   nftnl_obj_list_iter_destroy;
 
-local: *;
-};
-
-LIBNFTNL_6 {
   nftnl_expr_fprintf;
-} LIBNFTNL_5;
 
-LIBNFTNL_7 {
   nftnl_flowtable_alloc;
   nftnl_flowtable_free;
   nftnl_flowtable_is_set;
@@ -341,8 +332,7 @@ LIBNFTNL_7 {
   nftnl_flowtable_list_del;
   nftnl_flowtable_list_foreach;
 
-} LIBNFTNL_6;
-
-LIBNFTNL_8 {
   nftnl_rule_list_insert_at;
-} LIBNFTNL_7;
+
+local: *;
+};

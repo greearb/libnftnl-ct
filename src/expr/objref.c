@@ -202,32 +202,10 @@ static int nftnl_expr_objref_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_objref_cmp(const struct nftnl_expr *e1,
-				   const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_objref *c1 = nftnl_expr_data(e1);
-	struct nftnl_expr_objref *c2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_IMM_TYPE))
-		eq &= (c1->imm.type == c2->imm.type);
-	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_IMM_NAME))
-		eq &= !strcmp(c1->imm.name, c2->imm.name);
-	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_SET_SREG))
-		eq &= (c1->set.sreg == c2->set.sreg);
-	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_SET_NAME))
-		eq &= !strcmp(c1->set.name, c2->set.name);
-	if (e1->flags & (1 << NFTNL_EXPR_OBJREF_SET_ID))
-		eq &= (c1->set.id == c2->set.id);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_objref = {
 	.name		= "objref",
 	.alloc_len	= sizeof(struct nftnl_expr_objref),
 	.max_attr	= NFTA_OBJREF_MAX,
-	.cmp		= nftnl_expr_objref_cmp,
 	.set		= nftnl_expr_objref_set,
 	.get		= nftnl_expr_objref_get,
 	.parse		= nftnl_expr_objref_parse,

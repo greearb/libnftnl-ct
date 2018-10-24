@@ -141,26 +141,10 @@ static int nftnl_expr_connlimit_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_connlimit_cmp(const struct nftnl_expr *e1,
-				   const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_connlimit *c1 = nftnl_expr_data(e1);
-	struct nftnl_expr_connlimit *c2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_CONNLIMIT_COUNT))
-		eq &= (c1->count == c2->count);
-	if (e1->flags & (1 << NFTNL_EXPR_CONNLIMIT_FLAGS))
-		eq &= (c1->flags == c2->flags);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_connlimit = {
 	.name		= "connlimit",
 	.alloc_len	= sizeof(struct nftnl_expr_connlimit),
 	.max_attr	= NFTA_CONNLIMIT_MAX,
-	.cmp		= nftnl_expr_connlimit_cmp,
 	.set		= nftnl_expr_connlimit_set,
 	.get		= nftnl_expr_connlimit_get,
 	.parse		= nftnl_expr_connlimit_parse,

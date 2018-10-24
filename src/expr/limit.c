@@ -208,33 +208,11 @@ nftnl_expr_limit_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_limit_cmp(const struct nftnl_expr *e1,
-				 const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_limit *l1 = nftnl_expr_data(e1);
-	struct nftnl_expr_limit *l2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_LIMIT_RATE))
-		eq &= (l1->rate == l2->rate);
-	if (e1->flags & (1 << NFTNL_EXPR_LIMIT_UNIT))
-		eq &= (l1->unit == l2->unit);
-	if (e1->flags & (1 << NFTNL_EXPR_LIMIT_BURST))
-		eq &= (l1->burst == l2->burst);
-	if (e1->flags & (1 << NFTNL_EXPR_LIMIT_TYPE))
-		eq &= (l1->type == l2->type);
-	if (e1->flags & (1 << NFTNL_EXPR_LIMIT_FLAGS))
-		eq &= (l1->flags == l2->flags);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_limit = {
 	.name		= "limit",
 	.alloc_len	= sizeof(struct nftnl_expr_limit),
 	.max_attr	= NFTA_LIMIT_MAX,
 	.set		= nftnl_expr_limit_set,
-	.cmp		= nftnl_expr_limit_cmp,
 	.get		= nftnl_expr_limit_get,
 	.parse		= nftnl_expr_limit_parse,
 	.build		= nftnl_expr_limit_build,

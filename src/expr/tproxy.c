@@ -175,28 +175,10 @@ nftnl_expr_tproxy_snprintf(char *buf, size_t size, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_tproxy_cmp(const struct nftnl_expr *e1,
-			       const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_tproxy *n1 = nftnl_expr_data(e1);
-	struct nftnl_expr_tproxy *n2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_TPROXY_REG_ADDR))
-		eq &= (n1->sreg_addr == n2->sreg_addr);
-	if (e1->flags & (1 << NFTNL_EXPR_TPROXY_REG_PORT))
-		eq &= (n1->sreg_port == n2->sreg_port);
-	if (e1->flags & (1 << NFTNL_EXPR_TPROXY_FAMILY))
-		eq &= (n1->family == n2->family);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_tproxy = {
 	.name		= "tproxy",
 	.alloc_len	= sizeof(struct nftnl_expr_tproxy),
 	.max_attr	= NFTA_TPROXY_MAX,
-	.cmp		= nftnl_expr_tproxy_cmp,
 	.set		= nftnl_expr_tproxy_set,
 	.get		= nftnl_expr_tproxy_get,
 	.parse		= nftnl_expr_tproxy_parse,

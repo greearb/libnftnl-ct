@@ -169,26 +169,10 @@ nftnl_expr_rt_snprintf(char *buf, size_t len, uint32_t type,
 	return -1;
 }
 
-static bool nftnl_expr_rt_cmp(const struct nftnl_expr *e1,
-			      const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_rt *r1 = nftnl_expr_data(e1);
-	struct nftnl_expr_rt *r2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_RT_KEY))
-		eq &= (r1->key == r2->key);
-	if (e1->flags & (1 << NFTNL_EXPR_RT_DREG))
-		eq &= (r1->dreg == r2->dreg);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_rt = {
 	.name		= "rt",
 	.alloc_len	= sizeof(struct nftnl_expr_rt),
 	.max_attr	= NFTA_RT_MAX,
-	.cmp		= nftnl_expr_rt_cmp,
 	.set		= nftnl_expr_rt_set,
 	.get		= nftnl_expr_rt_get,
 	.parse		= nftnl_expr_rt_parse,

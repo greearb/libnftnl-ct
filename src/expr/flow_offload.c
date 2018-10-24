@@ -125,25 +125,11 @@ static void nftnl_expr_flow_free(const struct nftnl_expr *e)
 	xfree(flow->table_name);
 }
 
-static bool nftnl_expr_flow_cmp(const struct nftnl_expr *e1,
-				const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_flow *l1 = nftnl_expr_data(e1);
-	struct nftnl_expr_flow *l2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_FLOW_TABLE_NAME))
-		eq &= !strcmp(l1->table_name, l2->table_name);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_flow = {
 	.name		= "flow_offload",
 	.alloc_len	= sizeof(struct nftnl_expr_flow),
 	.max_attr	= NFTA_FLOW_MAX,
 	.free		= nftnl_expr_flow_free,
-	.cmp		= nftnl_expr_flow_cmp,
 	.set		= nftnl_expr_flow_set,
 	.get		= nftnl_expr_flow_get,
 	.parse		= nftnl_expr_flow_parse,

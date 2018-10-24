@@ -279,37 +279,11 @@ static void nftnl_expr_dynset_free(const struct nftnl_expr *e)
 	xfree(dynset->set_name);
 }
 
-static bool nftnl_expr_dynset_cmp(const struct nftnl_expr *e1,
-				  const struct nftnl_expr *e2)
-{
-	struct nftnl_expr_dynset *d1 = nftnl_expr_data(e1);
-	struct nftnl_expr_dynset *d2 = nftnl_expr_data(e2);
-	bool eq = true;
-
-	if (e1->flags & (1 << NFTNL_EXPR_DYNSET_SREG_KEY))
-		eq &= (d1->sreg_key == d2->sreg_key);
-	if (e1->flags & (1 << NFTNL_EXPR_DYNSET_SREG_DATA))
-		eq &= (d1->sreg_data == d2->sreg_data);
-	if (e1->flags & (1 << NFTNL_EXPR_DYNSET_OP))
-		eq &= (d1->op == d2->op);
-	if (e1->flags & (1 << NFTNL_EXPR_DYNSET_TIMEOUT))
-		eq &= (d1->timeout == d2->timeout);
-	if (e1->flags & (1 << NFTNL_EXPR_DYNSET_EXPR))
-		eq &= nftnl_expr_cmp(d1->expr, d2->expr);
-	if (e1->flags & (1 << NFTNL_EXPR_DYNSET_SET_NAME))
-		eq &= !strcmp(d1->set_name, d2->set_name);
-	if (e1->flags & (1 << NFTNL_EXPR_DYNSET_SET_ID))
-		eq &= (d1->set_id == d2->set_id);
-
-	return eq;
-}
-
 struct expr_ops expr_ops_dynset = {
 	.name		= "dynset",
 	.alloc_len	= sizeof(struct nftnl_expr_dynset),
 	.max_attr	= NFTA_DYNSET_MAX,
 	.free		= nftnl_expr_dynset_free,
-	.cmp		= nftnl_expr_dynset_cmp,
 	.set		= nftnl_expr_dynset_set,
 	.get		= nftnl_expr_dynset_get,
 	.parse		= nftnl_expr_dynset_parse,
