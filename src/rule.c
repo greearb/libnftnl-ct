@@ -30,28 +30,6 @@
 #include <libnftnl/set.h>
 #include <libnftnl/expr.h>
 
-struct nftnl_rule {
-	struct list_head head;
-
-	uint32_t	flags;
-	uint32_t	family;
-	const char	*table;
-	const char	*chain;
-	uint64_t	handle;
-	uint64_t	position;
-	uint32_t	id;
-	struct {
-			void		*data;
-			uint32_t	len;
-	} user;
-	struct {
-			uint32_t	flags;
-			uint32_t	proto;
-	} compat;
-
-	struct list_head expr_list;
-};
-
 EXPORT_SYMBOL(nftnl_rule_alloc);
 struct nftnl_rule *nftnl_rule_alloc(void)
 {

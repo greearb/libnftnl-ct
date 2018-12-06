@@ -27,6 +27,7 @@
 #include <linux/netfilter_arp.h>
 
 #include <libnftnl/chain.h>
+#include <libnftnl/rule.h>
 #include <buffer.h>
 
 struct nftnl_chain {
@@ -45,6 +46,8 @@ struct nftnl_chain {
 	uint64_t	bytes;
 	uint64_t	handle;
 	uint32_t	flags;
+
+	struct list_head rule_list;
 };
 
 static const char *nftnl_hooknum2str(int family, int hooknum)
@@ -90,12 +93,25 @@ static const char *nftnl_hooknum2str(int family, int hooknum)
 EXPORT_SYMBOL(nftnl_chain_alloc);
 struct nftnl_chain *nftnl_chain_alloc(void)
 {
-	return calloc(1, sizeof(struct nftnl_chain));
+	struct nftnl_chain *c;
+
+	c = calloc(1, sizeof(struct nftnl_chain));
+	if (c == NULL)
+		return NULL;
+
+	INIT_LIST_HEAD(&c->rule_list);
+
+	return c;
 }
 
 EXPORT_SYMBOL(nftnl_chain_free);
 void nftnl_chain_free(const struct nftnl_chain *c)
 {
+	struct nftnl_rule *r, *tmp;
+
+	list_for_each_entry_safe(r, tmp, &c->rule_list, head)
+		nftnl_rule_free(r);
+
 	if (c->flags & (1 << NFTNL_CHAIN_NAME))
 		xfree(c->name);
 	if (c->flags & (1 << NFTNL_CHAIN_TABLE))
@@ -406,6 +422,24 @@ void nftnl_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_ch
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_TYPE, c->type);
 }
 
+EXPORT_SYMBOL(nftnl_chain_rule_add);
+void nftnl_chain_rule_add(struct nftnl_rule *rule, struct nftnl_chain *c)
+{
+	list_add(&rule->head, &c->rule_list);
+}
+
+EXPORT_SYMBOL(nftnl_chain_rule_add_tail);
+void nftnl_chain_rule_add_tail(struct nftnl_rule *rule, struct nftnl_chain *c)
+{
+	list_add_tail(&rule->head, &c->rule_list);
+}
+
+EXPORT_SYMBOL(nftnl_chain_rule_insert_at);
+void nftnl_chain_rule_insert_at(struct nftnl_rule *rule, struct nftnl_rule *pos)
+{
+	list_add(&rule->head, &pos->head);
+}
+
 static int nftnl_chain_parse_attr_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;
@@ -682,6 +716,74 @@ int nftnl_chain_fprintf(FILE *fp, const struct nftnl_chain *c, uint32_t type,
 {
 	return nftnl_fprintf(fp, c, NFTNL_CMD_UNSPEC, type, flags,
 			   nftnl_chain_do_snprintf);
+}
+
+EXPORT_SYMBOL(nftnl_rule_foreach);
+int nftnl_rule_foreach(struct nftnl_chain *c,
+                          int (*cb)(struct nftnl_rule *r, void *data),
+                          void *data)
+{
+       struct nftnl_rule *cur, *tmp;
+       int ret;
+
+       list_for_each_entry_safe(cur, tmp, &c->rule_list, head) {
+               ret = cb(cur, data);
+               if (ret < 0)
+                       return ret;
+       }
+       return 0;
+}
+
+struct nftnl_rule_iter {
+	const struct nftnl_chain	*c;
+	struct nftnl_rule		*cur;
+};
+
+static void nftnl_rule_iter_init(const struct nftnl_chain *c,
+				 struct nftnl_rule_iter *iter)
+{
+	iter->c = c;
+	if (list_empty(&c->rule_list))
+		iter->cur = NULL;
+	else
+		iter->cur = list_entry(c->rule_list.next, struct nftnl_rule,
+				       head);
+}
+
+EXPORT_SYMBOL(nftnl_rule_iter_create);
+struct nftnl_rule_iter *nftnl_rule_iter_create(const struct nftnl_chain *c)
+{
+	struct nftnl_rule_iter *iter;
+
+	iter = calloc(1, sizeof(struct nftnl_rule_iter));
+	if (iter == NULL)
+		return NULL;
+
+	nftnl_rule_iter_init(c, iter);
+
+	return iter;
+}
+
+EXPORT_SYMBOL(nftnl_rule_iter_next);
+struct nftnl_rule *nftnl_rule_iter_next(struct nftnl_rule_iter *iter)
+{
+	struct nftnl_rule *rule = iter->cur;
+
+	if (rule == NULL)
+		return NULL;
+
+	/* get next rule, if any */
+	iter->cur = list_entry(iter->cur->head.next, struct nftnl_rule, head);
+	if (&iter->cur->head == iter->c->rule_list.next)
+		return NULL;
+
+	return rule;
+}
+
+EXPORT_SYMBOL(nftnl_rule_iter_destroy);
+void nftnl_rule_iter_destroy(struct nftnl_rule_iter *iter)
+{
+	xfree(iter);
 }
 
 struct nftnl_chain_list {

@@ -336,3 +336,13 @@ global:
 
 local: *;
 };
+
+LIBNFTNL_12 {
+  nftnl_chain_rule_add;
+  nftnl_chain_rule_add_tail;
+  nftnl_chain_rule_insert_at;
+  nftnl_rule_foreach;
+  nftnl_rule_iter_create;
+  nftnl_rule_iter_next;
+  nftnl_rule_iter_destroy;
+} LIBNFTNL_11;

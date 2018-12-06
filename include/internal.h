@@ -12,5 +12,6 @@
 #include "expr.h"
 #include "expr_ops.h"
 #include "buffer.h"
+#include "rule.h"
 
 #endif /* _LIBNFTNL_INTERNAL_H_ */

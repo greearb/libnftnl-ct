@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 struct nftnl_chain;
+struct nftnl_rule;
 
 struct nftnl_chain *nftnl_chain_alloc(void);
 void nftnl_chain_free(const struct nftnl_chain *);
@@ -54,6 +55,10 @@ uint32_t nftnl_chain_get_u32(const struct nftnl_chain *c, uint16_t attr);
 int32_t nftnl_chain_get_s32(const struct nftnl_chain *c, uint16_t attr);
 uint64_t nftnl_chain_get_u64(const struct nftnl_chain *c, uint16_t attr);
 
+void nftnl_chain_rule_add(struct nftnl_rule *rule, struct nftnl_chain *c);
+void nftnl_chain_rule_add_tail(struct nftnl_rule *rule, struct nftnl_chain *c);
+void nftnl_chain_rule_insert_at(struct nftnl_rule *rule, struct nftnl_rule *pos);
+
 struct nlmsghdr;
 
 void nftnl_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_chain *t);
@@ -67,6 +72,16 @@ int nftnl_chain_fprintf(FILE *fp, const struct nftnl_chain *c, uint32_t type, ui
 
 #define nftnl_chain_nlmsg_build_hdr	nftnl_nlmsg_build_hdr
 int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *t);
+
+int nftnl_rule_foreach(struct nftnl_chain *c,
+			  int (*cb)(struct nftnl_rule *r, void *data),
+			  void *data);
+
+struct nftnl_rule_iter;
+
+struct nftnl_rule_iter *nftnl_rule_iter_create(const struct nftnl_chain *c);
+struct nftnl_rule *nftnl_rule_iter_next(struct nftnl_rule_iter *iter);
+void nftnl_rule_iter_destroy(struct nftnl_rule_iter *iter);
 
 struct nftnl_chain_list;
 
