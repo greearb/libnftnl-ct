@@ -345,4 +345,7 @@ LIBNFTNL_12 {
   nftnl_rule_iter_create;
   nftnl_rule_iter_next;
   nftnl_rule_iter_destroy;
+
+  nftnl_chain_list_lookup_byname;
+  nftnl_rule_lookup_byindex;
 } LIBNFTNL_11;

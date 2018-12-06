@@ -734,6 +734,20 @@ int nftnl_rule_foreach(struct nftnl_chain *c,
        return 0;
 }
 
+EXPORT_SYMBOL(nftnl_rule_lookup_byindex);
+struct nftnl_rule *
+nftnl_rule_lookup_byindex(struct nftnl_chain *c, uint32_t index)
+{
+	struct nftnl_rule *r;
+
+	list_for_each_entry(r, &c->rule_list, head) {
+		if (!index)
+			return r;
+		index--;
+	}
+	return NULL;
+}
+
 struct nftnl_rule_iter {
 	const struct nftnl_chain	*c;
 	struct nftnl_rule		*cur;
@@ -854,6 +868,20 @@ int nftnl_chain_list_foreach(struct nftnl_chain_list *chain_list,
 			return ret;
 	}
 	return 0;
+}
+
+EXPORT_SYMBOL(nftnl_chain_list_lookup_byname);
+struct nftnl_chain *
+nftnl_chain_list_lookup_byname(struct nftnl_chain_list *chain_list,
+			       const char *chain)
+{
+	struct nftnl_chain *c;
+
+	list_for_each_entry(c, &chain_list->list, head) {
+		if (!strcmp(chain, c->name))
+			return c;
+	}
+	return NULL;
 }
 
 struct nftnl_chain_list_iter {

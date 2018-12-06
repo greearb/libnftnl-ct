@@ -76,6 +76,7 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *t);
 int nftnl_rule_foreach(struct nftnl_chain *c,
 			  int (*cb)(struct nftnl_rule *r, void *data),
 			  void *data);
+struct nftnl_rule *nftnl_rule_lookup_byindex(struct nftnl_chain *c, uint32_t index);
 
 struct nftnl_rule_iter;
 
@@ -89,6 +90,7 @@ struct nftnl_chain_list *nftnl_chain_list_alloc(void);
 void nftnl_chain_list_free(struct nftnl_chain_list *list);
 int nftnl_chain_list_is_empty(const struct nftnl_chain_list *list);
 int nftnl_chain_list_foreach(struct nftnl_chain_list *chain_list, int (*cb)(struct nftnl_chain *t, void *data), void *data);
+struct nftnl_chain *nftnl_chain_list_lookup_byname(struct nftnl_chain_list *chain_list, const char *chain);
 
 void nftnl_chain_list_add(struct nftnl_chain *r, struct nftnl_chain_list *list);
 void nftnl_chain_list_add_tail(struct nftnl_chain *r, struct nftnl_chain_list *list);
