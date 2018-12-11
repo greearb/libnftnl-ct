@@ -32,6 +32,7 @@
 
 struct nftnl_chain {
 	struct list_head head;
+	struct hlist_node hnode;
 
 	const char	*name;
 	const char	*type;
@@ -800,20 +801,27 @@ void nftnl_rule_iter_destroy(struct nftnl_rule_iter *iter)
 	xfree(iter);
 }
 
+#define CHAIN_NAME_HSIZE	512
+
 struct nftnl_chain_list {
+
 	struct list_head list;
+	struct hlist_head name_hash[CHAIN_NAME_HSIZE];
 };
 
 EXPORT_SYMBOL(nftnl_chain_list_alloc);
 struct nftnl_chain_list *nftnl_chain_list_alloc(void)
 {
 	struct nftnl_chain_list *list;
+	int i;
 
 	list = calloc(1, sizeof(struct nftnl_chain_list));
 	if (list == NULL)
 		return NULL;
 
 	INIT_LIST_HEAD(&list->list);
+	for (i = 0; i < CHAIN_NAME_HSIZE; i++)
+		INIT_HLIST_HEAD(&list->name_hash[i]);
 
 	return list;
 }
@@ -825,6 +833,7 @@ void nftnl_chain_list_free(struct nftnl_chain_list *list)
 
 	list_for_each_entry_safe(r, tmp, &list->list, head) {
 		list_del(&r->head);
+		hlist_del(&r->hnode);
 		nftnl_chain_free(r);
 	}
 	xfree(list);
@@ -836,15 +845,31 @@ int nftnl_chain_list_is_empty(const struct nftnl_chain_list *list)
 	return list_empty(&list->list);
 }
 
+static uint32_t djb_hash(const char *key)
+{
+	uint32_t i, hash = 5381;
+
+	for (i = 0; i < strlen(key); i++)
+		hash = ((hash << 5) + hash) + key[i];
+
+	return hash;
+}
+
 EXPORT_SYMBOL(nftnl_chain_list_add);
 void nftnl_chain_list_add(struct nftnl_chain *r, struct nftnl_chain_list *list)
 {
+	int key = djb_hash(r->name) % CHAIN_NAME_HSIZE;
+
+	hlist_add_head(&r->hnode, &list->name_hash[key]);
 	list_add(&r->head, &list->list);
 }
 
 EXPORT_SYMBOL(nftnl_chain_list_add_tail);
 void nftnl_chain_list_add_tail(struct nftnl_chain *r, struct nftnl_chain_list *list)
 {
+	int key = djb_hash(r->name) % CHAIN_NAME_HSIZE;
+
+	hlist_add_head(&r->hnode, &list->name_hash[key]);
 	list_add_tail(&r->head, &list->list);
 }
 
@@ -852,6 +877,7 @@ EXPORT_SYMBOL(nftnl_chain_list_del);
 void nftnl_chain_list_del(struct nftnl_chain *r)
 {
 	list_del(&r->head);
+	hlist_del(&r->hnode);
 }
 
 EXPORT_SYMBOL(nftnl_chain_list_foreach);
@@ -875,9 +901,11 @@ struct nftnl_chain *
 nftnl_chain_list_lookup_byname(struct nftnl_chain_list *chain_list,
 			       const char *chain)
 {
+	int key = djb_hash(chain) % CHAIN_NAME_HSIZE;
 	struct nftnl_chain *c;
+	struct hlist_node *n;
 
-	list_for_each_entry(c, &chain_list->list, head) {
+	hlist_for_each_entry(c, n, &chain_list->name_hash[key], hnode) {
 		if (!strcmp(chain, c->name))
 			return c;
 	}
