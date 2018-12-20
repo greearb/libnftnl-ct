@@ -163,6 +163,7 @@ int nftnl_flowtable_set_data(struct nftnl_flowtable *c, uint16_t attr,
 		break;
 	case NFTNL_FLOWTABLE_SIZE:
 		memcpy(&c->size, data, sizeof(c->size));
+		break;
 	case NFTNL_FLOWTABLE_FLAGS:
 		memcpy(&c->ft_flags, data, sizeof(c->ft_flags));
 		break;
