@@ -245,7 +245,7 @@ EXPORT_SYMBOL(nftnl_flowtable_get_str);
 
 uint32_t nftnl_flowtable_get_u32(const struct nftnl_flowtable *c, uint16_t attr)
 {
-	uint32_t data_len;
+	uint32_t data_len = 0;
 	const uint32_t *val = nftnl_flowtable_get_data(c, attr, &data_len);
 
 	nftnl_assert(val, attr, data_len == sizeof(uint32_t));
@@ -256,7 +256,7 @@ EXPORT_SYMBOL(nftnl_flowtable_get_u32);
 
 int32_t nftnl_flowtable_get_s32(const struct nftnl_flowtable *c, uint16_t attr)
 {
-	uint32_t data_len;
+	uint32_t data_len = 0;
 	const int32_t *val = nftnl_flowtable_get_data(c, attr, &data_len);
 
 	nftnl_assert(val, attr, data_len == sizeof(int32_t));
