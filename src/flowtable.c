@@ -85,10 +85,9 @@ void nftnl_flowtable_unset(struct nftnl_flowtable *c, uint16_t attr)
 	case NFTNL_FLOWTABLE_FLAGS:
 		break;
 	case NFTNL_FLOWTABLE_DEVICES:
-		for (i = 0; i < c->dev_array_len; i++) {
+		for (i = 0; i < c->dev_array_len; i++)
 			xfree(c->dev_array[i]);
-			xfree(c->dev_array);
-		}
+		xfree(c->dev_array);
 		break;
 	default:
 		return;
@@ -146,10 +145,9 @@ int nftnl_flowtable_set_data(struct nftnl_flowtable *c, uint16_t attr,
 			len++;
 
 		if (c->flags & (1 << NFTNL_FLOWTABLE_DEVICES)) {
-			for (i = 0; i < c->dev_array_len; i++) {
+			for (i = 0; i < c->dev_array_len; i++)
 				xfree(c->dev_array[i]);
-				xfree(c->dev_array);
-			}
+			xfree(c->dev_array);
 		}
 
 		c->dev_array = calloc(len + 1, sizeof(char *));
