@@ -25,7 +25,7 @@
 #include <buffer.h>
 #include "obj.h"
 
-static struct obj_ops *obj_ops[] = {
+static struct obj_ops *obj_ops[__NFT_OBJECT_MAX] = {
 	[NFT_OBJECT_COUNTER]	= &obj_ops_counter,
 	[NFT_OBJECT_QUOTA]	= &obj_ops_quota,
 	[NFT_OBJECT_CT_HELPER]	= &obj_ops_ct_helper,
