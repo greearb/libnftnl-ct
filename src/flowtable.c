@@ -364,7 +364,7 @@ static int nftnl_flowtable_parse_devs(struct nlattr *nest,
 
 	mnl_attr_for_each_nested(attr, nest) {
 		if (mnl_attr_get_type(attr) != NFTA_DEVICE_NAME)
-			return -1;
+			goto err;
 		dev_array[len++] = strdup(mnl_attr_get_str(attr));
 		if (len >= 8)
 			break;
@@ -375,14 +375,18 @@ static int nftnl_flowtable_parse_devs(struct nlattr *nest,
 
 	c->dev_array = calloc(len + 1, sizeof(char *));
 	if (!c->dev_array)
-		return -1;
+		goto err;
 
 	c->dev_array_len = len;
 
 	for (i = 0; i < len; i++)
-		c->dev_array[i] = strdup(dev_array[i]);
+		c->dev_array[i] = dev_array[i];
 
 	return 0;
+err:
+	while (len--)
+		xfree(dev_array[len]);
+	return -1;
 }
 
 static int nftnl_flowtable_parse_hook(struct nlattr *attr, struct nftnl_flowtable *c)
