@@ -429,6 +429,12 @@ void nftnl_chain_rule_add(struct nftnl_rule *rule, struct nftnl_chain *c)
 	list_add(&rule->head, &c->rule_list);
 }
 
+EXPORT_SYMBOL(nftnl_chain_rule_del);
+void nftnl_chain_rule_del(struct nftnl_rule *r)
+{
+	list_del(&r->head);
+}
+
 EXPORT_SYMBOL(nftnl_chain_rule_add_tail);
 void nftnl_chain_rule_add_tail(struct nftnl_rule *rule, struct nftnl_chain *c)
 {

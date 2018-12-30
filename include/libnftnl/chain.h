@@ -56,6 +56,7 @@ int32_t nftnl_chain_get_s32(const struct nftnl_chain *c, uint16_t attr);
 uint64_t nftnl_chain_get_u64(const struct nftnl_chain *c, uint16_t attr);
 
 void nftnl_chain_rule_add(struct nftnl_rule *rule, struct nftnl_chain *c);
+void nftnl_chain_rule_del(struct nftnl_rule *rule);
 void nftnl_chain_rule_add_tail(struct nftnl_rule *rule, struct nftnl_chain *c);
 void nftnl_chain_rule_insert_at(struct nftnl_rule *rule, struct nftnl_rule *pos);
 
