@@ -444,6 +444,12 @@ void nftnl_chain_rule_add_tail(struct nftnl_rule *rule, struct nftnl_chain *c)
 EXPORT_SYMBOL(nftnl_chain_rule_insert_at);
 void nftnl_chain_rule_insert_at(struct nftnl_rule *rule, struct nftnl_rule *pos)
 {
+	list_add_tail(&rule->head, &pos->head);
+}
+
+EXPORT_SYMBOL(nftnl_chain_rule_append_at);
+void nftnl_chain_rule_append_at(struct nftnl_rule *rule, struct nftnl_rule *pos)
+{
 	list_add(&rule->head, &pos->head);
 }
 

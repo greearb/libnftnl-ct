@@ -59,6 +59,7 @@ void nftnl_chain_rule_add(struct nftnl_rule *rule, struct nftnl_chain *c);
 void nftnl_chain_rule_del(struct nftnl_rule *rule);
 void nftnl_chain_rule_add_tail(struct nftnl_rule *rule, struct nftnl_chain *c);
 void nftnl_chain_rule_insert_at(struct nftnl_rule *rule, struct nftnl_rule *pos);
+void nftnl_chain_rule_append_at(struct nftnl_rule *rule, struct nftnl_rule *pos);
 
 struct nlmsghdr;
 
