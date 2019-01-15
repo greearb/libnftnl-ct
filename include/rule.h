@@ -11,6 +11,7 @@ struct nftnl_rule {
 	uint64_t	handle;
 	uint64_t	position;
 	uint32_t	id;
+	uint32_t	position_id;
 	struct {
 			void		*data;
 			uint32_t	len;

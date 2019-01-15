@@ -87,6 +87,7 @@ void nftnl_rule_unset(struct nftnl_rule *r, uint16_t attr)
 	case NFTNL_RULE_POSITION:
 	case NFTNL_RULE_FAMILY:
 	case NFTNL_RULE_ID:
+	case NFTNL_RULE_POSITION_ID:
 		break;
 	case NFTNL_RULE_USERDATA:
 		xfree(r->user.data);
@@ -103,6 +104,7 @@ static uint32_t nftnl_rule_validate[NFTNL_RULE_MAX + 1] = {
 	[NFTNL_RULE_FAMILY]		= sizeof(uint32_t),
 	[NFTNL_RULE_POSITION]		= sizeof(uint64_t),
 	[NFTNL_RULE_ID]			= sizeof(uint32_t),
+	[NFTNL_RULE_POSITION_ID]	= sizeof(uint32_t),
 };
 
 EXPORT_SYMBOL(nftnl_rule_set_data);
@@ -157,6 +159,9 @@ int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 		break;
 	case NFTNL_RULE_ID:
 		memcpy(&r->id, data, sizeof(r->id));
+		break;
+	case NFTNL_RULE_POSITION_ID:
+		memcpy(&r->position_id, data, sizeof(r->position_id));
 		break;
 	}
 	r->flags |= (1 << attr);
@@ -222,6 +227,9 @@ const void *nftnl_rule_get_data(const struct nftnl_rule *r, uint16_t attr,
 	case NFTNL_RULE_ID:
 		*data_len = sizeof(uint32_t);
 		return &r->id;
+	case NFTNL_RULE_POSITION_ID:
+		*data_len = sizeof(uint32_t);
+		return &r->position_id;
 	}
 	return NULL;
 }
@@ -313,6 +321,8 @@ void nftnl_rule_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_rule *r)
 	}
 	if (r->flags & (1 << NFTNL_RULE_ID))
 		mnl_attr_put_u32(nlh, NFTA_RULE_ID, htonl(r->id));
+	if (r->flags & (1 << NFTNL_RULE_POSITION_ID))
+		mnl_attr_put_u32(nlh, NFTA_RULE_POSITION_ID, htonl(r->position_id));
 }
 
 EXPORT_SYMBOL(nftnl_rule_add_expr);
@@ -352,6 +362,7 @@ static int nftnl_rule_parse_attr_cb(const struct nlattr *attr, void *data)
 			abi_breakage();
 		break;
 	case NFTA_RULE_ID:
+	case NFTA_RULE_POSITION_ID:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -483,6 +494,10 @@ int nftnl_rule_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_rule *r)
 		r->id = ntohl(mnl_attr_get_u32(tb[NFTA_RULE_ID]));
 		r->flags |= (1 << NFTNL_RULE_ID);
 	}
+	if (tb[NFTA_RULE_POSITION_ID]) {
+		r->position_id = ntohl(mnl_attr_get_u32(tb[NFTA_RULE_POSITION_ID]));
+		r->flags |= (1 << NFTNL_RULE_POSITION_ID);
+	}
 
 	r->family = nfg->nfgen_family;
 	r->flags |= (1 << NFTNL_RULE_FAMILY);
@@ -563,6 +578,11 @@ static int nftnl_rule_snprintf_default(char *buf, size_t size,
 
 	if (r->flags & (1 << NFTNL_RULE_ID)) {
 		ret = snprintf(buf + offset, remain, "%u ", r->id);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+	}
+
+	if (r->flags & (1 << NFTNL_RULE_POSITION_ID)) {
+		ret = snprintf(buf + offset, remain, "%u ", r->position_id);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
