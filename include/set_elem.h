@@ -6,10 +6,10 @@
 struct nftnl_set_elem {
 	struct list_head	head;
 	uint32_t		set_elem_flags;
+	uint32_t		flags;
 	union nftnl_data_reg	key;
 	union nftnl_data_reg	data;
 	struct nftnl_expr	*expr;
-	uint32_t		flags;
 	uint64_t		timeout;
 	uint64_t		expiration;
 	const char		*objref;
