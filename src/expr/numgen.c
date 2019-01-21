@@ -25,10 +25,6 @@ struct nftnl_expr_ng {
 	unsigned int		modulus;
 	enum nft_ng_types	type;
 	unsigned int		offset;
-	struct {
-		const char	*name;
-		uint32_t	id;
-	} map;
 };
 
 static int
@@ -49,14 +45,6 @@ nftnl_expr_ng_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_NG_OFFSET:
 		memcpy(&ng->offset, data, sizeof(ng->offset));
-		break;
-	case NFTNL_EXPR_NG_SET_NAME:
-		ng->map.name = strdup(data);
-		if (!ng->map.name)
-			return -1;
-		break;
-	case NFTNL_EXPR_NG_SET_ID:
-		memcpy(&ng->map.id, data, sizeof(ng->map.id));
 		break;
 	default:
 		return -1;
@@ -83,12 +71,6 @@ nftnl_expr_ng_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_NG_OFFSET:
 		*data_len = sizeof(ng->offset);
 		return &ng->offset;
-	case NFTNL_EXPR_NG_SET_NAME:
-		*data_len = strlen(ng->map.name) + 1;
-		return ng->map.name;
-	case NFTNL_EXPR_NG_SET_ID:
-		*data_len = sizeof(ng->map.id);
-		return &ng->map.id;
 	}
 	return NULL;
 }
@@ -106,12 +88,7 @@ static int nftnl_expr_ng_cb(const struct nlattr *attr, void *data)
 	case NFTA_NG_MODULUS:
 	case NFTA_NG_TYPE:
 	case NFTA_NG_OFFSET:
-	case NFTA_NG_SET_ID:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
-			abi_breakage();
-		break;
-	case NFTA_NG_SET_NAME:
-		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
 			abi_breakage();
 		break;
 	}
@@ -133,10 +110,6 @@ nftnl_expr_ng_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_NG_TYPE, htonl(ng->type));
 	if (e->flags & (1 << NFTNL_EXPR_NG_OFFSET))
 		mnl_attr_put_u32(nlh, NFTA_NG_OFFSET, htonl(ng->offset));
-	if (e->flags & (1 << NFTNL_EXPR_NG_SET_NAME))
-		mnl_attr_put_str(nlh, NFTA_NG_SET_NAME, ng->map.name);
-	if (e->flags & (1 << NFTNL_EXPR_NG_SET_ID))
-		mnl_attr_put_u32(nlh, NFTA_NG_SET_ID, htonl(ng->map.id));
 }
 
 static int
@@ -164,16 +137,6 @@ nftnl_expr_ng_parse(struct nftnl_expr *e, struct nlattr *attr)
 	if (tb[NFTA_NG_OFFSET]) {
 		ng->offset = ntohl(mnl_attr_get_u32(tb[NFTA_NG_OFFSET]));
 		e->flags |= (1 << NFTNL_EXPR_NG_OFFSET);
-	}
-	if (tb[NFTA_NG_SET_NAME]) {
-		ng->map.name =
-			strdup(mnl_attr_get_str(tb[NFTA_NG_SET_NAME]));
-		e->flags |= (1 << NFTNL_EXPR_NG_SET_NAME);
-	}
-	if (tb[NFTA_NG_SET_ID]) {
-		ng->map.id =
-			ntohl(mnl_attr_get_u32(tb[NFTA_NG_SET_ID]));
-		e->flags |= (1 << NFTNL_EXPR_NG_SET_ID);
 	}
 
 	return ret;
@@ -203,12 +166,6 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 
 	if (ng->offset) {
 		ret = snprintf(buf + offset, remain, "offset %u ", ng->offset);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-	}
-
-	if (ng->map.id) {
-		ret = snprintf(buf + offset, remain, "set %s id %u ",
-			       ng->map.name, ng->map.id);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
