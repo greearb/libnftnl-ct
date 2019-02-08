@@ -9,6 +9,39 @@
 extern "C" {
 #endif
 
+enum nftnl_udata_rule_types {
+	NFTNL_UDATA_RULE_COMMENT,
+	NFTNL_UDATA_RULE_EBTABLES_POLICY,
+	__NFTNL_UDATA_RULE_MAX
+};
+#define NFTNL_UDATA_RULE_MAX (__NFTNL_UDATA_RULE_MAX - 1)
+
+#define NFTNL_UDATA_COMMENT_MAXLEN	128
+
+enum nftnl_udata_set_types {
+	NFTNL_UDATA_SET_KEYBYTEORDER,
+	NFTNL_UDATA_SET_DATABYTEORDER,
+	NFTNL_UDATA_SET_MERGE_ELEMENTS,
+	__NFTNL_UDATA_SET_MAX
+};
+#define NFTNL_UDATA_SET_MAX (__NFTNL_UDATA_SET_MAX - 1)
+
+enum nftnl_udata_set_elem_types {
+	NFTNL_UDATA_SET_ELEM_COMMENT,
+	NFTNL_UDATA_SET_ELEM_FLAGS,
+	__NFTNL_UDATA_SET_ELEM_MAX
+};
+#define NFTNL_UDATA_SET_ELEM_MAX (__NFTNL_UDATA_SET_ELEM_MAX - 1)
+
+/**
+ * enum nftnl_udata_set_elem_flags - meaning of bits in UDATA_SET_ELEM_FLAGS
+ *
+ * @SET_ELEM_F_INTERVAL_OPEN:   set element denotes a half-open range
+ */
+enum nftnl_udata_set_elem_flags {
+	NFTNL_SET_ELEM_F_INTERVAL_OPEN	= 0x1,
+};
+
 /*
  * nftnl user data attributes API
  */
