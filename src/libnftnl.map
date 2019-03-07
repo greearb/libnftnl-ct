@@ -214,14 +214,14 @@ global:
 
   nftnl_gen_alloc;
   nftnl_gen_free;
-  nftnl_gen_attr_is_set;
-  nftnl_gen_attr_unset;
-  nftnl_gen_attr_set_data;
-  nftnl_gen_attr_set;
-  nftnl_gen_attr_set_u32;
-  nftnl_gen_attr_get_data;
-  nftnl_gen_attr_get;
-  nftnl_gen_attr_get_u32;
+  nftnl_gen_is_set;
+  nftnl_gen_unset;
+  nftnl_gen_set_data;
+  nftnl_gen_set;
+  nftnl_gen_set_u32;
+  nftnl_gen_get_data;
+  nftnl_gen_get;
+  nftnl_gen_get_u32;
   nftnl_gen_nlmsg_parse;
   nftnl_gen_snprintf;
   nftnl_gen_fprintf;
