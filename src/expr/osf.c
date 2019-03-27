@@ -15,6 +15,7 @@
 struct nftnl_expr_osf {
 	enum nft_registers	dreg;
 	uint8_t			ttl;
+	uint32_t		flags;
 };
 
 static int nftnl_expr_osf_set(struct nftnl_expr *e, uint16_t type,
@@ -28,6 +29,9 @@ static int nftnl_expr_osf_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_OSF_TTL:
 		memcpy(&osf->ttl, data, sizeof(osf->ttl));
+		break;
+	case NFTNL_EXPR_OSF_FLAGS:
+		memcpy(&osf->flags, data, sizeof(osf->flags));
 		break;
 	}
 	return 0;
@@ -46,6 +50,9 @@ nftnl_expr_osf_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_OSF_TTL:
 		*data_len = sizeof(osf->ttl);
 		return &osf->ttl;
+	case NFTNL_EXPR_OSF_FLAGS:
+		*data_len = sizeof(osf->flags);
+		return &osf->flags;
 	}
 	return NULL;
 }
@@ -60,6 +67,7 @@ static int nftnl_expr_osf_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTNL_EXPR_OSF_DREG:
+	case NFTNL_EXPR_OSF_FLAGS:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -68,6 +76,7 @@ static int nftnl_expr_osf_cb(const struct nlattr *attr, void *data)
 		if (mnl_attr_validate(attr, MNL_TYPE_U8) < 0)
 			abi_breakage();
 		break;
+
 	}
 
 	tb[type] = attr;
@@ -83,6 +92,9 @@ nftnl_expr_osf_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTNL_EXPR_OSF_DREG, htonl(osf->dreg));
 	if (e->flags & (1 << NFTNL_EXPR_OSF_TTL))
 		mnl_attr_put_u8(nlh, NFTNL_EXPR_OSF_TTL, osf->ttl);
+	if (e->flags & (1 << NFTNL_EXPR_OSF_FLAGS))
+		if (osf->flags)
+			mnl_attr_put_u32(nlh, NFTNL_EXPR_OSF_FLAGS, htonl(osf->flags));
 }
 
 static int
@@ -102,6 +114,11 @@ nftnl_expr_osf_parse(struct nftnl_expr *e, struct nlattr *attr)
 	if (tb[NFTA_OSF_TTL]) {
 		osf->ttl = mnl_attr_get_u8(tb[NFTA_OSF_TTL]);
 		e->flags |= (1 << NFTNL_EXPR_OSF_TTL);
+	}
+
+	if (tb[NFTA_OSF_FLAGS]) {
+		osf->flags = ntohl(mnl_attr_get_u32(tb[NFTA_OSF_FLAGS]));
+		e->flags |= (1 << NFTNL_EXPR_OSF_FLAGS);
 	}
 
 	return 0;
