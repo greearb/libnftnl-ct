@@ -172,6 +172,7 @@ static const char *ctkey2str_array[NFT_CT_MAX + 1] = {
 	[NFT_CT_DST_IP]		= "dst_ip",
 	[NFT_CT_SRC_IP6]	= "src_ip6",
 	[NFT_CT_DST_IP6]	= "dst_ip6",
+	[NFT_CT_ID]		= "id",
 };
 
 static const char *ctkey2str(uint32_t ctkey)
