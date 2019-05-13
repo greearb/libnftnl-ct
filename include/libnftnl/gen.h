@@ -42,7 +42,6 @@ int nftnl_gen_snprintf(char *buf, size_t size, const struct nftnl_gen *gen, uint
 int nftnl_gen_fprintf(FILE *fp, const struct nftnl_gen *gen, uint32_t type, uint32_t flags);
 
 #define nftnl_gen_nlmsg_build_hdr	nftnl_nlmsg_build_hdr
-int nftnl_gen_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_gen *gen);
 
 #ifdef __cplusplus
 } /* extern "C" */
