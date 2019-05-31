@@ -29,10 +29,14 @@ check_PROGRAMS = nft-table-add		\
 		 nft-flowtable-get	\
 		 nft-ruleset-get	\
 		 nft-compat-get 	\
+		 nft-ct-expectation-add \
+		 nft-ct-expectation-del \
+		 nft-ct-expectation-get \
 		 nft-ct-helper-add	\
 		 nft-ct-helper-get	\
 		 nft-ct-helper-del	\
 		 nft-rule-ct-helper-add \
+		 nft-rule-ct-expectation-add \
 		 nft-rule-ct-timeout-add
 
 nft_table_add_SOURCES = nft-table-add.c
@@ -122,6 +126,15 @@ nft_ruleset_get_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 nft_compat_get_SOURCES = nft-compat-get.c
 nft_compat_get_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
+nft_ct_expectation_add_SOURCES = nft-ct-expectation-add.c
+nft_ct_expectation_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
+nft_ct_expectation_del_SOURCES = nft-ct-expectation-del.c
+nft_ct_expectation_del_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
+nft_ct_expectation_get_SOURCES = nft-ct-expectation-get.c
+nft_ct_expectation_get_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
 nft_ct_helper_add_SOURCES = nft-ct-helper-add.c
 nft_ct_helper_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
@@ -133,6 +146,9 @@ nft_ct_helper_del_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_rule_ct_helper_add_SOURCES = nft-rule-ct-helper-add.c
 nft_rule_ct_helper_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
+
+nft_rule_ct_expectation_add_SOURCES = nft-rule-ct-expectation-add.c
+nft_rule_ct_expectation_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
 
 nft_rule_ct_timeout_add_SOURCES = nft-rule-ct-timeout-add.c
 nft_rule_ct_timeout_add_LDADD = ../src/libnftnl.la ${LIBMNL_LIBS}
