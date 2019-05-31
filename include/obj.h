@@ -42,6 +42,13 @@ struct nftnl_obj {
 			uint8_t 	l4proto;
 			uint32_t	timeout[NFTNL_CTTIMEOUT_ARRAY_MAX];
 		} ct_timeout;
+		struct nftnl_obj_ct_expect {
+			uint16_t	l3proto;
+			uint16_t	dport;
+			uint8_t		l4proto;
+			uint8_t		size;
+			uint32_t	timeout;
+		} ct_expect;
 		struct nftnl_obj_limit {
 			uint64_t	rate;
 			uint64_t	unit;
@@ -99,6 +106,7 @@ extern struct obj_ops obj_ops_counter;
 extern struct obj_ops obj_ops_quota;
 extern struct obj_ops obj_ops_ct_helper;
 extern struct obj_ops obj_ops_ct_timeout;
+extern struct obj_ops obj_ops_ct_expect;
 extern struct obj_ops obj_ops_limit;
 extern struct obj_ops obj_ops_tunnel;
 extern struct obj_ops obj_ops_secmark;

@@ -33,6 +33,7 @@ static struct obj_ops *obj_ops[__NFT_OBJECT_MAX] = {
 	[NFT_OBJECT_TUNNEL]	= &obj_ops_tunnel,
 	[NFT_OBJECT_CT_TIMEOUT] = &obj_ops_ct_timeout,
 	[NFT_OBJECT_SECMARK]	= &obj_ops_secmark,
+	[NFT_OBJECT_CT_EXPECT]	= &obj_ops_ct_expect,
 };
 
 static struct obj_ops *nftnl_obj_ops_lookup(uint32_t type)

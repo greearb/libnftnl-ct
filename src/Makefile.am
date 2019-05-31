@@ -65,4 +65,5 @@ libnftnl_la_SOURCES = utils.c		\
 		      obj/limit.c	\
 		      obj/ct_timeout.c 	\
 		      obj/secmark.c	\
+		      obj/ct_expect.c 	\
 		      libnftnl.map
