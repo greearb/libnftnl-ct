@@ -126,6 +126,9 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 	case NFTNL_SET_ELEM_TIMEOUT:	/* NFTA_SET_ELEM_TIMEOUT */
 		memcpy(&s->timeout, data, sizeof(s->timeout));
 		break;
+	case NFTNL_SET_ELEM_EXPIRATION:	/* NFTA_SET_ELEM_EXPIRATION */
+		memcpy(&s->expiration, data, sizeof(s->expiration));
+		break;
 	case NFTNL_SET_ELEM_USERDATA: /* NFTA_SET_ELEM_USERDATA */
 		if (s->flags & (1 << NFTNL_SET_ELEM_USERDATA))
 			xfree(s->user.data);
@@ -265,6 +268,8 @@ void nftnl_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 		mnl_attr_put_u32(nlh, NFTA_SET_ELEM_FLAGS, htonl(e->set_elem_flags));
 	if (e->flags & (1 << NFTNL_SET_ELEM_TIMEOUT))
 		mnl_attr_put_u64(nlh, NFTA_SET_ELEM_TIMEOUT, htobe64(e->timeout));
+	if (e->flags & (1 << NFTNL_SET_ELEM_EXPIRATION))
+		mnl_attr_put_u64(nlh, NFTA_SET_ELEM_EXPIRATION, htobe64(e->expiration));
 	if (e->flags & (1 << NFTNL_SET_ELEM_KEY)) {
 		struct nlattr *nest1;
 
