@@ -56,6 +56,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/redir.c	\
 		      expr/hash.c	\
 		      expr/socket.c	\
+		      expr/synproxy.c	\
 		      expr/osf.c	\
 		      expr/xfrm.c	\
 		      obj/counter.c	\

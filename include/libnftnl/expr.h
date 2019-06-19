@@ -291,6 +291,12 @@ enum {
 	NFTNL_EXPR_XFRM_SPNUM,
 };
 
+enum {
+	NFTNL_EXPR_SYNPROXY_MSS	= NFTNL_EXPR_BASE,
+	NFTNL_EXPR_SYNPROXY_WSCALE,
+	NFTNL_EXPR_SYNPROXY_FLAGS,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
