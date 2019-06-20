@@ -200,6 +200,9 @@ static const char *op2str(uint8_t op)
 	case NFT_EXTHDR_OP_TCPOPT:
 		return " tcpopt";
 	case NFT_EXTHDR_OP_IPV6:
+		return " ipv6";
+	case NFT_EXTHDR_OP_IPV4:
+		return " ipv4";
 	default:
 		return "";
 	}
@@ -209,6 +212,8 @@ static inline int str2exthdr_op(const char* str)
 {
 	if (!strcmp(str, "tcpopt"))
 		return NFT_EXTHDR_OP_TCPOPT;
+	if (!strcmp(str, "ipv4"))
+		return NFT_EXTHDR_OP_IPV4;
 
 	/* if str == "ipv6" or anything else */
 	return NFT_EXTHDR_OP_IPV6;
