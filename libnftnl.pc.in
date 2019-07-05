@@ -10,6 +10,7 @@ Description: Netfilter nf_tables infrastructure library
 URL: http://netfilter.org/projects/libnftnl/
 Version: @VERSION@
 Requires:
+Requires.private: libmnl
 Conflicts:
 Libs: -L${libdir} -lnftnl
 Cflags: -I${includedir}
