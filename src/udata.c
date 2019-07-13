@@ -122,9 +122,11 @@ void *nftnl_udata_get(const struct nftnl_udata *attr)
 EXPORT_SYMBOL(nftnl_udata_get_u32);
 uint32_t nftnl_udata_get_u32(const struct nftnl_udata *attr)
 {
-	uint32_t *data = (uint32_t *)attr->value;
+	uint32_t data;
 
-	return *data;
+	memcpy(&data, attr->value, sizeof(data));
+
+	return data;
 }
 
 EXPORT_SYMBOL(nftnl_udata_next);
