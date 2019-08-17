@@ -208,11 +208,12 @@ nftnl_expr_dynset_parse(struct nftnl_expr *e, struct nlattr *attr)
 static const char *op2str_array[] = {
 	[NFT_DYNSET_OP_ADD]		= "add",
 	[NFT_DYNSET_OP_UPDATE] 		= "update",
+	[NFT_DYNSET_OP_DELETE]		= "delete",
 };
 
 static const char *op2str(enum nft_dynset_ops op)
 {
-	if (op > NFT_DYNSET_OP_UPDATE)
+	if (op > NFT_DYNSET_OP_DELETE)
 		return "unknown";
 	return op2str_array[op];
 }
