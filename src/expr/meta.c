@@ -22,7 +22,7 @@
 #include <libnftnl/rule.h>
 
 #ifndef NFT_META_MAX
-#define NFT_META_MAX (NFT_META_BRI_IIFVPROTO + 1)
+#define NFT_META_MAX (NFT_META_TIME_HOUR + 1)
 #endif
 
 struct nftnl_expr_meta {
@@ -163,6 +163,9 @@ static const char *meta_key2str_array[NFT_META_MAX] = {
 	[NFT_META_OIFKIND]	= "oifkind",
 	[NFT_META_BRI_IIFPVID]	 = "bri_iifpvid",
 	[NFT_META_BRI_IIFVPROTO] = "bri_iifvproto",
+	[NFT_META_TIME_NS]	= "time",
+	[NFT_META_TIME_DAY]	= "day",
+	[NFT_META_TIME_HOUR]	= "hour",
 };
 
 static const char *meta_key2str(uint8_t key)
