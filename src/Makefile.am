@@ -64,6 +64,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      obj/quota.c	\
 		      obj/tunnel.c	\
 		      obj/limit.c	\
+		      obj/synproxy.c	\
 		      obj/ct_timeout.c 	\
 		      obj/secmark.c	\
 		      obj/ct_expect.c 	\

@@ -56,6 +56,11 @@ struct nftnl_obj {
 			uint32_t	type;
 			uint32_t	flags;
 		} limit;
+		struct nftnl_obj_synproxy {
+			uint16_t	mss;
+			uint8_t		wscale;
+			uint32_t	flags;
+		} synproxy;
 		struct nftnl_obj_tunnel {
 			uint32_t	id;
 			uint32_t	src_v4;
@@ -108,6 +113,7 @@ extern struct obj_ops obj_ops_ct_helper;
 extern struct obj_ops obj_ops_ct_timeout;
 extern struct obj_ops obj_ops_ct_expect;
 extern struct obj_ops obj_ops_limit;
+extern struct obj_ops obj_ops_synproxy;
 extern struct obj_ops obj_ops_tunnel;
 extern struct obj_ops obj_ops_secmark;
 
