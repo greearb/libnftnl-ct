@@ -351,3 +351,7 @@ LIBNFTNL_12 {
   nftnl_chain_list_lookup_byname;
   nftnl_rule_lookup_byindex;
 } LIBNFTNL_11;
+
+LIBNFTNL_13 {
+  nftnl_set_list_lookup_byname;
+} LIBNFTNL_12;

@@ -5,6 +5,7 @@
 
 struct nftnl_set {
 	struct list_head	head;
+	struct hlist_node	hnode;
 
 	uint32_t		family;
 	uint32_t		set_flags;

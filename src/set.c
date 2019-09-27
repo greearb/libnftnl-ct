@@ -715,20 +715,26 @@ void nftnl_set_elem_add(struct nftnl_set *s, struct nftnl_set_elem *elem)
 	list_add_tail(&elem->head, &s->element_list);
 }
 
+#define SET_NAME_HSIZE		512
+
 struct nftnl_set_list {
 	struct list_head list;
+	struct hlist_head name_hash[SET_NAME_HSIZE];
 };
 
 EXPORT_SYMBOL(nftnl_set_list_alloc);
 struct nftnl_set_list *nftnl_set_list_alloc(void)
 {
 	struct nftnl_set_list *list;
+	int i;
 
 	list = calloc(1, sizeof(struct nftnl_set_list));
 	if (list == NULL)
 		return NULL;
 
 	INIT_LIST_HEAD(&list->list);
+	for (i = 0; i < SET_NAME_HSIZE; i++)
+		INIT_HLIST_HEAD(&list->name_hash[i]);
 
 	return list;
 }
@@ -740,6 +746,7 @@ void nftnl_set_list_free(struct nftnl_set_list *list)
 
 	list_for_each_entry_safe(s, tmp, &list->list, head) {
 		list_del(&s->head);
+		hlist_del(&s->hnode);
 		nftnl_set_free(s);
 	}
 	xfree(list);
@@ -751,15 +758,31 @@ int nftnl_set_list_is_empty(const struct nftnl_set_list *list)
 	return list_empty(&list->list);
 }
 
+static uint32_t djb_hash(const char *key)
+{
+	uint32_t i, hash = 5381;
+
+	for (i = 0; i < strlen(key); i++)
+		hash = ((hash << 5) + hash) + key[i];
+
+	return hash;
+}
+
 EXPORT_SYMBOL(nftnl_set_list_add);
 void nftnl_set_list_add(struct nftnl_set *s, struct nftnl_set_list *list)
 {
+	int key = djb_hash(s->name) % SET_NAME_HSIZE;
+
+	hlist_add_head(&s->hnode, &list->name_hash[key]);
 	list_add(&s->head, &list->list);
 }
 
 EXPORT_SYMBOL(nftnl_set_list_add_tail);
 void nftnl_set_list_add_tail(struct nftnl_set *s, struct nftnl_set_list *list)
 {
+	int key = djb_hash(s->name) % SET_NAME_HSIZE;
+
+	hlist_add_head(&s->hnode, &list->name_hash[key]);
 	list_add_tail(&s->head, &list->list);
 }
 
@@ -767,6 +790,7 @@ EXPORT_SYMBOL(nftnl_set_list_del);
 void nftnl_set_list_del(struct nftnl_set *s)
 {
 	list_del(&s->head);
+	hlist_del(&s->hnode);
 }
 
 EXPORT_SYMBOL(nftnl_set_list_foreach);
@@ -837,28 +861,19 @@ void nftnl_set_list_iter_destroy(const struct nftnl_set_list_iter *iter)
 	xfree(iter);
 }
 
-static struct nftnl_set *nftnl_set_lookup(const char *this_set_name,
-				      struct nftnl_set_list *set_list)
+EXPORT_SYMBOL(nftnl_set_list_lookup_byname);
+struct nftnl_set *
+nftnl_set_list_lookup_byname(struct nftnl_set_list *set_list, const char *set)
 {
-	struct nftnl_set_list_iter *iter;
+	int key = djb_hash(set) % SET_NAME_HSIZE;
+	struct hlist_node *n;
 	struct nftnl_set *s;
-	const char *set_name;
 
-	iter = nftnl_set_list_iter_create(set_list);
-	if (iter == NULL)
-		return NULL;
-
-	s = nftnl_set_list_iter_cur(iter);
-	while (s != NULL) {
-		set_name  = nftnl_set_get_str(s, NFTNL_SET_NAME);
-		if (strcmp(this_set_name, set_name) == 0)
-			break;
-
-		s = nftnl_set_list_iter_next(iter);
+	hlist_for_each_entry(s, n, &set_list->name_hash[key], hnode) {
+		if (!strcmp(set, s->name))
+			return s;
 	}
-	nftnl_set_list_iter_destroy(iter);
-
-	return s;
+	return NULL;
 }
 
 int nftnl_set_lookup_id(struct nftnl_expr *e,
@@ -871,7 +886,7 @@ int nftnl_set_lookup_id(struct nftnl_expr *e,
 	if (set_name == NULL)
 		return 0;
 
-	s = nftnl_set_lookup(set_name, set_list);
+	s = nftnl_set_list_lookup_byname(set_list, set_name);
 	if (s == NULL)
 		return 0;
 
