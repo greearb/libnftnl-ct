@@ -149,7 +149,7 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 		break;
 	}
 	s->flags |= (1 << attr);
-	return -1;
+	return 0;
 }
 
 EXPORT_SYMBOL(nftnl_set_elem_set_u32);
