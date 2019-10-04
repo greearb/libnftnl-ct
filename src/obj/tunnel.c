@@ -227,7 +227,7 @@ nftnl_obj_tunnel_build(struct nlmsghdr *nlh, const struct nftnl_obj *e)
 	if (e->flags & (1 << NFTNL_OBJ_TUNNEL_ERSPAN_VERSION) &&
 	    (e->flags & (1 << NFTNL_OBJ_TUNNEL_ERSPAN_V1_INDEX) ||
 	     (e->flags & (1 << NFTNL_OBJ_TUNNEL_ERSPAN_V2_HWID) &&
-	      e->flags & (1 << NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR)))) {
+	      e->flags & (1u << NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR)))) {
 		struct nlattr *nest_inner;
 
 		nest = mnl_attr_nest_start(nlh, NFTA_TUNNEL_KEY_OPTS);
@@ -240,7 +240,7 @@ nftnl_obj_tunnel_build(struct nlmsghdr *nlh, const struct nftnl_obj *e)
 		if (e->flags & (1 << NFTNL_OBJ_TUNNEL_ERSPAN_V2_HWID))
 			mnl_attr_put_u8(nlh, NFTA_TUNNEL_KEY_ERSPAN_V2_HWID,
 					tun->u.tun_erspan.u.v2.hwid);
-		if (e->flags & (1 << NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR))
+		if (e->flags & (1u << NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR))
 			mnl_attr_put_u8(nlh, NFTA_TUNNEL_KEY_ERSPAN_V2_DIR,
 					tun->u.tun_erspan.u.v2.dir);
 		mnl_attr_nest_end(nlh, nest_inner);
@@ -430,7 +430,7 @@ nftnl_obj_tunnel_parse_erspan(struct nftnl_obj *e, struct nlattr *attr,
 	if (tb[NFTA_TUNNEL_KEY_ERSPAN_V2_DIR]) {
 		tun->u.tun_erspan.u.v2.dir =
 			mnl_attr_get_u8(tb[NFTA_TUNNEL_KEY_ERSPAN_V2_DIR]);
-		e->flags |= (1 << NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR);
+		e->flags |= (1u << NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR);
 	}
 
 	return 0;
