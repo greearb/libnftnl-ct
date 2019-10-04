@@ -58,6 +58,14 @@ void __nftnl_assert_attr_exists(uint16_t attr, uint16_t attr_max,
 		ret = remain;				\
 	remain -= ret;					\
 
+
+#define BUILD_BUG_ON_ZERO(e)	(sizeof(char[1 - 2 * !!(e)]) - 1)
+
+#define __must_be_array(a) \
+	BUILD_BUG_ON_ZERO(__builtin_types_compatible_p(typeof(a), typeof(&a[0])))
+
+#define array_size(arr)		(sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+
 const char *nftnl_family2str(uint32_t family);
 int nftnl_str2family(const char *family);
 
