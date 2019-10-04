@@ -204,13 +204,13 @@ int nftnl_set_set(struct nftnl_set *s, uint16_t attr, const void *data)
 EXPORT_SYMBOL(nftnl_set_set_u32);
 void nftnl_set_set_u32(struct nftnl_set *s, uint16_t attr, uint32_t val)
 {
-	nftnl_set_set(s, attr, &val);
+	nftnl_set_set_data(s, attr, &val, sizeof(uint32_t));
 }
 
 EXPORT_SYMBOL(nftnl_set_set_u64);
 void nftnl_set_set_u64(struct nftnl_set *s, uint16_t attr, uint64_t val)
 {
-	nftnl_set_set(s, attr, &val);
+	nftnl_set_set_data(s, attr, &val, sizeof(uint64_t));
 }
 
 EXPORT_SYMBOL(nftnl_set_set_str);
