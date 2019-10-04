@@ -19,7 +19,7 @@ union nftnl_data_reg {
 		uint32_t	len;
 	};
 	struct {
-		int		verdict;
+		uint32_t	verdict;
 		const char	*chain;
 	};
 };

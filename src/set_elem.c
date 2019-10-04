@@ -96,10 +96,20 @@ void nftnl_set_elem_unset(struct nftnl_set_elem *s, uint16_t attr)
 	s->flags &= ~(1 << attr);
 }
 
+static uint32_t nftnl_set_elem_validate[NFTNL_SET_ELEM_MAX + 1] = {
+	[NFTNL_SET_ELEM_FLAGS]		= sizeof(uint32_t),
+	[NFTNL_SET_ELEM_VERDICT]	= sizeof(uint32_t),
+	[NFTNL_SET_ELEM_TIMEOUT]	= sizeof(uint64_t),
+	[NFTNL_SET_ELEM_EXPIRATION]	= sizeof(uint64_t),
+};
+
 EXPORT_SYMBOL(nftnl_set_elem_set);
 int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 		       const void *data, uint32_t data_len)
 {
+	nftnl_assert_attr_exists(attr, NFTNL_SET_ELEM_MAX);
+	nftnl_assert_validate(data, nftnl_set_elem_validate, attr, data_len);
+
 	switch(attr) {
 	case NFTNL_SET_ELEM_FLAGS:
 		memcpy(&s->set_elem_flags, data, sizeof(s->set_elem_flags));
