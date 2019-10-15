@@ -358,29 +358,32 @@ static int nftnl_flowtable_parse_hook_cb(const struct nlattr *attr, void *data)
 static int nftnl_flowtable_parse_devs(struct nlattr *nest,
 				      struct nftnl_flowtable *c)
 {
+	const char **dev_array;
+	int len = 0, size = 8;
 	struct nlattr *attr;
-	char *dev_array[8];
-	int len = 0, i;
+
+	dev_array = calloc(8, sizeof(char *));
+	if (!dev_array)
+		return -1;
 
 	mnl_attr_for_each_nested(attr, nest) {
 		if (mnl_attr_get_type(attr) != NFTA_DEVICE_NAME)
 			goto err;
 		dev_array[len++] = strdup(mnl_attr_get_str(attr));
-		if (len >= 8)
-			break;
+		if (len >= size) {
+			dev_array = realloc(dev_array,
+					    size * 2 * sizeof(char *));
+			if (!dev_array)
+				goto err;
+
+			size *= 2;
+			memset(&dev_array[len], 0,
+			       (size - len) * sizeof(char *));
+		}
 	}
 
-	if (!len)
-		return -1;
-
-	c->dev_array = calloc(len + 1, sizeof(char *));
-	if (!c->dev_array)
-		goto err;
-
+	c->dev_array = dev_array;
 	c->dev_array_len = len;
-
-	for (i = 0; i < len; i++)
-		c->dev_array[i] = dev_array[i];
 
 	return 0;
 err:
