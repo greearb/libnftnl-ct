@@ -108,10 +108,10 @@ parse_timeout_attr_policy_cb(const struct nlattr *attr, void *data)
 	if (mnl_attr_type_valid(attr, data_cb->nlattr_max) < 0)
 		return MNL_CB_OK;
 
-	if (type <= data_cb->nlattr_max) {
+	if (type > 0 && type <= data_cb->nlattr_max) {
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
-		tb[type] = attr;
+		tb[type - 1] = attr;
 	}
 	return MNL_CB_OK;
 }
@@ -134,9 +134,9 @@ timeout_parse_attr_data(struct nftnl_obj *e,
 	if (mnl_attr_parse_nested(nest, parse_timeout_attr_policy_cb, &cnt) < 0)
 		return -1;
 
-	for (i = 1; i < array_size(tb); i++) {
+	for (i = 0; i < array_size(tb); i++) {
 		if (tb[i]) {
-			nftnl_timeout_policy_attr_set_u32(e, i-1,
+			nftnl_timeout_policy_attr_set_u32(e, i,
 				ntohl(mnl_attr_get_u32(tb[i])));
 		}
 	}
