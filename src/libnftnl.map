@@ -354,4 +354,6 @@ LIBNFTNL_12 {
 
 LIBNFTNL_13 {
   nftnl_set_list_lookup_byname;
+  nftnl_obj_set_data;
+  nftnl_flowtable_set_data;
 } LIBNFTNL_12;
