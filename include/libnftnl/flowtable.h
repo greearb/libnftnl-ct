@@ -33,7 +33,7 @@ enum nftnl_flowtable_attr {
 
 bool nftnl_flowtable_is_set(const struct nftnl_flowtable *c, uint16_t attr);
 void nftnl_flowtable_unset(struct nftnl_flowtable *c, uint16_t attr);
-void nftnl_flowtable_set(struct nftnl_flowtable *t, uint16_t attr, const void *data);
+void nftnl_flowtable_set(struct nftnl_flowtable *t, uint16_t attr, const void *data) __attribute__((deprecated));
 int nftnl_flowtable_set_data(struct nftnl_flowtable *t, uint16_t attr,
 			     const void *data, uint32_t data_len);
 void nftnl_flowtable_set_u32(struct nftnl_flowtable *t, uint16_t attr, uint32_t data);

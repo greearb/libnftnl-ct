@@ -38,7 +38,7 @@ enum nftnl_chain_attr {
 
 bool nftnl_chain_is_set(const struct nftnl_chain *c, uint16_t attr);
 void nftnl_chain_unset(struct nftnl_chain *c, uint16_t attr);
-void nftnl_chain_set(struct nftnl_chain *t, uint16_t attr, const void *data);
+void nftnl_chain_set(struct nftnl_chain *t, uint16_t attr, const void *data) __attribute__((deprecated));
 int nftnl_chain_set_data(struct nftnl_chain *t, uint16_t attr,
 			     const void *data, uint32_t data_len);
 void nftnl_chain_set_u8(struct nftnl_chain *t, uint16_t attr, uint8_t data);

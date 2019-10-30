@@ -195,7 +195,7 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 	return 0;
 }
 
-EXPORT_SYMBOL(nftnl_set_set);
+int nftnl_set_set(struct nftnl_set *s, uint16_t attr, const void *data) __visible;
 int nftnl_set_set(struct nftnl_set *s, uint16_t attr, const void *data)
 {
 	return nftnl_set_set_data(s, attr, data, nftnl_set_validate[attr]);

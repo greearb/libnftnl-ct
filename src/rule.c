@@ -168,7 +168,7 @@ int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 	return 0;
 }
 
-EXPORT_SYMBOL(nftnl_rule_set);
+int nftnl_rule_set(struct nftnl_rule *r, uint16_t attr, const void *data) __visible;
 int nftnl_rule_set(struct nftnl_rule *r, uint16_t attr, const void *data)
 {
 	return nftnl_rule_set_data(r, attr, data, nftnl_rule_validate[attr]);

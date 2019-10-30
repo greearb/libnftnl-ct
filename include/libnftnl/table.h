@@ -29,7 +29,7 @@ enum nftnl_table_attr {
 
 bool nftnl_table_is_set(const struct nftnl_table *t, uint16_t attr);
 void nftnl_table_unset(struct nftnl_table *t, uint16_t attr);
-void nftnl_table_set(struct nftnl_table *t, uint16_t attr, const void *data);
+void nftnl_table_set(struct nftnl_table *t, uint16_t attr, const void *data) __attribute__((deprecated));
 int nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
 			 const void *data, uint32_t data_len);
 const void *nftnl_table_get(const struct nftnl_table *t, uint16_t attr);

@@ -80,7 +80,7 @@ int nftnl_gen_set_data(struct nftnl_gen *gen, uint16_t attr,
 	return 0;
 }
 
-EXPORT_SYMBOL(nftnl_gen_set);
+int nftnl_gen_set(struct nftnl_gen *gen, uint16_t attr, const void *data) __visible;
 int nftnl_gen_set(struct nftnl_gen *gen, uint16_t attr, const void *data)
 {
 	return nftnl_gen_set_data(gen, attr, data, nftnl_gen_validate[attr]);

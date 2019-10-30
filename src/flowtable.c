@@ -171,7 +171,7 @@ int nftnl_flowtable_set_data(struct nftnl_flowtable *c, uint16_t attr,
 	return 0;
 }
 
-EXPORT_SYMBOL(nftnl_flowtable_set);
+void nftnl_flowtable_set(struct nftnl_flowtable *c, uint16_t attr, const void *data) __visible;
 void nftnl_flowtable_set(struct nftnl_flowtable *c, uint16_t attr, const void *data)
 {
 	nftnl_flowtable_set_data(c, attr, data, nftnl_flowtable_validate[attr]);

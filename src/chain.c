@@ -284,7 +284,7 @@ int nftnl_chain_set_data(struct nftnl_chain *c, uint16_t attr,
 	return 0;
 }
 
-EXPORT_SYMBOL(nftnl_chain_set);
+void nftnl_chain_set(struct nftnl_chain *c, uint16_t attr, const void *data) __visible;
 void nftnl_chain_set(struct nftnl_chain *c, uint16_t attr, const void *data)
 {
 	nftnl_chain_set_data(c, attr, data, nftnl_chain_validate[attr]);

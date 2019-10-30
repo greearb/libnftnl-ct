@@ -35,7 +35,7 @@ enum nftnl_rule_attr {
 
 void nftnl_rule_unset(struct nftnl_rule *r, uint16_t attr);
 bool nftnl_rule_is_set(const struct nftnl_rule *r, uint16_t attr);
-int nftnl_rule_set(struct nftnl_rule *r, uint16_t attr, const void *data);
+int nftnl_rule_set(struct nftnl_rule *r, uint16_t attr, const void *data) __attribute__((deprecated));
 int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 			const void *data, uint32_t data_len);
 void nftnl_rule_set_u32(struct nftnl_rule *r, uint16_t attr, uint32_t val);

@@ -112,7 +112,7 @@ void nftnl_obj_set_data(struct nftnl_obj *obj, uint16_t attr,
 	obj->flags |= (1 << attr);
 }
 
-EXPORT_SYMBOL(nftnl_obj_set);
+void nftnl_obj_set(struct nftnl_obj *obj, uint16_t attr, const void *data) __visible;
 void nftnl_obj_set(struct nftnl_obj *obj, uint16_t attr, const void *data)
 {
 	nftnl_obj_set_data(obj, attr, data, nftnl_obj_validate[attr]);
