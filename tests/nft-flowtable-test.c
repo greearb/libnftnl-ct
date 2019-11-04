@@ -17,28 +17,31 @@ static void cmp_nftnl_flowtable(struct nftnl_flowtable *a, struct nftnl_flowtabl
 {
 	if (strcmp(nftnl_flowtable_get_str(a, NFTNL_FLOWTABLE_NAME),
 		   nftnl_flowtable_get_str(b, NFTNL_FLOWTABLE_NAME)) != 0)
-		print_err("Chain name mismatches");
+		print_err("Flowtable name mismatches");
 	if (strcmp(nftnl_flowtable_get_str(a, NFTNL_FLOWTABLE_TABLE),
 		   nftnl_flowtable_get_str(b, NFTNL_FLOWTABLE_TABLE)) != 0)
-		print_err("Chain table mismatches");
+		print_err("Flowtable table mismatches");
 	if (nftnl_flowtable_get_u32(a, NFTNL_FLOWTABLE_FAMILY) !=
 	    nftnl_flowtable_get_u32(b, NFTNL_FLOWTABLE_FAMILY))
-		print_err("Chain family mismatches");
+		print_err("Flowtable family mismatches");
 	if (nftnl_flowtable_get_u32(a, NFTNL_FLOWTABLE_HOOKNUM) !=
 	    nftnl_flowtable_get_u32(b, NFTNL_FLOWTABLE_HOOKNUM))
-		print_err("Chain hooknum mismatches");
+		print_err("Flowtable hooknum mismatches");
 	if (nftnl_flowtable_get_s32(a, NFTNL_FLOWTABLE_PRIO) !=
 	    nftnl_flowtable_get_s32(b, NFTNL_FLOWTABLE_PRIO))
-		print_err("Chain Prio mismatches");
+		print_err("Flowtable prio mismatches");
 	if (nftnl_flowtable_get_u32(a, NFTNL_FLOWTABLE_USE) !=
 	    nftnl_flowtable_get_u32(b, NFTNL_FLOWTABLE_USE))
-		print_err("Chain use mismatches");
+		print_err("Flowtable use mismatches");
 	if (nftnl_flowtable_get_u32(a, NFTNL_FLOWTABLE_SIZE) !=
 	    nftnl_flowtable_get_u32(b, NFTNL_FLOWTABLE_SIZE))
-		print_err("Chain use mismatches");
+		print_err("Flowtable size mismatches");
 	if (nftnl_flowtable_get_u32(a, NFTNL_FLOWTABLE_FLAGS) !=
 	    nftnl_flowtable_get_u32(b, NFTNL_FLOWTABLE_FLAGS))
-		print_err("Chain use mismatches");
+		print_err("Flowtable flags mismatches");
+	if (nftnl_flowtable_get_u64(a, NFTNL_FLOWTABLE_HANDLE) !=
+	    nftnl_flowtable_get_u64(b, NFTNL_FLOWTABLE_HANDLE))
+		print_err("Flowtable handle mismatches");
 }
 
 int main(int argc, char *argv[])
@@ -60,6 +63,7 @@ int main(int argc, char *argv[])
 	nftnl_flowtable_set_u32(a, NFTNL_FLOWTABLE_USE, 0x78123456);
 	nftnl_flowtable_set_u32(a, NFTNL_FLOWTABLE_SIZE, 0x89016745);
 	nftnl_flowtable_set_u32(a, NFTNL_FLOWTABLE_FLAGS, 0x45016723);
+	nftnl_flowtable_set_u64(a, NFTNL_FLOWTABLE_HANDLE, 0x2345016789);
 
 	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_NEWFLOWTABLE, AF_INET,
 				    0, 1234);

@@ -32,6 +32,7 @@ struct nftnl_flowtable {
 	uint32_t		ft_flags;
 	uint32_t		use;
 	uint32_t		flags;
+	uint64_t		handle;
 };
 
 EXPORT_SYMBOL(nftnl_flowtable_alloc);
@@ -84,6 +85,7 @@ void nftnl_flowtable_unset(struct nftnl_flowtable *c, uint16_t attr)
 	case NFTNL_FLOWTABLE_USE:
 	case NFTNL_FLOWTABLE_FAMILY:
 	case NFTNL_FLOWTABLE_FLAGS:
+	case NFTNL_FLOWTABLE_HANDLE:
 		break;
 	case NFTNL_FLOWTABLE_DEVICES:
 		for (i = 0; i < c->dev_array_len; i++)
@@ -102,6 +104,7 @@ static uint32_t nftnl_flowtable_validate[NFTNL_FLOWTABLE_MAX + 1] = {
 	[NFTNL_FLOWTABLE_PRIO]		= sizeof(int32_t),
 	[NFTNL_FLOWTABLE_FAMILY]	= sizeof(uint32_t),
 	[NFTNL_FLOWTABLE_FLAGS]		= sizeof(uint32_t),
+	[NFTNL_FLOWTABLE_HANDLE]	= sizeof(uint64_t),
 };
 
 EXPORT_SYMBOL(nftnl_flowtable_set_data);
@@ -166,6 +169,9 @@ int nftnl_flowtable_set_data(struct nftnl_flowtable *c, uint16_t attr,
 	case NFTNL_FLOWTABLE_FLAGS:
 		memcpy(&c->ft_flags, data, sizeof(c->ft_flags));
 		break;
+	case NFTNL_FLOWTABLE_HANDLE:
+		memcpy(&c->handle, data, sizeof(c->handle));
+		break;
 	}
 	c->flags |= (1 << attr);
 	return 0;
@@ -193,6 +199,12 @@ EXPORT_SYMBOL(nftnl_flowtable_set_str);
 int nftnl_flowtable_set_str(struct nftnl_flowtable *c, uint16_t attr, const char *str)
 {
 	return nftnl_flowtable_set_data(c, attr, str, strlen(str) + 1);
+}
+
+EXPORT_SYMBOL(nftnl_flowtable_set_u64);
+void nftnl_flowtable_set_u64(struct nftnl_flowtable *c, uint16_t attr, uint64_t data)
+{
+	nftnl_flowtable_set_data(c, attr, &data, sizeof(uint64_t));
 }
 
 EXPORT_SYMBOL(nftnl_flowtable_get_data);
@@ -226,6 +238,9 @@ const void *nftnl_flowtable_get_data(const struct nftnl_flowtable *c,
 	case NFTNL_FLOWTABLE_FLAGS:
 		*data_len = sizeof(int32_t);
 		return &c->ft_flags;
+	case NFTNL_FLOWTABLE_HANDLE:
+		*data_len = sizeof(uint64_t);
+		return &c->handle;
 	}
 	return NULL;
 }
@@ -250,6 +265,17 @@ uint32_t nftnl_flowtable_get_u32(const struct nftnl_flowtable *c, uint16_t attr)
 	const uint32_t *val = nftnl_flowtable_get_data(c, attr, &data_len);
 
 	nftnl_assert(val, attr, data_len == sizeof(uint32_t));
+
+	return val ? *val : 0;
+}
+
+EXPORT_SYMBOL(nftnl_flowtable_get_u64);
+uint64_t nftnl_flowtable_get_u64(const struct nftnl_flowtable *c, uint16_t attr)
+{
+	uint32_t data_len = 0;
+	const uint64_t *val = nftnl_flowtable_get_data(c, attr, &data_len);
+
+	nftnl_assert(val, attr, data_len == sizeof(uint64_t));
 
 	return val ? *val : 0;
 }
@@ -300,6 +326,8 @@ void nftnl_flowtable_nlmsg_build_payload(struct nlmsghdr *nlh,
 		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_USE, htonl(c->use));
 	if (c->flags & (1 << NFTNL_FLOWTABLE_SIZE))
 		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_SIZE, htonl(c->size));
+	if (c->flags & (1 << NFTNL_FLOWTABLE_HANDLE))
+		mnl_attr_put_u64(nlh, NFTA_FLOWTABLE_HANDLE, htobe64(c->handle));
 }
 
 static int nftnl_flowtable_parse_attr_cb(const struct nlattr *attr, void *data)
@@ -323,6 +351,10 @@ static int nftnl_flowtable_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_FLOWTABLE_FLAGS:
 	case NFTA_FLOWTABLE_USE:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
+		break;
+	case NFTA_FLOWTABLE_HANDLE:
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
 			abi_breakage();
 		break;
 	}
@@ -460,6 +492,10 @@ int nftnl_flowtable_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_flowtab
 	if (tb[NFTA_FLOWTABLE_SIZE]) {
 		c->size = ntohl(mnl_attr_get_u32(tb[NFTA_FLOWTABLE_SIZE]));
 		c->flags |= (1 << NFTNL_FLOWTABLE_SIZE);
+	}
+	if (tb[NFTA_FLOWTABLE_HANDLE]) {
+		c->handle = be64toh(mnl_attr_get_u64(tb[NFTA_FLOWTABLE_HANDLE]));
+		c->flags |= (1 << NFTNL_FLOWTABLE_HANDLE);
 	}
 
 	c->family = nfg->nfgen_family;

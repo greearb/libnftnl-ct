@@ -27,6 +27,7 @@ enum nftnl_flowtable_attr {
 	NFTNL_FLOWTABLE_DEVICES,
 	NFTNL_FLOWTABLE_SIZE,
 	NFTNL_FLOWTABLE_FLAGS,
+	NFTNL_FLOWTABLE_HANDLE,
 	__NFTNL_FLOWTABLE_MAX
 };
 #define NFTNL_FLOWTABLE_MAX (__NFTNL_FLOWTABLE_MAX - 1)
@@ -38,6 +39,7 @@ int nftnl_flowtable_set_data(struct nftnl_flowtable *t, uint16_t attr,
 			     const void *data, uint32_t data_len);
 void nftnl_flowtable_set_u32(struct nftnl_flowtable *t, uint16_t attr, uint32_t data);
 void nftnl_flowtable_set_s32(struct nftnl_flowtable *t, uint16_t attr, int32_t data);
+void nftnl_flowtable_set_u64(struct nftnl_flowtable *t, uint16_t attr, uint64_t data);
 int nftnl_flowtable_set_str(struct nftnl_flowtable *t, uint16_t attr, const char *str);
 void nftnl_flowtable_set_array(struct nftnl_flowtable *t, uint16_t attr, const char **data);
 
@@ -47,6 +49,7 @@ const void *nftnl_flowtable_get_data(const struct nftnl_flowtable *c, uint16_t a
 const char *nftnl_flowtable_get_str(const struct nftnl_flowtable *c, uint16_t attr);
 uint32_t nftnl_flowtable_get_u32(const struct nftnl_flowtable *c, uint16_t attr);
 int32_t nftnl_flowtable_get_s32(const struct nftnl_flowtable *c, uint16_t attr);
+uint64_t nftnl_flowtable_get_u64(const struct nftnl_flowtable *c, uint16_t attr);
 const char **nftnl_flowtable_get_array(const struct nftnl_flowtable *t, uint16_t attr);
 
 struct nlmsghdr;
