@@ -12,6 +12,7 @@
 #	define __visible	__attribute__((visibility("default")))
 #	define EXPORT_SYMBOL(x)	typeof(x) (x) __visible;
 #else
+#	define __visible
 #	define EXPORT_SYMBOL
 #endif
 
