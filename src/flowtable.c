@@ -324,8 +324,6 @@ void nftnl_flowtable_nlmsg_build_payload(struct nlmsghdr *nlh,
 		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_FLAGS, htonl(c->ft_flags));
 	if (c->flags & (1 << NFTNL_FLOWTABLE_USE))
 		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_USE, htonl(c->use));
-	if (c->flags & (1 << NFTNL_FLOWTABLE_SIZE))
-		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_SIZE, htonl(c->size));
 	if (c->flags & (1 << NFTNL_FLOWTABLE_HANDLE))
 		mnl_attr_put_u64(nlh, NFTA_FLOWTABLE_HANDLE, htobe64(c->handle));
 }
@@ -488,10 +486,6 @@ int nftnl_flowtable_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_flowtab
 	if (tb[NFTA_FLOWTABLE_USE]) {
 		c->use = ntohl(mnl_attr_get_u32(tb[NFTA_FLOWTABLE_USE]));
 		c->flags |= (1 << NFTNL_FLOWTABLE_USE);
-	}
-	if (tb[NFTA_FLOWTABLE_SIZE]) {
-		c->size = ntohl(mnl_attr_get_u32(tb[NFTA_FLOWTABLE_SIZE]));
-		c->flags |= (1 << NFTNL_FLOWTABLE_SIZE);
 	}
 	if (tb[NFTA_FLOWTABLE_HANDLE]) {
 		c->handle = be64toh(mnl_attr_get_u64(tb[NFTA_FLOWTABLE_HANDLE]));
