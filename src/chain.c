@@ -636,6 +636,7 @@ static int nftnl_chain_parse_devs(struct nlattr *nest, struct nftnl_chain *c)
 err:
 	while (len--)
 		xfree(dev_array[len]);
+	xfree(dev_array);
 	return -1;
 }
 
