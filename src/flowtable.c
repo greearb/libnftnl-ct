@@ -419,6 +419,7 @@ static int nftnl_flowtable_parse_devs(struct nlattr *nest,
 err:
 	while (len--)
 		xfree(dev_array[len]);
+	xfree(dev_array);
 	return -1;
 }
 
