@@ -33,9 +33,11 @@ static void cmp_nftnl_flowtable(struct nftnl_flowtable *a, struct nftnl_flowtabl
 	if (nftnl_flowtable_get_u32(a, NFTNL_FLOWTABLE_USE) !=
 	    nftnl_flowtable_get_u32(b, NFTNL_FLOWTABLE_USE))
 		print_err("Flowtable use mismatches");
+#if 0
 	if (nftnl_flowtable_get_u32(a, NFTNL_FLOWTABLE_SIZE) !=
 	    nftnl_flowtable_get_u32(b, NFTNL_FLOWTABLE_SIZE))
 		print_err("Flowtable size mismatches");
+#endif
 	if (nftnl_flowtable_get_u32(a, NFTNL_FLOWTABLE_FLAGS) !=
 	    nftnl_flowtable_get_u32(b, NFTNL_FLOWTABLE_FLAGS))
 		print_err("Flowtable flags mismatches");
