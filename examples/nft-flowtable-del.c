@@ -19,8 +19,8 @@ static struct nftnl_flowtable *flowtable_del_parse(int argc, char *argv[])
 		return NULL;
 	}
 
-	nftnl_flowtable_set(t, NFTNL_FLOWTABLE_TABLE, argv[2]);
-	nftnl_flowtable_set(t, NFTNL_FLOWTABLE_NAME, argv[3]);
+	nftnl_flowtable_set_str(t, NFTNL_FLOWTABLE_TABLE, argv[2]);
+	nftnl_flowtable_set_str(t, NFTNL_FLOWTABLE_NAME, argv[3]);
 
 	return t;
 }

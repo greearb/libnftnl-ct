@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_table_set(t, NFTNL_TABLE_NAME, argv[2]);
+	nftnl_table_set_str(t, NFTNL_TABLE_NAME, argv[2]);
 	nftnl_table_set_u32(t, NFTNL_TABLE_FLAGS, flags);
 
 	table_seq = seq;

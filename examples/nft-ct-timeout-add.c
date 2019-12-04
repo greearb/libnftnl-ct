@@ -71,7 +71,8 @@ static struct nftnl_obj *obj_add_parse(int argc, char *argv[])
 	nftnl_obj_set_str(t, NFTNL_OBJ_NAME, argv[3]);
 	nftnl_obj_set_u8(t, NFTNL_OBJ_CT_TIMEOUT_L4PROTO, l4proto);
 	nftnl_obj_set_u16(t, NFTNL_OBJ_CT_TIMEOUT_L3PROTO, NFPROTO_IPV4);
-	nftnl_obj_set(t, NFTNL_OBJ_CT_TIMEOUT_ARRAY, timeout);
+	nftnl_obj_set_data(t, NFTNL_OBJ_CT_TIMEOUT_ARRAY,
+			   timeout, timeout_array_size);
 	return t;
 
 }

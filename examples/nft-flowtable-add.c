@@ -27,13 +27,13 @@ static struct nftnl_flowtable *flowtable_add_parse(int argc, char *argv[])
 		perror("OOM");
 		return NULL;
 	}
-	nftnl_flowtable_set(t, NFTNL_FLOWTABLE_TABLE, argv[2]);
-	nftnl_flowtable_set(t, NFTNL_FLOWTABLE_NAME, argv[3]);
+	nftnl_flowtable_set_str(t, NFTNL_FLOWTABLE_TABLE, argv[2]);
+	nftnl_flowtable_set_str(t, NFTNL_FLOWTABLE_NAME, argv[3]);
 	if (argc == 6) {
 		nftnl_flowtable_set_u32(t, NFTNL_FLOWTABLE_HOOKNUM, hooknum);
 		nftnl_flowtable_set_u32(t, NFTNL_FLOWTABLE_PRIO, atoi(argv[5]));
 	}
-	nftnl_flowtable_set(t, NFTNL_FLOWTABLE_DEVICES, dev_array);
+	nftnl_flowtable_set_data(t, NFTNL_FLOWTABLE_DEVICES, dev_array, 0);
 
 	return t;
 }

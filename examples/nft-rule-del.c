@@ -58,8 +58,8 @@ int main(int argc, char *argv[])
 	}
 
 	seq = time(NULL);
-	nftnl_rule_set(r, NFTNL_RULE_TABLE, argv[2]);
-	nftnl_rule_set(r, NFTNL_RULE_CHAIN, argv[3]);
+	nftnl_rule_set_str(r, NFTNL_RULE_TABLE, argv[2]);
+	nftnl_rule_set_str(r, NFTNL_RULE_CHAIN, argv[3]);
 
 	/* If no handle is specified, delete all rules in the chain */
 	if (argc == 5)

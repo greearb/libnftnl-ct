@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_set_set(s, NFTNL_SET_TABLE, argv[2]);
-	nftnl_set_set(s, NFTNL_SET_NAME, argv[3]);
+	nftnl_set_set_str(s, NFTNL_SET_TABLE, argv[2]);
+	nftnl_set_set_str(s, NFTNL_SET_NAME, argv[3]);
 
 	/* Add to dummy elements to set */
 	e = nftnl_set_elem_alloc();

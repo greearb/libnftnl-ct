@@ -90,13 +90,13 @@ int main(int argc, char *argv[])
 		nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETOBJ, family,
 					    NLM_F_DUMP, seq);
 		if (argc == 3) {
-			nftnl_obj_set(t, NFTNL_OBJ_TABLE, argv[2]);
+			nftnl_obj_set_str(t, NFTNL_OBJ_TABLE, argv[2]);
 			nftnl_obj_nlmsg_build_payload(nlh, t);
 			nftnl_obj_free(t);
 		}
 	} else {
-		nftnl_obj_set(t, NFTNL_OBJ_TABLE, argv[2]);
-		nftnl_obj_set(t, NFTNL_OBJ_NAME, argv[3]);
+		nftnl_obj_set_str(t, NFTNL_OBJ_TABLE, argv[2]);
+		nftnl_obj_set_str(t, NFTNL_OBJ_NAME, argv[3]);
 
 		nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETOBJ, family,
 					    NLM_F_ACK, seq);

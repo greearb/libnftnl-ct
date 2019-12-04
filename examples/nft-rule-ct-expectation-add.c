@@ -69,8 +69,8 @@ static struct nftnl_rule *setup_rule(uint8_t family, const char *table,
 		exit(EXIT_FAILURE);
 	}
 
-	nftnl_rule_set(r, NFTNL_RULE_TABLE, table);
-	nftnl_rule_set(r, NFTNL_RULE_CHAIN, chain);
+	nftnl_rule_set_str(r, NFTNL_RULE_TABLE, table);
+	nftnl_rule_set_str(r, NFTNL_RULE_CHAIN, chain);
 	nftnl_rule_set_u32(r, NFTNL_RULE_FAMILY, family);
 
 	if (handle != NULL) {
