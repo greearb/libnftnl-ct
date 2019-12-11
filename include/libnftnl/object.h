@@ -167,7 +167,7 @@ struct nftnl_obj_list_iter *nftnl_obj_list_iter_create(struct nftnl_obj_list *l)
 struct nftnl_obj *nftnl_obj_list_iter_next(struct nftnl_obj_list_iter *iter);
 void nftnl_obj_list_iter_destroy(struct nftnl_obj_list_iter *iter);
 
-#ifdef __cplusplusg
+#ifdef __cplusplus
 } /* extern "C" */
 #endif
 
