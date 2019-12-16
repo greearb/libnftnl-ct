@@ -75,6 +75,11 @@ bool nftnl_udata_put_u32(struct nftnl_udata_buf *buf, uint8_t type,
 bool nftnl_udata_put_strz(struct nftnl_udata_buf *buf, uint8_t type,
 			  const char *strz);
 
+/* nest */
+struct nftnl_udata *nftnl_udata_nest_start(struct nftnl_udata_buf *buf,
+					   uint8_t type);
+void nftnl_udata_nest_end(struct nftnl_udata_buf *buf, struct nftnl_udata *ud);
+
 /* nftnl_udata_attr */
 uint8_t nftnl_udata_type(const struct nftnl_udata *attr);
 uint8_t nftnl_udata_len(const struct nftnl_udata *attr);

@@ -150,3 +150,20 @@ int nftnl_udata_parse(const void *data, uint32_t data_len, nftnl_udata_cb_t cb,
 
 	return ret;
 }
+
+EXPORT_SYMBOL(nftnl_udata_nest_start);
+struct nftnl_udata *nftnl_udata_nest_start(struct nftnl_udata_buf *buf,
+                                           uint8_t type)
+{
+	struct nftnl_udata *ud = nftnl_udata_end(buf);
+
+	nftnl_udata_put(buf, type, 0, NULL);
+
+	return ud;
+}
+
+EXPORT_SYMBOL(nftnl_udata_nest_end);
+void nftnl_udata_nest_end(struct nftnl_udata_buf *buf, struct nftnl_udata *ud)
+{
+	ud->len = buf->end - (char *)ud->value;
+}
