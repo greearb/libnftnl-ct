@@ -17,7 +17,6 @@
 #include <linux/netfilter_arp.h>
 
 #include <libnftnl/flowtable.h>
-#include <buffer.h>
 
 struct nftnl_flowtable {
 	struct list_head	head;

@@ -20,7 +20,6 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <ctype.h>
-#include <buffer.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter/nfnetlink.h>

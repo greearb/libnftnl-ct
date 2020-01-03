@@ -24,7 +24,6 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libnftnl/table.h>
-#include <buffer.h>
 
 struct nftnl_table {
 	struct list_head head;

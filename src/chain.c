@@ -28,7 +28,6 @@
 
 #include <libnftnl/chain.h>
 #include <libnftnl/rule.h>
-#include <buffer.h>
 
 struct nftnl_chain {
 	struct list_head head;

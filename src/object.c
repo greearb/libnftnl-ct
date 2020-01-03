@@ -22,7 +22,6 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include <libnftnl/object.h>
-#include <buffer.h>
 #include "obj.h"
 
 static struct obj_ops *obj_ops[__NFT_OBJECT_MAX] = {

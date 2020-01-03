@@ -20,7 +20,6 @@
 #include <libnftnl/expr.h>
 #include "data_reg.h"
 #include "expr_ops.h"
-#include <buffer.h>
 
 struct nftnl_expr_dynset {
 	enum nft_registers	sreg_key;

@@ -19,7 +19,6 @@
 #include <libnftnl/rule.h>
 #include "expr_ops.h"
 #include "data_reg.h"
-#include <buffer.h>
 
 struct nftnl_expr_dup {
 	enum nft_registers	sreg_addr;

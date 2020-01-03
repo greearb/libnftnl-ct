@@ -242,11 +242,11 @@ enum nftnl_cmd_type nftnl_flag2cmd(uint32_t flags)
 }
 
 static const char *cmd2tag[NFTNL_CMD_MAX] = {
-	[NFTNL_CMD_ADD]			= ADD,
-	[NFTNL_CMD_INSERT]		= INSERT,
-	[NFTNL_CMD_DELETE]		= DELETE,
-	[NFTNL_CMD_REPLACE]		= REPLACE,
-	[NFTNL_CMD_FLUSH]			= FLUSH,
+	[NFTNL_CMD_ADD]			= "add",
+	[NFTNL_CMD_INSERT]		= "insert",
+	[NFTNL_CMD_DELETE]		= "delete",
+	[NFTNL_CMD_REPLACE]		= "replace",
+	[NFTNL_CMD_FLUSH]			= "flush",
 };
 
 const char *nftnl_cmd2tag(enum nftnl_cmd_type cmd)
@@ -259,15 +259,15 @@ const char *nftnl_cmd2tag(enum nftnl_cmd_type cmd)
 
 uint32_t nftnl_str2cmd(const char *cmd)
 {
-	if (strcmp(cmd, ADD) == 0)
+	if (strcmp(cmd, "add") == 0)
 		return NFTNL_CMD_ADD;
-	else if (strcmp(cmd, INSERT) == 0)
+	else if (strcmp(cmd, "insert") == 0)
 		return NFTNL_CMD_INSERT;
-	else if (strcmp(cmd, DELETE) == 0)
+	else if (strcmp(cmd, "delete") == 0)
 		return NFTNL_CMD_DELETE;
-	else if (strcmp(cmd, REPLACE) == 0)
+	else if (strcmp(cmd, "replace") == 0)
 		return NFTNL_CMD_REPLACE;
-	else if (strcmp(cmd, FLUSH) == 0)
+	else if (strcmp(cmd, "flush") == 0)
 		return NFTNL_CMD_FLUSH;
 
 	return NFTNL_CMD_UNSPEC;

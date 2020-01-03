@@ -17,7 +17,6 @@
 #include <libmnl/libmnl.h>
 #include <libnftnl/common.h>
 #include <libnftnl/set.h>
-#include <buffer.h>
 
 #include <errno.h>
 #include "internal.h"
