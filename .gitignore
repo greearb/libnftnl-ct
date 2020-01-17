@@ -29,3 +29,12 @@ examples/*
 tests/*
 !tests/*.c
 !tests/Makefile.am
+
+# Tag files for Vim and Emacs.
+TAGS
+tags
+
+# Emacs back-up files
+*~
+\#*\#
+.\#*
