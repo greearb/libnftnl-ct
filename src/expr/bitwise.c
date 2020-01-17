@@ -174,10 +174,10 @@ nftnl_expr_bitwise_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
-					       const struct nftnl_expr *e)
+static int
+nftnl_expr_bitwise_snprintf_bool(char *buf, size_t size,
+				 const struct nftnl_expr_bitwise *bitwise)
 {
-	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
 	int remain = size, offset = 0, ret;
 
 	ret = snprintf(buf, remain, "reg %u = (reg=%u & ",
@@ -196,6 +196,14 @@ static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
+}
+
+static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
+					       const struct nftnl_expr *e)
+{
+	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
+
+	return nftnl_expr_bitwise_snprintf_bool(buf, size, bitwise);
 }
 
 static int
