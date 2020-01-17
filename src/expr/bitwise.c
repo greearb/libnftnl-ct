@@ -31,7 +31,7 @@ struct nftnl_expr_bitwise {
 
 static int
 nftnl_expr_bitwise_set(struct nftnl_expr *e, uint16_t type,
-			  const void *data, uint32_t data_len)
+		       const void *data, uint32_t data_len)
 {
 	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
 
@@ -61,7 +61,7 @@ nftnl_expr_bitwise_set(struct nftnl_expr *e, uint16_t type,
 
 static const void *
 nftnl_expr_bitwise_get(const struct nftnl_expr *e, uint16_t type,
-			  uint32_t *data_len)
+		       uint32_t *data_len)
 {
 	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
 
@@ -127,7 +127,7 @@ nftnl_expr_bitwise_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 
 		nest = mnl_attr_nest_start(nlh, NFTA_BITWISE_MASK);
 		mnl_attr_put(nlh, NFTA_DATA_VALUE, bitwise->mask.len,
-				bitwise->mask.val);
+			     bitwise->mask.val);
 		mnl_attr_nest_end(nlh, nest);
 	}
 	if (e->flags & (1 << NFTNL_EXPR_BITWISE_XOR)) {
@@ -135,7 +135,7 @@ nftnl_expr_bitwise_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 
 		nest = mnl_attr_nest_start(nlh, NFTA_BITWISE_XOR);
 		mnl_attr_put(nlh, NFTA_DATA_VALUE, bitwise->xor.len,
-				bitwise->xor.val);
+			     bitwise->xor.val);
 		mnl_attr_nest_end(nlh, nest);
 	}
 }
@@ -185,14 +185,14 @@ static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = nftnl_data_reg_snprintf(buf + offset, remain, &bitwise->mask,
-				    NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
+				      NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = snprintf(buf + offset, remain, ") ^ ");
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = nftnl_data_reg_snprintf(buf + offset, remain, &bitwise->xor,
-				    NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
+				      NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;

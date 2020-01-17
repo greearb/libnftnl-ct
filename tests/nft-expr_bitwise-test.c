@@ -28,7 +28,7 @@ static void print_err(const char *msg)
 }
 
 static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
-			      struct nftnl_expr *rule_b)
+			   struct nftnl_expr *rule_b)
 {
 	uint32_t maska, maskb;
 	uint32_t xora, xorb;
@@ -50,8 +50,8 @@ static void cmp_nftnl_expr(struct nftnl_expr *rule_a,
 	nftnl_expr_get(rule_b, NFTNL_EXPR_BITWISE_XOR, &xorb);
 	if (xora != xorb)
 		print_err("Size of BITWISE_XOR mismatches");
-
 }
+
 int main(int argc, char *argv[])
 {
 	struct nftnl_rule *a, *b = NULL;
