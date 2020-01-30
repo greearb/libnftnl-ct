@@ -89,6 +89,7 @@ void nftnl_set_unset(struct nftnl_set *s, uint16_t attr)
 	case NFTNL_SET_ID:
 	case NFTNL_SET_POLICY:
 	case NFTNL_SET_DESC_SIZE:
+	case NFTNL_SET_DESC_CONCAT:
 	case NFTNL_SET_TIMEOUT:
 	case NFTNL_SET_GC_INTERVAL:
 		break;
@@ -173,6 +174,10 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 		break;
 	case NFTNL_SET_DESC_SIZE:
 		memcpy(&s->desc.size, data, sizeof(s->desc.size));
+		break;
+	case NFTNL_SET_DESC_CONCAT:
+		memcpy(&s->desc.field_len, data, data_len);
+		while (s->desc.field_len[++s->desc.field_count]);
 		break;
 	case NFTNL_SET_TIMEOUT:
 		memcpy(&s->timeout, data, sizeof(s->timeout));
@@ -266,6 +271,9 @@ const void *nftnl_set_get_data(const struct nftnl_set *s, uint16_t attr,
 	case NFTNL_SET_DESC_SIZE:
 		*data_len = sizeof(uint32_t);
 		return &s->desc.size;
+	case NFTNL_SET_DESC_CONCAT:
+		*data_len = s->desc.field_count;
+		return s->desc.field_len;
 	case NFTNL_SET_TIMEOUT:
 		*data_len = sizeof(uint64_t);
 		return &s->timeout;
@@ -351,13 +359,42 @@ err:
 	return NULL;
 }
 
+static void nftnl_set_nlmsg_build_desc_size_payload(struct nlmsghdr *nlh,
+						    struct nftnl_set *s)
+{
+	mnl_attr_put_u32(nlh, NFTA_SET_DESC_SIZE, htonl(s->desc.size));
+}
+
+static void nftnl_set_nlmsg_build_desc_concat_payload(struct nlmsghdr *nlh,
+						      struct nftnl_set *s)
+{
+	struct nlattr *nest;
+	int i;
+
+	nest = mnl_attr_nest_start(nlh, NFTA_SET_DESC_CONCAT);
+	for (i = 0; i < NFT_REG32_COUNT && i < s->desc.field_count; i++) {
+		struct nlattr *nest_elem;
+
+		nest_elem = mnl_attr_nest_start(nlh, NFTA_LIST_ELEM);
+		mnl_attr_put_u32(nlh, NFTA_SET_FIELD_LEN,
+				 htonl(s->desc.field_len[i]));
+		mnl_attr_nest_end(nlh, nest_elem);
+	}
+	mnl_attr_nest_end(nlh, nest);
+}
+
 static void
 nftnl_set_nlmsg_build_desc_payload(struct nlmsghdr *nlh, struct nftnl_set *s)
 {
 	struct nlattr *nest;
 
 	nest = mnl_attr_nest_start(nlh, NFTA_SET_DESC);
-	mnl_attr_put_u32(nlh, NFTA_SET_DESC_SIZE, htonl(s->desc.size));
+
+	if (s->flags & (1 << NFTNL_SET_DESC_SIZE))
+		nftnl_set_nlmsg_build_desc_size_payload(nlh, s);
+	if (s->flags & (1 << NFTNL_SET_DESC_CONCAT))
+		nftnl_set_nlmsg_build_desc_concat_payload(nlh, s);
+
 	mnl_attr_nest_end(nlh, nest);
 }
 
@@ -387,7 +424,7 @@ void nftnl_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set *s)
 		mnl_attr_put_u32(nlh, NFTA_SET_ID, htonl(s->id));
 	if (s->flags & (1 << NFTNL_SET_POLICY))
 		mnl_attr_put_u32(nlh, NFTA_SET_POLICY, htonl(s->policy));
-	if (s->flags & (1 << NFTNL_SET_DESC_SIZE))
+	if (s->flags & (1 << NFTNL_SET_DESC_SIZE | 1 << NFTNL_SET_DESC_CONCAT))
 		nftnl_set_nlmsg_build_desc_payload(nlh, s);
 	if (s->flags & (1 << NFTNL_SET_TIMEOUT))
 		mnl_attr_put_u64(nlh, NFTA_SET_TIMEOUT, htobe64(s->timeout));
@@ -445,39 +482,75 @@ static int nftnl_set_parse_attr_cb(const struct nlattr *attr, void *data)
 	return MNL_CB_OK;
 }
 
+static int
+nftnl_set_desc_concat_field_parse_attr_cb(const struct nlattr *attr, void *data)
+{
+	int type = mnl_attr_get_type(attr);
+	struct nftnl_set *s = data;
+
+	if (type != NFTA_SET_FIELD_LEN)
+		return MNL_CB_OK;
+
+	if (mnl_attr_validate(attr, MNL_TYPE_U32))
+		return MNL_CB_ERROR;
+
+	s->desc.field_len[s->desc.field_count] = ntohl(mnl_attr_get_u32(attr));
+	s->desc.field_count++;
+
+	return MNL_CB_OK;
+}
+
+static int
+nftnl_set_desc_concat_parse_attr_cb(const struct nlattr *attr, void *data)
+{
+	int type = mnl_attr_get_type(attr);
+	struct nftnl_set *s = data;
+
+	if (type != NFTA_LIST_ELEM)
+		return MNL_CB_OK;
+
+	return mnl_attr_parse_nested(attr,
+				     nftnl_set_desc_concat_field_parse_attr_cb,
+				     s);
+}
+
 static int nftnl_set_desc_parse_attr_cb(const struct nlattr *attr, void *data)
 {
-	const struct nlattr **tb = data;
-	int type = mnl_attr_get_type(attr);
+	int type = mnl_attr_get_type(attr), err;
+	struct nftnl_set *s = data;
 
 	if (mnl_attr_type_valid(attr, NFTA_SET_DESC_MAX) < 0)
 		return MNL_CB_OK;
 
 	switch (type) {
 	case NFTA_SET_DESC_SIZE:
-		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0) {
 			abi_breakage();
+			break;
+		}
+
+		s->desc.size = ntohl(mnl_attr_get_u32(attr));
+		s->flags |= (1 << NFTNL_SET_DESC_SIZE);
+		break;
+	case NFTA_SET_DESC_CONCAT:
+		err = mnl_attr_parse_nested(attr,
+					    nftnl_set_desc_concat_parse_attr_cb,
+					    s);
+		if (err != MNL_CB_OK)
+			abi_breakage();
+
+		s->flags |= (1 << NFTNL_SET_DESC_CONCAT);
+		break;
+	default:
 		break;
 	}
 
-	tb[type] = attr;
 	return MNL_CB_OK;
 }
 
-static int nftnl_set_desc_parse(struct nftnl_set *s,
-			      const struct nlattr *attr)
+static int nftnl_set_desc_parse(struct nftnl_set *s, const struct nlattr *attr)
 {
-	struct nlattr *tb[NFTA_SET_DESC_MAX + 1] = {};
-
-	if (mnl_attr_parse_nested(attr, nftnl_set_desc_parse_attr_cb, tb) < 0)
-		return -1;
-
-	if (tb[NFTA_SET_DESC_SIZE]) {
-		s->desc.size = ntohl(mnl_attr_get_u32(tb[NFTA_SET_DESC_SIZE]));
-		s->flags |= (1 << NFTNL_SET_DESC_SIZE);
-	}
-
-	return 0;
+	return mnl_attr_parse_nested(attr, nftnl_set_desc_parse_attr_cb, s);
 }
 
 EXPORT_SYMBOL(nftnl_set_nlmsg_parse);
