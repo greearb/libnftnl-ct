@@ -8,6 +8,7 @@ struct nftnl_set_elem {
 	uint32_t		set_elem_flags;
 	uint32_t		flags;
 	union nftnl_data_reg	key;
+	union nftnl_data_reg	key_end;
 	union nftnl_data_reg	data;
 	struct nftnl_expr	*expr;
 	uint64_t		timeout;

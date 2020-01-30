@@ -75,6 +75,7 @@ void nftnl_set_elem_unset(struct nftnl_set_elem *s, uint16_t attr)
 		break;
 	case NFTNL_SET_ELEM_FLAGS:
 	case NFTNL_SET_ELEM_KEY:	/* NFTA_SET_ELEM_KEY */
+	case NFTNL_SET_ELEM_KEY_END:	/* NFTA_SET_ELEM_KEY_END */
 	case NFTNL_SET_ELEM_VERDICT:	/* NFTA_SET_ELEM_DATA */
 	case NFTNL_SET_ELEM_DATA:	/* NFTA_SET_ELEM_DATA */
 	case NFTNL_SET_ELEM_TIMEOUT:	/* NFTA_SET_ELEM_TIMEOUT */
@@ -117,6 +118,10 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 	case NFTNL_SET_ELEM_KEY:	/* NFTA_SET_ELEM_KEY */
 		memcpy(&s->key.val, data, data_len);
 		s->key.len = data_len;
+		break;
+	case NFTNL_SET_ELEM_KEY_END:	/* NFTA_SET_ELEM_KEY_END */
+		memcpy(&s->key_end.val, data, data_len);
+		s->key_end.len = data_len;
 		break;
 	case NFTNL_SET_ELEM_VERDICT:	/* NFTA_SET_ELEM_DATA */
 		memcpy(&s->data.verdict, data, sizeof(s->data.verdict));
@@ -193,6 +198,9 @@ const void *nftnl_set_elem_get(struct nftnl_set_elem *s, uint16_t attr, uint32_t
 	case NFTNL_SET_ELEM_KEY:	/* NFTA_SET_ELEM_KEY */
 		*data_len = s->key.len;
 		return &s->key.val;
+	case NFTNL_SET_ELEM_KEY_END:	/* NFTA_SET_ELEM_KEY_END */
+		*data_len = s->key_end.len;
+		return &s->key_end.val;
 	case NFTNL_SET_ELEM_VERDICT:	/* NFTA_SET_ELEM_DATA */
 		*data_len = sizeof(s->data.verdict);
 		return &s->data.verdict;
@@ -287,6 +295,14 @@ void nftnl_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 		mnl_attr_put(nlh, NFTA_DATA_VALUE, e->key.len, e->key.val);
 		mnl_attr_nest_end(nlh, nest1);
 	}
+	if (e->flags & (1 << NFTNL_SET_ELEM_KEY_END)) {
+		struct nlattr *nest1;
+
+		nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_KEY_END);
+		mnl_attr_put(nlh, NFTA_DATA_VALUE, e->key_end.len,
+			     e->key_end.val);
+		mnl_attr_nest_end(nlh, nest1);
+	}
 	if (e->flags & (1 << NFTNL_SET_ELEM_VERDICT)) {
 		struct nlattr *nest1, *nest2;
 
@@ -373,6 +389,7 @@ static int nftnl_set_elem_parse_attr_cb(const struct nlattr *attr, void *data)
 			abi_breakage();
 		break;
 	case NFTA_SET_ELEM_KEY:
+	case NFTA_SET_ELEM_KEY_END:
 	case NFTA_SET_ELEM_DATA:
 	case NFTA_SET_ELEM_EXPR:
 		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
@@ -421,6 +438,13 @@ static int nftnl_set_elems_parse2(struct nftnl_set *s, const struct nlattr *nest
 			goto out_set_elem;
 		e->flags |= (1 << NFTNL_SET_ELEM_KEY);
         }
+	if (tb[NFTA_SET_ELEM_KEY_END]) {
+		ret = nftnl_parse_data(&e->key_end, tb[NFTA_SET_ELEM_KEY_END],
+				       &type);
+		if (ret < 0)
+			goto out_set_elem;
+		e->flags |= (1 << NFTNL_SET_ELEM_KEY_END);
+	}
         if (tb[NFTA_SET_ELEM_DATA]) {
 		ret = nftnl_parse_data(&e->data, tb[NFTA_SET_ELEM_DATA], &type);
 		if (ret < 0)
