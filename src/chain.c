@@ -364,6 +364,7 @@ const void *nftnl_chain_get_data(const struct nftnl_chain *c, uint16_t attr,
 		*data_len = strlen(c->dev) + 1;
 		return c->dev;
 	case NFTNL_CHAIN_DEVICES:
+		*data_len = 0;
 		return &c->dev_array[0];
 	}
 	return NULL;
