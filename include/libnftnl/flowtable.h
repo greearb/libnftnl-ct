@@ -41,7 +41,7 @@ void nftnl_flowtable_set_u32(struct nftnl_flowtable *t, uint16_t attr, uint32_t 
 void nftnl_flowtable_set_s32(struct nftnl_flowtable *t, uint16_t attr, int32_t data);
 void nftnl_flowtable_set_u64(struct nftnl_flowtable *t, uint16_t attr, uint64_t data);
 int nftnl_flowtable_set_str(struct nftnl_flowtable *t, uint16_t attr, const char *str);
-void nftnl_flowtable_set_array(struct nftnl_flowtable *t, uint16_t attr, const char **data);
+int nftnl_flowtable_set_array(struct nftnl_flowtable *t, uint16_t attr, const char **data);
 
 const void *nftnl_flowtable_get(const struct nftnl_flowtable *c, uint16_t attr);
 const void *nftnl_flowtable_get_data(const struct nftnl_flowtable *c, uint16_t attr,
@@ -50,7 +50,7 @@ const char *nftnl_flowtable_get_str(const struct nftnl_flowtable *c, uint16_t at
 uint32_t nftnl_flowtable_get_u32(const struct nftnl_flowtable *c, uint16_t attr);
 int32_t nftnl_flowtable_get_s32(const struct nftnl_flowtable *c, uint16_t attr);
 uint64_t nftnl_flowtable_get_u64(const struct nftnl_flowtable *c, uint16_t attr);
-const char **nftnl_flowtable_get_array(const struct nftnl_flowtable *t, uint16_t attr);
+const char *const *nftnl_flowtable_get_array(const struct nftnl_flowtable *t, uint16_t attr);
 
 struct nlmsghdr;
 

@@ -319,6 +319,13 @@ int nftnl_chain_set_str(struct nftnl_chain *c, uint16_t attr, const char *str)
 	return nftnl_chain_set_data(c, attr, str, strlen(str) + 1);
 }
 
+EXPORT_SYMBOL(nftnl_chain_set_array);
+int nftnl_chain_set_array(struct nftnl_chain *c, uint16_t attr,
+			  const char **data)
+{
+	return nftnl_chain_set_data(c, attr, data, 0);
+}
+
 EXPORT_SYMBOL(nftnl_chain_get_data);
 const void *nftnl_chain_get_data(const struct nftnl_chain *c, uint16_t attr,
 				 uint32_t *data_len)
@@ -425,6 +432,17 @@ uint8_t nftnl_chain_get_u8(const struct nftnl_chain *c, uint16_t attr)
 	nftnl_assert(val, attr, data_len == sizeof(int8_t));
 
 	return val ? *val : 0;
+}
+
+EXPORT_SYMBOL(nftnl_chain_get_array);
+const char *const *nftnl_chain_get_array(const struct nftnl_chain *c, uint16_t attr)
+{
+	uint32_t data_len;
+	const char * const *val = nftnl_chain_get_data(c, attr, &data_len);
+
+	nftnl_assert(val, attr, attr == NFTNL_CHAIN_DEVICES);
+
+	return val;
 }
 
 EXPORT_SYMBOL(nftnl_chain_nlmsg_build_payload);
