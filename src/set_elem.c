@@ -162,6 +162,12 @@ int nftnl_set_elem_set(struct nftnl_set_elem *s, uint16_t attr,
 		if (!s->objref)
 			return -1;
 		break;
+	case NFTNL_SET_ELEM_EXPR:
+		if (s->flags & (1 << NFTNL_SET_ELEM_EXPR))
+			nftnl_expr_free(s->expr);
+
+		s->expr = (void *)data;
+		break;
 	}
 	s->flags |= (1 << attr);
 	return 0;
@@ -326,6 +332,13 @@ void nftnl_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 		mnl_attr_put(nlh, NFTA_SET_ELEM_USERDATA, e->user.len, e->user.data);
 	if (e->flags & (1 << NFTNL_SET_ELEM_OBJREF))
 		mnl_attr_put_strz(nlh, NFTA_SET_ELEM_OBJREF, e->objref);
+	if (e->flags & (1 << NFTNL_SET_ELEM_EXPR)) {
+		struct nlattr *nest1;
+
+		nest1 = mnl_attr_nest_start(nlh, NFTA_SET_ELEM_EXPR);
+		nftnl_expr_build_payload(nlh, e->expr);
+		mnl_attr_nest_end(nlh, nest1);
+	}
 }
 
 static void nftnl_set_elem_nlmsg_build_def(struct nlmsghdr *nlh,
