@@ -33,6 +33,7 @@ struct nftnl_set {
 	uint32_t		flags;
 	uint32_t		gc_interval;
 	uint64_t		timeout;
+	struct nftnl_expr	*expr;
 };
 
 struct nftnl_set_list;

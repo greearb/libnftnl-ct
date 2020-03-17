@@ -51,6 +51,8 @@ void nftnl_set_free(const struct nftnl_set *s)
 		xfree(s->name);
 	if (s->flags & (1 << NFTNL_SET_USERDATA))
 		xfree(s->user.data);
+	if (s->flags & (1 << NFTNL_SET_EXPR))
+		nftnl_expr_free(s->expr);
 
 	list_for_each_entry_safe(elem, tmp, &s->element_list, head) {
 		list_del(&elem->head);
@@ -95,6 +97,9 @@ void nftnl_set_unset(struct nftnl_set *s, uint16_t attr)
 		break;
 	case NFTNL_SET_USERDATA:
 		xfree(s->user.data);
+		break;
+	case NFTNL_SET_EXPR:
+		nftnl_expr_free(s->expr);
 		break;
 	default:
 		return;
@@ -195,6 +200,12 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 		memcpy(s->user.data, data, data_len);
 		s->user.len = data_len;
 		break;
+	case NFTNL_SET_EXPR:
+		if (s->flags & (1 << NFTNL_SET_EXPR))
+			nftnl_expr_free(s->expr);
+
+		s->expr = (void *)data;
+		break;
 	}
 	s->flags |= (1 << attr);
 	return 0;
@@ -283,6 +294,8 @@ const void *nftnl_set_get_data(const struct nftnl_set *s, uint16_t attr,
 	case NFTNL_SET_USERDATA:
 		*data_len = s->user.len;
 		return s->user.data;
+	case NFTNL_SET_EXPR:
+		return s->expr;
 	}
 	return NULL;
 }
@@ -432,6 +445,13 @@ void nftnl_set_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set *s)
 		mnl_attr_put_u32(nlh, NFTA_SET_GC_INTERVAL, htonl(s->gc_interval));
 	if (s->flags & (1 << NFTNL_SET_USERDATA))
 		mnl_attr_put(nlh, NFTA_SET_USERDATA, s->user.len, s->user.data);
+	if (s->flags & (1 << NFTNL_SET_EXPR)) {
+		struct nlattr *nest1;
+
+		nest1 = mnl_attr_nest_start(nlh, NFTA_SET_EXPR);
+		nftnl_expr_build_payload(nlh, s->expr);
+		mnl_attr_nest_end(nlh, nest1);
+	}
 }
 
 
@@ -634,6 +654,13 @@ int nftnl_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 		ret = nftnl_set_desc_parse(s, tb[NFTA_SET_DESC]);
 		if (ret < 0)
 			return ret;
+	}
+	if (tb[NFTA_SET_EXPR]) {
+		s->expr = nftnl_expr_parse(tb[NFTA_SET_EXPR]);
+		if (!s->expr)
+			return -1;
+
+		s->flags |= (1 << NFTNL_SET_EXPR);
 	}
 
 	s->family = nfg->nfgen_family;
