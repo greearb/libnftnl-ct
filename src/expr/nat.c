@@ -249,7 +249,7 @@ nftnl_expr_nat_snprintf_default(char *buf, size_t size,
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_NAT_FLAGS)) {
-		ret = snprintf(buf + offset, remain, "flags %u", nat->flags);
+		ret = snprintf(buf + offset, remain, "flags 0x%x ", nat->flags);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
