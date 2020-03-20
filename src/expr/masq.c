@@ -135,16 +135,20 @@ static int nftnl_expr_masq_snprintf_default(char *buf, size_t len,
 					    const struct nftnl_expr *e)
 {
 	struct nftnl_expr_masq *masq = nftnl_expr_data(e);
+	int remain = len, offset = 0, ret = 0;
 
-	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS))
-		return snprintf(buf, len, "flags 0x%x ", masq->flags);
 	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MIN)) {
-		return snprintf(buf, len,
-				"proto_min reg %u proto_max reg %u ",
-				masq->sreg_proto_min, masq->sreg_proto_max);
+		ret = snprintf(buf, remain,
+			       "proto_min reg %u proto_max reg %u ",
+			       masq->sreg_proto_min, masq->sreg_proto_max);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+	}
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS)) {
+		ret = snprintf(buf + offset, remain, "flags 0x%x ", masq->flags);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
-	return 0;
+	return offset;
 }
 
 static int nftnl_expr_masq_snprintf(char *buf, size_t len, uint32_t type,
