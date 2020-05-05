@@ -187,6 +187,14 @@ static int nftnl_expr_objref_snprintf_default(char *buf, size_t len,
 				objref->imm.type, objref->imm.name);
 }
 
+static void nftnl_expr_objref_free(const struct nftnl_expr *e)
+{
+	struct nftnl_expr_objref *objref = nftnl_expr_data(e);
+
+	xfree(objref->imm.name);
+	xfree(objref->set.name);
+}
+
 static int nftnl_expr_objref_snprintf(char *buf, size_t len, uint32_t type,
 				      uint32_t flags,
 				      const struct nftnl_expr *e)
@@ -206,6 +214,7 @@ struct expr_ops expr_ops_objref = {
 	.name		= "objref",
 	.alloc_len	= sizeof(struct nftnl_expr_objref),
 	.max_attr	= NFTA_OBJREF_MAX,
+	.free		= nftnl_expr_objref_free,
 	.set		= nftnl_expr_objref_set,
 	.get		= nftnl_expr_objref_get,
 	.parse		= nftnl_expr_objref_parse,
