@@ -277,6 +277,8 @@ static void nftnl_expr_dynset_free(const struct nftnl_expr *e)
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
 
 	xfree(dynset->set_name);
+	if (dynset->expr)
+		nftnl_expr_free(dynset->expr);
 }
 
 struct expr_ops expr_ops_dynset = {
