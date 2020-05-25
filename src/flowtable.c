@@ -313,31 +313,38 @@ EXPORT_SYMBOL(nftnl_flowtable_nlmsg_build_payload);
 void nftnl_flowtable_nlmsg_build_payload(struct nlmsghdr *nlh,
 					 const struct nftnl_flowtable *c)
 {
+	struct nlattr *nest = NULL;
 	int i;
 
 	if (c->flags & (1 << NFTNL_FLOWTABLE_TABLE))
 		mnl_attr_put_strz(nlh, NFTA_FLOWTABLE_TABLE, c->table);
 	if (c->flags & (1 << NFTNL_FLOWTABLE_NAME))
 		mnl_attr_put_strz(nlh, NFTA_FLOWTABLE_NAME, c->name);
-	if ((c->flags & (1 << NFTNL_FLOWTABLE_HOOKNUM)) &&
-	    (c->flags & (1 << NFTNL_FLOWTABLE_PRIO))) {
-		struct nlattr *nest;
 
+	if (c->flags & (1 << NFTNL_FLOWTABLE_HOOKNUM) ||
+	    c->flags & (1 << NFTNL_FLOWTABLE_PRIO) ||
+	    c->flags & (1 << NFTNL_FLOWTABLE_DEVICES))
 		nest = mnl_attr_nest_start(nlh, NFTA_FLOWTABLE_HOOK);
-		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_HOOK_NUM, htonl(c->hooknum));
-		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_HOOK_PRIORITY, htonl(c->prio));
-		if (c->flags & (1 << NFTNL_FLOWTABLE_DEVICES)) {
-			struct nlattr *nest_dev;
 
-			nest_dev = mnl_attr_nest_start(nlh,
-						       NFTA_FLOWTABLE_HOOK_DEVS);
-			for (i = 0; i < c->dev_array_len; i++)
-				mnl_attr_put_strz(nlh, NFTA_DEVICE_NAME,
-						  c->dev_array[i]);
-			mnl_attr_nest_end(nlh, nest_dev);
+	if (c->flags & (1 << NFTNL_FLOWTABLE_HOOKNUM))
+		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_HOOK_NUM, htonl(c->hooknum));
+	if (c->flags & (1 << NFTNL_FLOWTABLE_PRIO))
+		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_HOOK_PRIORITY, htonl(c->prio));
+
+	if (c->flags & (1 << NFTNL_FLOWTABLE_DEVICES)) {
+		struct nlattr *nest_dev;
+
+		nest_dev = mnl_attr_nest_start(nlh, NFTA_FLOWTABLE_HOOK_DEVS);
+		for (i = 0; i < c->dev_array_len; i++) {
+			mnl_attr_put_strz(nlh, NFTA_DEVICE_NAME,
+					  c->dev_array[i]);
 		}
-		mnl_attr_nest_end(nlh, nest);
+		mnl_attr_nest_end(nlh, nest_dev);
 	}
+
+	if (nest)
+		mnl_attr_nest_end(nlh, nest);
+
 	if (c->flags & (1 << NFTNL_FLOWTABLE_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_FLAGS, htonl(c->ft_flags));
 	if (c->flags & (1 << NFTNL_FLOWTABLE_USE))
