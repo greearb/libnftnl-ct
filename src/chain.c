@@ -49,6 +49,7 @@ struct nftnl_chain {
 	uint64_t	bytes;
 	uint64_t	handle;
 	uint32_t	flags;
+	uint32_t	chain_id;
 
 	struct list_head rule_list;
 };
@@ -167,6 +168,7 @@ void nftnl_chain_unset(struct nftnl_chain *c, uint16_t attr)
 	case NFTNL_CHAIN_HANDLE:
 	case NFTNL_CHAIN_FAMILY:
 	case NFTNL_CHAIN_FLAGS:
+	case NFTNL_CHAIN_ID:
 		break;
 	case NFTNL_CHAIN_DEV:
 		xfree(c->dev);
@@ -192,6 +194,7 @@ static uint32_t nftnl_chain_validate[NFTNL_CHAIN_MAX + 1] = {
 	[NFTNL_CHAIN_HANDLE]		= sizeof(uint64_t),
 	[NFTNL_CHAIN_FAMILY]		= sizeof(uint32_t),
 	[NFTNL_CHAIN_FLAGS]		= sizeof(uint32_t),
+	[NFTNL_CHAIN_ID]		= sizeof(uint32_t),
 };
 
 EXPORT_SYMBOL(nftnl_chain_set_data);
@@ -283,6 +286,9 @@ int nftnl_chain_set_data(struct nftnl_chain *c, uint16_t attr,
 		break;
 	case NFTNL_CHAIN_FLAGS:
 		memcpy(&c->chain_flags, data, sizeof(c->chain_flags));
+		break;
+	case NFTNL_CHAIN_ID:
+		memcpy(&c->chain_id, data, sizeof(c->chain_id));
 		break;
 	}
 	c->flags |= (1 << attr);
@@ -382,6 +388,9 @@ const void *nftnl_chain_get_data(const struct nftnl_chain *c, uint16_t attr,
 	case NFTNL_CHAIN_FLAGS:
 		*data_len = sizeof(uint32_t);
 		return &c->chain_flags;
+	case NFTNL_CHAIN_ID:
+		*data_len = sizeof(uint32_t);
+		return &c->chain_id;
 	}
 	return NULL;
 }
@@ -502,6 +511,8 @@ void nftnl_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_ch
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_TYPE, c->type);
 	if (c->flags & (1 << NFTNL_CHAIN_FLAGS))
 		mnl_attr_put_u32(nlh, NFTA_CHAIN_FLAGS, htonl(c->chain_flags));
+	if (c->flags & (1 << NFTNL_CHAIN_ID))
+		mnl_attr_put_u32(nlh, NFTA_CHAIN_ID, htonl(c->chain_id));
 }
 
 EXPORT_SYMBOL(nftnl_chain_rule_add);
@@ -557,6 +568,7 @@ static int nftnl_chain_parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFTA_CHAIN_POLICY:
 	case NFTA_CHAIN_USE:
 	case NFTA_CHAIN_FLAGS:
+	case NFTA_CHAIN_ID:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -761,6 +773,10 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 		c->chain_flags = ntohl(mnl_attr_get_u32(tb[NFTA_CHAIN_FLAGS]));
 		c->flags |= (1 << NFTNL_CHAIN_FLAGS);
 	}
+	if (tb[NFTA_CHAIN_ID]) {
+		c->chain_id = ntohl(mnl_attr_get_u32(tb[NFTA_CHAIN_ID]));
+		c->flags |= (1 << NFTNL_CHAIN_ID);
+	}
 
 	c->family = nfg->nfgen_family;
 	c->flags |= (1 << NFTNL_CHAIN_FAMILY);
@@ -825,6 +841,11 @@ static int nftnl_chain_snprintf_default(char *buf, size_t size,
 		if (c->flags & (1 << NFTNL_CHAIN_FLAGS)) {
 			ret = snprintf(buf + offset, remain, " flags %x",
 				       c->chain_flags);
+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+		}
+		if (c->flags & (1 << NFTNL_CHAIN_ID)) {
+			ret = snprintf(buf + offset, remain, " id %x",
+				       c->chain_id);
 			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 	}

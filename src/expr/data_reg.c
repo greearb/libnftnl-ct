@@ -125,6 +125,7 @@ static int nftnl_verdict_parse_cb(const struct nlattr *attr, void *data)
 
 	switch(type) {
 	case NFTA_VERDICT_CODE:
+	case NFTA_VERDICT_CHAIN_ID:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;

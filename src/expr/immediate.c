@@ -50,6 +50,9 @@ nftnl_expr_immediate_set(struct nftnl_expr *e, uint16_t type,
 		if (!imm->data.chain)
 			return -1;
 		break;
+	case NFTNL_EXPR_IMM_CHAIN_ID:
+		memcpy(&imm->data.chain_id, data, sizeof(uint32_t));
+		break;
 	default:
 		return -1;
 	}
@@ -75,6 +78,9 @@ nftnl_expr_immediate_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_IMM_CHAIN:
 		*data_len = strlen(imm->data.chain)+1;
 		return imm->data.chain;
+	case NFTNL_EXPR_IMM_CHAIN_ID:
+		*data_len = sizeof(imm->data.chain_id);
+		return &imm->data.chain_id;
 	}
 	return NULL;
 }
@@ -126,6 +132,10 @@ nftnl_expr_immediate_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_VERDICT_CODE, htonl(imm->data.verdict));
 		if (e->flags & (1 << NFTNL_EXPR_IMM_CHAIN))
 			mnl_attr_put_strz(nlh, NFTA_VERDICT_CHAIN, imm->data.chain);
+		if (e->flags & (1 << NFTNL_EXPR_IMM_CHAIN_ID)) {
+			mnl_attr_put_u32(nlh, NFTA_VERDICT_CHAIN_ID,
+					 htonl(imm->data.chain_id));
+		}
 
 		mnl_attr_nest_end(nlh, nest1);
 		mnl_attr_nest_end(nlh, nest2);

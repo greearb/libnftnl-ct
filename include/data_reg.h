@@ -21,6 +21,7 @@ union nftnl_data_reg {
 	struct {
 		uint32_t	verdict;
 		const char	*chain;
+		uint32_t	chain_id;
 	};
 };
 
