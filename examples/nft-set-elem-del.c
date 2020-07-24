@@ -22,12 +22,14 @@
 
 int main(int argc, char *argv[])
 {
-	struct mnl_socket *nl;
 	char buf[MNL_SOCKET_BUFFER_SIZE];
-	struct nlmsghdr *nlh;
-	uint32_t portid, seq, family, data;
-	struct nftnl_set *s;
+	struct mnl_nlmsg_batch *batch;
+	uint32_t portid, seq, family;
 	struct nftnl_set_elem *e;
+	struct mnl_socket *nl;
+	struct nlmsghdr *nlh;
+	struct nftnl_set *s;
+	uint16_t data;
 	int ret;
 
 	if (argc != 4) {
@@ -78,10 +80,20 @@ int main(int argc, char *argv[])
 	nftnl_set_elem_set(e, NFTNL_SET_ELEM_KEY, &data, sizeof(data));
 	nftnl_set_elem_add(s, e);
 
-	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_DELSETELEM, family,
-				      NLM_F_ACK, seq);
+	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
+
+	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
+
+	nlh = nftnl_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+					NFT_MSG_DELSETELEM, family,
+					NLM_F_ACK, seq);
 	nftnl_set_elems_nlmsg_build_payload(nlh, s);
 	nftnl_set_free(s);
+	mnl_nlmsg_batch_next(batch);
+
+	nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
@@ -95,14 +107,18 @@ int main(int argc, char *argv[])
 	}
 	portid = mnl_socket_get_portid(nl);
 
-	if (mnl_socket_sendto(nl, nlh, nlh->nlmsg_len) < 0) {
-		perror("mnl_socket_send");
+	ret = mnl_socket_sendto(nl, mnl_nlmsg_batch_head(batch),
+				mnl_nlmsg_batch_size(batch));
+	if (ret == -1) {
+		perror("mnl_socket_sendto");
 		exit(EXIT_FAILURE);
 	}
 
+	mnl_nlmsg_batch_stop(batch);
+
 	ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
 	while (ret > 0) {
-		ret = mnl_cb_run(buf, ret, seq, portid, NULL, NULL);
+		ret = mnl_cb_run(buf, ret, 0, portid, NULL, NULL);
 		if (ret <= 0)
 			break;
 		ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
