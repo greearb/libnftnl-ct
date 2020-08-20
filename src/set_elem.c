@@ -706,7 +706,7 @@ static int nftnl_set_elem_do_snprintf(char *buf, size_t size, const void *e,
 }
 
 EXPORT_SYMBOL(nftnl_set_elem_fprintf);
-int nftnl_set_elem_fprintf(FILE *fp, struct nftnl_set_elem *se, uint32_t type,
+int nftnl_set_elem_fprintf(FILE *fp, const struct nftnl_set_elem *se, uint32_t type,
 			 uint32_t flags)
 {
 	return nftnl_fprintf(fp, se, NFTNL_CMD_UNSPEC, type, flags,

@@ -169,7 +169,7 @@ global:
   nftnl_set_elem_parse;
   nftnl_set_elem_parse_file;
   nftnl_set_elem_snprintf;
-  nftnl_set_elem_fprinf;
+  nftnl_set_elem_fprintf;
 
   nftnl_set_elems_nlmsg_build_payload;
   nftnl_set_elems_nlmsg_parse;
