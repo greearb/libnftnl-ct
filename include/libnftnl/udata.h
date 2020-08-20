@@ -9,6 +9,12 @@
 extern "C" {
 #endif
 
+enum nftnl_udata_table_types {
+	NFTNL_UDATA_TABLE_COMMENT,
+	__NFTNL_UDATA_TABLE_MAX
+};
+#define NFTNL_UDATA_TABLE_MAX (__NFTNL_UDATA_TABLE_MAX - 1)
+
 enum nftnl_udata_rule_types {
 	NFTNL_UDATA_RULE_COMMENT,
 	NFTNL_UDATA_RULE_EBTABLES_POLICY,
