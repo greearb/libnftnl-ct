@@ -22,6 +22,12 @@ enum nftnl_udata_rule_types {
 };
 #define NFTNL_UDATA_RULE_MAX (__NFTNL_UDATA_RULE_MAX - 1)
 
+enum nftnl_udata_obj_types {
+	NFTNL_UDATA_OBJ_COMMENT,
+	__NFTNL_UDATA_OBJ_MAX
+};
+#define NFTNL_UDATA_OBJ_MAX (__NFTNL_UDATA_OBJ_MAX - 1)
+
 #define NFTNL_UDATA_COMMENT_MAXLEN	128
 
 enum nftnl_udata_set_types {

@@ -368,3 +368,7 @@ LIBNFTNL_14 {
   nftnl_flowtable_set_array;
   nftnl_flowtable_get_array;
 } LIBNFTNL_13;
+
+LIBNFTNL_15 {
+  nftnl_obj_get_data;
+} LIBNFTNL_14;
