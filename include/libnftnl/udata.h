@@ -15,6 +15,12 @@ enum nftnl_udata_table_types {
 };
 #define NFTNL_UDATA_TABLE_MAX (__NFTNL_UDATA_TABLE_MAX - 1)
 
+enum nftnl_udata_chain_types {
+	NFTNL_UDATA_CHAIN_COMMENT,
+	__NFTNL_UDATA_CHAIN_MAX
+};
+#define NFTNL_UDATA_CHAIN_MAX (__NFTNL_UDATA_CHAIN_MAX - 1)
+
 enum nftnl_udata_rule_types {
 	NFTNL_UDATA_RULE_COMMENT,
 	NFTNL_UDATA_RULE_EBTABLES_POLICY,

@@ -51,6 +51,11 @@ struct nftnl_chain {
 	uint32_t	flags;
 	uint32_t	chain_id;
 
+	struct {
+		void		*data;
+		uint32_t	len;
+	} user;
+
 	struct list_head rule_list;
 };
 
@@ -125,6 +130,8 @@ void nftnl_chain_free(const struct nftnl_chain *c)
 		xfree(c->type);
 	if (c->flags & (1 << NFTNL_CHAIN_DEV))
 		xfree(c->dev);
+	if (c->flags & (1 << NFTNL_CHAIN_USERDATA))
+		xfree(c->user.data);
 	if (c->flags & (1 << NFTNL_CHAIN_DEVICES)) {
 		for (i = 0; i < c->dev_array_len; i++)
 			xfree(c->dev_array[i]);
@@ -290,6 +297,16 @@ int nftnl_chain_set_data(struct nftnl_chain *c, uint16_t attr,
 	case NFTNL_CHAIN_ID:
 		memcpy(&c->chain_id, data, sizeof(c->chain_id));
 		break;
+	case NFTNL_CHAIN_USERDATA:
+		if (c->flags & (1 << NFTNL_CHAIN_USERDATA))
+			xfree(c->user.data);
+
+		c->user.data = malloc(data_len);
+		if (!c->user.data)
+			return -1;
+		memcpy(c->user.data, data, data_len);
+		c->user.len = data_len;
+		break;
 	}
 	c->flags |= (1 << attr);
 	return 0;
@@ -391,6 +408,9 @@ const void *nftnl_chain_get_data(const struct nftnl_chain *c, uint16_t attr,
 	case NFTNL_CHAIN_ID:
 		*data_len = sizeof(uint32_t);
 		return &c->chain_id;
+	case NFTNL_CHAIN_USERDATA:
+		*data_len = c->user.len;
+		return c->user.data;
 	}
 	return NULL;
 }
@@ -513,6 +533,8 @@ void nftnl_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_ch
 		mnl_attr_put_u32(nlh, NFTA_CHAIN_FLAGS, htonl(c->chain_flags));
 	if (c->flags & (1 << NFTNL_CHAIN_ID))
 		mnl_attr_put_u32(nlh, NFTA_CHAIN_ID, htonl(c->chain_id));
+	if (c->flags & (1 << NFTNL_CHAIN_USERDATA))
+		mnl_attr_put(nlh, NFTA_CHAIN_USERDATA, c->user.len, c->user.data);
 }
 
 EXPORT_SYMBOL(nftnl_chain_rule_add);
@@ -574,6 +596,10 @@ static int nftnl_chain_parse_attr_cb(const struct nlattr *attr, void *data)
 		break;
 	case NFTA_CHAIN_HANDLE:
 		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
+			abi_breakage();
+		break;
+	case NFTA_CHAIN_USERDATA:
+		if (mnl_attr_validate(attr, MNL_TYPE_BINARY) < 0)
 			abi_breakage();
 		break;
 	}
@@ -776,6 +802,11 @@ int nftnl_chain_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_chain *c)
 	if (tb[NFTA_CHAIN_ID]) {
 		c->chain_id = ntohl(mnl_attr_get_u32(tb[NFTA_CHAIN_ID]));
 		c->flags |= (1 << NFTNL_CHAIN_ID);
+	}
+	if (tb[NFTA_CHAIN_USERDATA]) {
+		nftnl_chain_set_data(c, NFTNL_CHAIN_USERDATA,
+				     mnl_attr_get_payload(tb[NFTA_CHAIN_USERDATA]),
+				     mnl_attr_get_payload_len(tb[NFTA_CHAIN_USERDATA]));
 	}
 
 	c->family = nfg->nfgen_family;
