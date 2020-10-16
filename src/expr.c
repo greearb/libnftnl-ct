@@ -203,6 +203,7 @@ const char *nftnl_expr_get_str(const struct nftnl_expr *expr, uint16_t type)
 	return (const char *)nftnl_expr_get(expr, type, &data_len);
 }
 
+EXPORT_SYMBOL(nftnl_expr_build_payload);
 void nftnl_expr_build_payload(struct nlmsghdr *nlh, struct nftnl_expr *expr)
 {
 	struct nlattr *nest;
