@@ -51,6 +51,7 @@ uint32_t nftnl_rule_get_u32(const struct nftnl_rule *r, uint16_t attr);
 uint64_t nftnl_rule_get_u64(const struct nftnl_rule *r, uint16_t attr);
 
 void nftnl_rule_add_expr(struct nftnl_rule *r, struct nftnl_expr *expr);
+void nftnl_rule_del_expr(struct nftnl_expr *expr);
 
 struct nlmsghdr;
 

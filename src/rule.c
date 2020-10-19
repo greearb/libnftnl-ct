@@ -330,6 +330,12 @@ void nftnl_rule_add_expr(struct nftnl_rule *r, struct nftnl_expr *expr)
 	list_add_tail(&expr->head, &r->expr_list);
 }
 
+EXPORT_SYMBOL(nftnl_rule_del_expr);
+void nftnl_rule_del_expr(struct nftnl_expr *expr)
+{
+	list_del(&expr->head);
+}
+
 static int nftnl_rule_parse_attr_cb(const struct nlattr *attr, void *data)
 {
 	const struct nlattr **tb = data;

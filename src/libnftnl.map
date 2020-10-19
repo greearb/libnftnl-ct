@@ -372,4 +372,5 @@ LIBNFTNL_14 {
 LIBNFTNL_15 {
   nftnl_obj_get_data;
   nftnl_expr_build_payload;
+  nftnl_rule_del_expr;
 } LIBNFTNL_14;
