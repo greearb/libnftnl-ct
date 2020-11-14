@@ -215,7 +215,7 @@ nftnl_expr_bitwise_snprintf_bool(char *buf, size_t size,
 {
 	int remain = size, offset = 0, ret;
 
-	ret = snprintf(buf, remain, "reg %u = (reg=%u & ",
+	ret = snprintf(buf, remain, "reg %u = ( reg %u & ",
 		       bitwise->dreg, bitwise->sreg);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
