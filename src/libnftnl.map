@@ -374,3 +374,8 @@ LIBNFTNL_15 {
   nftnl_expr_build_payload;
   nftnl_rule_del_expr;
 } LIBNFTNL_14;
+
+LIBNFTNL_16 {
+  nftnl_set_elem_add_expr;
+  nftnl_set_elem_expr_foreach;
+} LIBNFTNL_15;

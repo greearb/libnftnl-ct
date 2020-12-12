@@ -107,6 +107,7 @@ enum {
 	NFTNL_SET_ELEM_EXPR,
 	NFTNL_SET_ELEM_OBJREF,
 	NFTNL_SET_ELEM_KEY_END,
+	NFTNL_SET_ELEM_EXPRESSIONS,
 	__NFTNL_SET_ELEM_MAX
 };
 #define NFTNL_SET_ELEM_MAX (__NFTNL_SET_ELEM_MAX - 1)
@@ -143,6 +144,12 @@ int nftnl_set_elem_parse_file(struct nftnl_set_elem *e, enum nftnl_parse_type ty
 			    FILE *fp, struct nftnl_parse_err *err);
 int nftnl_set_elem_snprintf(char *buf, size_t size, const struct nftnl_set_elem *s, uint32_t type, uint32_t flags);
 int nftnl_set_elem_fprintf(FILE *fp, const struct nftnl_set_elem *se, uint32_t type, uint32_t flags);
+
+struct nftnl_expr;
+void nftnl_set_elem_add_expr(struct nftnl_set_elem *e, struct nftnl_expr *expr);
+int nftnl_set_elem_expr_foreach(struct nftnl_set_elem *e,
+				int (*cb)(struct nftnl_expr *e, void *data),
+				void *data);
 
 int nftnl_set_elem_foreach(struct nftnl_set *s, int (*cb)(struct nftnl_set_elem *e, void *data), void *data);
 

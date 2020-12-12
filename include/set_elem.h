@@ -10,7 +10,7 @@ struct nftnl_set_elem {
 	union nftnl_data_reg	key;
 	union nftnl_data_reg	key_end;
 	union nftnl_data_reg	data;
-	struct nftnl_expr	*expr;
+	struct list_head	expr_list;
 	uint64_t		timeout;
 	uint64_t		expiration;
 	const char		*objref;
