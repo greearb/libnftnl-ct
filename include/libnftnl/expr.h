@@ -38,6 +38,12 @@ const char *nftnl_expr_get_str(const struct nftnl_expr *expr, uint16_t type);
 
 void nftnl_expr_build_payload(struct nlmsghdr *nlh, struct nftnl_expr *expr);
 
+/* For dynset expressions. */
+void nftnl_expr_add_expr(struct nftnl_expr *expr, uint32_t type, struct nftnl_expr *e);
+int nftnl_expr_expr_foreach(const struct nftnl_expr *e,
+			    int (*cb)(struct nftnl_expr *e, void *data),
+			    void *data);
+
 int nftnl_expr_snprintf(char *buf, size_t buflen, const struct nftnl_expr *expr, uint32_t type, uint32_t flags);
 int nftnl_expr_fprintf(FILE *fp, const struct nftnl_expr *expr, uint32_t type, uint32_t flags);
 
@@ -167,6 +173,7 @@ enum {
 	NFTNL_EXPR_DYNSET_SET_NAME,
 	NFTNL_EXPR_DYNSET_SET_ID,
 	NFTNL_EXPR_DYNSET_EXPR,
+	NFTNL_EXPR_DYNSET_EXPRESSIONS,
 };
 
 enum {

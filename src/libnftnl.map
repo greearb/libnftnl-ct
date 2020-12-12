@@ -380,4 +380,6 @@ LIBNFTNL_16 {
   nftnl_set_expr_foreach;
   nftnl_set_elem_add_expr;
   nftnl_set_elem_expr_foreach;
+  nftnl_expr_add_expr;
+  nftnl_expr_expr_foreach;
 } LIBNFTNL_15;

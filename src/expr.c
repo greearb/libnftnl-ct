@@ -42,6 +42,9 @@ struct nftnl_expr *nftnl_expr_alloc(const char *name)
 	expr->flags |= (1 << NFTNL_EXPR_NAME);
 	expr->ops = ops;
 
+	if (ops->init)
+		ops->init(expr);
+
 	return expr;
 }
 

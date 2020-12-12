@@ -26,7 +26,7 @@ struct nftnl_expr_dynset {
 	enum nft_registers	sreg_data;
 	enum nft_dynset_ops	op;
 	uint64_t		timeout;
-	struct nftnl_expr	*expr;
+	struct list_head	expr_list;
 	char			*set_name;
 	uint32_t		set_id;
 };
@@ -36,6 +36,7 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 			 const void *data, uint32_t data_len)
 {
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
+	struct nftnl_expr *expr, *next;
 
 	switch (type) {
 	case NFTNL_EXPR_DYNSET_SREG_KEY:
@@ -59,7 +60,11 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 		memcpy(&dynset->set_id, data, sizeof(dynset->set_id));
 		break;
 	case NFTNL_EXPR_DYNSET_EXPR:
-		dynset->expr = (void *)data;
+		list_for_each_entry_safe(expr, next, &dynset->expr_list, head)
+			nftnl_expr_free(expr);
+
+		expr = (void *)data;
+		list_add(&expr->head, &dynset->expr_list);
 		break;
 	default:
 		return -1;
@@ -72,6 +77,7 @@ nftnl_expr_dynset_get(const struct nftnl_expr *e, uint16_t type,
 			 uint32_t *data_len)
 {
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
+	struct nftnl_expr *expr;
 
 	switch (type) {
 	case NFTNL_EXPR_DYNSET_SREG_KEY:
@@ -93,7 +99,9 @@ nftnl_expr_dynset_get(const struct nftnl_expr *e, uint16_t type,
 		*data_len = sizeof(dynset->set_id);
 		return &dynset->set_id;
 	case NFTNL_EXPR_DYNSET_EXPR:
-		return dynset->expr;
+		list_for_each_entry(expr, &dynset->expr_list, head)
+			break;
+		return expr;
 	}
 	return NULL;
 }
@@ -137,6 +145,7 @@ nftnl_expr_dynset_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
 	struct nlattr *nest;
+	int num_exprs = 0;
 
 	if (e->flags & (1 << NFTNL_EXPR_DYNSET_SREG_KEY))
 		mnl_attr_put_u32(nlh, NFTA_DYNSET_SREG_KEY, htonl(dynset->sreg_key));
@@ -150,11 +159,55 @@ nftnl_expr_dynset_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_strz(nlh, NFTA_DYNSET_SET_NAME, dynset->set_name);
 	if (e->flags & (1 << NFTNL_EXPR_DYNSET_SET_ID))
 		mnl_attr_put_u32(nlh, NFTA_DYNSET_SET_ID, htonl(dynset->set_id));
-	if (e->flags & (1 << NFTNL_EXPR_DYNSET_EXPR)) {
-		nest = mnl_attr_nest_start(nlh, NFTA_DYNSET_EXPR);
-		nftnl_expr_build_payload(nlh, dynset->expr);
-		mnl_attr_nest_end(nlh, nest);
+	if (!list_empty(&dynset->expr_list)) {
+		struct nftnl_expr *expr;
+
+		list_for_each_entry(expr, &dynset->expr_list, head)
+			num_exprs++;
+
+		if (num_exprs == 1) {
+			nest = mnl_attr_nest_start(nlh, NFTA_DYNSET_EXPR);
+			list_for_each_entry(expr, &dynset->expr_list, head)
+				nftnl_expr_build_payload(nlh, expr);
+			mnl_attr_nest_end(nlh, nest);
+		} else if (num_exprs > 1) {
+			struct nlattr *nest1, *nest2;
+
+			nest1 = mnl_attr_nest_start(nlh, NFTA_DYNSET_EXPRESSIONS);
+			list_for_each_entry(expr, &dynset->expr_list, head) {
+				nest2 = mnl_attr_nest_start(nlh, NFTA_LIST_ELEM);
+				nftnl_expr_build_payload(nlh, expr);
+				mnl_attr_nest_end(nlh, nest2);
+			}
+			mnl_attr_nest_end(nlh, nest1);
+		}
 	}
+}
+
+EXPORT_SYMBOL(nftnl_expr_add_expr);
+void nftnl_expr_add_expr(struct nftnl_expr *e, uint32_t type,
+			 struct nftnl_expr *expr)
+{
+	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
+
+	list_add_tail(&expr->head, &dynset->expr_list);
+}
+
+EXPORT_SYMBOL(nftnl_expr_expr_foreach);
+int nftnl_expr_expr_foreach(const struct nftnl_expr *e,
+			    int (*cb)(struct nftnl_expr *e, void *data),
+			    void *data)
+{
+	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
+	struct nftnl_expr *cur, *tmp;
+	int ret;
+
+	list_for_each_entry_safe(cur, tmp, &dynset->expr_list, head) {
+		ret = cb(cur, data);
+		if (ret < 0)
+			return ret;
+	}
+	return 0;
 }
 
 static int
@@ -162,6 +215,7 @@ nftnl_expr_dynset_parse(struct nftnl_expr *e, struct nlattr *attr)
 {
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
 	struct nlattr *tb[NFTA_SET_MAX+1] = {};
+	struct nftnl_expr *expr, *next;
 	int ret = 0;
 
 	if (mnl_attr_parse_nested(attr, nftnl_expr_dynset_cb, tb) < 0)
@@ -195,13 +249,34 @@ nftnl_expr_dynset_parse(struct nftnl_expr *e, struct nlattr *attr)
 		e->flags |= (1 << NFTNL_EXPR_DYNSET_SET_ID);
 	}
 	if (tb[NFTA_DYNSET_EXPR]) {
-		e->flags |= (1 << NFTNL_EXPR_DYNSET_EXPR);
-		dynset->expr = nftnl_expr_parse(tb[NFTA_DYNSET_EXPR]);
-		if (dynset->expr == NULL)
+		expr = nftnl_expr_parse(tb[NFTA_DYNSET_EXPR]);
+		if (expr == NULL)
 			return -1;
+
+		list_add(&expr->head, &dynset->expr_list);
+		e->flags |= (1 << NFTNL_EXPR_DYNSET_EXPR);
+	} else if (tb[NFTA_DYNSET_EXPRESSIONS]) {
+		struct nlattr *attr2;
+
+		mnl_attr_for_each_nested(attr2, tb[NFTA_DYNSET_EXPRESSIONS]) {
+			if (mnl_attr_get_type(attr2) != NFTA_LIST_ELEM)
+				goto out_dynset_expr;
+
+			expr = nftnl_expr_parse(attr2);
+			if (!expr)
+				goto out_dynset_expr;
+
+			list_add_tail(&expr->head, &dynset->expr_list);
+		}
+		e->flags |= (1 << NFTNL_EXPR_DYNSET_EXPRESSIONS);
 	}
 
 	return ret;
+out_dynset_expr:
+	list_for_each_entry_safe(expr, next, &dynset->expr_list, head)
+		nftnl_expr_free(expr);
+
+	return -1;
 }
 
 static const char *op2str_array[] = {
@@ -239,8 +314,7 @@ nftnl_expr_dynset_snprintf_default(char *buf, size_t size,
 			       dynset->timeout);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
-	if (e->flags & (1 << NFTNL_EXPR_DYNSET_EXPR)) {
-		expr = dynset->expr;
+	list_for_each_entry(expr, &dynset->expr_list, head) {
 		ret = snprintf(buf + offset, remain, "expr [ %s ",
 			       expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
@@ -272,19 +346,28 @@ nftnl_expr_dynset_snprintf(char *buf, size_t size, uint32_t type,
 	return -1;
 }
 
-static void nftnl_expr_dynset_free(const struct nftnl_expr *e)
+static void nftnl_expr_dynset_init(const struct nftnl_expr *e)
 {
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
 
+	INIT_LIST_HEAD(&dynset->expr_list);
+}
+
+static void nftnl_expr_dynset_free(const struct nftnl_expr *e)
+{
+	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
+	struct nftnl_expr *expr, *next;
+
 	xfree(dynset->set_name);
-	if (dynset->expr)
-		nftnl_expr_free(dynset->expr);
+	list_for_each_entry_safe(expr, next, &dynset->expr_list, head)
+		nftnl_expr_free(expr);
 }
 
 struct expr_ops expr_ops_dynset = {
 	.name		= "dynset",
 	.alloc_len	= sizeof(struct nftnl_expr_dynset),
 	.max_attr	= NFTA_DYNSET_MAX,
+	.init		= nftnl_expr_dynset_init,
 	.free		= nftnl_expr_dynset_free,
 	.set		= nftnl_expr_dynset_set,
 	.get		= nftnl_expr_dynset_get,
