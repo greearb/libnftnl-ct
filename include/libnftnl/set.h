@@ -31,6 +31,7 @@ enum nftnl_set_attr {
 	NFTNL_SET_HANDLE,
 	NFTNL_SET_DESC_CONCAT,
 	NFTNL_SET_EXPR,
+	NFTNL_SET_EXPRESSIONS,
 	__NFTNL_SET_MAX
 };
 #define NFTNL_SET_MAX (__NFTNL_SET_MAX - 1)
@@ -79,6 +80,12 @@ void nftnl_set_list_del(struct nftnl_set *s);
 int nftnl_set_list_foreach(struct nftnl_set_list *set_list, int (*cb)(struct nftnl_set *t, void *data), void *data);
 struct nftnl_set *nftnl_set_list_lookup_byname(struct nftnl_set_list *set_list,
 					       const char *set);
+
+struct nftnl_expr;
+void nftnl_set_add_expr(struct nftnl_set *s, struct nftnl_expr *expr);
+int nftnl_set_expr_foreach(const struct nftnl_set *s,
+			   int (*cb)(struct nftnl_expr *e, void *data),
+			   void *data);
 
 struct nftnl_set_list_iter;
 struct nftnl_set_list_iter *nftnl_set_list_iter_create(const struct nftnl_set_list *l);
