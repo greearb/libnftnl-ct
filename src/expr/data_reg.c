@@ -29,10 +29,14 @@ nftnl_data_reg_value_snprintf_default(char *buf, size_t size,
 				      const union nftnl_data_reg *reg,
 				      uint32_t flags)
 {
+	const char *pfx = flags & DATA_F_NOPFX ? "" : "0x";
 	int remain = size, offset = 0, ret, i;
 
+
+
 	for (i = 0; i < div_round_up(reg->len, sizeof(uint32_t)); i++) {
-		ret = snprintf(buf + offset, remain, "0x%.8x ", reg->val[i]);
+		ret = snprintf(buf + offset, remain,
+			       "%s%.8x ", pfx, reg->val[i]);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 

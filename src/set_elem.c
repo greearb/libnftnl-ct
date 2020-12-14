@@ -629,18 +629,18 @@ static int nftnl_set_elem_snprintf_default(char *buf, size_t size,
 	ret = snprintf(buf, remain, "element ");
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	for (i = 0; i < div_round_up(e->key.len, sizeof(uint32_t)); i++) {
-		ret = snprintf(buf + offset, remain, "%.8x ", e->key.val[i]);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-	}
+	ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->key,
+				      NFTNL_OUTPUT_DEFAULT,
+				      DATA_F_NOPFX, DATA_VALUE);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = snprintf(buf + offset, remain, " : ");
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-	for (i = 0; i < div_round_up(e->data.len, sizeof(uint32_t)); i++) {
-		ret = snprintf(buf + offset, remain, "%.8x ", e->data.val[i]);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-	}
+	ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->data,
+				      NFTNL_OUTPUT_DEFAULT,
+				      DATA_F_NOPFX, DATA_VALUE);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = snprintf(buf + offset, remain, "%u [end]", e->set_elem_flags);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
