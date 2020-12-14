@@ -634,6 +634,16 @@ static int nftnl_set_elem_snprintf_default(char *buf, size_t size,
 				      DATA_F_NOPFX, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
+	if (e->flags & (1 << NFTNL_SET_ELEM_KEY_END)) {
+		ret = snprintf(buf + offset, remain, " - ");
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+
+		ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->key_end,
+					      NFTNL_OUTPUT_DEFAULT,
+					      DATA_F_NOPFX, DATA_VALUE);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+	}
+
 	ret = snprintf(buf + offset, remain, " : ");
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
