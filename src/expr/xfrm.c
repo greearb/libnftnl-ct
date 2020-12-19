@@ -171,34 +171,6 @@ static const char *xfrmdir2str(uint8_t dir)
 	return xfrmdir2str_array[dir];
 }
 
-#ifdef JSON_PARSING
-static uint32_t str2xfrmkey(const char *s)
-{
-	int i;
-
-	for (i = 0;
-	     i < sizeof(xfrmkey2str_array) / sizeof(xfrmkey2str_array[0]);
-	     i++) {
-		if (strcmp(xfrmkey2str_array[i], s) == 0)
-			return i;
-	}
-	return -1;
-}
-
-static int str2xfmrdir(const char *s)
-{
-	int i;
-
-	for (i = 0;
-	     i <  sizeof(xfrmdir2str_array) / sizeof(xfrmdir2str_array[0]);
-	     i++) {
-		if (strcmp(xfrmkey2str_array[i], s) == 0)
-			return i;
-	}
-	return -1;
-}
-#endif
-
 static int
 nftnl_expr_xfrm_snprintf_default(char *buf, size_t size,
 			       const struct nftnl_expr *e)
