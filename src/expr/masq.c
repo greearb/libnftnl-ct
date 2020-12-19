@@ -138,9 +138,13 @@ static int nftnl_expr_masq_snprintf_default(char *buf, size_t len,
 	int remain = len, offset = 0, ret = 0;
 
 	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MIN)) {
-		ret = snprintf(buf, remain,
-			       "proto_min reg %u proto_max reg %u ",
-			       masq->sreg_proto_min, masq->sreg_proto_max);
+		ret = snprintf(buf + offset, remain, "proto_min reg %u ",
+			       masq->sreg_proto_min);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+	}
+	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MAX)) {
+		ret = snprintf(buf + offset, remain, "proto_max reg %u ",
+			       masq->sreg_proto_max);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (e->flags & (1 << NFTNL_EXPR_MASQ_FLAGS)) {
