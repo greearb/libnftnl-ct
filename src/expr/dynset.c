@@ -29,6 +29,7 @@ struct nftnl_expr_dynset {
 	struct list_head	expr_list;
 	char			*set_name;
 	uint32_t		set_id;
+	uint32_t		dynset_flags;
 };
 
 static int
@@ -66,6 +67,9 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 		expr = (void *)data;
 		list_add(&expr->head, &dynset->expr_list);
 		break;
+	case NFTNL_EXPR_DYNSET_FLAGS:
+		memcpy(&dynset->dynset_flags, data, sizeof(dynset->dynset_flags));
+		break;
 	default:
 		return -1;
 	}
@@ -102,6 +106,9 @@ nftnl_expr_dynset_get(const struct nftnl_expr *e, uint16_t type,
 		list_for_each_entry(expr, &dynset->expr_list, head)
 			break;
 		return expr;
+	case NFTNL_EXPR_DYNSET_FLAGS:
+		*data_len = sizeof(dynset->dynset_flags);
+		return &dynset->dynset_flags;
 	}
 	return NULL;
 }
@@ -119,6 +126,7 @@ static int nftnl_expr_dynset_cb(const struct nlattr *attr, void *data)
 	case NFTA_DYNSET_SREG_DATA:
 	case NFTA_DYNSET_SET_ID:
 	case NFTA_DYNSET_OP:
+	case NFTA_DYNSET_FLAGS:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -182,6 +190,9 @@ nftnl_expr_dynset_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 			mnl_attr_nest_end(nlh, nest1);
 		}
 	}
+	if (e->flags & (1 << NFTNL_EXPR_DYNSET_FLAGS))
+		mnl_attr_put_u32(nlh, NFTA_DYNSET_FLAGS,
+				 htonl(dynset->dynset_flags));
 }
 
 EXPORT_SYMBOL(nftnl_expr_add_expr);
@@ -269,6 +280,10 @@ nftnl_expr_dynset_parse(struct nftnl_expr *e, struct nlattr *attr)
 			list_add_tail(&expr->head, &dynset->expr_list);
 		}
 		e->flags |= (1 << NFTNL_EXPR_DYNSET_EXPRESSIONS);
+	}
+	if (tb[NFTA_DYNSET_FLAGS]) {
+		dynset->dynset_flags = ntohl(mnl_attr_get_u32(tb[NFTA_DYNSET_FLAGS]));
+		e->flags |= (1 << NFTNL_EXPR_DYNSET_FLAGS);
 	}
 
 	return ret;
