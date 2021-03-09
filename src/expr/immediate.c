@@ -195,17 +195,17 @@ nftnl_expr_immediate_snprintf(char *buf, size_t len,
 
 	if (e->flags & (1 << NFTNL_EXPR_IMM_DATA)) {
 		ret = nftnl_data_reg_snprintf(buf + offset, remain, &imm->data,
-					NFTNL_OUTPUT_DEFAULT, flags, DATA_VALUE);
+					      flags, DATA_VALUE);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	} else if (e->flags & (1 << NFTNL_EXPR_IMM_VERDICT)) {
 		ret = nftnl_data_reg_snprintf(buf + offset, remain, &imm->data,
-				NFTNL_OUTPUT_DEFAULT, flags, DATA_VERDICT);
+					      flags, DATA_VERDICT);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	} else if (e->flags & (1 << NFTNL_EXPR_IMM_CHAIN)) {
 		ret = nftnl_data_reg_snprintf(buf + offset, remain, &imm->data,
-					NFTNL_OUTPUT_DEFAULT, flags, DATA_CHAIN);
+					      flags, DATA_CHAIN);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 

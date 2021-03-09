@@ -188,7 +188,7 @@ nftnl_expr_cmp_snprintf(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = nftnl_data_reg_snprintf(buf + offset, remain, &cmp->data,
-				    NFTNL_OUTPUT_DEFAULT, 0, DATA_VALUE);
+				      0, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;

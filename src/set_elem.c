@@ -710,7 +710,6 @@ int nftnl_set_elem_snprintf_default(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->key,
-				      NFTNL_OUTPUT_DEFAULT,
 				      DATA_F_NOPFX, DATA_VALUE);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
@@ -719,7 +718,6 @@ int nftnl_set_elem_snprintf_default(char *buf, size_t size,
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->key_end,
-					      NFTNL_OUTPUT_DEFAULT,
 					      DATA_F_NOPFX, DATA_VALUE);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
@@ -728,7 +726,6 @@ int nftnl_set_elem_snprintf_default(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->data,
-				      NFTNL_OUTPUT_DEFAULT,
 				      DATA_F_NOPFX, dregtype);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 

@@ -63,38 +63,19 @@ nftnl_data_reg_verdict_snprintf_def(char *buf, size_t size,
 
 int nftnl_data_reg_snprintf(char *buf, size_t size,
 			    const union nftnl_data_reg *reg,
-			    uint32_t output_format, uint32_t flags,
-			    int reg_type)
+			    uint32_t flags, int reg_type)
 {
 	switch(reg_type) {
 	case DATA_VALUE:
-		switch(output_format) {
-		case NFTNL_OUTPUT_DEFAULT:
-			return nftnl_data_reg_value_snprintf_default(buf, size,
-								   reg, flags);
-		case NFTNL_OUTPUT_JSON:
-		case NFTNL_OUTPUT_XML:
-		default:
-			break;
-		}
-		break;
+		return nftnl_data_reg_value_snprintf_default(buf, size,
+							     reg, flags);
 	case DATA_VERDICT:
 	case DATA_CHAIN:
-		switch(output_format) {
-		case NFTNL_OUTPUT_DEFAULT:
-			return nftnl_data_reg_verdict_snprintf_def(buf, size,
-								 reg, flags);
-		case NFTNL_OUTPUT_JSON:
-		case NFTNL_OUTPUT_XML:
-		default:
-			break;
-		}
-		break;
+		return nftnl_data_reg_verdict_snprintf_def(buf, size,
+							   reg, flags);
 	default:
-		break;
+		return -1;
 	}
-
-	return -1;
 }
 
 static int nftnl_data_parse_cb(const struct nlattr *attr, void *data)
