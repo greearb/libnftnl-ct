@@ -153,31 +153,31 @@ static int nftnl_expr_queue_snprintf_default(char *buf, size_t len,
 	if (e->flags & (1 << NFTNL_EXPR_QUEUE_NUM)) {
 		total_queues = queue->queuenum + queue->queues_total - 1;
 
-		ret = snprintf(buf + offset, len, "num %u", queue->queuenum);
+		ret = snprintf(buf + offset, remain, "num %u", queue->queuenum);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		if (queue->queues_total && total_queues != queue->queuenum) {
-			ret = snprintf(buf + offset, len, "-%u", total_queues);
+			ret = snprintf(buf + offset, remain, "-%u", total_queues);
 			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 
-		ret = snprintf(buf + offset, len, " ");
+		ret = snprintf(buf + offset, remain, " ");
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_QUEUE_SREG_QNUM)) {
-		ret = snprintf(buf + offset, len, "sreg_qnum %u ",
+		ret = snprintf(buf + offset, remain, "sreg_qnum %u ",
 			       queue->sreg_qnum);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_QUEUE_FLAGS)) {
 		if (queue->flags & (NFT_QUEUE_FLAG_BYPASS)) {
-			ret = snprintf(buf + offset, len, "bypass ");
+			ret = snprintf(buf + offset, remain, "bypass ");
 			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 		if (queue->flags & (NFT_QUEUE_FLAG_CPU_FANOUT)) {
-			ret = snprintf(buf + offset, len, "fanout ");
+			ret = snprintf(buf + offset, remain, "fanout ");
 			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 	}

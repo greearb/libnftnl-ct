@@ -230,7 +230,7 @@ nftnl_expr_ct_snprintf_default(char *buf, size_t size,
 	struct nftnl_expr_ct *ct = nftnl_expr_data(e);
 
 	if (e->flags & (1 << NFTNL_EXPR_CT_SREG)) {
-		ret = snprintf(buf, size, "set %s with reg %u ",
+		ret = snprintf(buf, remain, "set %s with reg %u ",
 				ctkey2str(ct->key), ct->sreg);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}

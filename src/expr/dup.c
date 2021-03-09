@@ -119,12 +119,12 @@ static int nftnl_expr_dup_snprintf_default(char *buf, size_t len,
 	struct nftnl_expr_dup *dup = nftnl_expr_data(e);
 
 	if (e->flags & (1 << NFTNL_EXPR_DUP_SREG_ADDR)) {
-		ret = snprintf(buf + offset, len, "sreg_addr %u ", dup->sreg_addr);
+		ret = snprintf(buf + offset, remain, "sreg_addr %u ", dup->sreg_addr);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (e->flags & (1 << NFTNL_EXPR_DUP_SREG_DEV)) {
-		ret = snprintf(buf + offset, len, "sreg_dev %u ", dup->sreg_dev);
+		ret = snprintf(buf + offset, remain, "sreg_dev %u ", dup->sreg_dev);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
