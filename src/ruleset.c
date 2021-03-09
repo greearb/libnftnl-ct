@@ -305,43 +305,6 @@ int nftnl_ruleset_parse_file(struct nftnl_ruleset *rs, enum nftnl_parse_type typ
 	return nftnl_ruleset_parse_file_cb(type, fp, err, rs, nftnl_ruleset_cb);
 }
 
-static const char *nftnl_ruleset_o_opentag(uint32_t type)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_JSON:
-		return "{\"nftables\":[";
-	case NFTNL_OUTPUT_XML:
-	default:
-		return "";
-	}
-}
-
-static const char *nftnl_ruleset_o_separator(void *obj, uint32_t type)
-{
-	if (obj == NULL)
-		return "";
-
-	switch (type) {
-	case NFTNL_OUTPUT_JSON:
-		return ",";
-	case NFTNL_OUTPUT_DEFAULT:
-		return "\n";
-	default:
-		return "";
-	}
-}
-
-static const char *nftnl_ruleset_o_closetag(uint32_t type)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_JSON:
-		return "]}";
-	case NFTNL_OUTPUT_XML:
-	default:
-		return "";
-	}
-}
-
 static int
 nftnl_ruleset_snprintf_table(char *buf, size_t remain,
 			   const struct nftnl_ruleset *rs, uint32_t type,
@@ -349,6 +312,7 @@ nftnl_ruleset_snprintf_table(char *buf, size_t remain,
 {
 	struct nftnl_table *t;
 	struct nftnl_table_list_iter *ti;
+	const char *sep = "";
 	int ret, offset = 0;
 
 	ti = nftnl_table_list_iter_create(rs->table_list);
@@ -357,14 +321,14 @@ nftnl_ruleset_snprintf_table(char *buf, size_t remain,
 
 	t = nftnl_table_list_iter_next(ti);
 	while (t != NULL) {
+		ret = snprintf(buf + offset, remain, "%s", sep);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+
 		ret = nftnl_table_snprintf(buf + offset, remain, t, type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		t = nftnl_table_list_iter_next(ti);
-
-		ret = snprintf(buf + offset, remain, "%s",
-			       nftnl_ruleset_o_separator(t, type));
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+		sep = "\n";
 	}
 	nftnl_table_list_iter_destroy(ti);
 
@@ -378,6 +342,7 @@ nftnl_ruleset_snprintf_chain(char *buf, size_t remain,
 {
 	struct nftnl_chain *c;
 	struct nftnl_chain_list_iter *ci;
+	const char *sep = "";
 	int ret, offset = 0;
 
 	ci = nftnl_chain_list_iter_create(rs->chain_list);
@@ -386,14 +351,14 @@ nftnl_ruleset_snprintf_chain(char *buf, size_t remain,
 
 	c = nftnl_chain_list_iter_next(ci);
 	while (c != NULL) {
+		ret = snprintf(buf + offset, remain, "%s", sep);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+
 		ret = nftnl_chain_snprintf(buf + offset, remain, c, type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		c = nftnl_chain_list_iter_next(ci);
-
-		ret = snprintf(buf + offset, remain, "%s",
-			       nftnl_ruleset_o_separator(c, type));
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+		sep = "\n";
 	}
 	nftnl_chain_list_iter_destroy(ci);
 
@@ -407,6 +372,7 @@ nftnl_ruleset_snprintf_set(char *buf, size_t remain,
 {
 	struct nftnl_set *s;
 	struct nftnl_set_list_iter *si;
+	const char *sep = "";
 	int ret, offset = 0;
 
 	si = nftnl_set_list_iter_create(rs->set_list);
@@ -415,14 +381,14 @@ nftnl_ruleset_snprintf_set(char *buf, size_t remain,
 
 	s = nftnl_set_list_iter_next(si);
 	while (s != NULL) {
+		ret = snprintf(buf + offset, remain, "%s", sep);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+
 		ret = nftnl_set_snprintf(buf + offset, remain, s, type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		s = nftnl_set_list_iter_next(si);
-
-		ret = snprintf(buf + offset, remain, "%s",
-			       nftnl_ruleset_o_separator(s, type));
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+		sep = "\n";
 	}
 	nftnl_set_list_iter_destroy(si);
 
@@ -436,6 +402,7 @@ nftnl_ruleset_snprintf_rule(char *buf, size_t remain,
 {
 	struct nftnl_rule *r;
 	struct nftnl_rule_list_iter *ri;
+	const char *sep = "";
 	int ret, offset = 0;
 
 	ri = nftnl_rule_list_iter_create(rs->rule_list);
@@ -444,14 +411,14 @@ nftnl_ruleset_snprintf_rule(char *buf, size_t remain,
 
 	r = nftnl_rule_list_iter_next(ri);
 	while (r != NULL) {
+		ret = snprintf(buf + offset, remain, "%s", sep);
+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+
 		ret = nftnl_rule_snprintf(buf + offset, remain, r, type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		r = nftnl_rule_list_iter_next(ri);
-
-		ret = snprintf(buf + offset, remain, "%s",
-			       nftnl_ruleset_o_separator(r, type));
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+		sep = "\n";
 	}
 	nftnl_rule_list_iter_destroy(ri);
 
@@ -464,8 +431,8 @@ nftnl_ruleset_do_snprintf(char *buf, size_t remain,
 			  uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	uint32_t inner_flags = flags;
+	const char *sep = "";
 	int ret, offset = 0;
-	void *prev = NULL;
 
 	/* dont pass events flags to child calls of _snprintf() */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
@@ -477,13 +444,12 @@ nftnl_ruleset_do_snprintf(char *buf, size_t remain,
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		if (ret > 0)
-			prev = rs->table_list;
+			sep = "\n";
 	}
 
 	if (nftnl_ruleset_is_set(rs, NFTNL_RULESET_CHAINLIST) &&
 	    (!nftnl_chain_list_is_empty(rs->chain_list))) {
-		ret = snprintf(buf + offset, remain, "%s",
-			       nftnl_ruleset_o_separator(prev, type));
+		ret = snprintf(buf + offset, remain, "%s", sep);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		ret = nftnl_ruleset_snprintf_chain(buf + offset, remain, rs,
@@ -491,13 +457,12 @@ nftnl_ruleset_do_snprintf(char *buf, size_t remain,
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		if (ret > 0)
-			prev = rs->chain_list;
+			sep = "\n";
 	}
 
 	if (nftnl_ruleset_is_set(rs, NFTNL_RULESET_SETLIST) &&
 	    (!nftnl_set_list_is_empty(rs->set_list))) {
-		ret = snprintf(buf + offset, remain, "%s",
-			       nftnl_ruleset_o_separator(prev, type));
+		ret = snprintf(buf + offset, remain, "%s", sep);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		ret = nftnl_ruleset_snprintf_set(buf + offset, remain, rs,
@@ -505,13 +470,12 @@ nftnl_ruleset_do_snprintf(char *buf, size_t remain,
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		if (ret > 0)
-			prev = rs->set_list;
+			sep = "\n";
 	}
 
 	if (nftnl_ruleset_is_set(rs, NFTNL_RULESET_RULELIST) &&
 	    (!nftnl_rule_list_is_empty(rs->rule_list))) {
-		ret = snprintf(buf + offset, remain, "%s",
-			       nftnl_ruleset_o_separator(prev, type));
+		ret = snprintf(buf + offset, remain, "%s", sep);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		ret = nftnl_ruleset_snprintf_rule(buf + offset, remain, rs,
@@ -543,6 +507,7 @@ static int nftnl_ruleset_fprintf_tables(FILE *fp, const struct nftnl_ruleset *rs
 	int len = 0, ret = 0;
 	struct nftnl_table *t;
 	struct nftnl_table_list_iter *ti;
+	const char *sep = "";
 
 	ti = nftnl_table_list_iter_create(rs->table_list);
 	if (ti == NULL)
@@ -550,6 +515,12 @@ static int nftnl_ruleset_fprintf_tables(FILE *fp, const struct nftnl_ruleset *rs
 
 	t = nftnl_table_list_iter_next(ti);
 	while (t != NULL) {
+		ret = fprintf(fp, "%s", sep);
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+
 		ret = nftnl_table_fprintf(fp, t, type, flags);
 		if (ret < 0)
 			goto err;
@@ -557,12 +528,8 @@ static int nftnl_ruleset_fprintf_tables(FILE *fp, const struct nftnl_ruleset *rs
 		len += ret;
 
 		t = nftnl_table_list_iter_next(ti);
+		sep = "\n";
 
-		ret = fprintf(fp, "%s", nftnl_ruleset_o_separator(t, type));
-		if (ret < 0)
-			goto err;
-
-		len += ret;
 	}
 	nftnl_table_list_iter_destroy(ti);
 
@@ -578,6 +545,7 @@ static int nftnl_ruleset_fprintf_chains(FILE *fp, const struct nftnl_ruleset *rs
 	int len = 0, ret = 0;
 	struct nftnl_chain *o;
 	struct nftnl_chain_list_iter *i;
+	const char *sep = "";
 
 	i = nftnl_chain_list_iter_create(rs->chain_list);
 	if (i == NULL)
@@ -585,6 +553,12 @@ static int nftnl_ruleset_fprintf_chains(FILE *fp, const struct nftnl_ruleset *rs
 
 	o = nftnl_chain_list_iter_next(i);
 	while (o != NULL) {
+		ret = fprintf(fp, "%s", sep);
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+
 		ret = nftnl_chain_fprintf(fp, o, type, flags);
 		if (ret < 0)
 			goto err;
@@ -592,12 +566,7 @@ static int nftnl_ruleset_fprintf_chains(FILE *fp, const struct nftnl_ruleset *rs
 		len += ret;
 
 		o = nftnl_chain_list_iter_next(i);
-
-		ret = fprintf(fp, "%s", nftnl_ruleset_o_separator(o, type));
-		if (ret < 0)
-			goto err;
-
-		len += ret;
+		sep = "\n";
 	}
 	nftnl_chain_list_iter_destroy(i);
 
@@ -613,6 +582,7 @@ static int nftnl_ruleset_fprintf_sets(FILE *fp, const struct nftnl_ruleset *rs,
 	int len = 0, ret = 0;
 	struct nftnl_set *o;
 	struct nftnl_set_list_iter *i;
+	const char *sep = "";
 
 	i = nftnl_set_list_iter_create(rs->set_list);
 	if (i == NULL)
@@ -620,6 +590,12 @@ static int nftnl_ruleset_fprintf_sets(FILE *fp, const struct nftnl_ruleset *rs,
 
 	o = nftnl_set_list_iter_next(i);
 	while (o != NULL) {
+		ret = fprintf(fp, "%s", sep);
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+
 		ret = nftnl_set_fprintf(fp, o, type, flags);
 		if (ret < 0)
 			goto err;
@@ -627,12 +603,7 @@ static int nftnl_ruleset_fprintf_sets(FILE *fp, const struct nftnl_ruleset *rs,
 		len += ret;
 
 		o = nftnl_set_list_iter_next(i);
-
-		ret = fprintf(fp, "%s", nftnl_ruleset_o_separator(o, type));
-		if (ret < 0)
-			goto err;
-
-		len += ret;
+		sep = "\n";
 	}
 	nftnl_set_list_iter_destroy(i);
 
@@ -648,6 +619,7 @@ static int nftnl_ruleset_fprintf_rules(FILE *fp, const struct nftnl_ruleset *rs,
 	int len = 0, ret = 0;
 	struct nftnl_rule *o;
 	struct nftnl_rule_list_iter *i;
+	const char *sep = "";
 
 	i = nftnl_rule_list_iter_create(rs->rule_list);
 	if (i == NULL)
@@ -655,6 +627,12 @@ static int nftnl_ruleset_fprintf_rules(FILE *fp, const struct nftnl_ruleset *rs,
 
 	o = nftnl_rule_list_iter_next(i);
 	while (o != NULL) {
+		ret = fprintf(fp, "%s", sep);
+		if (ret < 0)
+			goto err;
+
+		len += ret;
+
 		ret = nftnl_rule_fprintf(fp, o, type, flags);
 		if (ret < 0)
 			goto err;
@@ -662,12 +640,7 @@ static int nftnl_ruleset_fprintf_rules(FILE *fp, const struct nftnl_ruleset *rs,
 		len += ret;
 
 		o = nftnl_rule_list_iter_next(i);
-
-		ret = fprintf(fp, "%s", nftnl_ruleset_o_separator(o, type));
-		if (ret < 0)
-			goto err;
-
-		len += ret;
+		sep = "\n";
 	}
 	nftnl_rule_list_iter_destroy(i);
 
@@ -686,14 +659,11 @@ static int nftnl_ruleset_cmd_fprintf(FILE *fp, const struct nftnl_ruleset *rs,
 				   uint32_t cmd, uint32_t type, uint32_t flags)
 {
 	int len = 0, ret = 0;
-	void *prev = NULL;
 	uint32_t inner_flags = flags;
+	const char *sep = "";
 
 	/* dont pass events flags to child calls of _snprintf() */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
-
-	ret = fprintf(fp, "%s", nftnl_ruleset_o_opentag(type));
-	NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 	if ((nftnl_ruleset_is_set(rs, NFTNL_RULESET_TABLELIST)) &&
 	    (!nftnl_table_list_is_empty(rs->table_list))) {
@@ -701,44 +671,41 @@ static int nftnl_ruleset_cmd_fprintf(FILE *fp, const struct nftnl_ruleset *rs,
 		NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		if (ret > 0)
-			prev = rs->table_list;
+			sep = "\n";
 	}
 
 	if ((nftnl_ruleset_is_set(rs, NFTNL_RULESET_CHAINLIST)) &&
 	    (!nftnl_chain_list_is_empty(rs->chain_list))) {
-		ret = fprintf(fp, "%s", nftnl_ruleset_o_separator(prev, type));
+		ret = fprintf(fp, "%s", sep);
 		NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		ret = nftnl_ruleset_fprintf_chains(fp, rs, type, inner_flags);
 		NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		if (ret > 0)
-			prev = rs->chain_list;
+			sep = "\n";
 	}
 
 	if ((nftnl_ruleset_is_set(rs, NFTNL_RULESET_SETLIST)) &&
 	    (!nftnl_set_list_is_empty(rs->set_list))) {
-		ret = fprintf(fp, "%s", nftnl_ruleset_o_separator(prev, type));
+		ret = fprintf(fp, "%s", sep);
 		NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		ret = nftnl_ruleset_fprintf_sets(fp, rs, type, inner_flags);
 		NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		if (ret > 0)
-			prev = rs->set_list;
+			sep = "\n";
 	}
 
 	if ((nftnl_ruleset_is_set(rs, NFTNL_RULESET_RULELIST)) &&
 	    (!nftnl_rule_list_is_empty(rs->rule_list))) {
-		ret = fprintf(fp, "%s", nftnl_ruleset_o_separator(prev, type));
+		ret = fprintf(fp, "%s", sep);
 		NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 		ret = nftnl_ruleset_fprintf_rules(fp, rs, type, inner_flags);
 		NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 	}
-
-	ret = fprintf(fp, "%s", nftnl_ruleset_o_closetag(type));
-	NFTNL_FPRINTF_RETURN_OR_FIXLEN(ret, len);
 
 	return len;
 }
