@@ -396,8 +396,7 @@ static int nftnl_obj_snprintf_dflt(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (obj->ops) {
-		ret = obj->ops->snprintf(buf + offset, remain, type, flags,
-					 obj);
+		ret = obj->ops->snprintf(buf + offset, remain, flags, obj);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	ret = snprintf(buf + offset, remain, "]");

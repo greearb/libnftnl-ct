@@ -131,30 +131,14 @@ nftnl_obj_ct_helper_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_obj_ct_helper_snprintf_default(char *buf, size_t len,
-					       const struct nftnl_obj *e)
+static int nftnl_obj_ct_helper_snprintf(char *buf, size_t len,
+				       uint32_t flags,
+				       const struct nftnl_obj *e)
 {
 	struct nftnl_obj_ct_helper *helper = nftnl_obj_data(e);
 
 	return snprintf(buf, len, "name %s family %d protocol %d ",
 			helper->name, helper->l3proto, helper->l4proto);
-}
-
-static int nftnl_obj_ct_helper_snprintf(char *buf, size_t len, uint32_t type,
-				       uint32_t flags,
-				       const struct nftnl_obj *e)
-{
-	if (len)
-		buf[0] = '\0';
-
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_obj_ct_helper_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct obj_ops obj_ops_ct_helper = {

@@ -257,8 +257,9 @@ nftnl_obj_ct_timeout_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_obj_ct_timeout_snprintf_default(char *buf, size_t len,
-					       const struct nftnl_obj *e)
+static int nftnl_obj_ct_timeout_snprintf(char *buf, size_t len,
+				       uint32_t flags,
+				       const struct nftnl_obj *e)
 {
 	int ret = 0;
 	int offset = 0, remain = len;
@@ -305,23 +306,6 @@ static int nftnl_obj_ct_timeout_snprintf_default(char *buf, size_t len,
 	buf[offset] = '\0';
 
 	return offset;
-}
-
-static int nftnl_obj_ct_timeout_snprintf(char *buf, size_t len, uint32_t type,
-				       uint32_t flags,
-				       const struct nftnl_obj *e)
-{
-	if (len)
-		buf[0] = '\0';
-
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_obj_ct_timeout_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct obj_ops obj_ops_ct_timeout = {

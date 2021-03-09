@@ -148,32 +148,15 @@ static int nftnl_obj_limit_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_obj_limit_snprintf_default(char *buf, size_t len,
-					    const struct nftnl_obj *e)
+static int nftnl_obj_limit_snprintf(char *buf, size_t len,
+				    uint32_t flags,
+				    const struct nftnl_obj *e)
 {
 	struct nftnl_obj_limit *limit = nftnl_obj_data(e);
 
 	return snprintf(buf, len, "rate %"PRIu64" unit %"PRIu64" burst %u "
 			"type %u flags %u ", limit->rate, limit->unit,
 			limit->burst, limit->type, limit->flags);
-}
-
-static int nftnl_obj_limit_snprintf(char *buf, size_t len, uint32_t type,
-				    uint32_t flags,
-				    const struct nftnl_obj *e)
-{
-	if (len)
-		buf[0] = '\0';
-
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_obj_limit_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct obj_ops obj_ops_limit = {
