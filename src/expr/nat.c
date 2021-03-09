@@ -221,11 +221,11 @@ static inline int nftnl_str2nat(const char *nat)
 }
 
 static int
-nftnl_expr_nat_snprintf(char *buf, size_t size,
+nftnl_expr_nat_snprintf(char *buf, size_t remain,
 			uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_nat *nat = nftnl_expr_data(e);
-	int remain = size, offset = 0, ret = 0;
+	int offset = 0, ret = 0;
 
 	ret = snprintf(buf, remain, "%s ", nat2str(nat->type));
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);

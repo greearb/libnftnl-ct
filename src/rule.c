@@ -545,12 +545,12 @@ int nftnl_rule_parse_file(struct nftnl_rule *r, enum nftnl_parse_type type,
 	return nftnl_rule_do_parse(r, type, fp, err, NFTNL_PARSE_FILE);
 }
 
-static int nftnl_rule_snprintf_default(char *buf, size_t size,
+static int nftnl_rule_snprintf_default(char *buf, size_t remain,
 				       const struct nftnl_rule *r,
 				       uint32_t type, uint32_t flags)
 {
 	struct nftnl_expr *expr;
-	int ret, remain = size, offset = 0, i;
+	int ret, offset = 0, i;
 	const char *sep = "";
 
 	if (r->flags & (1 << NFTNL_RULE_FAMILY)) {
@@ -635,12 +635,12 @@ static int nftnl_rule_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_rule_cmd_snprintf(char *buf, size_t size,
+static int nftnl_rule_cmd_snprintf(char *buf, size_t remain,
 				   const struct nftnl_rule *r, uint32_t cmd,
 				   uint32_t type, uint32_t flags)
 {
-	int ret, remain = size, offset = 0;
 	uint32_t inner_flags = flags;
+	int ret, offset = 0;
 
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 

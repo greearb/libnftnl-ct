@@ -184,11 +184,11 @@ static inline int nftnl_str2range(const char *op)
 	}
 }
 
-static int nftnl_expr_range_snprintf(char *buf, size_t size,
+static int nftnl_expr_range_snprintf(char *buf, size_t remain,
 				     uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_range *range = nftnl_expr_data(e);
-	int remain = size, offset = 0, ret;
+	int offset = 0, ret;
 
 	ret = snprintf(buf, remain, "%s reg %u ",
 		       range2str(range->op), range->sreg);

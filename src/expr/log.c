@@ -187,11 +187,11 @@ nftnl_expr_log_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_log_snprintf(char *buf, size_t size,
+nftnl_expr_log_snprintf(char *buf, size_t remain,
 			uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_log *log = nftnl_expr_data(e);
-	int ret, offset = 0, remain = size;
+	int ret, offset = 0;
 
 	if (e->flags & (1 << NFTNL_EXPR_LOG_PREFIX)) {
 		ret = snprintf(buf, remain, "prefix %s ", log->prefix);

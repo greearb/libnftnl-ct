@@ -25,12 +25,12 @@
 #include "internal.h"
 
 static int
-nftnl_data_reg_value_snprintf_default(char *buf, size_t size,
+nftnl_data_reg_value_snprintf_default(char *buf, size_t remain,
 				      const union nftnl_data_reg *reg,
 				      uint32_t flags)
 {
 	const char *pfx = flags & DATA_F_NOPFX ? "" : "0x";
-	int remain = size, offset = 0, ret, i;
+	int offset = 0, ret, i;
 
 
 

@@ -128,11 +128,11 @@ nftnl_expr_synproxy_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_synproxy_snprintf(char *buf, size_t size,
+nftnl_expr_synproxy_snprintf(char *buf, size_t len,
 			     uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_synproxy *synproxy = nftnl_expr_data(e);
-	int ret, offset = 0, len = size;
+	int ret, offset = 0;
 
 	if (e->flags & (1 << NFTNL_EXPR_SYNPROXY_MSS) &&
 	    e->flags & (1 << NFTNL_EXPR_SYNPROXY_WSCALE)) {

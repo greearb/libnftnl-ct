@@ -92,11 +92,11 @@ static int nftnl_expr_flow_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static int nftnl_expr_flow_snprintf(char *buf, size_t size,
+static int nftnl_expr_flow_snprintf(char *buf, size_t remain,
 				    uint32_t flags, const struct nftnl_expr *e)
 {
-	int remain = size, offset = 0, ret;
 	struct nftnl_expr_flow *l = nftnl_expr_data(e);
+	int offset = 0, ret;
 
 	ret = snprintf(buf, remain, "flowtable %s ", l->table_name);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);

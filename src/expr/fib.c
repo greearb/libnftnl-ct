@@ -143,13 +143,13 @@ static const char *fib_type_str(enum nft_fib_result r)
 }
 
 static int
-nftnl_expr_fib_snprintf(char *buf, size_t size,
+nftnl_expr_fib_snprintf(char *buf, size_t remain,
 			 uint32_t printflags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_fib *fib = nftnl_expr_data(e);
-	int remain = size, offset = 0, ret, i;
 	uint32_t flags = fib->flags & ~NFTA_FIB_F_PRESENT;
 	uint32_t present_flag = fib->flags & NFTA_FIB_F_PRESENT;
+	int offset = 0, ret, i;
 	static const struct {
 		int bit;
 		const char *name;

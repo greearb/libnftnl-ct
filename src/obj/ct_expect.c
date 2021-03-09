@@ -151,13 +151,12 @@ nftnl_obj_ct_expect_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_obj_ct_expect_snprintf(char *buf, size_t len,
+static int nftnl_obj_ct_expect_snprintf(char *buf, size_t remain,
 					uint32_t flags,
 					const struct nftnl_obj *e)
 {
-	int ret = 0;
-	int offset = 0, remain = len;
 	struct nftnl_obj_ct_expect *exp = nftnl_obj_data(e);
+	int ret = 0, offset = 0;
 
 	if (e->flags & (1 << NFTNL_OBJ_CT_EXPECT_L3PROTO)) {
 		ret = snprintf(buf + offset, remain,

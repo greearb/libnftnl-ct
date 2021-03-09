@@ -308,12 +308,12 @@ static const char *op2str(enum nft_dynset_ops op)
 }
 
 static int
-nftnl_expr_dynset_snprintf(char *buf, size_t size,
+nftnl_expr_dynset_snprintf(char *buf, size_t remain,
 			   uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
 	struct nftnl_expr *expr;
-	int remain = size, offset = 0, ret;
+	int offset = 0, ret;
 
 	ret = snprintf(buf, remain, "%s reg_key %u set %s ",
 		       op2str(dynset->op), dynset->sreg_key, dynset->set_name);

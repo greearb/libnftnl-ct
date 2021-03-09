@@ -177,11 +177,11 @@ static inline int nftnl_str2cmp(const char *op)
 }
 
 static int
-nftnl_expr_cmp_snprintf(char *buf, size_t size,
+nftnl_expr_cmp_snprintf(char *buf, size_t remain,
 			uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_cmp *cmp = nftnl_expr_data(e);
-	int remain = size, offset = 0, ret;
+	int offset = 0, ret;
 
 	ret = snprintf(buf, remain, "%s reg %u ",
 		       cmp2str(cmp->op), cmp->sreg);

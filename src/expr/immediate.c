@@ -184,11 +184,11 @@ nftnl_expr_immediate_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_immediate_snprintf(char *buf, size_t len,
+nftnl_expr_immediate_snprintf(char *buf, size_t remain,
 			      uint32_t flags, const struct nftnl_expr *e)
 {
-	int remain = len, offset = 0, ret;
 	struct nftnl_expr_immediate *imm = nftnl_expr_data(e);
+	int offset = 0, ret;
 
 	ret = snprintf(buf, remain, "reg %u ", imm->dreg);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);

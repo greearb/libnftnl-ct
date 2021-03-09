@@ -210,10 +210,10 @@ nftnl_expr_bitwise_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_bitwise_snprintf_bool(char *buf, size_t size,
+nftnl_expr_bitwise_snprintf_bool(char *buf, size_t remain,
 				 const struct nftnl_expr_bitwise *bitwise)
 {
-	int remain = size, offset = 0, ret;
+	int offset = 0, ret;
 
 	ret = snprintf(buf, remain, "reg %u = ( reg %u & ",
 		       bitwise->dreg, bitwise->sreg);
@@ -234,9 +234,9 @@ nftnl_expr_bitwise_snprintf_bool(char *buf, size_t size,
 }
 
 static int
-nftnl_expr_bitwise_snprintf_shift(char *buf, size_t size, const char *op,
+nftnl_expr_bitwise_snprintf_shift(char *buf, size_t remain, const char *op,
 				  const struct nftnl_expr_bitwise *bitwise)
-{	int remain = size, offset = 0, ret;
+{	int offset = 0, ret;
 
 	ret = snprintf(buf, remain, "reg %u = ( reg %u %s ",
 		       bitwise->dreg, bitwise->sreg, op);

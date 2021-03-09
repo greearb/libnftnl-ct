@@ -131,11 +131,11 @@ nftnl_expr_masq_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_expr_masq_snprintf(char *buf, size_t len,
+static int nftnl_expr_masq_snprintf(char *buf, size_t remain,
 				    uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_masq *masq = nftnl_expr_data(e);
-	int remain = len, offset = 0, ret = 0;
+	int offset = 0, ret = 0;
 
 	if (e->flags & (1 << NFTNL_EXPR_MASQ_REG_PROTO_MIN)) {
 		ret = snprintf(buf + offset, remain, "proto_min reg %u ",

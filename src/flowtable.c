@@ -591,10 +591,10 @@ int nftnl_flowtable_parse_file(struct nftnl_flowtable *c,
 	return -1;
 }
 
-static int nftnl_flowtable_snprintf_default(char *buf, size_t size,
+static int nftnl_flowtable_snprintf_default(char *buf, size_t remain,
 					    const struct nftnl_flowtable *c)
 {
-	int ret, remain = size, offset = 0, i;
+	int ret, offset = 0, i;
 
 	ret = snprintf(buf, remain, "flow table %s %s use %u size %u flags %x",
 		       c->table, c->name, c->use, c->size, c->ft_flags);
@@ -623,12 +623,12 @@ static int nftnl_flowtable_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_flowtable_cmd_snprintf(char *buf, size_t size,
+static int nftnl_flowtable_cmd_snprintf(char *buf, size_t remain,
 					const struct nftnl_flowtable *c,
 					uint32_t cmd, uint32_t type,
 					uint32_t flags)
 {
-	int ret, remain = size, offset = 0;
+	int ret, offset = 0;
 
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:

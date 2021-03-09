@@ -784,13 +784,12 @@ int nftnl_set_parse_file(struct nftnl_set *s, enum nftnl_parse_type type,
 	return nftnl_set_do_parse(s, type, fp, err, NFTNL_PARSE_FILE);
 }
 
-static int nftnl_set_snprintf_default(char *buf, size_t size,
+static int nftnl_set_snprintf_default(char *buf, size_t remain,
 				      const struct nftnl_set *s,
 				      uint32_t type, uint32_t flags)
 {
-	int ret;
-	int remain = size, offset = 0;
 	struct nftnl_set_elem *elem;
+	int ret, offset = 0;
 
 	ret = snprintf(buf, remain, "%s %s %x",
 			s->name, s->table, s->set_flags);
@@ -837,12 +836,12 @@ static int nftnl_set_snprintf_default(char *buf, size_t size,
 	return offset;
 }
 
-static int nftnl_set_cmd_snprintf(char *buf, size_t size,
+static int nftnl_set_cmd_snprintf(char *buf, size_t remain,
 				  const struct nftnl_set *s, uint32_t cmd,
 				  uint32_t type, uint32_t flags)
 {
-	int ret, remain = size, offset = 0;
 	uint32_t inner_flags = flags;
+	int ret, offset = 0;
 
 	if (type == NFTNL_OUTPUT_XML)
 		return 0;

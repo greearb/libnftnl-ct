@@ -172,11 +172,11 @@ static const char *xfrmdir2str(uint8_t dir)
 }
 
 static int
-nftnl_expr_xfrm_snprintf(char *buf, size_t size,
+nftnl_expr_xfrm_snprintf(char *buf, size_t remain,
 			 uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_xfrm *x = nftnl_expr_data(e);
-	int ret, remain = size, offset = 0;
+	int ret, offset = 0;
 
 	if (e->flags & (1 << NFTNL_EXPR_XFRM_DREG)) {
 		ret = snprintf(buf, remain, "load %s %u %s => reg %u ",

@@ -144,12 +144,12 @@ nftnl_expr_queue_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_queue_snprintf(char *buf, size_t len,
+nftnl_expr_queue_snprintf(char *buf, size_t remain,
 			  uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
-	int ret, remain = len, offset = 0;
 	uint16_t total_queues;
+	int ret, offset = 0;
 
 	if (e->flags & (1 << NFTNL_EXPR_QUEUE_NUM)) {
 		total_queues = queue->queuenum + queue->queues_total - 1;

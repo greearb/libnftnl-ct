@@ -343,13 +343,13 @@ static const char *nftnl_ruleset_o_closetag(uint32_t type)
 }
 
 static int
-nftnl_ruleset_snprintf_table(char *buf, size_t size,
+nftnl_ruleset_snprintf_table(char *buf, size_t remain,
 			   const struct nftnl_ruleset *rs, uint32_t type,
 			   uint32_t flags)
 {
 	struct nftnl_table *t;
 	struct nftnl_table_list_iter *ti;
-	int ret, remain = size, offset = 0;
+	int ret, offset = 0;
 
 	ti = nftnl_table_list_iter_create(rs->table_list);
 	if (ti == NULL)
@@ -372,13 +372,13 @@ nftnl_ruleset_snprintf_table(char *buf, size_t size,
 }
 
 static int
-nftnl_ruleset_snprintf_chain(char *buf, size_t size,
+nftnl_ruleset_snprintf_chain(char *buf, size_t remain,
 			   const struct nftnl_ruleset *rs, uint32_t type,
 			   uint32_t flags)
 {
 	struct nftnl_chain *c;
 	struct nftnl_chain_list_iter *ci;
-	int ret, remain = size, offset = 0;
+	int ret, offset = 0;
 
 	ci = nftnl_chain_list_iter_create(rs->chain_list);
 	if (ci == NULL)
@@ -401,13 +401,13 @@ nftnl_ruleset_snprintf_chain(char *buf, size_t size,
 }
 
 static int
-nftnl_ruleset_snprintf_set(char *buf, size_t size,
+nftnl_ruleset_snprintf_set(char *buf, size_t remain,
 			 const struct nftnl_ruleset *rs, uint32_t type,
 			 uint32_t flags)
 {
 	struct nftnl_set *s;
 	struct nftnl_set_list_iter *si;
-	int ret, remain = size, offset = 0;
+	int ret, offset = 0;
 
 	si = nftnl_set_list_iter_create(rs->set_list);
 	if (si == NULL)
@@ -430,13 +430,13 @@ nftnl_ruleset_snprintf_set(char *buf, size_t size,
 }
 
 static int
-nftnl_ruleset_snprintf_rule(char *buf, size_t size,
+nftnl_ruleset_snprintf_rule(char *buf, size_t remain,
 			  const struct nftnl_ruleset *rs, uint32_t type,
 			  uint32_t flags)
 {
 	struct nftnl_rule *r;
 	struct nftnl_rule_list_iter *ri;
-	int ret, remain = size, offset = 0;
+	int ret, offset = 0;
 
 	ri = nftnl_rule_list_iter_create(rs->rule_list);
 	if (ri == NULL)
@@ -459,12 +459,13 @@ nftnl_ruleset_snprintf_rule(char *buf, size_t size,
 }
 
 static int
-nftnl_ruleset_do_snprintf(char *buf, size_t size, const struct nftnl_ruleset *rs,
-			uint32_t cmd, uint32_t type, uint32_t flags)
+nftnl_ruleset_do_snprintf(char *buf, size_t remain,
+			  const struct nftnl_ruleset *rs,
+			  uint32_t cmd, uint32_t type, uint32_t flags)
 {
-	int ret, remain = size, offset = 0;
-	void *prev = NULL;
 	uint32_t inner_flags = flags;
+	int ret, offset = 0;
+	void *prev = NULL;
 
 	/* dont pass events flags to child calls of _snprintf() */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;

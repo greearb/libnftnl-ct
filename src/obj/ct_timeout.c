@@ -257,12 +257,11 @@ nftnl_obj_ct_timeout_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_obj_ct_timeout_snprintf(char *buf, size_t len,
+static int nftnl_obj_ct_timeout_snprintf(char *buf, size_t remain,
 				       uint32_t flags,
 				       const struct nftnl_obj *e)
 {
-	int ret = 0;
-	int offset = 0, remain = len;
+	int ret = 0, offset = 0;
 
 	struct nftnl_obj_ct_timeout *timeout = nftnl_obj_data(e);
 

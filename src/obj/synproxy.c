@@ -117,12 +117,12 @@ static int nftnl_obj_synproxy_parse(struct nftnl_obj *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_obj_synproxy_snprintf(char *buf, size_t size,
+static int nftnl_obj_synproxy_snprintf(char *buf, size_t len,
 				    uint32_t flags,
 				    const struct nftnl_obj *e)
 {
 	struct nftnl_obj_synproxy *synproxy = nftnl_obj_data(e);
-        int ret, offset = 0, len = size;
+        int ret, offset = 0;
 
         if (e->flags & (1 << NFTNL_OBJ_SYNPROXY_MSS) &&
             e->flags & (1 << NFTNL_OBJ_SYNPROXY_WSCALE)) {

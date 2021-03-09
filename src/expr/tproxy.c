@@ -135,11 +135,11 @@ nftnl_expr_tproxy_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 }
 
 static int
-nftnl_expr_tproxy_snprintf(char *buf, size_t size,
+nftnl_expr_tproxy_snprintf(char *buf, size_t remain,
 			uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_tproxy *tproxy = nftnl_expr_data(e);
-	int remain = size, offset = 0, ret = 0;
+	int offset = 0, ret = 0;
 
 	if (tproxy->family != NFTA_TPROXY_UNSPEC) {
 		ret = snprintf(buf + offset, remain, "%s ",

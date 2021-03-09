@@ -184,11 +184,11 @@ nftnl_expr_hash_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_hash_snprintf(char *buf, size_t size,
+nftnl_expr_hash_snprintf(char *buf, size_t remain,
 			 uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_hash *hash = nftnl_expr_data(e);
-	int remain = size, offset = 0, ret;
+	int offset = 0, ret;
 
 	switch (hash->type) {
 	case NFT_HASH_SYM:

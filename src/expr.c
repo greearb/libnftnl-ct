@@ -270,13 +270,13 @@ err1:
 }
 
 EXPORT_SYMBOL(nftnl_expr_snprintf);
-int nftnl_expr_snprintf(char *buf, size_t size, const struct nftnl_expr *expr,
+int nftnl_expr_snprintf(char *buf, size_t remain, const struct nftnl_expr *expr,
 			uint32_t type, uint32_t flags)
 {
 	int ret;
-	unsigned int offset = 0, remain = size;
+	unsigned int offset = 0;
 
-	if (size)
+	if (remain)
 		buf[0] = '\0';
 
 	if (!expr->ops->snprintf || type != NFTNL_OUTPUT_DEFAULT)

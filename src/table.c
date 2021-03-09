@@ -367,11 +367,11 @@ static int nftnl_table_snprintf_default(char *buf, size_t size,
 			t->table_flags, t->use, (unsigned long long)t->handle);
 }
 
-static int nftnl_table_cmd_snprintf(char *buf, size_t size,
+static int nftnl_table_cmd_snprintf(char *buf, size_t remain,
 				    const struct nftnl_table *t, uint32_t cmd,
 				    uint32_t type, uint32_t flags)
 {
-	int ret, remain = size, offset = 0;
+	int ret, offset = 0;
 
 	switch (type) {
 	case NFTNL_OUTPUT_DEFAULT:

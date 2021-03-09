@@ -156,15 +156,15 @@ int nftnl_gen_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_gen *gen)
 	return 0;
 }
 
-static int nftnl_gen_cmd_snprintf(char *buf, size_t size,
+static int nftnl_gen_cmd_snprintf(char *buf, size_t remain,
 				  const struct nftnl_gen *gen, uint32_t cmd,
 				  uint32_t type, uint32_t flags)
 {
-	int ret, remain = size, offset = 0;
+	int ret, offset = 0;
 
 	switch(type) {
 	case NFTNL_OUTPUT_DEFAULT:
-		ret = snprintf(buf, size, "ruleset generation ID %u", gen->id);
+		ret = snprintf(buf, remain, "ruleset generation ID %u", gen->id);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		break;
 	default:

@@ -132,10 +132,10 @@ nftnl_expr_redir_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_redir_snprintf(char *buf, size_t len,
+nftnl_expr_redir_snprintf(char *buf, size_t remain,
 			  uint32_t flags, const struct nftnl_expr *e)
 {
-	int ret, remain = len, offset = 0;
+	int ret, offset = 0;
 	struct nftnl_expr_redir *redir = nftnl_expr_data(e);
 
 	if (nftnl_expr_is_set(e, NFTNL_EXPR_REDIR_REG_PROTO_MIN)) {

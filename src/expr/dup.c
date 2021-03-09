@@ -111,11 +111,11 @@ static int nftnl_expr_dup_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return ret;
 }
 
-static int nftnl_expr_dup_snprintf(char *buf, size_t len,
+static int nftnl_expr_dup_snprintf(char *buf, size_t remain,
 				   uint32_t flags, const struct nftnl_expr *e)
 {
-	int remain = len, offset = 0, ret;
 	struct nftnl_expr_dup *dup = nftnl_expr_data(e);
+	int offset = 0, ret;
 
 	if (e->flags & (1 << NFTNL_EXPR_DUP_SREG_ADDR)) {
 		ret = snprintf(buf + offset, remain, "sreg_addr %u ", dup->sreg_addr);
