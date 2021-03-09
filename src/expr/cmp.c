@@ -176,8 +176,9 @@ static inline int nftnl_str2cmp(const char *op)
 	}
 }
 
-static int nftnl_expr_cmp_snprintf_default(char *buf, size_t size,
-					   const struct nftnl_expr *e)
+static int
+nftnl_expr_cmp_snprintf(char *buf, size_t size,
+			uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_cmp *cmp = nftnl_expr_data(e);
 	int remain = size, offset = 0, ret;
@@ -191,21 +192,6 @@ static int nftnl_expr_cmp_snprintf_default(char *buf, size_t size,
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;
-}
-
-static int
-nftnl_expr_cmp_snprintf(char *buf, size_t size, uint32_t type,
-			uint32_t flags, const struct nftnl_expr *e)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_cmp_snprintf_default(buf, size, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_cmp = {

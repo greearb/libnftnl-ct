@@ -192,8 +192,8 @@ static inline int str2meta_key(const char *str)
 }
 
 static int
-nftnl_expr_meta_snprintf_default(char *buf, size_t len,
-				 const struct nftnl_expr *e)
+nftnl_expr_meta_snprintf(char *buf, size_t len,
+			 uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_meta *meta = nftnl_expr_data(e);
 
@@ -206,21 +206,6 @@ nftnl_expr_meta_snprintf_default(char *buf, size_t len,
 				meta_key2str(meta->key), meta->dreg);
 	}
 	return 0;
-}
-
-static int
-nftnl_expr_meta_snprintf(char *buf, size_t len, uint32_t type,
-			 uint32_t flags, const struct nftnl_expr *e)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_meta_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_meta = {

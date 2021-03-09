@@ -183,29 +183,15 @@ static const char *limit_to_type(enum nft_limit_type type)
 	}
 }
 
-static int nftnl_expr_limit_snprintf_default(char *buf, size_t len,
-					     const struct nftnl_expr *e)
+static int
+nftnl_expr_limit_snprintf(char *buf, size_t len,
+			  uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_limit *limit = nftnl_expr_data(e);
 
 	return snprintf(buf, len, "rate %"PRIu64"/%s burst %u type %s flags 0x%x ",
 			limit->rate, get_unit(limit->unit), limit->burst,
 			limit_to_type(limit->type), limit->flags);
-}
-
-static int
-nftnl_expr_limit_snprintf(char *buf, size_t len, uint32_t type,
-			  uint32_t flags, const struct nftnl_expr *e)
-{
-	switch(type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_limit_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_limit = {

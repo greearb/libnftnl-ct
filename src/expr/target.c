@@ -165,21 +165,12 @@ static int nftnl_expr_target_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_target_snprintf(char *buf, size_t len, uint32_t type,
+nftnl_expr_target_snprintf(char *buf, size_t len,
 			   uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_target *target = nftnl_expr_data(e);
 
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return snprintf(buf, len, "name %s rev %u ",
-				target->name, target->rev);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
+	return snprintf(buf, len, "name %s rev %u ", target->name, target->rev);
 }
 
 static void nftnl_expr_target_free(const struct nftnl_expr *e)

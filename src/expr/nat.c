@@ -221,8 +221,8 @@ static inline int nftnl_str2nat(const char *nat)
 }
 
 static int
-nftnl_expr_nat_snprintf_default(char *buf, size_t size,
-				const struct nftnl_expr *e)
+nftnl_expr_nat_snprintf(char *buf, size_t size,
+			uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_nat *nat = nftnl_expr_data(e);
 	int remain = size, offset = 0, ret = 0;
@@ -264,21 +264,6 @@ nftnl_expr_nat_snprintf_default(char *buf, size_t size,
 	}
 
 	return offset;
-}
-
-static int
-nftnl_expr_nat_snprintf(char *buf, size_t size, uint32_t type,
-			uint32_t flags, const struct nftnl_expr *e)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_nat_snprintf_default(buf, size, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_nat = {

@@ -143,8 +143,8 @@ nftnl_expr_ng_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_ng_snprintf_default(char *buf, size_t size,
-			       const struct nftnl_expr *e)
+nftnl_expr_ng_snprintf(char *buf, size_t size,
+		       uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_ng *ng = nftnl_expr_data(e);
 	int remain = size, offset = 0, ret;
@@ -170,21 +170,6 @@ nftnl_expr_ng_snprintf_default(char *buf, size_t size,
 	}
 
 	return offset;
-}
-
-static int
-nftnl_expr_ng_snprintf(char *buf, size_t len, uint32_t type,
-		       uint32_t flags, const struct nftnl_expr *e)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_ng_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_ng = {

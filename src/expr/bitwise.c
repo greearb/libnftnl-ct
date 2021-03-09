@@ -252,8 +252,9 @@ nftnl_expr_bitwise_snprintf_shift(char *buf, size_t size, const char *op,
 	return offset;
 }
 
-static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
-					       const struct nftnl_expr *e)
+static int
+nftnl_expr_bitwise_snprintf(char *buf, size_t size,
+			    uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_bitwise *bitwise = nftnl_expr_data(e);
 	int err = -1;
@@ -271,19 +272,6 @@ static int nftnl_expr_bitwise_snprintf_default(char *buf, size_t size,
 	}
 
 	return err;
-}
-
-static int
-nftnl_expr_bitwise_snprintf(char *buf, size_t size, uint32_t type,
-			    uint32_t flags, const struct nftnl_expr *e)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_bitwise_snprintf_default(buf, size, e);
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_bitwise = {

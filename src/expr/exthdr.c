@@ -235,8 +235,9 @@ static inline int str2exthdr_type(const char *str)
 	return -1;
 }
 
-static int nftnl_expr_exthdr_snprintf_default(char *buf, size_t len,
-					      const struct nftnl_expr *e)
+static int
+nftnl_expr_exthdr_snprintf(char *buf, size_t len,
+			   uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_exthdr *exthdr = nftnl_expr_data(e);
 
@@ -251,21 +252,6 @@ static int nftnl_expr_exthdr_snprintf_default(char *buf, size_t len,
 				op2str(exthdr->op), exthdr->sreg, exthdr->len, exthdr->type,
 				exthdr->offset);
 
-}
-
-static int
-nftnl_expr_exthdr_snprintf(char *buf, size_t len, uint32_t type,
-			   uint32_t flags, const struct nftnl_expr *e)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_exthdr_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_exthdr = {

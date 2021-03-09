@@ -127,8 +127,9 @@ nftnl_expr_synproxy_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_expr_synproxy_snprintf_default(char *buf, size_t size,
-						const struct nftnl_expr *e)
+static int
+nftnl_expr_synproxy_snprintf(char *buf, size_t size,
+			     uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_synproxy *synproxy = nftnl_expr_data(e);
 	int ret, offset = 0, len = size;
@@ -141,21 +142,6 @@ static int nftnl_expr_synproxy_snprintf_default(char *buf, size_t size,
 	}
 
 	return offset;
-}
-
-static int
-nftnl_expr_synproxy_snprintf(char *buf, size_t len, uint32_t type,
-			     uint32_t flags, const struct nftnl_expr *e)
-{
-	switch(type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_synproxy_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_synproxy = {

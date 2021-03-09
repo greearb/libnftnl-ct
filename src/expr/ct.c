@@ -223,8 +223,8 @@ static inline int str2ctdir(const char *str, uint8_t *ctdir)
 }
 
 static int
-nftnl_expr_ct_snprintf_default(char *buf, size_t size,
-			       const struct nftnl_expr *e)
+nftnl_expr_ct_snprintf(char *buf, size_t size,
+		       uint32_t flags, const struct nftnl_expr *e)
 {
 	int ret, remain = size, offset = 0;
 	struct nftnl_expr_ct *ct = nftnl_expr_data(e);
@@ -248,21 +248,6 @@ nftnl_expr_ct_snprintf_default(char *buf, size_t size,
 	}
 
 	return offset;
-}
-
-static int
-nftnl_expr_ct_snprintf(char *buf, size_t len, uint32_t type,
-		       uint32_t flags, const struct nftnl_expr *e)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_ct_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_ct = {

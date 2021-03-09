@@ -165,21 +165,12 @@ static int nftnl_expr_match_parse(struct nftnl_expr *e, struct nlattr *attr)
 }
 
 static int
-nftnl_expr_match_snprintf(char *buf, size_t len, uint32_t type,
+nftnl_expr_match_snprintf(char *buf, size_t len,
 			  uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_match *match = nftnl_expr_data(e);
 
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return snprintf(buf, len, "name %s rev %u ",
-				match->name, match->rev);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
+	return snprintf(buf, len, "name %s rev %u ", match->name, match->rev);
 }
 
 static void nftnl_expr_match_free(const struct nftnl_expr *e)

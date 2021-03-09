@@ -143,8 +143,9 @@ nftnl_expr_queue_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static int nftnl_expr_queue_snprintf_default(char *buf, size_t len,
-					     const struct nftnl_expr *e)
+static int
+nftnl_expr_queue_snprintf(char *buf, size_t len,
+			  uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_queue *queue = nftnl_expr_data(e);
 	int ret, remain = len, offset = 0;
@@ -182,21 +183,6 @@ static int nftnl_expr_queue_snprintf_default(char *buf, size_t len,
 		}
 	}
 	return offset;
-}
-
-static int
-nftnl_expr_queue_snprintf(char *buf, size_t len, uint32_t type,
-			  uint32_t flags, const struct nftnl_expr *e)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		return nftnl_expr_queue_snprintf_default(buf, len, e);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
 }
 
 struct expr_ops expr_ops_queue = {

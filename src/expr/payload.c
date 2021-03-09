@@ -232,30 +232,22 @@ static inline int nftnl_str2base(const char *base)
 }
 
 static int
-nftnl_expr_payload_snprintf(char *buf, size_t len, uint32_t type,
+nftnl_expr_payload_snprintf(char *buf, size_t len,
 			    uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_payload *payload = nftnl_expr_data(e);
 
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		if (payload->sreg)
-			return snprintf(buf, len, "write reg %u => %ub @ %s header + %u csum_type %u csum_off %u csum_flags 0x%x ",
-					payload->sreg,
-					payload->len, base2str(payload->base),
-					payload->offset, payload->csum_type,
-					payload->csum_offset,
-					payload->csum_flags);
-		else
-			return snprintf(buf, len, "load %ub @ %s header + %u => reg %u ",
-					payload->len, base2str(payload->base),
-					payload->offset, payload->dreg);
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
-		break;
-	}
-	return -1;
+	if (payload->sreg)
+		return snprintf(buf, len, "write reg %u => %ub @ %s header + %u csum_type %u csum_off %u csum_flags 0x%x ",
+				payload->sreg,
+				payload->len, base2str(payload->base),
+				payload->offset, payload->csum_type,
+				payload->csum_offset,
+				payload->csum_flags);
+	else
+		return snprintf(buf, len, "load %ub @ %s header + %u => reg %u ",
+				payload->len, base2str(payload->base),
+				payload->offset, payload->dreg);
 }
 
 struct expr_ops expr_ops_payload = {
