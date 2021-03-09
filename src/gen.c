@@ -162,15 +162,11 @@ static int nftnl_gen_cmd_snprintf(char *buf, size_t remain,
 {
 	int ret, offset = 0;
 
-	switch(type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		ret = snprintf(buf, remain, "ruleset generation ID %u", gen->id);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-		break;
-	default:
+	if (type != NFTNL_OUTPUT_DEFAULT)
 		return -1;
-	}
 
+	ret = snprintf(buf, remain, "ruleset generation ID %u", gen->id);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	return offset;
 }
 

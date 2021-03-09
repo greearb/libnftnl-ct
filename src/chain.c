@@ -890,17 +890,11 @@ static int nftnl_chain_cmd_snprintf(char *buf, size_t remain,
 {
 	int ret, offset = 0;
 
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_chain_snprintf_default(buf + offset, remain, c);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-		break;
-	case NFTNL_OUTPUT_XML:
-	case NFTNL_OUTPUT_JSON:
-	default:
+	if (type != NFTNL_OUTPUT_DEFAULT)
 		return -1;
-	}
 
+	ret = nftnl_chain_snprintf_default(buf + offset, remain, c);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	return offset;
 }
 

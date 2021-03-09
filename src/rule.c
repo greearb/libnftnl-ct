@@ -644,18 +644,12 @@ static int nftnl_rule_cmd_snprintf(char *buf, size_t remain,
 
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
-	switch(type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_rule_snprintf_default(buf + offset, remain, r, type,
-						inner_flags);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-		break;
-	case NFTNL_OUTPUT_JSON:
-	case NFTNL_OUTPUT_XML:
-	default:
+	if (type != NFTNL_OUTPUT_DEFAULT)
 		return -1;
-	}
 
+	ret = nftnl_rule_snprintf_default(buf + offset, remain, r, type,
+					inner_flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	return offset;
 }
 

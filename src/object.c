@@ -411,18 +411,11 @@ static int nftnl_obj_cmd_snprintf(char *buf, size_t remain,
 {
 	int ret, offset = 0;
 
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_obj_snprintf_dflt(buf + offset, remain, obj, type,
-					      flags);
-		break;
-	case NFTNL_OUTPUT_JSON:
-	case NFTNL_OUTPUT_XML:
-	default:
+	if (type != NFTNL_OUTPUT_DEFAULT)
 		return -1;
-	}
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
+	ret = nftnl_obj_snprintf_dflt(buf + offset, remain, obj, type, flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	return offset;
 }
 

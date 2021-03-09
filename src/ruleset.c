@@ -522,21 +522,6 @@ nftnl_ruleset_do_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
-static int nftnl_ruleset_cmd_snprintf(char *buf, size_t size,
-				    const struct nftnl_ruleset *r, uint32_t cmd,
-				    uint32_t type, uint32_t flags)
-{
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-	case NFTNL_OUTPUT_JSON:
-		return nftnl_ruleset_do_snprintf(buf, size, r, cmd, type, flags);
-	case NFTNL_OUTPUT_XML:
-	default:
-		errno = EOPNOTSUPP;
-		return -1;
-	}
-}
-
 EXPORT_SYMBOL(nftnl_ruleset_snprintf);
 int nftnl_ruleset_snprintf(char *buf, size_t size, const struct nftnl_ruleset *r,
 			 uint32_t type, uint32_t flags)
@@ -544,17 +529,12 @@ int nftnl_ruleset_snprintf(char *buf, size_t size, const struct nftnl_ruleset *r
 	if (size)
 		buf[0] = '\0';
 
-	switch (type) {
-	case NFTNL_OUTPUT_DEFAULT:
-	case NFTNL_OUTPUT_JSON:
-		return nftnl_ruleset_cmd_snprintf(buf, size, r,
-						nftnl_flag2cmd(flags), type,
-						flags);
-	case NFTNL_OUTPUT_XML:
-	default:
+	if (type != NFTNL_OUTPUT_DEFAULT) {
 		errno = EOPNOTSUPP;
 		return -1;
 	}
+	return nftnl_ruleset_do_snprintf(buf, size, r, nftnl_flag2cmd(flags),
+					 type, flags);
 }
 
 static int nftnl_ruleset_fprintf_tables(FILE *fp, const struct nftnl_ruleset *rs,

@@ -843,22 +843,15 @@ static int nftnl_set_cmd_snprintf(char *buf, size_t remain,
 	uint32_t inner_flags = flags;
 	int ret, offset = 0;
 
-	if (type == NFTNL_OUTPUT_XML)
-		return 0;
+	if (type != NFTNL_OUTPUT_DEFAULT)
+		return -1;
 
 	/* prevent set_elems to print as events */
 	inner_flags &= ~NFTNL_OF_EVENT_ANY;
 
-	switch(type) {
-	case NFTNL_OUTPUT_DEFAULT:
-		ret = nftnl_set_snprintf_default(buf + offset, remain, s, type,
-					       inner_flags);
-		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-		break;
-	default:
-		return -1;
-	}
-
+	ret = nftnl_set_snprintf_default(buf + offset, remain, s, type,
+					 inner_flags);
+	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	return offset;
 }
 
