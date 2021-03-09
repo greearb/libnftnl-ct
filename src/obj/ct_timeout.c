@@ -266,12 +266,12 @@ static int nftnl_obj_ct_timeout_snprintf_default(char *buf, size_t len,
 	struct nftnl_obj_ct_timeout *timeout = nftnl_obj_data(e);
 
 	if (e->flags & (1 << NFTNL_OBJ_CT_TIMEOUT_L3PROTO)) {
-		ret = snprintf(buf + offset, len, "family %d ",
+		ret = snprintf(buf + offset, remain, "family %d ",
 			       timeout->l3proto);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (e->flags & (1 << NFTNL_OBJ_CT_TIMEOUT_L4PROTO)) {
-		ret = snprintf(buf + offset, len, "protocol %d ",
+		ret = snprintf(buf + offset, remain, "protocol %d ",
 				timeout->l4proto);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
@@ -283,7 +283,7 @@ static int nftnl_obj_ct_timeout_snprintf_default(char *buf, size_t len,
 		if (timeout_protocol[timeout->l4proto].attr_max == 0)
 			l4num = IPPROTO_RAW;
 
-		ret = snprintf(buf + offset, len, "policy = {");
+		ret = snprintf(buf + offset, remain, "policy = {");
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		for (i = 0; i < timeout_protocol[l4num].attr_max; i++) {
@@ -293,13 +293,13 @@ static int nftnl_obj_ct_timeout_snprintf_default(char *buf, size_t len,
 				"UNKNOWN";
 
 			if (timeout->timeout[i] != timeout_protocol[l4num].dflt_timeout[i]) {
-				ret = snprintf(buf + offset, len,
+				ret = snprintf(buf + offset, remain,
 					"%s = %u,", state_name, timeout->timeout[i]);
 				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 			}
 		}
 
-		ret = snprintf(buf + offset, len, "}");
+		ret = snprintf(buf + offset, remain, "}");
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	buf[offset] = '\0';
