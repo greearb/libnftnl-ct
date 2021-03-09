@@ -159,23 +159,27 @@ static int nftnl_obj_ct_expect_snprintf_default(char *buf, size_t len,
 	struct nftnl_obj_ct_expect *exp = nftnl_obj_data(e);
 
 	if (e->flags & (1 << NFTNL_OBJ_CT_EXPECT_L3PROTO)) {
-		ret = snprintf(buf + offset, len, "family %d ", exp->l3proto);
+		ret = snprintf(buf + offset, remain,
+			       "family %d ", exp->l3proto);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (e->flags & (1 << NFTNL_OBJ_CT_EXPECT_L4PROTO)) {
-		ret = snprintf(buf + offset, len, "protocol %d ", exp->l4proto);
+		ret = snprintf(buf + offset, remain,
+			       "protocol %d ", exp->l4proto);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (e->flags & (1 << NFTNL_OBJ_CT_EXPECT_DPORT)) {
-		ret = snprintf(buf + offset, len, "dport %d ", exp->dport);
+		ret = snprintf(buf + offset, remain,
+			       "dport %d ", exp->dport);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (e->flags & (1 << NFTNL_OBJ_CT_EXPECT_TIMEOUT)) {
-		ret = snprintf(buf + offset, len, "timeout %d ", exp->timeout);
+		ret = snprintf(buf + offset, remain,
+			       "timeout %d ", exp->timeout);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 	if (e->flags & (1 << NFTNL_OBJ_CT_EXPECT_SIZE)) {
-		ret = snprintf(buf + offset, len, "size %d ", exp->size);
+		ret = snprintf(buf + offset, remain, "size %d ", exp->size);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
