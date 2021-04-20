@@ -22,6 +22,7 @@
 struct nftnl_expr_socket {
 	enum nft_socket_keys	key;
 	enum nft_registers	dreg;
+	uint32_t		level;
 };
 
 static int
@@ -36,6 +37,9 @@ nftnl_expr_socket_set(struct nftnl_expr *e, uint16_t type,
 		break;
 	case NFTNL_EXPR_SOCKET_DREG:
 		memcpy(&socket->dreg, data, sizeof(socket->dreg));
+		break;
+	case NFTNL_EXPR_SOCKET_LEVEL:
+		memcpy(&socket->level, data, sizeof(socket->level));
 		break;
 	default:
 		return -1;
@@ -56,6 +60,9 @@ nftnl_expr_socket_get(const struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_SOCKET_DREG:
 		*data_len = sizeof(socket->dreg);
 		return &socket->dreg;
+	case NFTNL_EXPR_SOCKET_LEVEL:
+		*data_len = sizeof(socket->level);
+		return &socket->level;
 	}
 	return NULL;
 }
@@ -71,6 +78,7 @@ static int nftnl_expr_socket_cb(const struct nlattr *attr, void *data)
 	switch (type) {
 	case NFTA_SOCKET_KEY:
 	case NFTA_SOCKET_DREG:
+	case NFTA_SOCKET_LEVEL:
 		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
 			abi_breakage();
 		break;
@@ -89,6 +97,8 @@ nftnl_expr_socket_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 		mnl_attr_put_u32(nlh, NFTA_SOCKET_KEY, htonl(socket->key));
 	if (e->flags & (1 << NFTNL_EXPR_SOCKET_DREG))
 		mnl_attr_put_u32(nlh, NFTA_SOCKET_DREG, htonl(socket->dreg));
+	if (e->flags & (1 << NFTNL_EXPR_SOCKET_LEVEL))
+		mnl_attr_put_u32(nlh, NFTA_SOCKET_LEVEL, htonl(socket->level));
 }
 
 static int
@@ -108,6 +118,10 @@ nftnl_expr_socket_parse(struct nftnl_expr *e, struct nlattr *attr)
 		socket->dreg = ntohl(mnl_attr_get_u32(tb[NFTA_SOCKET_DREG]));
 		e->flags |= (1 << NFTNL_EXPR_SOCKET_DREG);
 	}
+	if (tb[NFTA_SOCKET_LEVEL]) {
+		socket->level = ntohl(mnl_attr_get_u32(tb[NFTA_SOCKET_LEVEL]));
+		e->flags |= (1 << NFTNL_EXPR_SOCKET_LEVEL);
+	}
 
 	return 0;
 }
@@ -116,6 +130,7 @@ static const char *socket_key2str_array[NFT_SOCKET_MAX + 1] = {
 	[NFT_SOCKET_TRANSPARENT] = "transparent",
 	[NFT_SOCKET_MARK] = "mark",
 	[NFT_SOCKET_WILDCARD] = "wildcard",
+	[NFT_SOCKET_CGROUPV2] = "cgroupv2",
 };
 
 static const char *socket_key2str(uint8_t key)
@@ -136,6 +151,9 @@ nftnl_expr_socket_snprintf(char *buf, size_t len,
 		return snprintf(buf, len, "load %s => reg %u ",
 				socket_key2str(socket->key), socket->dreg);
 	}
+	if (e->flags & (1 << NFTNL_EXPR_SOCKET_LEVEL))
+		return snprintf(buf, len, "level %u ", socket->level);
+
 	return 0;
 }
 
