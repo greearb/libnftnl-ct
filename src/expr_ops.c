@@ -14,6 +14,7 @@ extern struct expr_ops expr_ops_dup;
 extern struct expr_ops expr_ops_exthdr;
 extern struct expr_ops expr_ops_fwd;
 extern struct expr_ops expr_ops_immediate;
+extern struct expr_ops expr_ops_last;
 extern struct expr_ops expr_ops_limit;
 extern struct expr_ops expr_ops_log;
 extern struct expr_ops expr_ops_lookup;
@@ -57,6 +58,7 @@ static struct expr_ops *expr_ops[] = {
 	&expr_ops_exthdr,
 	&expr_ops_fwd,
 	&expr_ops_immediate,
+	&expr_ops_last,
 	&expr_ops_limit,
 	&expr_ops_log,
 	&expr_ops_lookup,

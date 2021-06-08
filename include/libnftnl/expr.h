@@ -311,6 +311,10 @@ enum {
 	NFTNL_EXPR_SYNPROXY_FLAGS,
 };
 
+enum {
+	NFTNL_EXPR_LAST_MSECS = NFTNL_EXPR_BASE,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

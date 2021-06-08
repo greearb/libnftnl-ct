@@ -1,0 +1,118 @@
+/*
+ * (C) 2016 by Pablo Neira Ayuso <pablo@netfilter.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ */
+
+#include <stdio.h>
+#include <stdint.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <inttypes.h>
+
+#include <linux/netfilter/nf_tables.h>
+
+#include "internal.h"
+#include <libmnl/libmnl.h>
+#include <libnftnl/expr.h>
+#include <libnftnl/rule.h>
+
+struct nftnl_expr_last {
+	uint64_t	msecs;
+};
+
+static int nftnl_expr_last_set(struct nftnl_expr *e, uint16_t type,
+				const void *data, uint32_t data_len)
+{
+	struct nftnl_expr_last *last = nftnl_expr_data(e);
+
+	switch (type) {
+	case NFTNL_EXPR_LAST_MSECS:
+		memcpy(&last->msecs, data, sizeof(last->msecs));
+		break;
+	default:
+		return -1;
+	}
+	return 0;
+}
+
+static const void *nftnl_expr_last_get(const struct nftnl_expr *e,
+					uint16_t type, uint32_t *data_len)
+{
+	struct nftnl_expr_last *last = nftnl_expr_data(e);
+
+	switch (type) {
+	case NFTNL_EXPR_LAST_MSECS:
+		*data_len = sizeof(last->msecs);
+		return &last->msecs;
+	}
+	return NULL;
+}
+
+static int nftnl_expr_last_cb(const struct nlattr *attr, void *data)
+{
+	int type = mnl_attr_get_type(attr);
+	const struct nlattr **tb = data;
+
+	if (mnl_attr_type_valid(attr, NFTA_LAST_MAX) < 0)
+		return MNL_CB_OK;
+
+	switch(type) {
+	case NFTA_LAST_MSECS:
+		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
+			abi_breakage();
+		break;
+	}
+
+	tb[type] = attr;
+	return MNL_CB_OK;
+}
+
+static void
+nftnl_expr_last_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
+{
+	struct nftnl_expr_last *last = nftnl_expr_data(e);
+
+	if (e->flags & (1 << NFTNL_EXPR_LAST_MSECS))
+		mnl_attr_put_u64(nlh, NFTA_LAST_MSECS, htobe64(last->msecs));
+}
+
+static int
+nftnl_expr_last_parse(struct nftnl_expr *e, struct nlattr *attr)
+{
+	struct nftnl_expr_last *last = nftnl_expr_data(e);
+	struct nlattr *tb[NFTA_LAST_MAX + 1] = {};
+
+	if (mnl_attr_parse_nested(attr, nftnl_expr_last_cb, tb) < 0)
+		return -1;
+
+	if (tb[NFTA_LAST_MSECS]) {
+		last->msecs = be64toh(mnl_attr_get_u64(tb[NFTA_LAST_MSECS]));
+		e->flags |= (1 << NFTNL_EXPR_LAST_MSECS);
+	}
+
+	return 0;
+}
+
+static int nftnl_expr_last_snprintf(char *buf, size_t len,
+				       uint32_t flags,
+				       const struct nftnl_expr *e)
+{
+	struct nftnl_expr_last *last = nftnl_expr_data(e);
+
+	return snprintf(buf, len, "last %"PRIu64" ", last->msecs);
+}
+
+struct expr_ops expr_ops_last = {
+	.name		= "last",
+	.alloc_len	= sizeof(struct nftnl_expr_last),
+	.max_attr	= NFTA_LAST_MAX,
+	.set		= nftnl_expr_last_set,
+	.get		= nftnl_expr_last_get,
+	.parse		= nftnl_expr_last_parse,
+	.build		= nftnl_expr_last_build,
+	.snprintf	= nftnl_expr_last_snprintf,
+};
