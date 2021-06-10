@@ -1198,10 +1198,12 @@ enum nft_counter_attributes {
 /**
  * enum nft_last_attributes - nf_tables last expression netlink attributes
  *
+ * @NFTA_LAST_SET: last update has been set, zero means never updated (NLA_U32)
  * @NFTA_LAST_MSECS: milliseconds since last update (NLA_U64)
  */
 enum nft_last_attributes {
 	NFTA_LAST_UNSPEC,
+	NFTA_LAST_SET,
 	NFTA_LAST_MSECS,
 	NFTA_LAST_PAD,
 	__NFTA_LAST_MAX
