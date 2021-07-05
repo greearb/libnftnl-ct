@@ -22,6 +22,7 @@
 
 struct nftnl_expr_last {
 	uint64_t	msecs;
+	uint32_t	set;
 };
 
 static int nftnl_expr_last_set(struct nftnl_expr *e, uint16_t type,
@@ -32,6 +33,9 @@ static int nftnl_expr_last_set(struct nftnl_expr *e, uint16_t type,
 	switch (type) {
 	case NFTNL_EXPR_LAST_MSECS:
 		memcpy(&last->msecs, data, sizeof(last->msecs));
+		break;
+	case NFTNL_EXPR_LAST_SET:
+		memcpy(&last->set, data, sizeof(last->set));
 		break;
 	default:
 		return -1;
@@ -48,6 +52,9 @@ static const void *nftnl_expr_last_get(const struct nftnl_expr *e,
 	case NFTNL_EXPR_LAST_MSECS:
 		*data_len = sizeof(last->msecs);
 		return &last->msecs;
+	case NFTNL_EXPR_LAST_SET:
+		*data_len = sizeof(last->set);
+		return &last->set;
 	}
 	return NULL;
 }
@@ -65,6 +72,10 @@ static int nftnl_expr_last_cb(const struct nlattr *attr, void *data)
 		if (mnl_attr_validate(attr, MNL_TYPE_U64) < 0)
 			abi_breakage();
 		break;
+	case NFTA_LAST_SET:
+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
+			abi_breakage();
+		break;
 	}
 
 	tb[type] = attr;
@@ -78,6 +89,8 @@ nftnl_expr_last_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 
 	if (e->flags & (1 << NFTNL_EXPR_LAST_MSECS))
 		mnl_attr_put_u64(nlh, NFTA_LAST_MSECS, htobe64(last->msecs));
+	if (e->flags & (1 << NFTNL_EXPR_LAST_SET))
+		mnl_attr_put_u32(nlh, NFTA_LAST_SET, htonl(last->set));
 }
 
 static int
@@ -93,6 +106,10 @@ nftnl_expr_last_parse(struct nftnl_expr *e, struct nlattr *attr)
 		last->msecs = be64toh(mnl_attr_get_u64(tb[NFTA_LAST_MSECS]));
 		e->flags |= (1 << NFTNL_EXPR_LAST_MSECS);
 	}
+	if (tb[NFTA_LAST_SET]) {
+		last->set = ntohl(mnl_attr_get_u32(tb[NFTA_LAST_SET]));
+		e->flags |= (1 << NFTNL_EXPR_LAST_SET);
+	}
 
 	return 0;
 }
@@ -103,7 +120,10 @@ static int nftnl_expr_last_snprintf(char *buf, size_t len,
 {
 	struct nftnl_expr_last *last = nftnl_expr_data(e);
 
-	return snprintf(buf, len, "last %"PRIu64" ", last->msecs);
+	if (!last->set)
+		return snprintf(buf, len, "never ");
+
+	return snprintf(buf, len, "%"PRIu64" ", last->msecs);
 }
 
 struct expr_ops expr_ops_last = {
