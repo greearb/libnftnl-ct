@@ -383,3 +383,7 @@ LIBNFTNL_16 {
   nftnl_expr_add_expr;
   nftnl_expr_expr_foreach;
 } LIBNFTNL_15;
+
+LIBNFTNL_17 {
+  nftnl_set_elem_nlmsg_build;
+} LIBNFTNL_16;

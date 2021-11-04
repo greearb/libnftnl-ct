@@ -144,6 +144,8 @@ bool nftnl_set_elem_is_set(const struct nftnl_set_elem *s, uint16_t attr);
 #define nftnl_set_elem_nlmsg_build_hdr	nftnl_nlmsg_build_hdr
 void nftnl_set_elems_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set *s);
 void nftnl_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh, struct nftnl_set_elem *e);
+struct nlattr *nftnl_set_elem_nlmsg_build(struct nlmsghdr *nlh,
+					  struct nftnl_set_elem *elem, int i);
 
 int nftnl_set_elem_parse(struct nftnl_set_elem *e, enum nftnl_parse_type type,
 		       const char *data, struct nftnl_parse_err *err);
