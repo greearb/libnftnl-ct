@@ -829,7 +829,7 @@ static int nftnl_set_snprintf_default(char *buf, size_t remain,
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		ret = nftnl_set_elem_snprintf_default(buf + offset, remain,
-						      elem, s->data_type);
+						      elem);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 

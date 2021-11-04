@@ -700,11 +700,9 @@ int nftnl_set_elem_parse_file(struct nftnl_set_elem *e, enum nftnl_parse_type ty
 }
 
 int nftnl_set_elem_snprintf_default(char *buf, size_t remain,
-				    const struct nftnl_set_elem *e,
-				    enum nft_data_types dtype)
+				    const struct nftnl_set_elem *e)
 {
-	int dregtype = (dtype == NFT_DATA_VERDICT) ? DATA_VERDICT : DATA_VALUE;
-	int ret, offset = 0, i;
+	int ret, dregtype = DATA_VALUE, offset = 0, i;
 
 	ret = snprintf(buf, remain, "element ");
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
@@ -724,6 +722,9 @@ int nftnl_set_elem_snprintf_default(char *buf, size_t remain,
 
 	ret = snprintf(buf + offset, remain, " : ");
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+
+	if (e->flags & (1 << NFTNL_SET_ELEM_VERDICT))
+		dregtype = DATA_VERDICT;
 
 	ret = nftnl_data_reg_snprintf(buf + offset, remain, &e->data,
 				      DATA_F_NOPFX, dregtype);
@@ -761,9 +762,9 @@ static int nftnl_set_elem_cmd_snprintf(char *buf, size_t remain,
 	if (type != NFTNL_OUTPUT_DEFAULT)
 		return -1;
 
-	ret = nftnl_set_elem_snprintf_default(buf + offset, remain, e,
-					      NFT_DATA_VALUE);
+	ret = nftnl_set_elem_snprintf_default(buf + offset, remain, e);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+
 	return offset;
 }
 
