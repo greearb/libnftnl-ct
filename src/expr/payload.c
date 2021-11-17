@@ -203,15 +203,16 @@ nftnl_expr_payload_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static const char *base2str_array[NFT_PAYLOAD_TRANSPORT_HEADER+1] = {
+static const char *base2str_array[NFT_PAYLOAD_INNER_HEADER + 1] = {
 	[NFT_PAYLOAD_LL_HEADER]		= "link",
 	[NFT_PAYLOAD_NETWORK_HEADER] 	= "network",
 	[NFT_PAYLOAD_TRANSPORT_HEADER]	= "transport",
+	[NFT_PAYLOAD_INNER_HEADER]	= "inner",
 };
 
 static const char *base2str(enum nft_payload_bases base)
 {
-	if (base > NFT_PAYLOAD_TRANSPORT_HEADER)
+	if (base > NFT_PAYLOAD_INNER_HEADER)
 		return "unknown";
 
 	return base2str_array[base];
