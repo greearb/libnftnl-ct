@@ -247,10 +247,15 @@ nftnl_expr_exthdr_snprintf(char *buf, size_t len,
 				exthdr->offset,
 				exthdr->flags & NFT_EXTHDR_F_PRESENT ? " present" : "",
 				exthdr->dreg);
-	else
+	else if (e->flags & (1 << NFTNL_EXPR_EXTHDR_SREG))
 		return snprintf(buf, len, "write%s reg %u => %ub @ %u + %u ",
 				op2str(exthdr->op), exthdr->sreg, exthdr->len, exthdr->type,
 				exthdr->offset);
+	else if (exthdr->op == NFT_EXTHDR_OP_TCPOPT && exthdr->len == 0)
+		return snprintf(buf, len, "reset tcpopt %u ", exthdr->type);
+	else
+		return snprintf(buf, len, "op %u len %u type %u offset %u ",
+				exthdr->op, exthdr->len, exthdr->type, exthdr->offset);
 
 }
 
