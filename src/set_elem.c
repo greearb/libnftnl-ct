@@ -300,6 +300,7 @@ err:
 	return NULL;
 }
 
+EXPORT_SYMBOL(nftnl_set_elem_nlmsg_build_payload);
 void nftnl_set_elem_nlmsg_build_payload(struct nlmsghdr *nlh,
 				      struct nftnl_set_elem *e)
 {
