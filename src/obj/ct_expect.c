@@ -196,5 +196,5 @@ struct obj_ops obj_ops_ct_expect = {
 	.get		= nftnl_obj_ct_expect_get,
 	.parse		= nftnl_obj_ct_expect_parse,
 	.build		= nftnl_obj_ct_expect_build,
-	.snprintf	= nftnl_obj_ct_expect_snprintf,
+	.output		= nftnl_obj_ct_expect_snprintf,
 };

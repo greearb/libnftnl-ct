@@ -150,5 +150,5 @@ struct obj_ops obj_ops_ct_helper = {
 	.get		= nftnl_obj_ct_helper_get,
 	.parse		= nftnl_obj_ct_helper_parse,
 	.build		= nftnl_obj_ct_helper_build,
-	.snprintf	= nftnl_obj_ct_helper_snprintf,
+	.output		= nftnl_obj_ct_helper_snprintf,
 };

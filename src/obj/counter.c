@@ -127,5 +127,5 @@ struct obj_ops obj_ops_counter = {
 	.get		= nftnl_obj_counter_get,
 	.parse		= nftnl_obj_counter_parse,
 	.build		= nftnl_obj_counter_build,
-	.snprintf	= nftnl_obj_counter_snprintf,
+	.output		= nftnl_obj_counter_snprintf,
 };

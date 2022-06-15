@@ -196,5 +196,5 @@ struct expr_ops expr_ops_xfrm = {
 	.get		= nftnl_expr_xfrm_get,
 	.parse		= nftnl_expr_xfrm_parse,
 	.build		= nftnl_expr_xfrm_build,
-	.snprintf	= nftnl_expr_xfrm_snprintf,
+	.output		= nftnl_expr_xfrm_snprintf,
 };

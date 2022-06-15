@@ -316,5 +316,5 @@ struct obj_ops obj_ops_ct_timeout = {
 	.get		= nftnl_obj_ct_timeout_get,
 	.parse		= nftnl_obj_ct_timeout_parse,
 	.build		= nftnl_obj_ct_timeout_build,
-	.snprintf	= nftnl_obj_ct_timeout_snprintf,
+	.output		= nftnl_obj_ct_timeout_snprintf,
 };

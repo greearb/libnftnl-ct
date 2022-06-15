@@ -229,5 +229,5 @@ struct expr_ops expr_ops_immediate = {
 	.get		= nftnl_expr_immediate_get,
 	.parse		= nftnl_expr_immediate_parse,
 	.build		= nftnl_expr_immediate_build,
-	.snprintf	= nftnl_expr_immediate_snprintf,
+	.output		= nftnl_expr_immediate_snprintf,
 };

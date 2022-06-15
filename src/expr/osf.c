@@ -147,5 +147,5 @@ struct expr_ops expr_ops_osf = {
 	.get		= nftnl_expr_osf_get,
 	.parse		= nftnl_expr_osf_parse,
 	.build		= nftnl_expr_osf_build,
-	.snprintf	= nftnl_expr_osf_snprintf,
+	.output		= nftnl_expr_osf_snprintf,
 };

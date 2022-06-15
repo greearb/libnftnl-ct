@@ -145,5 +145,5 @@ struct expr_ops expr_ops_tunnel = {
 	.get		= nftnl_expr_tunnel_get,
 	.parse		= nftnl_expr_tunnel_parse,
 	.build		= nftnl_expr_tunnel_build,
-	.snprintf	= nftnl_expr_tunnel_snprintf,
+	.output		= nftnl_expr_tunnel_snprintf,
 };

@@ -193,5 +193,5 @@ struct expr_ops expr_ops_queue = {
 	.get		= nftnl_expr_queue_get,
 	.parse		= nftnl_expr_queue_parse,
 	.build		= nftnl_expr_queue_build,
-	.snprintf	= nftnl_expr_queue_snprintf,
+	.output		= nftnl_expr_queue_snprintf,
 };

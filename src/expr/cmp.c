@@ -202,5 +202,5 @@ struct expr_ops expr_ops_cmp = {
 	.get		= nftnl_expr_cmp_get,
 	.parse		= nftnl_expr_cmp_parse,
 	.build		= nftnl_expr_cmp_build,
-	.snprintf	= nftnl_expr_cmp_snprintf,
+	.output		= nftnl_expr_cmp_snprintf,
 };

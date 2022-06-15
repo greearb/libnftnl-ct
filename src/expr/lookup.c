@@ -206,5 +206,5 @@ struct expr_ops expr_ops_lookup = {
 	.get		= nftnl_expr_lookup_get,
 	.parse		= nftnl_expr_lookup_parse,
 	.build		= nftnl_expr_lookup_build,
-	.snprintf	= nftnl_expr_lookup_snprintf,
+	.output		= nftnl_expr_lookup_snprintf,
 };

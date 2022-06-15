@@ -373,5 +373,5 @@ struct expr_ops expr_ops_dynset = {
 	.get		= nftnl_expr_dynset_get,
 	.parse		= nftnl_expr_dynset_parse,
 	.build		= nftnl_expr_dynset_build,
-	.snprintf	= nftnl_expr_dynset_snprintf,
+	.output		= nftnl_expr_dynset_snprintf,
 };

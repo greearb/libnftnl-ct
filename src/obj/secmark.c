@@ -116,5 +116,5 @@ struct obj_ops obj_ops_secmark = {
 	.get		= nftnl_obj_secmark_get,
 	.parse		= nftnl_obj_secmark_parse,
 	.build		= nftnl_obj_secmark_build,
-	.snprintf	= nftnl_obj_secmark_snprintf,
+	.output		= nftnl_obj_secmark_snprintf,
 };

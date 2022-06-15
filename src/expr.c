@@ -279,10 +279,10 @@ int nftnl_expr_snprintf(char *buf, size_t remain, const struct nftnl_expr *expr,
 	if (remain)
 		buf[0] = '\0';
 
-	if (!expr->ops->snprintf || type != NFTNL_OUTPUT_DEFAULT)
+	if (!expr->ops->output || type != NFTNL_OUTPUT_DEFAULT)
 		return 0;
 
-	ret = expr->ops->snprintf(buf + offset, remain, flags, expr);
+	ret = expr->ops->output(buf + offset, remain, flags, expr);
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	return offset;

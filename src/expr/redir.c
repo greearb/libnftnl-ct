@@ -167,5 +167,5 @@ struct expr_ops expr_ops_redir = {
 	.get		= nftnl_expr_redir_get,
 	.parse		= nftnl_expr_redir_parse,
 	.build		= nftnl_expr_redir_build,
-	.snprintf	= nftnl_expr_redir_snprintf,
+	.output		= nftnl_expr_redir_snprintf,
 };

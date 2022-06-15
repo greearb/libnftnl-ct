@@ -267,5 +267,5 @@ struct expr_ops expr_ops_exthdr = {
 	.get		= nftnl_expr_exthdr_get,
 	.parse		= nftnl_expr_exthdr_parse,
 	.build		= nftnl_expr_exthdr_build,
-	.snprintf	= nftnl_expr_exthdr_snprintf,
+	.output		= nftnl_expr_exthdr_snprintf,
 };

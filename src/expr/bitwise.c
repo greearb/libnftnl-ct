@@ -282,5 +282,5 @@ struct expr_ops expr_ops_bitwise = {
 	.get		= nftnl_expr_bitwise_get,
 	.parse		= nftnl_expr_bitwise_parse,
 	.build		= nftnl_expr_bitwise_build,
-	.snprintf	= nftnl_expr_bitwise_snprintf,
+	.output		= nftnl_expr_bitwise_snprintf,
 };

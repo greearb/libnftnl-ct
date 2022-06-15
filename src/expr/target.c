@@ -189,5 +189,5 @@ struct expr_ops expr_ops_target = {
 	.get		= nftnl_expr_target_get,
 	.parse		= nftnl_expr_target_parse,
 	.build		= nftnl_expr_target_build,
-	.snprintf	= nftnl_expr_target_snprintf,
+	.output		= nftnl_expr_target_snprintf,
 };

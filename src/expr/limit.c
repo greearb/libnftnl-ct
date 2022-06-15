@@ -202,5 +202,5 @@ struct expr_ops expr_ops_limit = {
 	.get		= nftnl_expr_limit_get,
 	.parse		= nftnl_expr_limit_parse,
 	.build		= nftnl_expr_limit_build,
-	.snprintf	= nftnl_expr_limit_snprintf,
+	.output		= nftnl_expr_limit_snprintf,
 };

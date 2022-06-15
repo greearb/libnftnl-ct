@@ -226,5 +226,5 @@ struct expr_ops expr_ops_hash = {
 	.get		= nftnl_expr_hash_get,
 	.parse		= nftnl_expr_hash_parse,
 	.build		= nftnl_expr_hash_build,
-	.snprintf	= nftnl_expr_hash_snprintf,
+	.output		= nftnl_expr_hash_snprintf,
 };

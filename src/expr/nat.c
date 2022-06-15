@@ -274,5 +274,5 @@ struct expr_ops expr_ops_nat = {
 	.get		= nftnl_expr_nat_get,
 	.parse		= nftnl_expr_nat_parse,
 	.build		= nftnl_expr_nat_build,
-	.snprintf	= nftnl_expr_nat_snprintf,
+	.output		= nftnl_expr_nat_snprintf,
 };

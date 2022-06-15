@@ -165,5 +165,5 @@ struct expr_ops expr_ops_socket = {
 	.get		= nftnl_expr_socket_get,
 	.parse		= nftnl_expr_socket_parse,
 	.build		= nftnl_expr_socket_build,
-	.snprintf	= nftnl_expr_socket_snprintf,
+	.output		= nftnl_expr_socket_snprintf,
 };

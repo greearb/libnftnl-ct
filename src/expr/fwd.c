@@ -158,5 +158,5 @@ struct expr_ops expr_ops_fwd = {
 	.get		= nftnl_expr_fwd_get,
 	.parse		= nftnl_expr_fwd_parse,
 	.build		= nftnl_expr_fwd_build,
-	.snprintf	= nftnl_expr_fwd_snprintf,
+	.output		= nftnl_expr_fwd_snprintf,
 };

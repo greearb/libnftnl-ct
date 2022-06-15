@@ -258,5 +258,5 @@ struct expr_ops expr_ops_ct = {
 	.get		= nftnl_expr_ct_get,
 	.parse		= nftnl_expr_ct_parse,
 	.build		= nftnl_expr_ct_build,
-	.snprintf	= nftnl_expr_ct_snprintf,
+	.output		= nftnl_expr_ct_snprintf,
 };

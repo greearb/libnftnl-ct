@@ -170,5 +170,5 @@ struct expr_ops expr_ops_tproxy = {
 	.get		= nftnl_expr_tproxy_get,
 	.parse		= nftnl_expr_tproxy_parse,
 	.build		= nftnl_expr_tproxy_build,
-	.snprintf	= nftnl_expr_tproxy_snprintf,
+	.output		= nftnl_expr_tproxy_snprintf,
 };

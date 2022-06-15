@@ -109,7 +109,7 @@ struct obj_ops {
 	const void *(*get)(const struct nftnl_obj *e, uint16_t type, uint32_t *data_len);
 	int	(*parse)(struct nftnl_obj *e, struct nlattr *attr);
 	void	(*build)(struct nlmsghdr *nlh, const struct nftnl_obj *e);
-	int	(*snprintf)(char *buf, size_t len, uint32_t flags, const struct nftnl_obj *e);
+	int	(*output)(char *buf, size_t len, uint32_t flags, const struct nftnl_obj *e);
 };
 
 extern struct obj_ops obj_ops_counter;

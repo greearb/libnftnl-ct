@@ -18,7 +18,7 @@ struct expr_ops {
 	const void *(*get)(const struct nftnl_expr *e, uint16_t type, uint32_t *data_len);
 	int 	(*parse)(struct nftnl_expr *e, struct nlattr *attr);
 	void	(*build)(struct nlmsghdr *nlh, const struct nftnl_expr *e);
-	int	(*snprintf)(char *buf, size_t len, uint32_t flags, const struct nftnl_expr *e);
+	int	(*output)(char *buf, size_t len, uint32_t flags, const struct nftnl_expr *e);
 };
 
 struct expr_ops *nftnl_expr_ops_lookup(const char *name);

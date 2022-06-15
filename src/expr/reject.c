@@ -134,5 +134,5 @@ struct expr_ops expr_ops_reject = {
 	.get		= nftnl_expr_reject_get,
 	.parse		= nftnl_expr_reject_parse,
 	.build		= nftnl_expr_reject_build,
-	.snprintf	= nftnl_expr_reject_snprintf,
+	.output		= nftnl_expr_reject_snprintf,
 };

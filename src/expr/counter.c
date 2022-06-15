@@ -133,5 +133,5 @@ struct expr_ops expr_ops_counter = {
 	.get		= nftnl_expr_counter_get,
 	.parse		= nftnl_expr_counter_parse,
 	.build		= nftnl_expr_counter_build,
-	.snprintf	= nftnl_expr_counter_snprintf,
+	.output		= nftnl_expr_counter_snprintf,
 };

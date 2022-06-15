@@ -147,5 +147,5 @@ struct expr_ops expr_ops_quota = {
 	.get		= nftnl_expr_quota_get,
 	.parse		= nftnl_expr_quota_parse,
 	.build		= nftnl_expr_quota_build,
-	.snprintf	= nftnl_expr_quota_snprintf,
+	.output		= nftnl_expr_quota_snprintf,
 };

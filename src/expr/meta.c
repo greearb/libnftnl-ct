@@ -216,5 +216,5 @@ struct expr_ops expr_ops_meta = {
 	.get		= nftnl_expr_meta_get,
 	.parse		= nftnl_expr_meta_parse,
 	.build		= nftnl_expr_meta_build,
-	.snprintf	= nftnl_expr_meta_snprintf,
+	.output		= nftnl_expr_meta_snprintf,
 };

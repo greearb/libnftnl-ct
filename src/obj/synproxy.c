@@ -143,5 +143,5 @@ struct obj_ops obj_ops_synproxy = {
 	.get		= nftnl_obj_synproxy_get,
 	.parse		= nftnl_obj_synproxy_parse,
 	.build		= nftnl_obj_synproxy_build,
-	.snprintf	= nftnl_obj_synproxy_snprintf,
+	.output		= nftnl_obj_synproxy_snprintf,
 };

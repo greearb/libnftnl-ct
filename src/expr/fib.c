@@ -198,5 +198,5 @@ struct expr_ops expr_ops_fib = {
 	.get		= nftnl_expr_fib_get,
 	.parse		= nftnl_expr_fib_parse,
 	.build		= nftnl_expr_fib_build,
-	.snprintf	= nftnl_expr_fib_snprintf,
+	.output		= nftnl_expr_fib_snprintf,
 };

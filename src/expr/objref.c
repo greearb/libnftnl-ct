@@ -205,5 +205,5 @@ struct expr_ops expr_ops_objref = {
 	.get		= nftnl_expr_objref_get,
 	.parse		= nftnl_expr_objref_parse,
 	.build		= nftnl_expr_objref_build,
-	.snprintf	= nftnl_expr_objref_snprintf,
+	.output		= nftnl_expr_objref_snprintf,
 };

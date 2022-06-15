@@ -189,5 +189,5 @@ struct expr_ops expr_ops_match = {
 	.get		= nftnl_expr_match_get,
 	.parse		= nftnl_expr_match_parse,
 	.build		= nftnl_expr_match_build,
-	.snprintf	= nftnl_expr_match_snprintf,
+	.output		= nftnl_expr_match_snprintf,
 };

@@ -120,5 +120,5 @@ struct expr_ops expr_ops_flow = {
 	.get		= nftnl_expr_flow_get,
 	.parse		= nftnl_expr_flow_parse,
 	.build		= nftnl_expr_flow_build,
-	.snprintf	= nftnl_expr_flow_snprintf,
+	.output		= nftnl_expr_flow_snprintf,
 };

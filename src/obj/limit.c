@@ -168,5 +168,5 @@ struct obj_ops obj_ops_limit = {
 	.get		= nftnl_obj_limit_get,
 	.parse		= nftnl_obj_limit_parse,
 	.build		= nftnl_obj_limit_build,
-	.snprintf	= nftnl_obj_limit_snprintf,
+	.output		= nftnl_obj_limit_snprintf,
 };

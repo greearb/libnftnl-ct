@@ -135,5 +135,5 @@ struct expr_ops expr_ops_connlimit = {
 	.get		= nftnl_expr_connlimit_get,
 	.parse		= nftnl_expr_connlimit_parse,
 	.build		= nftnl_expr_connlimit_build,
-	.snprintf	= nftnl_expr_connlimit_snprintf,
+	.output		= nftnl_expr_connlimit_snprintf,
 };

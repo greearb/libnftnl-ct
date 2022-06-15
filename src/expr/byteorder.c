@@ -220,5 +220,5 @@ struct expr_ops expr_ops_byteorder = {
 	.get		= nftnl_expr_byteorder_get,
 	.parse		= nftnl_expr_byteorder_parse,
 	.build		= nftnl_expr_byteorder_build,
-	.snprintf	= nftnl_expr_byteorder_snprintf,
+	.output		= nftnl_expr_byteorder_snprintf,
 };

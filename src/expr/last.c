@@ -134,5 +134,5 @@ struct expr_ops expr_ops_last = {
 	.get		= nftnl_expr_last_get,
 	.parse		= nftnl_expr_last_parse,
 	.build		= nftnl_expr_last_build,
-	.snprintf	= nftnl_expr_last_snprintf,
+	.output		= nftnl_expr_last_snprintf,
 };

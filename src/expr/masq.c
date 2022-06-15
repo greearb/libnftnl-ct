@@ -163,5 +163,5 @@ struct expr_ops expr_ops_masq = {
 	.get		= nftnl_expr_masq_get,
 	.parse		= nftnl_expr_masq_parse,
 	.build		= nftnl_expr_masq_build,
-	.snprintf	= nftnl_expr_masq_snprintf,
+	.output		= nftnl_expr_masq_snprintf,
 };

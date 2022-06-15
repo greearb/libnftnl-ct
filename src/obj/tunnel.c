@@ -547,5 +547,5 @@ struct obj_ops obj_ops_tunnel = {
 	.get		= nftnl_obj_tunnel_get,
 	.parse		= nftnl_obj_tunnel_parse,
 	.build		= nftnl_obj_tunnel_build,
-	.snprintf	= nftnl_obj_tunnel_snprintf,
+	.output		= nftnl_obj_tunnel_snprintf,
 };

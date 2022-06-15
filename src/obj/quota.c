@@ -144,5 +144,5 @@ struct obj_ops obj_ops_quota = {
 	.get		= nftnl_obj_quota_get,
 	.parse		= nftnl_obj_quota_parse,
 	.build		= nftnl_obj_quota_build,
-	.snprintf	= nftnl_obj_quota_snprintf,
+	.output		= nftnl_obj_quota_snprintf,
 };

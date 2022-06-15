@@ -152,5 +152,5 @@ struct expr_ops expr_ops_synproxy = {
 	.get		= nftnl_expr_synproxy_get,
 	.parse		= nftnl_expr_synproxy_parse,
 	.build		= nftnl_expr_synproxy_build,
-	.snprintf	= nftnl_expr_synproxy_snprintf,
+	.output		= nftnl_expr_synproxy_snprintf,
 };

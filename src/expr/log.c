@@ -253,5 +253,5 @@ struct expr_ops expr_ops_log = {
 	.get		= nftnl_expr_log_get,
 	.parse		= nftnl_expr_log_parse,
 	.build		= nftnl_expr_log_build,
-	.snprintf	= nftnl_expr_log_snprintf,
+	.output		= nftnl_expr_log_snprintf,
 };

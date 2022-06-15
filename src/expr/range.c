@@ -213,5 +213,5 @@ struct expr_ops expr_ops_range = {
 	.get		= nftnl_expr_range_get,
 	.parse		= nftnl_expr_range_parse,
 	.build		= nftnl_expr_range_build,
-	.snprintf	= nftnl_expr_range_snprintf,
+	.output		= nftnl_expr_range_snprintf,
 };

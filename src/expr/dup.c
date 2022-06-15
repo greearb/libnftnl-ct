@@ -138,5 +138,5 @@ struct expr_ops expr_ops_dup = {
 	.get		= nftnl_expr_dup_get,
 	.parse		= nftnl_expr_dup_parse,
 	.build		= nftnl_expr_dup_build,
-	.snprintf	= nftnl_expr_dup_snprintf,
+	.output		= nftnl_expr_dup_snprintf,
 };
