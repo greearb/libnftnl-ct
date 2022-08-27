@@ -735,14 +735,15 @@ int nftnl_set_elem_snprintf_default(char *buf, size_t remain,
 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 	if (e->user.len) {
-		ret = snprintf(buf + offset, remain, "  userdata = {");
+		ret = snprintf(buf + offset, remain, "  userdata = { ");
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		for (i = 0; i < e->user.len; i++) {
 			char *c = e->user.data;
 
-			ret = snprintf(buf + offset, remain, "%c",
-				       isalnum(c[i]) ? c[i] : 0);
+			ret = snprintf(buf + offset, remain,
+				       isprint(c[i]) ? "%c" : "\\x%02hhx",
+				       c[i]);
 			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 		}
 
