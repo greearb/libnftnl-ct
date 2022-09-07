@@ -218,20 +218,6 @@ static const char *base2str(enum nft_payload_bases base)
 	return base2str_array[base];
 }
 
-static inline int nftnl_str2base(const char *base)
-{
-	if (strcmp(base, "link") == 0)
-		return NFT_PAYLOAD_LL_HEADER;
-	else if (strcmp(base, "network") == 0)
-		return NFT_PAYLOAD_NETWORK_HEADER;
-	else if (strcmp(base, "transport") == 0)
-		return NFT_PAYLOAD_TRANSPORT_HEADER;
-	else {
-		errno = EINVAL;
-		return -1;
-	}
-}
-
 static int
 nftnl_expr_payload_snprintf(char *buf, size_t len,
 			    uint32_t flags, const struct nftnl_expr *e)
