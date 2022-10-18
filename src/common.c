@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <time.h>
+#include <arpa/inet.h>
 #include <linux/netlink.h>
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nf_tables.h>
@@ -37,7 +38,7 @@ static struct nlmsghdr *__nftnl_nlmsg_build_hdr(char *buf, uint16_t type,
 	nfh = mnl_nlmsg_put_extra_header(nlh, sizeof(struct nfgenmsg));
 	nfh->nfgen_family = family;
 	nfh->version = NFNETLINK_V0;
-	nfh->res_id = res_id;
+	nfh->res_id = htons(res_id);
 
 	return nlh;
 }
