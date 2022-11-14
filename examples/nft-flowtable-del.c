@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	struct nlmsghdr *nlh;
 	uint32_t portid, seq, flowtable_seq;
 	struct nftnl_flowtable *t;
-	int ret, family, batching;
+	int ret, family;
 
 	if (argc != 4) {
 		fprintf(stderr, "Usage: %s <family> <table> <flowtable>\n",
@@ -60,19 +60,11 @@ int main(int argc, char *argv[])
 	if (t == NULL)
 		exit(EXIT_FAILURE);
 
-	batching = nftnl_batch_is_supported();
-	if (batching < 0) {
-		perror("cannot talk to nfnetlink");
-		exit(EXIT_FAILURE);
-	}
-
 	seq = time(NULL);
 	batch = mnl_nlmsg_batch_start(buf, sizeof(buf));
 
-	if (batching) {
-		nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	flowtable_seq = seq;
 	nlh = nftnl_flowtable_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
@@ -82,10 +74,8 @@ int main(int argc, char *argv[])
 	nftnl_flowtable_free(t);
 	mnl_nlmsg_batch_next(batch);
 
-	if (batching) {
-		nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
-		mnl_nlmsg_batch_next(batch);
-	}
+	nftnl_batch_end(mnl_nlmsg_batch_current(batch), seq++);
+	mnl_nlmsg_batch_next(batch);
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
