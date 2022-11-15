@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
-					NLM_F_DUMP|NLM_F_ACK, seq);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
+				    NLM_F_DUMP | NLM_F_ACK, seq);
 	/* Use this below if you want to obtain sets per table */
 /*	nftnl_set_set(t, NFT_SET_TABLE, argv[2]); */
 	nftnl_set_nlmsg_build_payload(nlh, t);

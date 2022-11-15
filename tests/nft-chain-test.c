@@ -89,8 +89,7 @@ int main(int argc, char *argv[])
 	nftnl_chain_set_str(a, NFTNL_CHAIN_DEV, "eth0");
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
-	nlh = nftnl_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, AF_INET,
-					0, 1234);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, AF_INET, 0, 1234);
 	nftnl_chain_nlmsg_build_payload(nlh, a);
 
 	if (nftnl_chain_nlmsg_parse(nlh, b) < 0)

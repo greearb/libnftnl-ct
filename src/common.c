@@ -127,9 +127,8 @@ int nftnl_batch_is_supported(void)
 	mnl_nlmsg_batch_next(b);
 
 	req_seq = seq;
-	nftnl_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(b),
-				NFT_MSG_NEWSET, AF_INET,
-				NLM_F_ACK, seq++);
+	nftnl_nlmsg_build_hdr(mnl_nlmsg_batch_current(b), NFT_MSG_NEWSET,
+			      AF_INET, NLM_F_ACK, seq++);
 	mnl_nlmsg_batch_next(b);
 
 	nftnl_batch_end(mnl_nlmsg_batch_current(b), seq++);

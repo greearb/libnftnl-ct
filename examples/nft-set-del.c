@@ -62,9 +62,8 @@ int main(int argc, char *argv[])
 	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
 	mnl_nlmsg_batch_next(batch);
 
-	nlh = nftnl_set_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
-					NFT_MSG_DELSET, family,
-					NLM_F_ACK, seq);
+	nlh = nftnl_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+				    NFT_MSG_DELSET, family, NLM_F_ACK, seq);
 	nftnl_set_set_str(t, NFTNL_SET_TABLE, argv[2]);
 	nftnl_set_set_str(t, NFTNL_SET_NAME, argv[3]);
 

@@ -111,8 +111,8 @@ int main(int argc, char *argv[])
 	}
 
 	seq = time(NULL);
-	nlh = nftnl_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
-					 NLM_F_DUMP, seq);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
+				    NLM_F_DUMP, seq);
 
 	r = setup_rule(family, table, chain, NULL);
 	if (!r) {

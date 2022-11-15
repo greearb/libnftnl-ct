@@ -72,11 +72,8 @@ int main(int argc, char *argv[])
 	nftnl_batch_begin(mnl_nlmsg_batch_current(batch), seq++);
 	mnl_nlmsg_batch_next(batch);
 
-	nlh = nftnl_rule_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
-				NFT_MSG_DELRULE,
-				family,
-				NLM_F_ACK, seq++);
-
+	nlh = nftnl_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+				    NFT_MSG_DELRULE, family, NLM_F_ACK, seq++);
 	nftnl_rule_nlmsg_build_payload(nlh, r);
 	nftnl_rule_free(r);
 	mnl_nlmsg_batch_next(batch);

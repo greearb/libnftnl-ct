@@ -55,8 +55,7 @@ int main(int argc, char *argv[])
 	nftnl_table_set_u32(a, NFTNL_TABLE_FLAGS, 0);
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
-	nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, AF_INET, 0,
-					1234);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_NEWTABLE, AF_INET, 0, 1234);
 	nftnl_table_nlmsg_build_payload(nlh, a);
 
 	if (nftnl_table_nlmsg_parse(nlh, b) < 0)

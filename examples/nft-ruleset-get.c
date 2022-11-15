@@ -97,8 +97,8 @@ static struct nftnl_rule_list *mnl_rule_dump(struct mnl_socket *nf_sock,
 	if (nlr_list == NULL)
 		memory_allocation_error();
 
-	nlh = nftnl_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
-				       NLM_F_DUMP, seq);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, family,
+				    NLM_F_DUMP, seq);
 
 	ret = mnl_talk(nf_sock, nlh, nlh->nlmsg_len, rule_cb, nlr_list);
 	if (ret < 0)
@@ -145,8 +145,8 @@ static struct nftnl_chain_list *mnl_chain_dump(struct mnl_socket *nf_sock,
 	if (nlc_list == NULL)
 		memory_allocation_error();
 
-	nlh = nftnl_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
-					NLM_F_DUMP, seq);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, family,
+				    NLM_F_DUMP, seq);
 
 	ret = mnl_talk(nf_sock, nlh, nlh->nlmsg_len, chain_cb, nlc_list);
 	if (ret < 0)
@@ -193,8 +193,8 @@ static struct nftnl_table_list *mnl_table_dump(struct mnl_socket *nf_sock,
 	if (nlt_list == NULL)
 		memory_allocation_error();
 
-	nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
-					NLM_F_DUMP, seq);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
+				    NLM_F_DUMP, seq);
 
 	ret = mnl_talk(nf_sock, nlh, nlh->nlmsg_len, table_cb, nlt_list);
 	if (ret < 0)
@@ -221,8 +221,8 @@ static int mnl_setelem_get(struct mnl_socket *nf_sock, struct nftnl_set *nls)
 	struct nlmsghdr *nlh;
 	uint32_t family = nftnl_set_get_u32(nls, NFTNL_SET_FAMILY);
 
-	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
-				      NLM_F_DUMP|NLM_F_ACK, seq);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETSETELEM, family,
+				    NLM_F_DUMP | NLM_F_ACK, seq);
 	nftnl_set_nlmsg_build_payload(nlh, nls);
 
 	return mnl_talk(nf_sock, nlh, nlh->nlmsg_len, set_elem_cb, nls);
@@ -266,8 +266,8 @@ mnl_set_dump(struct mnl_socket *nf_sock, int family)
 	if (s == NULL)
 		memory_allocation_error();
 
-	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
-				      NLM_F_DUMP|NLM_F_ACK, seq);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETSET, family,
+				    NLM_F_DUMP | NLM_F_ACK, seq);
 	nftnl_set_nlmsg_build_payload(nlh, s);
 	nftnl_set_free(s);
 

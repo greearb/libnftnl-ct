@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	nftnl_set_set_str(a, NFTNL_SET_USERDATA, "testing user data");
 
 	/* cmd extracted from include/linux/netfilter/nf_tables.h */
-	nlh = nftnl_set_nlmsg_build_hdr(buf, NFT_MSG_NEWSET, AF_INET, 0, 1234);
+	nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_NEWSET, AF_INET, 0, 1234);
 	nftnl_set_nlmsg_build_payload(nlh, a);
 
 	if (nftnl_set_nlmsg_parse(nlh, b) < 0)

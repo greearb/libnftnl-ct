@@ -88,11 +88,11 @@ int main(int argc, char *argv[])
 
 	seq = time(NULL);
 	if (t == NULL) {
-		nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
-						NLM_F_DUMP, seq);
+		nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
+					    NLM_F_DUMP, seq);
 	} else {
-		nlh = nftnl_table_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
-						NLM_F_ACK, seq);
+		nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, family,
+					    NLM_F_ACK, seq);
 		nftnl_table_set_str(t, NFTNL_TABLE_NAME, argv[2]);
 		nftnl_table_nlmsg_build_payload(nlh, t);
 		nftnl_table_free(t);

@@ -79,9 +79,9 @@ int main(int argc, char *argv[])
 
 	table_seq = seq;
 	family = nftnl_table_get_u32(t, NFTNL_TABLE_FAMILY);
-	nlh = nftnl_table_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
-					NFT_MSG_NEWTABLE, family,
-					NLM_F_CREATE|NLM_F_ACK, seq++);
+	nlh = nftnl_nlmsg_build_hdr(mnl_nlmsg_batch_current(batch),
+				    NFT_MSG_NEWTABLE, family,
+				    NLM_F_CREATE | NLM_F_ACK, seq++);
 	nftnl_table_nlmsg_build_payload(nlh, t);
 	nftnl_table_free(t);
 	mnl_nlmsg_batch_next(batch);

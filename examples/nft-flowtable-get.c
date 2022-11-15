@@ -75,15 +75,15 @@ int main(int argc, char *argv[])
 			perror("OOM");
 			exit(EXIT_FAILURE);
 		}
-		nlh = nftnl_flowtable_nlmsg_build_hdr(buf, NFT_MSG_GETFLOWTABLE, family,
-						NLM_F_ACK, seq);
+		nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETFLOWTABLE, family,
+					    NLM_F_ACK, seq);
 		nftnl_flowtable_set_str(t, NFTNL_FLOWTABLE_TABLE, argv[2]);
 		nftnl_flowtable_set_str(t, NFTNL_FLOWTABLE_NAME, argv[3]);
 		nftnl_flowtable_nlmsg_build_payload(nlh, t);
 		nftnl_flowtable_free(t);
 	} else if (argc >= 2) {
-		nlh = nftnl_flowtable_nlmsg_build_hdr(buf, NFT_MSG_GETFLOWTABLE, family,
-						NLM_F_DUMP, seq);
+		nlh = nftnl_nlmsg_build_hdr(buf, NFT_MSG_GETFLOWTABLE, family,
+					    NLM_F_DUMP, seq);
 	}
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
