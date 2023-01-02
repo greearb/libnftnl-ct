@@ -316,6 +316,13 @@ enum {
 	NFTNL_EXPR_LAST_SET,
 };
 
+enum {
+	NFTNL_EXPR_INNER_TYPE = NFTNL_EXPR_BASE,
+	NFTNL_EXPR_INNER_FLAGS,
+	NFTNL_EXPR_INNER_HDRSIZE,
+	NFTNL_EXPR_INNER_EXPR,
+};
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

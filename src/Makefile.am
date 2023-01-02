@@ -40,6 +40,7 @@ libnftnl_la_SOURCES = utils.c		\
 		      expr/lookup.c	\
 		      expr/dynset.c	\
 		      expr/immediate.c	\
+		      expr/inner.c	\
 		      expr/match.c	\
 		      expr/meta.c	\
 		      expr/numgen.c	\
