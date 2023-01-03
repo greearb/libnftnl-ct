@@ -486,40 +486,49 @@ const char *const *nftnl_chain_get_array(const struct nftnl_chain *c, uint16_t a
 EXPORT_SYMBOL(nftnl_chain_nlmsg_build_payload);
 void nftnl_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_chain *c)
 {
+	struct nlattr *nest = NULL;
 	int i;
 
 	if (c->flags & (1 << NFTNL_CHAIN_TABLE))
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_TABLE, c->table);
 	if (c->flags & (1 << NFTNL_CHAIN_NAME))
 		mnl_attr_put_strz(nlh, NFTA_CHAIN_NAME, c->name);
-	if ((c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) &&
-	    (c->flags & (1 << NFTNL_CHAIN_PRIO))) {
-		struct nlattr *nest;
 
+	if ((c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) ||
+	    (c->flags & (1 << NFTNL_CHAIN_PRIO)) ||
+	    (c->flags & (1 << NFTNL_CHAIN_DEV)) ||
+	    (c->flags & (1 << NFTNL_CHAIN_DEVICES)))
 		nest = mnl_attr_nest_start(nlh, NFTA_CHAIN_HOOK);
-		mnl_attr_put_u32(nlh, NFTA_HOOK_HOOKNUM, htonl(c->hooknum));
-		mnl_attr_put_u32(nlh, NFTA_HOOK_PRIORITY, htonl(c->prio));
-		if (c->flags & (1 << NFTNL_CHAIN_DEV))
-			mnl_attr_put_strz(nlh, NFTA_HOOK_DEV, c->dev);
-		else if (c->flags & (1 << NFTNL_CHAIN_DEVICES)) {
-			struct nlattr *nest_dev;
 
-			nest_dev = mnl_attr_nest_start(nlh, NFTA_HOOK_DEVS);
-			for (i = 0; i < c->dev_array_len; i++)
-				mnl_attr_put_strz(nlh, NFTA_DEVICE_NAME,
-						  c->dev_array[i]);
-			mnl_attr_nest_end(nlh, nest_dev);
-		}
-		mnl_attr_nest_end(nlh, nest);
+	if ((c->flags & (1 << NFTNL_CHAIN_HOOKNUM)))
+		mnl_attr_put_u32(nlh, NFTA_HOOK_HOOKNUM, htonl(c->hooknum));
+	if ((c->flags & (1 << NFTNL_CHAIN_PRIO)))
+		mnl_attr_put_u32(nlh, NFTA_HOOK_PRIORITY, htonl(c->prio));
+
+	if (c->flags & (1 << NFTNL_CHAIN_DEV))
+		mnl_attr_put_strz(nlh, NFTA_HOOK_DEV, c->dev);
+	else if (c->flags & (1 << NFTNL_CHAIN_DEVICES)) {
+		struct nlattr *nest_dev;
+
+		nest_dev = mnl_attr_nest_start(nlh, NFTA_HOOK_DEVS);
+		for (i = 0; i < c->dev_array_len; i++)
+			mnl_attr_put_strz(nlh, NFTA_DEVICE_NAME,
+					  c->dev_array[i]);
+		mnl_attr_nest_end(nlh, nest_dev);
 	}
+
+	if ((c->flags & (1 << NFTNL_CHAIN_HOOKNUM)) ||
+	    (c->flags & (1 << NFTNL_CHAIN_PRIO)) ||
+	    (c->flags & (1 << NFTNL_CHAIN_DEV)) ||
+	    (c->flags & (1 << NFTNL_CHAIN_DEVICES)))
+		mnl_attr_nest_end(nlh, nest);
+
 	if (c->flags & (1 << NFTNL_CHAIN_POLICY))
 		mnl_attr_put_u32(nlh, NFTA_CHAIN_POLICY, htonl(c->policy));
 	if (c->flags & (1 << NFTNL_CHAIN_USE))
 		mnl_attr_put_u32(nlh, NFTA_CHAIN_USE, htonl(c->use));
 	if ((c->flags & (1 << NFTNL_CHAIN_PACKETS)) &&
 	    (c->flags & (1 << NFTNL_CHAIN_BYTES))) {
-		struct nlattr *nest;
-
 		nest = mnl_attr_nest_start(nlh, NFTA_CHAIN_COUNTERS);
 		mnl_attr_put_u64(nlh, NFTA_COUNTER_PACKETS, be64toh(c->packets));
 		mnl_attr_put_u64(nlh, NFTA_COUNTER_BYTES, be64toh(c->bytes));
