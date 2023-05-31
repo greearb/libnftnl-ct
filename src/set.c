@@ -54,8 +54,10 @@ void nftnl_set_free(const struct nftnl_set *s)
 	if (s->flags & (1 << NFTNL_SET_USERDATA))
 		xfree(s->user.data);
 
-	list_for_each_entry_safe(expr, next, &s->expr_list, head)
+	list_for_each_entry_safe(expr, next, &s->expr_list, head) {
+		list_del(&expr->head);
 		nftnl_expr_free(expr);
+	}
 
 	list_for_each_entry_safe(elem, tmp, &s->element_list, head) {
 		list_del(&elem->head);
@@ -105,8 +107,10 @@ void nftnl_set_unset(struct nftnl_set *s, uint16_t attr)
 		break;
 	case NFTNL_SET_EXPR:
 	case NFTNL_SET_EXPRESSIONS:
-		list_for_each_entry_safe(expr, tmp, &s->expr_list, head)
+		list_for_each_entry_safe(expr, tmp, &s->expr_list, head) {
+			list_del(&expr->head);
 			nftnl_expr_free(expr);
+		}
 		break;
 	default:
 		return;
@@ -210,8 +214,10 @@ int nftnl_set_set_data(struct nftnl_set *s, uint16_t attr, const void *data,
 		s->user.len = data_len;
 		break;
 	case NFTNL_SET_EXPR:
-		list_for_each_entry_safe(expr, tmp, &s->expr_list, head)
+		list_for_each_entry_safe(expr, tmp, &s->expr_list, head) {
+			list_del(&expr->head);
 			nftnl_expr_free(expr);
+		}
 
 		expr = (void *)data;
 		list_add(&expr->head, &s->expr_list);
@@ -742,8 +748,10 @@ int nftnl_set_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_set *s)
 
 	return 0;
 out_set_expr:
-	list_for_each_entry_safe(expr, next, &s->expr_list, head)
+	list_for_each_entry_safe(expr, next, &s->expr_list, head) {
+		list_del(&expr->head);
 		nftnl_expr_free(expr);
+	}
 
 	return -1;
 }
