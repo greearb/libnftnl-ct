@@ -48,6 +48,12 @@ static void cmp_nftnl_rule(struct nftnl_rule *a, struct nftnl_rule *b)
 	if (nftnl_rule_get_u32(a, NFTNL_RULE_COMPAT_FLAGS) !=
 	    nftnl_rule_get_u32(b, NFTNL_RULE_COMPAT_FLAGS))
 		print_err("Rule compat_flags mismatches");
+	if (nftnl_rule_get_u32(a, NFTNL_RULE_ID) !=
+            nftnl_rule_get_u32(b, NFTNL_RULE_ID))
+                print_err("Rule id mismatches");
+	if (nftnl_rule_get_u32(a, NFTNL_RULE_POSITION_ID) !=
+            nftnl_rule_get_u32(b, NFTNL_RULE_POSITION_ID))
+                print_err("Rule position_id mismatches");
 	if (nftnl_rule_get_u64(a, NFTNL_RULE_POSITION) !=
 	    nftnl_rule_get_u64(b, NFTNL_RULE_POSITION))
 		print_err("Rule compat_position mismatches");
@@ -84,6 +90,8 @@ int main(int argc, char *argv[])
 	nftnl_rule_set_u64(a, NFTNL_RULE_HANDLE, 0x1234567812345678);
 	nftnl_rule_set_u32(a, NFTNL_RULE_COMPAT_PROTO, 0x12345678);
 	nftnl_rule_set_u32(a, NFTNL_RULE_COMPAT_FLAGS, 0x12345678);
+	nftnl_rule_set_u32(a, NFTNL_RULE_ID, 0x12345678);
+	nftnl_rule_set_u32(a, NFTNL_RULE_POSITION_ID, 0x12345678);
 	nftnl_rule_set_u64(a, NFTNL_RULE_POSITION, 0x1234567812345678);
 	nftnl_rule_set_data(a, NFTNL_RULE_USERDATA,
 			    nftnl_udata_buf_data(udata),
