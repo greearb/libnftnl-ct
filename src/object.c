@@ -160,7 +160,7 @@ void nftnl_obj_set_str(struct nftnl_obj *obj, uint16_t attr, const char *str)
 }
 
 EXPORT_SYMBOL(nftnl_obj_get_data);
-const void *nftnl_obj_get_data(struct nftnl_obj *obj, uint16_t attr,
+const void *nftnl_obj_get_data(const struct nftnl_obj *obj, uint16_t attr,
 			       uint32_t *data_len)
 {
 	if (!(obj->flags & (1 << attr)))
@@ -198,42 +198,42 @@ const void *nftnl_obj_get_data(struct nftnl_obj *obj, uint16_t attr,
 }
 
 EXPORT_SYMBOL(nftnl_obj_get);
-const void *nftnl_obj_get(struct nftnl_obj *obj, uint16_t attr)
+const void *nftnl_obj_get(const struct nftnl_obj *obj, uint16_t attr)
 {
 	uint32_t data_len;
 	return nftnl_obj_get_data(obj, attr, &data_len);
 }
 
 EXPORT_SYMBOL(nftnl_obj_get_u8);
-uint8_t nftnl_obj_get_u8(struct nftnl_obj *obj, uint16_t attr)
+uint8_t nftnl_obj_get_u8(const struct nftnl_obj *obj, uint16_t attr)
 {
 	const void *ret = nftnl_obj_get(obj, attr);
 	return ret == NULL ? 0 : *((uint8_t *)ret);
 }
 
 EXPORT_SYMBOL(nftnl_obj_get_u16);
-uint16_t nftnl_obj_get_u16(struct nftnl_obj *obj, uint16_t attr)
+uint16_t nftnl_obj_get_u16(const struct nftnl_obj *obj, uint16_t attr)
 {
 	const void *ret = nftnl_obj_get(obj, attr);
 	return ret == NULL ? 0 : *((uint16_t *)ret);
 }
 
 EXPORT_SYMBOL(nftnl_obj_get_u32);
-uint32_t nftnl_obj_get_u32(struct nftnl_obj *obj, uint16_t attr)
+uint32_t nftnl_obj_get_u32(const struct nftnl_obj *obj, uint16_t attr)
 {
 	const void *ret = nftnl_obj_get(obj, attr);
 	return ret == NULL ? 0 : *((uint32_t *)ret);
 }
 
 EXPORT_SYMBOL(nftnl_obj_get_u64);
-uint64_t nftnl_obj_get_u64(struct nftnl_obj *obj, uint16_t attr)
+uint64_t nftnl_obj_get_u64(const struct nftnl_obj *obj, uint16_t attr)
 {
 	const void *ret = nftnl_obj_get(obj, attr);
 	return ret == NULL ? 0 : *((uint64_t *)ret);
 }
 
 EXPORT_SYMBOL(nftnl_obj_get_str);
-const char *nftnl_obj_get_str(struct nftnl_obj *obj, uint16_t attr)
+const char *nftnl_obj_get_str(const struct nftnl_obj *obj, uint16_t attr)
 {
 	return nftnl_obj_get(obj, attr);
 }

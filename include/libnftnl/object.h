@@ -131,14 +131,14 @@ void nftnl_obj_set_u16(struct nftnl_obj *ne, uint16_t attr, uint16_t val);
 void nftnl_obj_set_u32(struct nftnl_obj *ne, uint16_t attr, uint32_t val);
 void nftnl_obj_set_u64(struct nftnl_obj *obj, uint16_t attr, uint64_t val);
 void nftnl_obj_set_str(struct nftnl_obj *ne, uint16_t attr, const char *str);
-const void *nftnl_obj_get_data(struct nftnl_obj *ne, uint16_t attr,
+const void *nftnl_obj_get_data(const struct nftnl_obj *ne, uint16_t attr,
 			       uint32_t *data_len);
-const void *nftnl_obj_get(struct nftnl_obj *ne, uint16_t attr);
-uint8_t nftnl_obj_get_u8(struct nftnl_obj *ne, uint16_t attr);
-uint16_t nftnl_obj_get_u16(struct nftnl_obj *obj, uint16_t attr);
-uint32_t nftnl_obj_get_u32(struct nftnl_obj *ne, uint16_t attr);
-uint64_t nftnl_obj_get_u64(struct nftnl_obj *obj, uint16_t attr);
-const char *nftnl_obj_get_str(struct nftnl_obj *ne, uint16_t attr);
+const void *nftnl_obj_get(const struct nftnl_obj *ne, uint16_t attr);
+uint8_t nftnl_obj_get_u8(const struct nftnl_obj *ne, uint16_t attr);
+uint16_t nftnl_obj_get_u16(const struct nftnl_obj *obj, uint16_t attr);
+uint32_t nftnl_obj_get_u32(const struct nftnl_obj *ne, uint16_t attr);
+uint64_t nftnl_obj_get_u64(const struct nftnl_obj *obj, uint16_t attr);
+const char *nftnl_obj_get_str(const struct nftnl_obj *ne, uint16_t attr);
 
 void nftnl_obj_nlmsg_build_payload(struct nlmsghdr *nlh,
 				   const struct nftnl_obj *ne);
