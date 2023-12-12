@@ -217,3 +217,17 @@ void nftnl_free_verdict(const union nftnl_data_reg *data)
 		break;
 	}
 }
+
+int nftnl_data_cpy(union nftnl_data_reg *dreg, const void *src, uint32_t len)
+{
+	int ret = 0;
+
+	if (len > sizeof(dreg->val)) {
+		len = sizeof(dreg->val);
+		ret = -1;
+	}
+
+	memcpy(dreg->val, src, len);
+	dreg->len = len;
+	return ret;
+}

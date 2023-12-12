@@ -40,13 +40,9 @@ static int nftnl_expr_range_set(struct nftnl_expr *e, uint16_t type,
 		memcpy(&range->op, data, sizeof(range->op));
 		break;
 	case NFTNL_EXPR_RANGE_FROM_DATA:
-		memcpy(&range->data_from.val, data, data_len);
-		range->data_from.len = data_len;
-		break;
+		return nftnl_data_cpy(&range->data_from, data, data_len);
 	case NFTNL_EXPR_RANGE_TO_DATA:
-		memcpy(&range->data_to.val, data, data_len);
-		range->data_to.len = data_len;
-		break;
+		return nftnl_data_cpy(&range->data_to, data, data_len);
 	default:
 		return -1;
 	}

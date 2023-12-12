@@ -42,9 +42,7 @@ nftnl_expr_cmp_set(struct nftnl_expr *e, uint16_t type,
 		memcpy(&cmp->op, data, sizeof(cmp->op));
 		break;
 	case NFTNL_EXPR_CMP_DATA:
-		memcpy(&cmp->data.val, data, data_len);
-		cmp->data.len = data_len;
-		break;
+		return nftnl_data_cpy(&cmp->data, data, data_len);
 	default:
 		return -1;
 	}

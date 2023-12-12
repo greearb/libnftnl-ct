@@ -36,9 +36,7 @@ nftnl_expr_immediate_set(struct nftnl_expr *e, uint16_t type,
 		memcpy(&imm->dreg, data, sizeof(imm->dreg));
 		break;
 	case NFTNL_EXPR_IMM_DATA:
-		memcpy(&imm->data.val, data, data_len);
-		imm->data.len = data_len;
-		break;
+		return nftnl_data_cpy(&imm->data, data, data_len);
 	case NFTNL_EXPR_IMM_VERDICT:
 		memcpy(&imm->data.verdict, data, sizeof(imm->data.verdict));
 		break;
