@@ -43,8 +43,6 @@ static int nftnl_expr_range_set(struct nftnl_expr *e, uint16_t type,
 		return nftnl_data_cpy(&range->data_from, data, data_len);
 	case NFTNL_EXPR_RANGE_TO_DATA:
 		return nftnl_data_cpy(&range->data_to, data, data_len);
-	default:
-		return -1;
 	}
 	return 0;
 }

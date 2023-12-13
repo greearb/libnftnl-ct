@@ -42,8 +42,6 @@ nftnl_expr_redir_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_REDIR_FLAGS:
 		memcpy(&redir->flags, data, sizeof(redir->flags));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

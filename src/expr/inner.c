@@ -59,8 +59,6 @@ nftnl_expr_inner_set(struct nftnl_expr *e, uint16_t type,
 
 		inner->expr = (void *)data;
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

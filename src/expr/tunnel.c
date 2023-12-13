@@ -36,8 +36,6 @@ static int nftnl_expr_tunnel_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_TUNNEL_DREG:
 		memcpy(&tunnel->dreg, data, sizeof(tunnel->dreg));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

@@ -41,8 +41,6 @@ nftnl_expr_socket_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_SOCKET_LEVEL:
 		memcpy(&socket->level, data, sizeof(socket->level));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

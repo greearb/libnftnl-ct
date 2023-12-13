@@ -43,8 +43,6 @@ nftnl_expr_fib_set(struct nftnl_expr *e, uint16_t result,
 	case NFTNL_EXPR_FIB_FLAGS:
 		memcpy(&fib->flags, data, sizeof(fib->flags));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

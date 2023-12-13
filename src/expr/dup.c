@@ -37,8 +37,6 @@ static int nftnl_expr_dup_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_DUP_SREG_DEV:
 		memcpy(&dup->sreg_dev, data, sizeof(dup->sreg_dev));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

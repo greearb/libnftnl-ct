@@ -45,8 +45,6 @@ static int nftnl_expr_queue_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_QUEUE_SREG_QNUM:
 		memcpy(&queue->sreg_qnum, data, sizeof(queue->sreg_qnum));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

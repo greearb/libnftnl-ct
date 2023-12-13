@@ -38,8 +38,6 @@ static int nftnl_expr_reject_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_REJECT_CODE:
 		memcpy(&reject->icmp_code, data, sizeof(reject->icmp_code));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

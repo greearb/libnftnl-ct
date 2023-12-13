@@ -53,8 +53,6 @@ nftnl_expr_lookup_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_LOOKUP_FLAGS:
 		memcpy(&lookup->flags, data, sizeof(lookup->flags));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

@@ -66,8 +66,6 @@ nftnl_expr_exthdr_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_EXTHDR_SREG:
 		memcpy(&exthdr->sreg, data, sizeof(exthdr->sreg));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

@@ -37,8 +37,6 @@ static int nftnl_expr_last_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_LAST_SET:
 		memcpy(&last->set, data, sizeof(last->set));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

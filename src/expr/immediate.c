@@ -51,8 +51,6 @@ nftnl_expr_immediate_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_IMM_CHAIN_ID:
 		memcpy(&imm->data.chain_id, data, sizeof(uint32_t));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

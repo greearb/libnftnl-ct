@@ -51,8 +51,6 @@ nftnl_expr_byteorder_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_BYTEORDER_SIZE:
 		memcpy(&byteorder->size, data, sizeof(byteorder->size));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

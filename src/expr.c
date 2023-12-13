@@ -71,6 +71,9 @@ int nftnl_expr_set(struct nftnl_expr *expr, uint16_t type,
 	case NFTNL_EXPR_NAME:	/* cannot be modified */
 		return 0;
 	default:
+		if (type < NFTNL_EXPR_BASE || type > expr->ops->nftnl_max_attr)
+			return -1;
+
 		if (expr->ops->set(expr, type, data, data_len) < 0)
 			return -1;
 	}

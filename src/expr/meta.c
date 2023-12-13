@@ -47,8 +47,6 @@ nftnl_expr_meta_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_META_SREG:
 		memcpy(&meta->sreg, data, sizeof(meta->sreg));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

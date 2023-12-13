@@ -57,8 +57,6 @@ static int nftnl_expr_objref_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_OBJREF_SET_ID:
 		memcpy(&objref->set.id, data, sizeof(objref->set.id));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

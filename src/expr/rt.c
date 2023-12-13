@@ -37,8 +37,6 @@ nftnl_expr_rt_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_RT_DREG:
 		memcpy(&rt->dreg, data, sizeof(rt->dreg));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

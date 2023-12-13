@@ -42,8 +42,6 @@ nftnl_expr_tproxy_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_TPROXY_REG_PORT:
 		memcpy(&tproxy->sreg_port, data, sizeof(tproxy->sreg_port));
 		break;
-	default:
-		return -1;
 	}
 
 	return 0;

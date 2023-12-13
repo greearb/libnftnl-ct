@@ -60,8 +60,6 @@ static int nftnl_expr_log_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_LOG_FLAGS:
 		memcpy(&log->flags, data, sizeof(log->flags));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

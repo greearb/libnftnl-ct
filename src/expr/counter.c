@@ -40,8 +40,6 @@ nftnl_expr_counter_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_CTR_PACKETS:
 		memcpy(&ctr->pkts, data, sizeof(ctr->pkts));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

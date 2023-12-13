@@ -41,8 +41,6 @@ static int nftnl_expr_fwd_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_FWD_NFPROTO:
 		memcpy(&fwd->nfproto, data, sizeof(fwd->nfproto));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

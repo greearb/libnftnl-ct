@@ -41,8 +41,6 @@ static int nftnl_expr_quota_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_QUOTA_FLAGS:
 		memcpy(&quota->flags, data, sizeof(quota->flags));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

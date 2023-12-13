@@ -42,8 +42,6 @@ nftnl_expr_masq_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_MASQ_REG_PROTO_MAX:
 		memcpy(&masq->sreg_proto_max, data, sizeof(masq->sreg_proto_max));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

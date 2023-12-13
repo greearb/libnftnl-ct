@@ -62,8 +62,6 @@ nftnl_expr_nat_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_NAT_FLAGS:
 		memcpy(&nat->flags, data, sizeof(nat->flags));
 		break;
-	default:
-		return -1;
 	}
 
 	return 0;

@@ -55,8 +55,6 @@ nftnl_expr_target_set(struct nftnl_expr *e, uint16_t type,
 		tg->data = data;
 		tg->data_len = data_len;
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

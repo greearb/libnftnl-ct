@@ -38,8 +38,6 @@ nftnl_expr_connlimit_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_CONNLIMIT_FLAGS:
 		memcpy(&connlimit->flags, data, sizeof(connlimit->flags));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

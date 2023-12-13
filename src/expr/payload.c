@@ -66,8 +66,6 @@ nftnl_expr_payload_set(struct nftnl_expr *e, uint16_t type,
 	case NFTNL_EXPR_PAYLOAD_FLAGS:
 		memcpy(&payload->csum_flags, data, sizeof(payload->csum_flags));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

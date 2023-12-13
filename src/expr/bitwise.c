@@ -56,8 +56,6 @@ nftnl_expr_bitwise_set(struct nftnl_expr *e, uint16_t type,
 		return nftnl_data_cpy(&bitwise->xor, data, data_len);
 	case NFTNL_EXPR_BITWISE_DATA:
 		return nftnl_data_cpy(&bitwise->data, data, data_len);
-	default:
-		return -1;
 	}
 	return 0;
 }

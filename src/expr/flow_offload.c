@@ -25,8 +25,6 @@ static int nftnl_expr_flow_set(struct nftnl_expr *e, uint16_t type,
 		if (!flow->table_name)
 			return -1;
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }
