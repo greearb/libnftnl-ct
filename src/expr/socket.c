@@ -160,7 +160,7 @@ nftnl_expr_socket_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_socket = {
 	.name		= "socket",
 	.alloc_len	= sizeof(struct nftnl_expr_socket),
-	.max_attr	= NFTA_SOCKET_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_SOCKET_MAX - 1,
 	.set		= nftnl_expr_socket_set,
 	.get		= nftnl_expr_socket_get,
 	.parse		= nftnl_expr_socket_parse,

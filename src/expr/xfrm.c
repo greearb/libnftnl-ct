@@ -191,7 +191,7 @@ nftnl_expr_xfrm_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_xfrm = {
 	.name		= "xfrm",
 	.alloc_len	= sizeof(struct nftnl_expr_xfrm),
-	.max_attr	= NFTA_XFRM_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_XFRM_MAX - 1,
 	.set		= nftnl_expr_xfrm_set,
 	.get		= nftnl_expr_xfrm_get,
 	.parse		= nftnl_expr_xfrm_parse,

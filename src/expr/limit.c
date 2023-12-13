@@ -197,7 +197,7 @@ nftnl_expr_limit_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_limit = {
 	.name		= "limit",
 	.alloc_len	= sizeof(struct nftnl_expr_limit),
-	.max_attr	= NFTA_LIMIT_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_LIMIT_MAX - 1,
 	.set		= nftnl_expr_limit_set,
 	.get		= nftnl_expr_limit_get,
 	.parse		= nftnl_expr_limit_parse,

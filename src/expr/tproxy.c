@@ -165,7 +165,7 @@ nftnl_expr_tproxy_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_tproxy = {
 	.name		= "tproxy",
 	.alloc_len	= sizeof(struct nftnl_expr_tproxy),
-	.max_attr	= NFTA_TPROXY_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_TPROXY_MAX - 1,
 	.set		= nftnl_expr_tproxy_set,
 	.get		= nftnl_expr_tproxy_get,
 	.parse		= nftnl_expr_tproxy_parse,

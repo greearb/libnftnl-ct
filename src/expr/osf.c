@@ -142,7 +142,7 @@ nftnl_expr_osf_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_osf = {
 	.name		= "osf",
 	.alloc_len	= sizeof(struct nftnl_expr_osf),
-	.max_attr	= NFTA_OSF_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_OSF_MAX - 1,
 	.set		= nftnl_expr_osf_set,
 	.get		= nftnl_expr_osf_get,
 	.parse		= nftnl_expr_osf_parse,

@@ -130,7 +130,7 @@ static int nftnl_expr_connlimit_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_connlimit = {
 	.name		= "connlimit",
 	.alloc_len	= sizeof(struct nftnl_expr_connlimit),
-	.max_attr	= NFTA_CONNLIMIT_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_CONNLIMIT_MAX - 1,
 	.set		= nftnl_expr_connlimit_set,
 	.get		= nftnl_expr_connlimit_get,
 	.parse		= nftnl_expr_connlimit_parse,

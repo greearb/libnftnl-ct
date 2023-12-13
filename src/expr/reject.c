@@ -129,7 +129,7 @@ nftnl_expr_reject_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_reject = {
 	.name		= "reject",
 	.alloc_len	= sizeof(struct nftnl_expr_reject),
-	.max_attr	= NFTA_REJECT_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_REJECT_MAX - 1,
 	.set		= nftnl_expr_reject_set,
 	.get		= nftnl_expr_reject_get,
 	.parse		= nftnl_expr_reject_parse,

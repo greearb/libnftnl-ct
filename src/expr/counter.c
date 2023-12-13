@@ -128,7 +128,7 @@ static int nftnl_expr_counter_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_counter = {
 	.name		= "counter",
 	.alloc_len	= sizeof(struct nftnl_expr_counter),
-	.max_attr	= NFTA_COUNTER_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_CTR_MAX - 1,
 	.set		= nftnl_expr_counter_set,
 	.get		= nftnl_expr_counter_get,
 	.parse		= nftnl_expr_counter_parse,

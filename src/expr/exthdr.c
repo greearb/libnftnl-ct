@@ -262,7 +262,7 @@ nftnl_expr_exthdr_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_exthdr = {
 	.name		= "exthdr",
 	.alloc_len	= sizeof(struct nftnl_expr_exthdr),
-	.max_attr	= NFTA_EXTHDR_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_EXTHDR_MAX - 1,
 	.set		= nftnl_expr_exthdr_set,
 	.get		= nftnl_expr_exthdr_get,
 	.parse		= nftnl_expr_exthdr_parse,

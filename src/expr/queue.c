@@ -188,7 +188,7 @@ nftnl_expr_queue_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_queue = {
 	.name		= "queue",
 	.alloc_len	= sizeof(struct nftnl_expr_queue),
-	.max_attr	= NFTA_QUEUE_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_QUEUE_MAX - 1,
 	.set		= nftnl_expr_queue_set,
 	.get		= nftnl_expr_queue_get,
 	.parse		= nftnl_expr_queue_parse,

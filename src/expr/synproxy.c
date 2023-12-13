@@ -147,7 +147,7 @@ nftnl_expr_synproxy_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_synproxy = {
 	.name		= "synproxy",
 	.alloc_len	= sizeof(struct nftnl_expr_synproxy),
-	.max_attr	= NFTA_SYNPROXY_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_SYNPROXY_MAX - 1,
 	.set		= nftnl_expr_synproxy_set,
 	.get		= nftnl_expr_synproxy_get,
 	.parse		= nftnl_expr_synproxy_parse,

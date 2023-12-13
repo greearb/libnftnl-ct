@@ -175,7 +175,7 @@ nftnl_expr_ng_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_ng = {
 	.name		= "numgen",
 	.alloc_len	= sizeof(struct nftnl_expr_ng),
-	.max_attr	= NFTA_NG_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_NG_MAX - 1,
 	.set		= nftnl_expr_ng_set,
 	.get		= nftnl_expr_ng_get,
 	.parse		= nftnl_expr_ng_parse,

@@ -271,7 +271,7 @@ nftnl_expr_bitwise_snprintf(char *buf, size_t size,
 struct expr_ops expr_ops_bitwise = {
 	.name		= "bitwise",
 	.alloc_len	= sizeof(struct nftnl_expr_bitwise),
-	.max_attr	= NFTA_BITWISE_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_BITWISE_MAX - 1,
 	.set		= nftnl_expr_bitwise_set,
 	.get		= nftnl_expr_bitwise_get,
 	.parse		= nftnl_expr_bitwise_parse,

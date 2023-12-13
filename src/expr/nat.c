@@ -269,7 +269,7 @@ nftnl_expr_nat_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_nat = {
 	.name		= "nat",
 	.alloc_len	= sizeof(struct nftnl_expr_nat),
-	.max_attr	= NFTA_NAT_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_NAT_MAX - 1,
 	.set		= nftnl_expr_nat_set,
 	.get		= nftnl_expr_nat_get,
 	.parse		= nftnl_expr_nat_parse,

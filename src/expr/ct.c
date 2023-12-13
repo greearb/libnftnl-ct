@@ -253,7 +253,7 @@ nftnl_expr_ct_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_ct = {
 	.name		= "ct",
 	.alloc_len	= sizeof(struct nftnl_expr_ct),
-	.max_attr	= NFTA_CT_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_CT_MAX - 1,
 	.set		= nftnl_expr_ct_set,
 	.get		= nftnl_expr_ct_get,
 	.parse		= nftnl_expr_ct_parse,

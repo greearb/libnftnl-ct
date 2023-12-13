@@ -200,7 +200,7 @@ static void nftnl_expr_lookup_free(const struct nftnl_expr *e)
 struct expr_ops expr_ops_lookup = {
 	.name		= "lookup",
 	.alloc_len	= sizeof(struct nftnl_expr_lookup),
-	.max_attr	= NFTA_LOOKUP_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_LOOKUP_MAX - 1,
 	.free		= nftnl_expr_lookup_free,
 	.set		= nftnl_expr_lookup_set,
 	.get		= nftnl_expr_lookup_get,

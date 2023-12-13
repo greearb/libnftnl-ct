@@ -162,7 +162,7 @@ nftnl_expr_redir_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_redir = {
 	.name		= "redir",
 	.alloc_len	= sizeof(struct nftnl_expr_redir),
-	.max_attr	= NFTA_REDIR_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_REDIR_MAX - 1,
 	.set		= nftnl_expr_redir_set,
 	.get		= nftnl_expr_redir_get,
 	.parse		= nftnl_expr_redir_parse,

@@ -366,7 +366,7 @@ static void nftnl_expr_dynset_free(const struct nftnl_expr *e)
 struct expr_ops expr_ops_dynset = {
 	.name		= "dynset",
 	.alloc_len	= sizeof(struct nftnl_expr_dynset),
-	.max_attr	= NFTA_DYNSET_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_DYNSET_MAX - 1,
 	.init		= nftnl_expr_dynset_init,
 	.free		= nftnl_expr_dynset_free,
 	.set		= nftnl_expr_dynset_set,

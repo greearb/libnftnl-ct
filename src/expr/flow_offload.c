@@ -114,7 +114,7 @@ static void nftnl_expr_flow_free(const struct nftnl_expr *e)
 struct expr_ops expr_ops_flow = {
 	.name		= "flow_offload",
 	.alloc_len	= sizeof(struct nftnl_expr_flow),
-	.max_attr	= NFTA_FLOW_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_FLOW_MAX - 1,
 	.free		= nftnl_expr_flow_free,
 	.set		= nftnl_expr_flow_set,
 	.get		= nftnl_expr_flow_get,

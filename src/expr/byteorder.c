@@ -215,7 +215,7 @@ nftnl_expr_byteorder_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_byteorder = {
 	.name		= "byteorder",
 	.alloc_len	= sizeof(struct nftnl_expr_byteorder),
-	.max_attr	= NFTA_BYTEORDER_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_BYTEORDER_MAX - 1,
 	.set		= nftnl_expr_byteorder_set,
 	.get		= nftnl_expr_byteorder_get,
 	.parse		= nftnl_expr_byteorder_parse,

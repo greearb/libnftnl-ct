@@ -183,7 +183,7 @@ static void nftnl_expr_match_free(const struct nftnl_expr *e)
 struct expr_ops expr_ops_match = {
 	.name		= "match",
 	.alloc_len	= sizeof(struct nftnl_expr_match),
-	.max_attr	= NFTA_MATCH_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_MT_MAX - 1,
 	.free		= nftnl_expr_match_free,
 	.set		= nftnl_expr_match_set,
 	.get		= nftnl_expr_match_get,

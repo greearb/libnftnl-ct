@@ -204,7 +204,7 @@ nftnl_expr_inner_snprintf(char *buf, size_t remain, uint32_t flags,
 struct expr_ops expr_ops_inner = {
 	.name		= "inner",
 	.alloc_len	= sizeof(struct nftnl_expr_inner),
-	.max_attr	= NFTA_INNER_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_INNER_MAX - 1,
 	.free		= nftnl_expr_inner_free,
 	.set		= nftnl_expr_inner_set,
 	.get		= nftnl_expr_inner_get,

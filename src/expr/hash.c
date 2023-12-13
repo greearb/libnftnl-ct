@@ -221,7 +221,7 @@ nftnl_expr_hash_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_hash = {
 	.name		= "hash",
 	.alloc_len	= sizeof(struct nftnl_expr_hash),
-	.max_attr	= NFTA_HASH_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_HASH_MAX - 1,
 	.set		= nftnl_expr_hash_set,
 	.get		= nftnl_expr_hash_get,
 	.parse		= nftnl_expr_hash_parse,

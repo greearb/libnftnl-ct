@@ -183,7 +183,7 @@ static void nftnl_expr_target_free(const struct nftnl_expr *e)
 struct expr_ops expr_ops_target = {
 	.name		= "target",
 	.alloc_len	= sizeof(struct nftnl_expr_target),
-	.max_attr	= NFTA_TARGET_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_TG_MAX - 1,
 	.free		= nftnl_expr_target_free,
 	.set		= nftnl_expr_target_set,
 	.get		= nftnl_expr_target_get,

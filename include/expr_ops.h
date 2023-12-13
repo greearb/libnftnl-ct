@@ -11,7 +11,7 @@ struct nftnl_expr;
 struct expr_ops {
 	const char *name;
 	uint32_t alloc_len;
-	int	max_attr;
+	int	nftnl_max_attr;
 	void	(*init)(const struct nftnl_expr *e);
 	void	(*free)(const struct nftnl_expr *e);
 	int	(*set)(struct nftnl_expr *e, uint16_t type, const void *data, uint32_t data_len);

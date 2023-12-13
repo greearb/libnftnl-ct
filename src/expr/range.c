@@ -204,7 +204,7 @@ static int nftnl_expr_range_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_range = {
 	.name		= "range",
 	.alloc_len	= sizeof(struct nftnl_expr_range),
-	.max_attr	= NFTA_RANGE_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_RANGE_MAX - 1,
 	.set		= nftnl_expr_range_set,
 	.get		= nftnl_expr_range_get,
 	.parse		= nftnl_expr_range_parse,

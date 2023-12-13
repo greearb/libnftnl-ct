@@ -241,7 +241,7 @@ nftnl_expr_payload_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_payload = {
 	.name		= "payload",
 	.alloc_len	= sizeof(struct nftnl_expr_payload),
-	.max_attr	= NFTA_PAYLOAD_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_PAYLOAD_MAX - 1,
 	.set		= nftnl_expr_payload_set,
 	.get		= nftnl_expr_payload_get,
 	.parse		= nftnl_expr_payload_parse,

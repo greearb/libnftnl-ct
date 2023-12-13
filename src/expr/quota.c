@@ -142,7 +142,7 @@ static int nftnl_expr_quota_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_quota = {
 	.name		= "quota",
 	.alloc_len	= sizeof(struct nftnl_expr_quota),
-	.max_attr	= NFTA_QUOTA_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_QUOTA_MAX - 1,
 	.set		= nftnl_expr_quota_set,
 	.get		= nftnl_expr_quota_get,
 	.parse		= nftnl_expr_quota_parse,

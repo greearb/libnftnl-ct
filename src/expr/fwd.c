@@ -153,7 +153,7 @@ static int nftnl_expr_fwd_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_fwd = {
 	.name		= "fwd",
 	.alloc_len	= sizeof(struct nftnl_expr_fwd),
-	.max_attr	= NFTA_FWD_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_FWD_MAX - 1,
 	.set		= nftnl_expr_fwd_set,
 	.get		= nftnl_expr_fwd_get,
 	.parse		= nftnl_expr_fwd_parse,

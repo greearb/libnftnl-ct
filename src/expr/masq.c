@@ -158,7 +158,7 @@ static int nftnl_expr_masq_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_masq = {
 	.name		= "masq",
 	.alloc_len	= sizeof(struct nftnl_expr_masq),
-	.max_attr	= NFTA_MASQ_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_MASQ_MAX - 1,
 	.set		= nftnl_expr_masq_set,
 	.get		= nftnl_expr_masq_get,
 	.parse		= nftnl_expr_masq_parse,

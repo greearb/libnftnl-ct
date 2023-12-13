@@ -140,7 +140,7 @@ nftnl_expr_tunnel_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_tunnel = {
 	.name		= "tunnel",
 	.alloc_len	= sizeof(struct nftnl_expr_tunnel),
-	.max_attr	= NFTA_TUNNEL_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_TUNNEL_MAX - 1,
 	.set		= nftnl_expr_tunnel_set,
 	.get		= nftnl_expr_tunnel_get,
 	.parse		= nftnl_expr_tunnel_parse,

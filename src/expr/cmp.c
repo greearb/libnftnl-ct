@@ -195,7 +195,7 @@ nftnl_expr_cmp_snprintf(char *buf, size_t remain,
 struct expr_ops expr_ops_cmp = {
 	.name		= "cmp",
 	.alloc_len	= sizeof(struct nftnl_expr_cmp),
-	.max_attr	= NFTA_CMP_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_CMP_MAX - 1,
 	.set		= nftnl_expr_cmp_set,
 	.get		= nftnl_expr_cmp_get,
 	.parse		= nftnl_expr_cmp_parse,

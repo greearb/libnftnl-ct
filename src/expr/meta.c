@@ -212,7 +212,7 @@ nftnl_expr_meta_snprintf(char *buf, size_t len,
 struct expr_ops expr_ops_meta = {
 	.name		= "meta",
 	.alloc_len	= sizeof(struct nftnl_expr_meta),
-	.max_attr	= NFTA_META_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_META_MAX - 1,
 	.set		= nftnl_expr_meta_set,
 	.get		= nftnl_expr_meta_get,
 	.parse		= nftnl_expr_meta_parse,

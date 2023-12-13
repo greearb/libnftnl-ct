@@ -221,7 +221,7 @@ static void nftnl_expr_immediate_free(const struct nftnl_expr *e)
 struct expr_ops expr_ops_immediate = {
 	.name		= "immediate",
 	.alloc_len	= sizeof(struct nftnl_expr_immediate),
-	.max_attr	= NFTA_IMMEDIATE_MAX,
+	.nftnl_max_attr	= __NFTNL_EXPR_IMM_MAX - 1,
 	.free		= nftnl_expr_immediate_free,
 	.set		= nftnl_expr_immediate_set,
 	.get		= nftnl_expr_immediate_get,
