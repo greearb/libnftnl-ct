@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	b = nftnl_rule_alloc();
 	if (a == NULL || b == NULL)
 		print_err("OOM");
-	ex = nftnl_expr_alloc("lookup");
+	ex = nftnl_expr_alloc("objref");
 	if (ex == NULL)
 		print_err("OOM");
 
