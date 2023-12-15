@@ -74,6 +74,13 @@ int nftnl_expr_set(struct nftnl_expr *expr, uint16_t type,
 		if (type < NFTNL_EXPR_BASE || type > expr->ops->nftnl_max_attr)
 			return -1;
 
+		if (!expr->ops->attr_policy)
+			return -1;
+
+		if (expr->ops->attr_policy[type].maxlen &&
+		    expr->ops->attr_policy[type].maxlen < data_len)
+			return -1;
+
 		if (expr->ops->set(expr, type, data, data_len) < 0)
 			return -1;
 	}
