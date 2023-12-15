@@ -124,10 +124,16 @@ nftnl_expr_reject_snprintf(char *buf, size_t len,
 			reject->type, reject->icmp_code);
 }
 
+static struct attr_policy reject_attr_policy[__NFTNL_EXPR_REJECT_MAX] = {
+	[NFTNL_EXPR_REJECT_TYPE] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_REJECT_CODE] = { .maxlen = sizeof(uint8_t) },
+};
+
 struct expr_ops expr_ops_reject = {
 	.name		= "reject",
 	.alloc_len	= sizeof(struct nftnl_expr_reject),
 	.nftnl_max_attr	= __NFTNL_EXPR_REJECT_MAX - 1,
+	.attr_policy	= reject_attr_policy,
 	.set		= nftnl_expr_reject_set,
 	.get		= nftnl_expr_reject_get,
 	.parse		= nftnl_expr_reject_parse,

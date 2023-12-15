@@ -194,10 +194,19 @@ static void nftnl_expr_objref_free(const struct nftnl_expr *e)
 	xfree(objref->set.name);
 }
 
+static struct attr_policy objref_attr_policy[__NFTNL_EXPR_OBJREF_MAX] = {
+	[NFTNL_EXPR_OBJREF_IMM_TYPE] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_OBJREF_IMM_NAME] = { .maxlen = NFT_NAME_MAXLEN },
+	[NFTNL_EXPR_OBJREF_SET_SREG] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_OBJREF_SET_NAME] = { .maxlen = NFT_NAME_MAXLEN },
+	[NFTNL_EXPR_OBJREF_SET_ID]   = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_objref = {
 	.name		= "objref",
 	.alloc_len	= sizeof(struct nftnl_expr_objref),
 	.nftnl_max_attr	= __NFTNL_EXPR_OBJREF_MAX - 1,
+	.attr_policy	= objref_attr_policy,
 	.free		= nftnl_expr_objref_free,
 	.set		= nftnl_expr_objref_set,
 	.get		= nftnl_expr_objref_get,

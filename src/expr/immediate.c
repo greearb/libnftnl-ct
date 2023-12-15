@@ -216,10 +216,19 @@ static void nftnl_expr_immediate_free(const struct nftnl_expr *e)
 		xfree(imm->data.chain);
 }
 
+static struct attr_policy immediate_attr_policy[__NFTNL_EXPR_IMM_MAX] = {
+	[NFTNL_EXPR_IMM_DREG]     = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_IMM_DATA]     = { .maxlen = NFT_DATA_VALUE_MAXLEN },
+	[NFTNL_EXPR_IMM_VERDICT]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_IMM_CHAIN]    = { .maxlen = NFT_CHAIN_MAXNAMELEN },
+	[NFTNL_EXPR_IMM_CHAIN_ID] = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_immediate = {
 	.name		= "immediate",
 	.alloc_len	= sizeof(struct nftnl_expr_immediate),
 	.nftnl_max_attr	= __NFTNL_EXPR_IMM_MAX - 1,
+	.attr_policy	= immediate_attr_policy,
 	.free		= nftnl_expr_immediate_free,
 	.set		= nftnl_expr_immediate_set,
 	.get		= nftnl_expr_immediate_get,

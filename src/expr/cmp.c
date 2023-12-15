@@ -190,10 +190,17 @@ nftnl_expr_cmp_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
+static struct attr_policy cmp_attr_policy[__NFTNL_EXPR_CMP_MAX] = {
+	[NFTNL_EXPR_CMP_SREG] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_CMP_OP]   = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_CMP_DATA] = { .maxlen = NFT_DATA_VALUE_MAXLEN }
+};
+
 struct expr_ops expr_ops_cmp = {
 	.name		= "cmp",
 	.alloc_len	= sizeof(struct nftnl_expr_cmp),
 	.nftnl_max_attr	= __NFTNL_EXPR_CMP_MAX - 1,
+	.attr_policy	= cmp_attr_policy,
 	.set		= nftnl_expr_cmp_set,
 	.get		= nftnl_expr_cmp_get,
 	.parse		= nftnl_expr_cmp_parse,

@@ -144,10 +144,17 @@ nftnl_expr_synproxy_snprintf(char *buf, size_t len,
 	return offset;
 }
 
+static struct attr_policy synproxy_attr_policy[__NFTNL_EXPR_SYNPROXY_MAX] = {
+	[NFTNL_EXPR_SYNPROXY_MSS]    = { .maxlen = sizeof(uint16_t) },
+	[NFTNL_EXPR_SYNPROXY_WSCALE] = { .maxlen = sizeof(uint8_t) },
+	[NFTNL_EXPR_SYNPROXY_FLAGS]  = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_synproxy = {
 	.name		= "synproxy",
 	.alloc_len	= sizeof(struct nftnl_expr_synproxy),
 	.nftnl_max_attr	= __NFTNL_EXPR_SYNPROXY_MAX - 1,
+	.attr_policy	= synproxy_attr_policy,
 	.set		= nftnl_expr_synproxy_set,
 	.get		= nftnl_expr_synproxy_get,
 	.parse		= nftnl_expr_synproxy_parse,

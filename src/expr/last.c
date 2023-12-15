@@ -124,10 +124,16 @@ static int nftnl_expr_last_snprintf(char *buf, size_t len,
 	return snprintf(buf, len, "%"PRIu64" ", last->msecs);
 }
 
+static struct attr_policy last_attr_policy[__NFTNL_EXPR_LAST_MAX] = {
+	[NFTNL_EXPR_LAST_MSECS] = { .maxlen = sizeof(uint64_t) },
+	[NFTNL_EXPR_LAST_SET]   = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_last = {
 	.name		= "last",
 	.alloc_len	= sizeof(struct nftnl_expr_last),
 	.nftnl_max_attr	= __NFTNL_EXPR_LAST_MAX - 1,
+	.attr_policy	= last_attr_policy,
 	.set		= nftnl_expr_last_set,
 	.get		= nftnl_expr_last_get,
 	.parse		= nftnl_expr_last_parse,

@@ -257,10 +257,21 @@ nftnl_expr_exthdr_snprintf(char *buf, size_t len,
 
 }
 
+static struct attr_policy exthdr_attr_policy[__NFTNL_EXPR_EXTHDR_MAX] = {
+	[NFTNL_EXPR_EXTHDR_DREG]   = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_EXTHDR_TYPE]   = { .maxlen = sizeof(uint8_t) },
+	[NFTNL_EXPR_EXTHDR_OFFSET] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_EXTHDR_LEN]    = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_EXTHDR_FLAGS]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_EXTHDR_OP]     = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_EXTHDR_SREG]   = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_exthdr = {
 	.name		= "exthdr",
 	.alloc_len	= sizeof(struct nftnl_expr_exthdr),
 	.nftnl_max_attr	= __NFTNL_EXPR_EXTHDR_MAX - 1,
+	.attr_policy	= exthdr_attr_policy,
 	.set		= nftnl_expr_exthdr_set,
 	.get		= nftnl_expr_exthdr_get,
 	.parse		= nftnl_expr_exthdr_parse,

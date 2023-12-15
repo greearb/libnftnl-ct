@@ -135,10 +135,16 @@ nftnl_expr_tunnel_snprintf(char *buf, size_t len,
 	return 0;
 }
 
+static struct attr_policy tunnel_attr_policy[__NFTNL_EXPR_TUNNEL_MAX] = {
+	[NFTNL_EXPR_TUNNEL_KEY]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_TUNNEL_DREG] = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_tunnel = {
 	.name		= "tunnel",
 	.alloc_len	= sizeof(struct nftnl_expr_tunnel),
 	.nftnl_max_attr	= __NFTNL_EXPR_TUNNEL_MAX - 1,
+	.attr_policy	= tunnel_attr_policy,
 	.set		= nftnl_expr_tunnel_set,
 	.get		= nftnl_expr_tunnel_get,
 	.parse		= nftnl_expr_tunnel_parse,

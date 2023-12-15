@@ -178,10 +178,17 @@ static void nftnl_expr_match_free(const struct nftnl_expr *e)
 	xfree(match->data);
 }
 
+static struct attr_policy match_attr_policy[__NFTNL_EXPR_MT_MAX] = {
+	[NFTNL_EXPR_MT_NAME] = { .maxlen = XT_EXTENSION_MAXNAMELEN },
+	[NFTNL_EXPR_MT_REV]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_MT_INFO] = { .maxlen = 0 },
+};
+
 struct expr_ops expr_ops_match = {
 	.name		= "match",
 	.alloc_len	= sizeof(struct nftnl_expr_match),
 	.nftnl_max_attr	= __NFTNL_EXPR_MT_MAX - 1,
+	.attr_policy	= match_attr_policy,
 	.free		= nftnl_expr_match_free,
 	.set		= nftnl_expr_match_set,
 	.get		= nftnl_expr_match_get,

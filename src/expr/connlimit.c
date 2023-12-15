@@ -125,10 +125,16 @@ static int nftnl_expr_connlimit_snprintf(char *buf, size_t len,
 			connlimit->count, connlimit->flags);
 }
 
+static struct attr_policy connlimit_attr_policy[__NFTNL_EXPR_CONNLIMIT_MAX] = {
+	[NFTNL_EXPR_CONNLIMIT_COUNT] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_CONNLIMIT_FLAGS] = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_connlimit = {
 	.name		= "connlimit",
 	.alloc_len	= sizeof(struct nftnl_expr_connlimit),
 	.nftnl_max_attr	= __NFTNL_EXPR_CONNLIMIT_MAX - 1,
+	.attr_policy	= connlimit_attr_policy,
 	.set		= nftnl_expr_connlimit_set,
 	.get		= nftnl_expr_connlimit_get,
 	.parse		= nftnl_expr_connlimit_parse,

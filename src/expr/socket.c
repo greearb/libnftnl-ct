@@ -155,10 +155,17 @@ nftnl_expr_socket_snprintf(char *buf, size_t len,
 	return 0;
 }
 
+static struct attr_policy socket_attr_policy[__NFTNL_EXPR_SOCKET_MAX] = {
+	[NFTNL_EXPR_SOCKET_KEY]   = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_SOCKET_DREG]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_SOCKET_LEVEL] = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_socket = {
 	.name		= "socket",
 	.alloc_len	= sizeof(struct nftnl_expr_socket),
 	.nftnl_max_attr	= __NFTNL_EXPR_SOCKET_MAX - 1,
+	.attr_policy	= socket_attr_policy,
 	.set		= nftnl_expr_socket_set,
 	.get		= nftnl_expr_socket_get,
 	.parse		= nftnl_expr_socket_parse,

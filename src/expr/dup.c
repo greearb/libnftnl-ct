@@ -128,10 +128,16 @@ static int nftnl_expr_dup_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
+static struct attr_policy dup_attr_policy[__NFTNL_EXPR_DUP_MAX] = {
+	[NFTNL_EXPR_DUP_SREG_ADDR] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_DUP_SREG_DEV]  = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_dup = {
 	.name		= "dup",
 	.alloc_len	= sizeof(struct nftnl_expr_dup),
 	.nftnl_max_attr	= __NFTNL_EXPR_DUP_MAX - 1,
+	.attr_policy	= dup_attr_policy,
 	.set		= nftnl_expr_dup_set,
 	.get		= nftnl_expr_dup_get,
 	.parse		= nftnl_expr_dup_parse,

@@ -160,10 +160,17 @@ nftnl_expr_tproxy_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
+static struct attr_policy tproxy_attr_policy[__NFTNL_EXPR_TPROXY_MAX] = {
+	[NFTNL_EXPR_TPROXY_FAMILY]   = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_TPROXY_REG_ADDR] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_TPROXY_REG_PORT] = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_tproxy = {
 	.name		= "tproxy",
 	.alloc_len	= sizeof(struct nftnl_expr_tproxy),
 	.nftnl_max_attr	= __NFTNL_EXPR_TPROXY_MAX - 1,
+	.attr_policy	= tproxy_attr_policy,
 	.set		= nftnl_expr_tproxy_set,
 	.get		= nftnl_expr_tproxy_get,
 	.parse		= nftnl_expr_tproxy_parse,

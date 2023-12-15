@@ -152,10 +152,16 @@ nftnl_expr_rt_snprintf(char *buf, size_t len,
 	return 0;
 }
 
+static struct attr_policy rt_attr_policy[__NFTNL_EXPR_RT_MAX] = {
+	[NFTNL_EXPR_RT_KEY]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_RT_DREG] = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_rt = {
 	.name		= "rt",
 	.alloc_len	= sizeof(struct nftnl_expr_rt),
 	.nftnl_max_attr	= __NFTNL_EXPR_RT_MAX - 1,
+	.attr_policy	= rt_attr_policy,
 	.set		= nftnl_expr_rt_set,
 	.get		= nftnl_expr_rt_get,
 	.parse		= nftnl_expr_rt_parse,

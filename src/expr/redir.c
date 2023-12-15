@@ -157,10 +157,17 @@ nftnl_expr_redir_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
+static struct attr_policy redir_attr_policy[__NFTNL_EXPR_REDIR_MAX] = {
+	[NFTNL_EXPR_REDIR_REG_PROTO_MIN] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_REDIR_REG_PROTO_MAX] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_REDIR_FLAGS]         = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_redir = {
 	.name		= "redir",
 	.alloc_len	= sizeof(struct nftnl_expr_redir),
 	.nftnl_max_attr	= __NFTNL_EXPR_REDIR_MAX - 1,
+	.attr_policy	= redir_attr_policy,
 	.set		= nftnl_expr_redir_set,
 	.get		= nftnl_expr_redir_get,
 	.parse		= nftnl_expr_redir_parse,

@@ -199,10 +199,18 @@ nftnl_expr_inner_snprintf(char *buf, size_t remain, uint32_t flags,
 	return offset;
 }
 
+static struct attr_policy inner_attr_policy[__NFTNL_EXPR_INNER_MAX] = {
+	[NFTNL_EXPR_INNER_TYPE]    = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_INNER_FLAGS]   = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_INNER_HDRSIZE] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_INNER_EXPR]    = { .maxlen = 0 },
+};
+
 struct expr_ops expr_ops_inner = {
 	.name		= "inner",
 	.alloc_len	= sizeof(struct nftnl_expr_inner),
 	.nftnl_max_attr	= __NFTNL_EXPR_INNER_MAX - 1,
+	.attr_policy	= inner_attr_policy,
 	.free		= nftnl_expr_inner_free,
 	.set		= nftnl_expr_inner_set,
 	.get		= nftnl_expr_inner_get,

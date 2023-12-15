@@ -109,10 +109,15 @@ static void nftnl_expr_flow_free(const struct nftnl_expr *e)
 	xfree(flow->table_name);
 }
 
+static struct attr_policy flow_offload_attr_policy[__NFTNL_EXPR_FLOW_MAX] = {
+	[NFTNL_EXPR_FLOW_TABLE_NAME] = { .maxlen = NFT_NAME_MAXLEN },
+};
+
 struct expr_ops expr_ops_flow = {
 	.name		= "flow_offload",
 	.alloc_len	= sizeof(struct nftnl_expr_flow),
 	.nftnl_max_attr	= __NFTNL_EXPR_FLOW_MAX - 1,
+	.attr_policy	= flow_offload_attr_policy,
 	.free		= nftnl_expr_flow_free,
 	.set		= nftnl_expr_flow_set,
 	.get		= nftnl_expr_flow_get,

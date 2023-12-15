@@ -172,10 +172,18 @@ nftnl_expr_ng_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
+static struct attr_policy numgen_attr_policy[__NFTNL_EXPR_NG_MAX] = {
+	[NFTNL_EXPR_NG_DREG]    = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NG_MODULUS] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NG_TYPE]    = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NG_OFFSET]  = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_ng = {
 	.name		= "numgen",
 	.alloc_len	= sizeof(struct nftnl_expr_ng),
 	.nftnl_max_attr	= __NFTNL_EXPR_NG_MAX - 1,
+	.attr_policy	= numgen_attr_policy,
 	.set		= nftnl_expr_ng_set,
 	.get		= nftnl_expr_ng_get,
 	.parse		= nftnl_expr_ng_parse,

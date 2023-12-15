@@ -363,10 +363,23 @@ static void nftnl_expr_dynset_free(const struct nftnl_expr *e)
 		nftnl_expr_free(expr);
 }
 
+static struct attr_policy dynset_attr_policy[__NFTNL_EXPR_DYNSET_MAX] = {
+	[NFTNL_EXPR_DYNSET_SREG_KEY]    = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_DYNSET_SREG_DATA]   = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_DYNSET_OP]          = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_DYNSET_TIMEOUT]     = { .maxlen = sizeof(uint64_t) },
+	[NFTNL_EXPR_DYNSET_SET_NAME]    = { .maxlen = NFT_SET_MAXNAMELEN },
+	[NFTNL_EXPR_DYNSET_SET_ID]      = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_DYNSET_EXPR]        = { .maxlen = 0 },
+	[NFTNL_EXPR_DYNSET_EXPRESSIONS] = { .maxlen = 0 },
+	[NFTNL_EXPR_DYNSET_FLAGS]       = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_dynset = {
 	.name		= "dynset",
 	.alloc_len	= sizeof(struct nftnl_expr_dynset),
 	.nftnl_max_attr	= __NFTNL_EXPR_DYNSET_MAX - 1,
+	.attr_policy	= dynset_attr_policy,
 	.init		= nftnl_expr_dynset_init,
 	.free		= nftnl_expr_dynset_free,
 	.set		= nftnl_expr_dynset_set,

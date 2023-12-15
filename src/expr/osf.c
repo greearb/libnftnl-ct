@@ -139,10 +139,17 @@ nftnl_expr_osf_snprintf(char *buf, size_t len,
 	return offset;
 }
 
+static struct attr_policy osf_attr_policy[__NFTNL_EXPR_OSF_MAX] = {
+	[NFTNL_EXPR_OSF_DREG]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_OSF_TTL]   = { .maxlen = sizeof(uint8_t) },
+	[NFTNL_EXPR_OSF_FLAGS] = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_osf = {
 	.name		= "osf",
 	.alloc_len	= sizeof(struct nftnl_expr_osf),
 	.nftnl_max_attr	= __NFTNL_EXPR_OSF_MAX - 1,
+	.attr_policy	= osf_attr_policy,
 	.set		= nftnl_expr_osf_set,
 	.get		= nftnl_expr_osf_get,
 	.parse		= nftnl_expr_osf_parse,

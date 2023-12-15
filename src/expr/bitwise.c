@@ -266,10 +266,21 @@ nftnl_expr_bitwise_snprintf(char *buf, size_t size,
 	return err;
 }
 
+static struct attr_policy bitwise_attr_policy[__NFTNL_EXPR_BITWISE_MAX] = {
+	[NFTNL_EXPR_BITWISE_SREG] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_BITWISE_DREG] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_BITWISE_LEN]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_BITWISE_MASK] = { .maxlen = NFT_DATA_VALUE_MAXLEN },
+	[NFTNL_EXPR_BITWISE_XOR]  = { .maxlen = NFT_DATA_VALUE_MAXLEN },
+	[NFTNL_EXPR_BITWISE_OP]   = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_BITWISE_DATA] = { .maxlen = NFT_DATA_VALUE_MAXLEN },
+};
+
 struct expr_ops expr_ops_bitwise = {
 	.name		= "bitwise",
 	.alloc_len	= sizeof(struct nftnl_expr_bitwise),
 	.nftnl_max_attr	= __NFTNL_EXPR_BITWISE_MAX - 1,
+	.attr_policy	= bitwise_attr_policy,
 	.set		= nftnl_expr_bitwise_set,
 	.get		= nftnl_expr_bitwise_get,
 	.parse		= nftnl_expr_bitwise_parse,

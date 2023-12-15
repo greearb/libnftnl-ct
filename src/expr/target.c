@@ -178,10 +178,17 @@ static void nftnl_expr_target_free(const struct nftnl_expr *e)
 	xfree(target->data);
 }
 
+static struct attr_policy target_attr_policy[__NFTNL_EXPR_TG_MAX] = {
+	[NFTNL_EXPR_TG_NAME] = { .maxlen = XT_EXTENSION_MAXNAMELEN },
+	[NFTNL_EXPR_TG_REV]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_TG_INFO] = { .maxlen = 0 },
+};
+
 struct expr_ops expr_ops_target = {
 	.name		= "target",
 	.alloc_len	= sizeof(struct nftnl_expr_target),
 	.nftnl_max_attr	= __NFTNL_EXPR_TG_MAX - 1,
+	.attr_policy	= target_attr_policy,
 	.free		= nftnl_expr_target_free,
 	.set		= nftnl_expr_target_set,
 	.get		= nftnl_expr_target_get,

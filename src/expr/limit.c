@@ -192,10 +192,19 @@ nftnl_expr_limit_snprintf(char *buf, size_t len,
 			limit_to_type(limit->type), limit->flags);
 }
 
+static struct attr_policy limit_attr_policy[__NFTNL_EXPR_LIMIT_MAX] = {
+	[NFTNL_EXPR_LIMIT_RATE]  = { .maxlen = sizeof(uint64_t) },
+	[NFTNL_EXPR_LIMIT_UNIT]  = { .maxlen = sizeof(uint64_t) },
+	[NFTNL_EXPR_LIMIT_BURST] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_LIMIT_TYPE]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_LIMIT_FLAGS] = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_limit = {
 	.name		= "limit",
 	.alloc_len	= sizeof(struct nftnl_expr_limit),
 	.nftnl_max_attr	= __NFTNL_EXPR_LIMIT_MAX - 1,
+	.attr_policy	= limit_attr_policy,
 	.set		= nftnl_expr_limit_set,
 	.get		= nftnl_expr_limit_get,
 	.parse		= nftnl_expr_limit_parse,

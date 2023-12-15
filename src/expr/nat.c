@@ -264,10 +264,21 @@ nftnl_expr_nat_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
+static struct attr_policy nat_attr_policy[__NFTNL_EXPR_NAT_MAX] = {
+	[NFTNL_EXPR_NAT_TYPE]          = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NAT_FAMILY]        = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NAT_REG_ADDR_MIN]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NAT_REG_ADDR_MAX]  = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NAT_REG_PROTO_MIN] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NAT_REG_PROTO_MAX] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_EXPR_NAT_FLAGS]         = { .maxlen = sizeof(uint32_t) },
+};
+
 struct expr_ops expr_ops_nat = {
 	.name		= "nat",
 	.alloc_len	= sizeof(struct nftnl_expr_nat),
 	.nftnl_max_attr	= __NFTNL_EXPR_NAT_MAX - 1,
+	.attr_policy	= nat_attr_policy,
 	.set		= nftnl_expr_nat_set,
 	.get		= nftnl_expr_nat_get,
 	.parse		= nftnl_expr_nat_parse,
