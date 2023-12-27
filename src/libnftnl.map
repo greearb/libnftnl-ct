@@ -47,8 +47,6 @@ global:
   nftnl_chain_get_s32;
   nftnl_chain_get_u64;
   nftnl_chain_get_str;
-  nftnl_chain_parse;
-  nftnl_chain_parse_file;
   nftnl_chain_snprintf;
   nftnl_chain_fprintf;
   nftnl_chain_nlmsg_build_payload;
@@ -173,8 +171,6 @@ global:
 
   nftnl_set_elems_nlmsg_build_payload;
   nftnl_set_elems_nlmsg_parse;
-
-  nftnl_set_elems_foreach;
 
   nftnl_set_elems_iter_create;
   nftnl_set_elems_iter_cur;

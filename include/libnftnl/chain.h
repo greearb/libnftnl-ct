@@ -71,10 +71,6 @@ struct nlmsghdr;
 
 void nftnl_chain_nlmsg_build_payload(struct nlmsghdr *nlh, const struct nftnl_chain *t);
 
-int nftnl_chain_parse(struct nftnl_chain *c, enum nftnl_parse_type type,
-		    const char *data, struct nftnl_parse_err *err);
-int nftnl_chain_parse_file(struct nftnl_chain *c, enum nftnl_parse_type type,
-			 FILE *fp, struct nftnl_parse_err *err);
 int nftnl_chain_snprintf(char *buf, size_t size, const struct nftnl_chain *t, uint32_t type, uint32_t flags);
 int nftnl_chain_fprintf(FILE *fp, const struct nftnl_chain *c, uint32_t type, uint32_t flags);
 
