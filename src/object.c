@@ -69,6 +69,34 @@ bool nftnl_obj_is_set(const struct nftnl_obj *obj, uint16_t attr)
 	return obj->flags & (1 << attr);
 }
 
+EXPORT_SYMBOL(nftnl_obj_unset);
+void nftnl_obj_unset(struct nftnl_obj *obj, uint16_t attr)
+{
+	if (!(obj->flags & (1 << attr)))
+		return;
+
+	switch (attr) {
+	case NFTNL_OBJ_TABLE:
+		xfree(obj->table);
+		break;
+	case NFTNL_OBJ_NAME:
+		xfree(obj->name);
+		break;
+	case NFTNL_OBJ_USERDATA:
+		xfree(obj->user.data);
+		break;
+	case NFTNL_OBJ_TYPE:
+	case NFTNL_OBJ_FAMILY:
+	case NFTNL_OBJ_USE:
+	case NFTNL_OBJ_HANDLE:
+		break;
+	default:
+		break;
+	}
+
+	obj->flags &= ~(1 << attr);
+}
+
 static uint32_t nftnl_obj_validate[NFTNL_OBJ_MAX + 1] = {
 	[NFTNL_OBJ_FAMILY]	= sizeof(uint32_t),
 	[NFTNL_OBJ_USE]		= sizeof(uint32_t),
