@@ -21,7 +21,7 @@
 
 #include "obj.h"
 
-static const char *const tcp_state_to_name[] = {
+static const char *const tcp_state_to_name[NFTNL_CTTIMEOUT_TCP_MAX] = {
 	[NFTNL_CTTIMEOUT_TCP_SYN_SENT]		= "SYN_SENT",
 	[NFTNL_CTTIMEOUT_TCP_SYN_RECV]		= "SYN_RECV",
 	[NFTNL_CTTIMEOUT_TCP_ESTABLISHED]	= "ESTABLISHED",
@@ -35,7 +35,7 @@ static const char *const tcp_state_to_name[] = {
 	[NFTNL_CTTIMEOUT_TCP_UNACK]		= "UNACKNOWLEDGED",
 };
 
-static uint32_t tcp_dflt_timeout[] = {
+static uint32_t tcp_dflt_timeout[NFTNL_CTTIMEOUT_TCP_MAX] = {
 	[NFTNL_CTTIMEOUT_TCP_SYN_SENT]		= 120,
 	[NFTNL_CTTIMEOUT_TCP_SYN_RECV]		= 60,
 	[NFTNL_CTTIMEOUT_TCP_ESTABLISHED]	= 432000,
@@ -49,12 +49,12 @@ static uint32_t tcp_dflt_timeout[] = {
 	[NFTNL_CTTIMEOUT_TCP_UNACK]		= 300,
 };
 
-static const char *const udp_state_to_name[] = {
+static const char *const udp_state_to_name[NFTNL_CTTIMEOUT_UDP_MAX] = {
 	[NFTNL_CTTIMEOUT_UDP_UNREPLIED]		= "UNREPLIED",
 	[NFTNL_CTTIMEOUT_UDP_REPLIED]		= "REPLIED",
 };
 
-static uint32_t udp_dflt_timeout[] = {
+static uint32_t udp_dflt_timeout[NFTNL_CTTIMEOUT_UDP_MAX] = {
 	[NFTNL_CTTIMEOUT_UDP_UNREPLIED]		= 30,
 	[NFTNL_CTTIMEOUT_UDP_REPLIED]		= 180,
 };
@@ -156,6 +156,9 @@ static int nftnl_obj_ct_timeout_set(struct nftnl_obj *e, uint16_t type,
 		memcpy(&timeout->l4proto, data, sizeof(timeout->l4proto));
 		break;
 	case NFTNL_OBJ_CT_TIMEOUT_ARRAY:
+		if (data_len < sizeof(uint32_t) * NFTNL_CTTIMEOUT_ARRAY_MAX)
+			return -1;
+
 		memcpy(timeout->timeout, data,
 		       sizeof(uint32_t) * NFTNL_CTTIMEOUT_ARRAY_MAX);
 		break;
