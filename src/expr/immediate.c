@@ -214,8 +214,8 @@ static void nftnl_expr_immediate_free(const struct nftnl_expr *e)
 {
 	struct nftnl_expr_immediate *imm = nftnl_expr_data(e);
 
-	if (e->flags & (1 << NFTNL_EXPR_IMM_VERDICT))
-		nftnl_free_verdict(&imm->data);
+	if (e->flags & (1 << NFTNL_EXPR_IMM_CHAIN))
+		xfree(imm->data.chain);
 }
 
 struct expr_ops expr_ops_immediate = {

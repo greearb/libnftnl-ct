@@ -35,8 +35,6 @@ int nftnl_data_reg_snprintf(char *buf, size_t size,
 struct nlattr;
 
 int nftnl_parse_data(union nftnl_data_reg *data, struct nlattr *attr, int *type);
-void nftnl_free_verdict(const union nftnl_data_reg *data);
-
 int nftnl_data_cpy(union nftnl_data_reg *dreg, const void *src, uint32_t len);
 
 #endif
