@@ -68,27 +68,8 @@ void __nftnl_assert_attr_exists(uint16_t attr, uint16_t attr_max,
 #define array_size(arr)		(sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
 
 const char *nftnl_family2str(uint32_t family);
-int nftnl_str2family(const char *family);
-
-enum nftnl_type {
-	NFTNL_TYPE_U8,
-	NFTNL_TYPE_U16,
-	NFTNL_TYPE_U32,
-	NFTNL_TYPE_U64,
-	NFTNL_TYPE_S8,
-	NFTNL_TYPE_S16,
-	NFTNL_TYPE_S32,
-	NFTNL_TYPE_S64,
-};
-
-int nftnl_strtoi(const char *string, int base, void *number, enum nftnl_type type);
-int nftnl_get_value(enum nftnl_type type, void *val, void *out);
 
 const char *nftnl_verdict2str(uint32_t verdict);
-int nftnl_str2verdict(const char *verdict, int *verdict_num);
-
-const char *nftnl_cmd2tag(enum nftnl_cmd_type cmd);
-uint32_t nftnl_str2cmd(const char *cmd);
 
 enum nftnl_cmd_type nftnl_flag2cmd(uint32_t flags);
 
