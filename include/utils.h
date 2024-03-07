@@ -37,9 +37,9 @@ void __nftnl_assert_fail(uint16_t attr, const char *filename, int line);
 #define nftnl_assert_validate(data, _validate_array, _attr, _data_len)		\
 ({										\
 	if (!data)								\
-		__nftnl_assert_fail(attr, __FILE__, __LINE__);			\
+		__nftnl_assert_fail(_attr, __FILE__, __LINE__);			\
 	if (_validate_array[_attr])						\
-		nftnl_assert(data, attr, _validate_array[_attr] == _data_len);	\
+		nftnl_assert(data, _attr, _validate_array[_attr] == _data_len);	\
 })
 
 void __nftnl_assert_attr_exists(uint16_t attr, uint16_t attr_max,
@@ -78,5 +78,8 @@ int nftnl_fprintf(FILE *fpconst, const void *obj, uint32_t cmd, uint32_t type,
 		  int (*snprintf_cb)(char *buf, size_t bufsiz, const void *obj,
 			  	     uint32_t cmd, uint32_t type,
 				     uint32_t flags));
+
+int nftnl_set_str_attr(const char **dptr, uint32_t *flags,
+		       uint16_t attr, const void *data, uint32_t data_len);
 
 #endif
