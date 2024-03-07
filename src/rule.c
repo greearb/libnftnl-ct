@@ -115,21 +115,11 @@ int nftnl_rule_set_data(struct nftnl_rule *r, uint16_t attr,
 
 	switch(attr) {
 	case NFTNL_RULE_TABLE:
-		if (r->flags & (1 << NFTNL_RULE_TABLE))
-			xfree(r->table);
-
-		r->table = strdup(data);
-		if (!r->table)
-			return -1;
-		break;
+		return nftnl_set_str_attr(&r->table, &r->flags,
+					  attr, data, data_len);
 	case NFTNL_RULE_CHAIN:
-		if (r->flags & (1 << NFTNL_RULE_CHAIN))
-			xfree(r->chain);
-
-		r->chain = strdup(data);
-		if (!r->chain)
-			return -1;
-		break;
+		return nftnl_set_str_attr(&r->chain, &r->flags,
+					  attr, data, data_len);
 	case NFTNL_RULE_HANDLE:
 		memcpy(&r->handle, data, sizeof(r->handle));
 		break;

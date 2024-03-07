@@ -101,13 +101,8 @@ int nftnl_table_set_data(struct nftnl_table *t, uint16_t attr,
 
 	switch (attr) {
 	case NFTNL_TABLE_NAME:
-		if (t->flags & (1 << NFTNL_TABLE_NAME))
-			xfree(t->name);
-
-		t->name = strdup(data);
-		if (!t->name)
-			return -1;
-		break;
+		return nftnl_set_str_attr(&t->name, &t->flags,
+					  attr, data, data_len);
 	case NFTNL_TABLE_HANDLE:
 		memcpy(&t->handle, data, sizeof(t->handle));
 		break;

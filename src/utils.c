@@ -136,3 +136,17 @@ void __noreturn __abi_breakage(const char *file, int line, const char *reason)
 		       "%s:%d reason: %s\n", file, line, reason);
        exit(EXIT_FAILURE);
 }
+
+int nftnl_set_str_attr(const char **dptr, uint32_t *flags,
+		       uint16_t attr, const void *data, uint32_t data_len)
+{
+	if (*flags & (1 << attr))
+		xfree(*dptr);
+
+	*dptr = strndup(data, data_len);
+	if (!*dptr)
+		return -1;
+
+	*flags |= (1 << attr);
+	return 0;
+}

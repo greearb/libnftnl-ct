@@ -113,17 +113,12 @@ int nftnl_obj_set_data(struct nftnl_obj *obj, uint16_t attr,
 
 	switch (attr) {
 	case NFTNL_OBJ_TABLE:
-		xfree(obj->table);
-		obj->table = strdup(data);
-		if (!obj->table)
-			return -1;
+		return nftnl_set_str_attr(&obj->table, &obj->flags,
+					  attr, data, data_len);
 		break;
 	case NFTNL_OBJ_NAME:
-		xfree(obj->name);
-		obj->name = strdup(data);
-		if (!obj->name)
-			return -1;
-		break;
+		return nftnl_set_str_attr(&obj->name, &obj->flags,
+					  attr, data, data_len);
 	case NFTNL_OBJ_TYPE:
 		obj->ops = nftnl_obj_ops_lookup(*((uint32_t *)data));
 		if (!obj->ops)

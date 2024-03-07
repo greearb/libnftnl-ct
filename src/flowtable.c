@@ -119,20 +119,11 @@ int nftnl_flowtable_set_data(struct nftnl_flowtable *c, uint16_t attr,
 
 	switch(attr) {
 	case NFTNL_FLOWTABLE_NAME:
-		if (c->flags & (1 << NFTNL_FLOWTABLE_NAME))
-			xfree(c->name);
-
-		c->name = strdup(data);
-		if (!c->name)
-			return -1;
-		break;
+		return nftnl_set_str_attr(&c->name, &c->flags,
+					  attr, data, data_len);
 	case NFTNL_FLOWTABLE_TABLE:
-		if (c->flags & (1 << NFTNL_FLOWTABLE_TABLE))
-			xfree(c->table);
-
-		c->table = strdup(data);
-		if (!c->table)
-			return -1;
+		return nftnl_set_str_attr(&c->table, &c->flags,
+					  attr, data, data_len);
 		break;
 	case NFTNL_FLOWTABLE_HOOKNUM:
 		memcpy(&c->hooknum, data, sizeof(c->hooknum));
