@@ -21,19 +21,19 @@ static int nftnl_obj_ct_expect_set(struct nftnl_obj *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_OBJ_CT_EXPECT_L3PROTO:
-		memcpy(&exp->l3proto, data, sizeof(exp->l3proto));
+		memcpy(&exp->l3proto, data, data_len);
 		break;
 	case NFTNL_OBJ_CT_EXPECT_L4PROTO:
-		memcpy(&exp->l4proto, data, sizeof(exp->l4proto));
+		memcpy(&exp->l4proto, data, data_len);
 		break;
 	case NFTNL_OBJ_CT_EXPECT_DPORT:
-		memcpy(&exp->dport, data, sizeof(exp->dport));
+		memcpy(&exp->dport, data, data_len);
 		break;
 	case NFTNL_OBJ_CT_EXPECT_TIMEOUT:
-		memcpy(&exp->timeout, data, sizeof(exp->timeout));
+		memcpy(&exp->timeout, data, data_len);
 		break;
 	case NFTNL_OBJ_CT_EXPECT_SIZE:
-		memcpy(&exp->size, data, sizeof(exp->size));
+		memcpy(&exp->size, data, data_len);
 		break;
 	}
 	return 0;

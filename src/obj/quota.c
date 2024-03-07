@@ -28,13 +28,13 @@ static int nftnl_obj_quota_set(struct nftnl_obj *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_OBJ_QUOTA_BYTES:
-		memcpy(&quota->bytes, data, sizeof(quota->bytes));
+		memcpy(&quota->bytes, data, data_len);
 		break;
 	case NFTNL_OBJ_QUOTA_CONSUMED:
-		memcpy(&quota->consumed, data, sizeof(quota->consumed));
+		memcpy(&quota->consumed, data, data_len);
 		break;
 	case NFTNL_OBJ_QUOTA_FLAGS:
-		memcpy(&quota->flags, data, sizeof(quota->flags));
+		memcpy(&quota->flags, data, data_len);
 		break;
 	}
 	return 0;

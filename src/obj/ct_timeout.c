@@ -150,10 +150,10 @@ static int nftnl_obj_ct_timeout_set(struct nftnl_obj *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_OBJ_CT_TIMEOUT_L3PROTO:
-		memcpy(&timeout->l3proto, data, sizeof(timeout->l3proto));
+		memcpy(&timeout->l3proto, data, data_len);
 		break;
 	case NFTNL_OBJ_CT_TIMEOUT_L4PROTO:
-		memcpy(&timeout->l4proto, data, sizeof(timeout->l4proto));
+		memcpy(&timeout->l4proto, data, data_len);
 		break;
 	case NFTNL_OBJ_CT_TIMEOUT_ARRAY:
 		if (data_len < sizeof(uint32_t) * NFTNL_CTTIMEOUT_ARRAY_MAX)
