@@ -30,8 +30,6 @@ static int nftnl_obj_secmark_set(struct nftnl_obj *e, uint16_t type,
 	case NFTNL_OBJ_SECMARK_CTX:
 		snprintf(secmark->ctx, sizeof(secmark->ctx), "%s", (const char *)data);
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

@@ -34,8 +34,6 @@ nftnl_obj_counter_set(struct nftnl_obj *e, uint16_t type,
 	case NFTNL_OBJ_CTR_PKTS:
 		memcpy(&ctr->pkts, data, sizeof(ctr->pkts));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

@@ -42,8 +42,6 @@ static int nftnl_obj_limit_set(struct nftnl_obj *e, uint16_t type,
 	case NFTNL_OBJ_LIMIT_FLAGS:
 		memcpy(&limit->flags, data, sizeof(limit->flags));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

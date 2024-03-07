@@ -37,8 +37,6 @@ static int nftnl_obj_ct_helper_set(struct nftnl_obj *e, uint16_t type,
 	case NFTNL_OBJ_CT_HELPER_L4PROTO:
 		memcpy(&helper->l4proto, data, sizeof(helper->l4proto));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

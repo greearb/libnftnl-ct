@@ -149,7 +149,9 @@ int nftnl_obj_set_data(struct nftnl_obj *obj, uint16_t attr,
 		obj->user.len = data_len;
 		break;
 	default:
-		if (!obj->ops)
+		if (!obj->ops ||
+		    attr < NFTNL_OBJ_BASE ||
+		    attr > obj->ops->nftnl_max_attr)
 			return -1;
 
 		if (obj->ops->set(obj, attr, data, data_len) < 0)

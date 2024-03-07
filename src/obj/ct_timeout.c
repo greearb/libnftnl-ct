@@ -162,8 +162,6 @@ static int nftnl_obj_ct_timeout_set(struct nftnl_obj *e, uint16_t type,
 		memcpy(timeout->timeout, data,
 		       sizeof(uint32_t) * NFTNL_CTTIMEOUT_ARRAY_MAX);
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

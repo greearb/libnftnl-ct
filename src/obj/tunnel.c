@@ -76,8 +76,6 @@ nftnl_obj_tunnel_set(struct nftnl_obj *e, uint16_t type,
 	case NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR:
 		memcpy(&tun->u.tun_erspan.u.v2.dir, data, sizeof(tun->u.tun_erspan.u.v2.dir));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

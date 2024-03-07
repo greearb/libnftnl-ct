@@ -35,8 +35,6 @@ static int nftnl_obj_ct_expect_set(struct nftnl_obj *e, uint16_t type,
 	case NFTNL_OBJ_CT_EXPECT_SIZE:
 		memcpy(&exp->size, data, sizeof(exp->size));
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }

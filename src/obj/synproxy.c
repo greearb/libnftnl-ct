@@ -27,8 +27,6 @@ static int nftnl_obj_synproxy_set(struct nftnl_obj *e, uint16_t type,
 	case NFTNL_OBJ_SYNPROXY_FLAGS:
 		memcpy(&synproxy->flags, data, data_len);
 		break;
-	default:
-		return -1;
 	}
 	return 0;
 }
