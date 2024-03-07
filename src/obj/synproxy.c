@@ -19,13 +19,13 @@ static int nftnl_obj_synproxy_set(struct nftnl_obj *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_OBJ_SYNPROXY_MSS:
-		synproxy->mss = *((uint16_t *)data);
+		memcpy(&synproxy->mss, data, data_len);
 		break;
 	case NFTNL_OBJ_SYNPROXY_WSCALE:
-		synproxy->wscale = *((uint8_t *)data);
+		memcpy(&synproxy->wscale, data, data_len);
 		break;
 	case NFTNL_OBJ_SYNPROXY_FLAGS:
-		synproxy->flags = *((uint32_t *)data);
+		memcpy(&synproxy->flags, data, data_len);
 		break;
 	default:
 		return -1;
