@@ -33,10 +33,10 @@ nftnl_expr_connlimit_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_CONNLIMIT_COUNT:
-		memcpy(&connlimit->count, data, sizeof(connlimit->count));
+		memcpy(&connlimit->count, data, data_len);
 		break;
 	case NFTNL_EXPR_CONNLIMIT_FLAGS:
-		memcpy(&connlimit->flags, data, sizeof(connlimit->flags));
+		memcpy(&connlimit->flags, data, data_len);
 		break;
 	}
 	return 0;

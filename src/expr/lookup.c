@@ -37,10 +37,10 @@ nftnl_expr_lookup_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_LOOKUP_SREG:
-		memcpy(&lookup->sreg, data, sizeof(lookup->sreg));
+		memcpy(&lookup->sreg, data, data_len);
 		break;
 	case NFTNL_EXPR_LOOKUP_DREG:
-		memcpy(&lookup->dreg, data, sizeof(lookup->dreg));
+		memcpy(&lookup->dreg, data, data_len);
 		break;
 	case NFTNL_EXPR_LOOKUP_SET:
 		lookup->set_name = strdup((const char *)data);
@@ -48,10 +48,10 @@ nftnl_expr_lookup_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_LOOKUP_SET_ID:
-		memcpy(&lookup->set_id, data, sizeof(lookup->set_id));
+		memcpy(&lookup->set_id, data, data_len);
 		break;
 	case NFTNL_EXPR_LOOKUP_FLAGS:
-		memcpy(&lookup->flags, data, sizeof(lookup->flags));
+		memcpy(&lookup->flags, data, data_len);
 		break;
 	}
 	return 0;

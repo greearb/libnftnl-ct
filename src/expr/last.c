@@ -32,10 +32,10 @@ static int nftnl_expr_last_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_LAST_MSECS:
-		memcpy(&last->msecs, data, sizeof(last->msecs));
+		memcpy(&last->msecs, data, data_len);
 		break;
 	case NFTNL_EXPR_LAST_SET:
-		memcpy(&last->set, data, sizeof(last->set));
+		memcpy(&last->set, data, data_len);
 		break;
 	}
 	return 0;

@@ -25,13 +25,13 @@ static int nftnl_expr_osf_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_OSF_DREG:
-		memcpy(&osf->dreg, data, sizeof(osf->dreg));
+		memcpy(&osf->dreg, data, data_len);
 		break;
 	case NFTNL_EXPR_OSF_TTL:
-		memcpy(&osf->ttl, data, sizeof(osf->ttl));
+		memcpy(&osf->ttl, data, data_len);
 		break;
 	case NFTNL_EXPR_OSF_FLAGS:
-		memcpy(&osf->flags, data, sizeof(osf->flags));
+		memcpy(&osf->flags, data, data_len);
 		break;
 	}
 	return 0;

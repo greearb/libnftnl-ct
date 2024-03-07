@@ -33,16 +33,16 @@ nftnl_expr_xfrm_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_XFRM_KEY:
-		memcpy(&x->key, data, sizeof(x->key));
+		memcpy(&x->key, data, data_len);
 		break;
 	case NFTNL_EXPR_XFRM_DIR:
-		memcpy(&x->dir, data, sizeof(x->dir));
+		memcpy(&x->dir, data, data_len);
 		break;
 	case NFTNL_EXPR_XFRM_SPNUM:
-		memcpy(&x->spnum, data, sizeof(x->spnum));
+		memcpy(&x->spnum, data, data_len);
 		break;
 	case NFTNL_EXPR_XFRM_DREG:
-		memcpy(&x->dreg, data, sizeof(x->dreg));
+		memcpy(&x->dreg, data, data_len);
 		break;
 	default:
 		return -1;

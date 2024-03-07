@@ -33,13 +33,13 @@ static int nftnl_expr_fwd_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_FWD_SREG_DEV:
-		memcpy(&fwd->sreg_dev, data, sizeof(fwd->sreg_dev));
+		memcpy(&fwd->sreg_dev, data, data_len);
 		break;
 	case NFTNL_EXPR_FWD_SREG_ADDR:
-		memcpy(&fwd->sreg_addr, data, sizeof(fwd->sreg_addr));
+		memcpy(&fwd->sreg_addr, data, data_len);
 		break;
 	case NFTNL_EXPR_FWD_NFPROTO:
-		memcpy(&fwd->nfproto, data, sizeof(fwd->nfproto));
+		memcpy(&fwd->nfproto, data, data_len);
 		break;
 	}
 	return 0;

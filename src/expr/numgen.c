@@ -35,16 +35,16 @@ nftnl_expr_ng_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_NG_DREG:
-		memcpy(&ng->dreg, data, sizeof(ng->dreg));
+		memcpy(&ng->dreg, data, data_len);
 		break;
 	case NFTNL_EXPR_NG_MODULUS:
-		memcpy(&ng->modulus, data, sizeof(ng->modulus));
+		memcpy(&ng->modulus, data, data_len);
 		break;
 	case NFTNL_EXPR_NG_TYPE:
-		memcpy(&ng->type, data, sizeof(ng->type));
+		memcpy(&ng->type, data, data_len);
 		break;
 	case NFTNL_EXPR_NG_OFFSET:
-		memcpy(&ng->offset, data, sizeof(ng->offset));
+		memcpy(&ng->offset, data, data_len);
 		break;
 	default:
 		return -1;

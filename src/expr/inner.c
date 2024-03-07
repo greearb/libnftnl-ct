@@ -45,13 +45,13 @@ nftnl_expr_inner_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_INNER_TYPE:
-		memcpy(&inner->type, data, sizeof(inner->type));
+		memcpy(&inner->type, data, data_len);
 		break;
 	case NFTNL_EXPR_INNER_FLAGS:
-		memcpy(&inner->flags, data, sizeof(inner->flags));
+		memcpy(&inner->flags, data, data_len);
 		break;
 	case NFTNL_EXPR_INNER_HDRSIZE:
-		memcpy(&inner->hdrsize, data, sizeof(inner->hdrsize));
+		memcpy(&inner->hdrsize, data, data_len);
 		break;
 	case NFTNL_EXPR_INNER_EXPR:
 		if (inner->expr)

@@ -34,13 +34,13 @@ nftnl_expr_redir_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_REDIR_REG_PROTO_MIN:
-		memcpy(&redir->sreg_proto_min, data, sizeof(redir->sreg_proto_min));
+		memcpy(&redir->sreg_proto_min, data, data_len);
 		break;
 	case NFTNL_EXPR_REDIR_REG_PROTO_MAX:
-		memcpy(&redir->sreg_proto_max, data, sizeof(redir->sreg_proto_max));
+		memcpy(&redir->sreg_proto_max, data, data_len);
 		break;
 	case NFTNL_EXPR_REDIR_FLAGS:
-		memcpy(&redir->flags, data, sizeof(redir->flags));
+		memcpy(&redir->flags, data, data_len);
 		break;
 	}
 	return 0;

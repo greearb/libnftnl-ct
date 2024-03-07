@@ -46,7 +46,7 @@ nftnl_expr_target_set(struct nftnl_expr *e, uint16_t type,
 			 (const char *) data);
 		break;
 	case NFTNL_EXPR_TG_REV:
-		memcpy(&tg->rev, data, sizeof(tg->rev));
+		memcpy(&tg->rev, data, data_len);
 		break;
 	case NFTNL_EXPR_TG_INFO:
 		if (e->flags & (1 << NFTNL_EXPR_TG_INFO))

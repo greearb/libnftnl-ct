@@ -34,16 +34,16 @@ static int nftnl_expr_queue_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_QUEUE_NUM:
-		memcpy(&queue->queuenum, data, sizeof(queue->queuenum));
+		memcpy(&queue->queuenum, data, data_len);
 		break;
 	case NFTNL_EXPR_QUEUE_TOTAL:
-		memcpy(&queue->queues_total, data, sizeof(queue->queues_total));
+		memcpy(&queue->queues_total, data, data_len);
 		break;
 	case NFTNL_EXPR_QUEUE_FLAGS:
-		memcpy(&queue->flags, data, sizeof(queue->flags));
+		memcpy(&queue->flags, data, data_len);
 		break;
 	case NFTNL_EXPR_QUEUE_SREG_QNUM:
-		memcpy(&queue->sreg_qnum, data, sizeof(queue->sreg_qnum));
+		memcpy(&queue->sreg_qnum, data, data_len);
 		break;
 	}
 	return 0;

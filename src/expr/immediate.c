@@ -33,12 +33,12 @@ nftnl_expr_immediate_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_IMM_DREG:
-		memcpy(&imm->dreg, data, sizeof(imm->dreg));
+		memcpy(&imm->dreg, data, data_len);
 		break;
 	case NFTNL_EXPR_IMM_DATA:
 		return nftnl_data_cpy(&imm->data, data, data_len);
 	case NFTNL_EXPR_IMM_VERDICT:
-		memcpy(&imm->data.verdict, data, sizeof(imm->data.verdict));
+		memcpy(&imm->data.verdict, data, data_len);
 		break;
 	case NFTNL_EXPR_IMM_CHAIN:
 		if (e->flags & (1 << NFTNL_EXPR_IMM_CHAIN))
@@ -49,7 +49,7 @@ nftnl_expr_immediate_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_IMM_CHAIN_ID:
-		memcpy(&imm->data.chain_id, data, sizeof(uint32_t));
+		memcpy(&imm->data.chain_id, data, data_len);
 		break;
 	}
 	return 0;

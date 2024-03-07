@@ -33,13 +33,13 @@ nftnl_expr_socket_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_SOCKET_KEY:
-		memcpy(&socket->key, data, sizeof(socket->key));
+		memcpy(&socket->key, data, data_len);
 		break;
 	case NFTNL_EXPR_SOCKET_DREG:
-		memcpy(&socket->dreg, data, sizeof(socket->dreg));
+		memcpy(&socket->dreg, data, data_len);
 		break;
 	case NFTNL_EXPR_SOCKET_LEVEL:
-		memcpy(&socket->level, data, sizeof(socket->level));
+		memcpy(&socket->level, data, data_len);
 		break;
 	}
 	return 0;

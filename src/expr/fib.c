@@ -35,13 +35,13 @@ nftnl_expr_fib_set(struct nftnl_expr *e, uint16_t result,
 
 	switch (result) {
 	case NFTNL_EXPR_FIB_RESULT:
-		memcpy(&fib->result, data, sizeof(fib->result));
+		memcpy(&fib->result, data, data_len);
 		break;
 	case NFTNL_EXPR_FIB_DREG:
-		memcpy(&fib->dreg, data, sizeof(fib->dreg));
+		memcpy(&fib->dreg, data, data_len);
 		break;
 	case NFTNL_EXPR_FIB_FLAGS:
-		memcpy(&fib->flags, data, sizeof(fib->flags));
+		memcpy(&fib->flags, data, data_len);
 		break;
 	}
 	return 0;

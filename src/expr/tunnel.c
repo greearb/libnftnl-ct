@@ -31,10 +31,10 @@ static int nftnl_expr_tunnel_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_TUNNEL_KEY:
-		memcpy(&tunnel->key, data, sizeof(tunnel->key));
+		memcpy(&tunnel->key, data, data_len);
 		break;
 	case NFTNL_EXPR_TUNNEL_DREG:
-		memcpy(&tunnel->dreg, data, sizeof(tunnel->dreg));
+		memcpy(&tunnel->dreg, data, data_len);
 		break;
 	}
 	return 0;

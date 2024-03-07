@@ -46,7 +46,7 @@ nftnl_expr_match_set(struct nftnl_expr *e, uint16_t type,
 			 (const char *)data);
 		break;
 	case NFTNL_EXPR_MT_REV:
-		memcpy(&mt->rev, data, sizeof(mt->rev));
+		memcpy(&mt->rev, data, data_len);
 		break;
 	case NFTNL_EXPR_MT_INFO:
 		if (e->flags & (1 << NFTNL_EXPR_MT_INFO))

@@ -23,13 +23,13 @@ static int nftnl_expr_synproxy_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_SYNPROXY_MSS:
-		memcpy(&synproxy->mss, data, sizeof(synproxy->mss));
+		memcpy(&synproxy->mss, data, data_len);
 		break;
 	case NFTNL_EXPR_SYNPROXY_WSCALE:
-		memcpy(&synproxy->wscale, data, sizeof(synproxy->wscale));
+		memcpy(&synproxy->wscale, data, data_len);
 		break;
 	case NFTNL_EXPR_SYNPROXY_FLAGS:
-		memcpy(&synproxy->flags, data, sizeof(synproxy->flags));
+		memcpy(&synproxy->flags, data, data_len);
 		break;
 	}
 	return 0;

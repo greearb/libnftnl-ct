@@ -41,16 +41,16 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 
 	switch (type) {
 	case NFTNL_EXPR_DYNSET_SREG_KEY:
-		memcpy(&dynset->sreg_key, data, sizeof(dynset->sreg_key));
+		memcpy(&dynset->sreg_key, data, data_len);
 		break;
 	case NFTNL_EXPR_DYNSET_SREG_DATA:
-		memcpy(&dynset->sreg_data, data, sizeof(dynset->sreg_data));
+		memcpy(&dynset->sreg_data, data, data_len);
 		break;
 	case NFTNL_EXPR_DYNSET_OP:
-		memcpy(&dynset->op, data, sizeof(dynset->op));
+		memcpy(&dynset->op, data, data_len);
 		break;
 	case NFTNL_EXPR_DYNSET_TIMEOUT:
-		memcpy(&dynset->timeout, data, sizeof(dynset->timeout));
+		memcpy(&dynset->timeout, data, data_len);
 		break;
 	case NFTNL_EXPR_DYNSET_SET_NAME:
 		dynset->set_name = strdup((const char *)data);
@@ -58,7 +58,7 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 			return -1;
 		break;
 	case NFTNL_EXPR_DYNSET_SET_ID:
-		memcpy(&dynset->set_id, data, sizeof(dynset->set_id));
+		memcpy(&dynset->set_id, data, data_len);
 		break;
 	case NFTNL_EXPR_DYNSET_EXPR:
 		list_for_each_entry_safe(expr, next, &dynset->expr_list, head)
@@ -68,7 +68,7 @@ nftnl_expr_dynset_set(struct nftnl_expr *e, uint16_t type,
 		list_add(&expr->head, &dynset->expr_list);
 		break;
 	case NFTNL_EXPR_DYNSET_FLAGS:
-		memcpy(&dynset->dynset_flags, data, sizeof(dynset->dynset_flags));
+		memcpy(&dynset->dynset_flags, data, data_len);
 		break;
 	default:
 		return -1;

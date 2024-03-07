@@ -34,13 +34,13 @@ nftnl_expr_tproxy_set(struct nftnl_expr *e, uint16_t type,
 
 	switch(type) {
 	case NFTNL_EXPR_TPROXY_FAMILY:
-		memcpy(&tproxy->family, data, sizeof(tproxy->family));
+		memcpy(&tproxy->family, data, data_len);
 		break;
 	case NFTNL_EXPR_TPROXY_REG_ADDR:
-		memcpy(&tproxy->sreg_addr, data, sizeof(tproxy->sreg_addr));
+		memcpy(&tproxy->sreg_addr, data, data_len);
 		break;
 	case NFTNL_EXPR_TPROXY_REG_PORT:
-		memcpy(&tproxy->sreg_port, data, sizeof(tproxy->sreg_port));
+		memcpy(&tproxy->sreg_port, data, data_len);
 		break;
 	}
 
