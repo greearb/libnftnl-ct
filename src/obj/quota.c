@@ -133,11 +133,18 @@ static int nftnl_obj_quota_snprintf(char *buf, size_t len,
 			quota->bytes, quota->flags);
 }
 
+static struct attr_policy obj_quota_attr_policy[__NFTNL_OBJ_QUOTA_MAX] = {
+	[NFTNL_OBJ_QUOTA_BYTES]		= { .maxlen = sizeof(uint64_t) },
+	[NFTNL_OBJ_QUOTA_CONSUMED]	= { .maxlen = sizeof(uint64_t) },
+	[NFTNL_OBJ_QUOTA_FLAGS]		= { .maxlen = sizeof(uint32_t) },
+};
+
 struct obj_ops obj_ops_quota = {
 	.name		= "quota",
 	.type		= NFT_OBJECT_QUOTA,
 	.alloc_len	= sizeof(struct nftnl_obj_quota),
 	.nftnl_max_attr	= __NFTNL_OBJ_QUOTA_MAX - 1,
+	.attr_policy	= obj_quota_attr_policy,
 	.set		= nftnl_obj_quota_set,
 	.get		= nftnl_obj_quota_get,
 	.parse		= nftnl_obj_quota_parse,

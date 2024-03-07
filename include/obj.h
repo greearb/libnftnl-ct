@@ -105,6 +105,7 @@ struct obj_ops {
 	uint32_t type;
 	size_t	alloc_len;
 	int	nftnl_max_attr;
+	struct attr_policy *attr_policy;
 	int	(*set)(struct nftnl_obj *e, uint16_t type, const void *data, uint32_t data_len);
 	const void *(*get)(const struct nftnl_obj *e, uint16_t type, uint32_t *data_len);
 	int	(*parse)(struct nftnl_obj *e, struct nlattr *attr);

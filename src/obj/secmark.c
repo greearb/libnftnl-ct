@@ -105,11 +105,16 @@ static int nftnl_obj_secmark_snprintf(char *buf, size_t len,
 	return snprintf(buf, len, "context %s ", secmark->ctx);
 }
 
+static struct attr_policy obj_secmark_attr_policy[__NFTNL_OBJ_SECMARK_MAX] = {
+	[NFTNL_OBJ_SECMARK_CTX]	= { .maxlen = NFT_SECMARK_CTX_MAXLEN },
+};
+
 struct obj_ops obj_ops_secmark = {
 	.name		= "secmark",
 	.type		= NFT_OBJECT_SECMARK,
 	.alloc_len	= sizeof(struct nftnl_obj_secmark),
 	.nftnl_max_attr	= __NFTNL_OBJ_SECMARK_MAX - 1,
+	.attr_policy	= obj_secmark_attr_policy,
 	.set		= nftnl_obj_secmark_set,
 	.get		= nftnl_obj_secmark_get,
 	.parse		= nftnl_obj_secmark_parse,

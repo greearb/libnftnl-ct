@@ -157,11 +157,20 @@ static int nftnl_obj_limit_snprintf(char *buf, size_t len,
 			limit->burst, limit->type, limit->flags);
 }
 
+static struct attr_policy obj_limit_attr_policy[__NFTNL_OBJ_LIMIT_MAX] = {
+	[NFTNL_OBJ_LIMIT_RATE]	= { .maxlen = sizeof(uint64_t) },
+	[NFTNL_OBJ_LIMIT_UNIT]	= { .maxlen = sizeof(uint64_t) },
+	[NFTNL_OBJ_LIMIT_BURST]	= { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_LIMIT_TYPE]	= { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_LIMIT_FLAGS]	= { .maxlen = sizeof(uint32_t) },
+};
+
 struct obj_ops obj_ops_limit = {
 	.name		= "limit",
 	.type		= NFT_OBJECT_LIMIT,
 	.alloc_len	= sizeof(struct nftnl_obj_limit),
 	.nftnl_max_attr	= __NFTNL_OBJ_LIMIT_MAX - 1,
+	.attr_policy	= obj_limit_attr_policy,
 	.set		= nftnl_obj_limit_set,
 	.get		= nftnl_obj_limit_get,
 	.parse		= nftnl_obj_limit_parse,

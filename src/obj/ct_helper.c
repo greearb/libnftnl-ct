@@ -139,11 +139,22 @@ static int nftnl_obj_ct_helper_snprintf(char *buf, size_t len,
 			helper->name, helper->l3proto, helper->l4proto);
 }
 
+/* from kernel's include/net/netfilter/nf_conntrack_helper.h */
+#define NF_CT_HELPER_NAME_LEN	16
+
+static struct attr_policy
+obj_ct_helper_attr_policy[__NFTNL_OBJ_CT_HELPER_MAX] = {
+	[NFTNL_OBJ_CT_HELPER_NAME]	= { .maxlen = NF_CT_HELPER_NAME_LEN },
+	[NFTNL_OBJ_CT_HELPER_L3PROTO]	= { .maxlen = sizeof(uint16_t) },
+	[NFTNL_OBJ_CT_HELPER_L4PROTO]	= { .maxlen = sizeof(uint8_t) },
+};
+
 struct obj_ops obj_ops_ct_helper = {
 	.name		= "ct_helper",
 	.type		= NFT_OBJECT_CT_HELPER,
 	.alloc_len	= sizeof(struct nftnl_obj_ct_helper),
 	.nftnl_max_attr	= __NFTNL_OBJ_CT_HELPER_MAX - 1,
+	.attr_policy	= obj_ct_helper_attr_policy,
 	.set		= nftnl_obj_ct_helper_set,
 	.get		= nftnl_obj_ct_helper_get,
 	.parse		= nftnl_obj_ct_helper_parse,

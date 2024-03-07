@@ -308,11 +308,18 @@ static int nftnl_obj_ct_timeout_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
+static struct attr_policy
+obj_ct_timeout_attr_policy[__NFTNL_OBJ_CT_TIMEOUT_MAX] = {
+	[NFTNL_OBJ_CT_TIMEOUT_L3PROTO]	= { .maxlen = sizeof(uint16_t) },
+	[NFTNL_OBJ_CT_TIMEOUT_L4PROTO]	= { .maxlen = sizeof(uint8_t) },
+};
+
 struct obj_ops obj_ops_ct_timeout = {
 	.name		= "ct_timeout",
 	.type		= NFT_OBJECT_CT_TIMEOUT,
 	.alloc_len	= sizeof(struct nftnl_obj_ct_timeout),
 	.nftnl_max_attr	= __NFTNL_OBJ_CT_TIMEOUT_MAX - 1,
+	.attr_policy	= obj_ct_timeout_attr_policy,
 	.set		= nftnl_obj_ct_timeout_set,
 	.get		= nftnl_obj_ct_timeout_get,
 	.parse		= nftnl_obj_ct_timeout_parse,

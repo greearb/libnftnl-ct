@@ -536,11 +536,31 @@ static int nftnl_obj_tunnel_snprintf(char *buf, size_t len,
 	return snprintf(buf, len, "id %u ", tun->id);
 }
 
+static struct attr_policy obj_tunnel_attr_policy[__NFTNL_OBJ_TUNNEL_MAX] = {
+	[NFTNL_OBJ_TUNNEL_ID]		= { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_TUNNEL_IPV4_SRC]	= { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_TUNNEL_IPV4_DST]	= { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_TUNNEL_IPV6_SRC]	= { .maxlen = sizeof(struct in6_addr) },
+	[NFTNL_OBJ_TUNNEL_IPV6_DST]	= { .maxlen = sizeof(struct in6_addr) },
+	[NFTNL_OBJ_TUNNEL_IPV6_FLOWLABEL] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_TUNNEL_SPORT]	= { .maxlen = sizeof(uint16_t) },
+	[NFTNL_OBJ_TUNNEL_DPORT]	= { .maxlen = sizeof(uint16_t) },
+	[NFTNL_OBJ_TUNNEL_FLAGS]	= { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_TUNNEL_TOS]		= { .maxlen = sizeof(uint8_t) },
+	[NFTNL_OBJ_TUNNEL_TTL]		= { .maxlen = sizeof(uint8_t) },
+	[NFTNL_OBJ_TUNNEL_VXLAN_GBP]	= { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_TUNNEL_ERSPAN_VERSION] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_TUNNEL_ERSPAN_V1_INDEX] = { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_TUNNEL_ERSPAN_V2_HWID] = { .maxlen = sizeof(uint8_t) },
+	[NFTNL_OBJ_TUNNEL_ERSPAN_V2_DIR] = { .maxlen = sizeof(uint8_t) },
+};
+
 struct obj_ops obj_ops_tunnel = {
 	.name		= "tunnel",
 	.type		= NFT_OBJECT_TUNNEL,
 	.alloc_len	= sizeof(struct nftnl_obj_tunnel),
 	.nftnl_max_attr	= __NFTNL_OBJ_TUNNEL_MAX - 1,
+	.attr_policy	= obj_tunnel_attr_policy,
 	.set		= nftnl_obj_tunnel_set,
 	.get		= nftnl_obj_tunnel_get,
 	.parse		= nftnl_obj_tunnel_parse,

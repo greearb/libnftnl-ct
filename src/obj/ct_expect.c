@@ -185,11 +185,21 @@ static int nftnl_obj_ct_expect_snprintf(char *buf, size_t remain,
 	return offset;
 }
 
+static struct attr_policy
+obj_ct_expect_attr_policy[__NFTNL_OBJ_CT_EXPECT_MAX] = {
+	[NFTNL_OBJ_CT_EXPECT_L3PROTO]	= { .maxlen = sizeof(uint16_t) },
+	[NFTNL_OBJ_CT_EXPECT_L4PROTO]	= { .maxlen = sizeof(uint8_t) },
+	[NFTNL_OBJ_CT_EXPECT_DPORT]	= { .maxlen = sizeof(uint16_t) },
+	[NFTNL_OBJ_CT_EXPECT_TIMEOUT]	= { .maxlen = sizeof(uint32_t) },
+	[NFTNL_OBJ_CT_EXPECT_SIZE]	= { .maxlen = sizeof(uint8_t) },
+};
+
 struct obj_ops obj_ops_ct_expect = {
 	.name		= "ct_expect",
 	.type		= NFT_OBJECT_CT_EXPECT,
 	.alloc_len	= sizeof(struct nftnl_obj_ct_expect),
 	.nftnl_max_attr	= __NFTNL_OBJ_CT_EXPECT_MAX - 1,
+	.attr_policy	= obj_ct_expect_attr_policy,
 	.set		= nftnl_obj_ct_expect_set,
 	.get		= nftnl_obj_ct_expect_get,
 	.parse		= nftnl_obj_ct_expect_parse,
