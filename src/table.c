@@ -88,6 +88,7 @@ static uint32_t nftnl_table_validate[NFTNL_TABLE_MAX + 1] = {
 	[NFTNL_TABLE_FLAGS]	= sizeof(uint32_t),
 	[NFTNL_TABLE_FAMILY]	= sizeof(uint32_t),
 	[NFTNL_TABLE_HANDLE]	= sizeof(uint64_t),
+	[NFTNL_TABLE_USE]	= sizeof(uint32_t),
 };
 
 EXPORT_SYMBOL(nftnl_table_set_data);
