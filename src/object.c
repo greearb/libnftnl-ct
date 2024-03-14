@@ -185,7 +185,7 @@ void nftnl_obj_set_u64(struct nftnl_obj *obj, uint16_t attr, uint64_t val)
 EXPORT_SYMBOL(nftnl_obj_set_str);
 void nftnl_obj_set_str(struct nftnl_obj *obj, uint16_t attr, const char *str)
 {
-	nftnl_obj_set_data(obj, attr, str, 0);
+	nftnl_obj_set_data(obj, attr, str, strlen(str) + 1);
 }
 
 EXPORT_SYMBOL(nftnl_obj_get_data);
