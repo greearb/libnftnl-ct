@@ -123,14 +123,14 @@ void nftnl_obj_free(const struct nftnl_obj *ne);
 
 bool nftnl_obj_is_set(const struct nftnl_obj *ne, uint16_t attr);
 void nftnl_obj_unset(struct nftnl_obj *ne, uint16_t attr);
-void nftnl_obj_set_data(struct nftnl_obj *ne, uint16_t attr, const void *data,
-			uint32_t data_len);
+int nftnl_obj_set_data(struct nftnl_obj *ne, uint16_t attr, const void *data,
+		       uint32_t data_len);
 void nftnl_obj_set(struct nftnl_obj *ne, uint16_t attr, const void *data) __attribute__((deprecated));
-void nftnl_obj_set_u8(struct nftnl_obj *ne, uint16_t attr, uint8_t val);
-void nftnl_obj_set_u16(struct nftnl_obj *ne, uint16_t attr, uint16_t val);
-void nftnl_obj_set_u32(struct nftnl_obj *ne, uint16_t attr, uint32_t val);
-void nftnl_obj_set_u64(struct nftnl_obj *obj, uint16_t attr, uint64_t val);
-void nftnl_obj_set_str(struct nftnl_obj *ne, uint16_t attr, const char *str);
+int nftnl_obj_set_u8(struct nftnl_obj *ne, uint16_t attr, uint8_t val);
+int nftnl_obj_set_u16(struct nftnl_obj *ne, uint16_t attr, uint16_t val);
+int nftnl_obj_set_u32(struct nftnl_obj *ne, uint16_t attr, uint32_t val);
+int nftnl_obj_set_u64(struct nftnl_obj *obj, uint16_t attr, uint64_t val);
+int nftnl_obj_set_str(struct nftnl_obj *ne, uint16_t attr, const char *str);
 const void *nftnl_obj_get_data(const struct nftnl_obj *ne, uint16_t attr,
 			       uint32_t *data_len);
 const void *nftnl_obj_get(const struct nftnl_obj *ne, uint16_t attr);
