@@ -196,6 +196,7 @@ static uint32_t nftnl_chain_validate[NFTNL_CHAIN_MAX + 1] = {
 	[NFTNL_CHAIN_HOOKNUM]	= sizeof(uint32_t),
 	[NFTNL_CHAIN_PRIO]		= sizeof(int32_t),
 	[NFTNL_CHAIN_POLICY]		= sizeof(uint32_t),
+	[NFTNL_CHAIN_USE]		= sizeof(uint32_t),
 	[NFTNL_CHAIN_BYTES]		= sizeof(uint64_t),
 	[NFTNL_CHAIN_PACKETS]	= sizeof(uint64_t),
 	[NFTNL_CHAIN_HANDLE]		= sizeof(uint64_t),
