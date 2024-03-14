@@ -98,6 +98,7 @@ void nftnl_obj_unset(struct nftnl_obj *obj, uint16_t attr)
 }
 
 static uint32_t nftnl_obj_validate[NFTNL_OBJ_MAX + 1] = {
+	[NFTNL_OBJ_TYPE]	= sizeof(uint32_t),
 	[NFTNL_OBJ_FAMILY]	= sizeof(uint32_t),
 	[NFTNL_OBJ_USE]		= sizeof(uint32_t),
 	[NFTNL_OBJ_HANDLE]	= sizeof(uint64_t),
