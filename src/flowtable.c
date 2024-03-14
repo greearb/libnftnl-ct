@@ -102,6 +102,7 @@ static uint32_t nftnl_flowtable_validate[NFTNL_FLOWTABLE_MAX + 1] = {
 	[NFTNL_FLOWTABLE_HOOKNUM]	= sizeof(uint32_t),
 	[NFTNL_FLOWTABLE_PRIO]		= sizeof(int32_t),
 	[NFTNL_FLOWTABLE_FAMILY]	= sizeof(uint32_t),
+	[NFTNL_FLOWTABLE_SIZE]		= sizeof(uint32_t),
 	[NFTNL_FLOWTABLE_FLAGS]		= sizeof(uint32_t),
 	[NFTNL_FLOWTABLE_HANDLE]	= sizeof(uint64_t),
 };
