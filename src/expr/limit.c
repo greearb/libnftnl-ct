@@ -158,16 +158,28 @@ nftnl_expr_limit_parse(struct nftnl_expr *e, struct nlattr *attr)
 	return 0;
 }
 
-static const char *get_unit(uint64_t u)
+static const char *get_time(uint64_t seconds, uint64_t *val)
 {
-	switch (u) {
-	case 1: return "second";
-	case 60: return "minute";
-	case 60 * 60: return "hour";
-	case 60 * 60 * 24: return "day";
-	case 60 * 60 * 24 * 7: return "week";
+	static const struct {
+		unsigned int size;
+		const char *name;
+	} units[] = {
+		{ 0,  "second" },
+		{ 60, "minute" },
+		{ 60, "hour" },
+		{ 24, "day" },
+		{ 7,  "week" }
+	};
+	int i;
+
+	for (i = 1; i < array_size(units); i++) {
+		if (seconds % units[i].size)
+			break;
+		seconds /= units[i].size;
 	}
-	return "error";
+	if (val)
+		*val = seconds;
+	return units[i - 1].name;
 }
 
 static const char *limit_to_type(enum nft_limit_type type)
@@ -186,10 +198,26 @@ nftnl_expr_limit_snprintf(char *buf, size_t len,
 			  uint32_t flags, const struct nftnl_expr *e)
 {
 	struct nftnl_expr_limit *limit = nftnl_expr_data(e);
+	unsigned int offset = 0;
+	const char *time_unit;
+	uint64_t time_val;
+	int ret;
 
-	return snprintf(buf, len, "rate %"PRIu64"/%s burst %u type %s flags 0x%x ",
-			limit->rate, get_unit(limit->unit), limit->burst,
-			limit_to_type(limit->type), limit->flags);
+	ret = snprintf(buf, len, "rate %"PRIu64"/", limit->rate);
+	SNPRINTF_BUFFER_SIZE(ret, len, offset);
+
+	time_unit = get_time(limit->unit, &time_val);
+	if (time_val > 1) {
+		ret = snprintf(buf + offset, len, "%"PRIu64" ", time_val);
+		SNPRINTF_BUFFER_SIZE(ret, len, offset);
+	}
+
+	ret = snprintf(buf + offset, len, "%s burst %u type %s flags 0x%x ",
+		       time_unit, limit->burst, limit_to_type(limit->type),
+		       limit->flags);
+	SNPRINTF_BUFFER_SIZE(ret, len, offset);
+
+	return offset;
 }
 
 static struct attr_policy limit_attr_policy[__NFTNL_EXPR_LIMIT_MAX] = {
