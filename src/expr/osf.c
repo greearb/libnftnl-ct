@@ -89,12 +89,12 @@ nftnl_expr_osf_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 	struct nftnl_expr_osf *osf = nftnl_expr_data(e);
 
 	if (e->flags & (1 << NFTNL_EXPR_OSF_DREG))
-		mnl_attr_put_u32(nlh, NFTNL_EXPR_OSF_DREG, htonl(osf->dreg));
+		mnl_attr_put_u32(nlh, NFTA_OSF_DREG, htonl(osf->dreg));
 	if (e->flags & (1 << NFTNL_EXPR_OSF_TTL))
-		mnl_attr_put_u8(nlh, NFTNL_EXPR_OSF_TTL, osf->ttl);
+		mnl_attr_put_u8(nlh, NFTA_OSF_TTL, osf->ttl);
 	if (e->flags & (1 << NFTNL_EXPR_OSF_FLAGS))
 		if (osf->flags)
-			mnl_attr_put_u32(nlh, NFTNL_EXPR_OSF_FLAGS, htonl(osf->flags));
+			mnl_attr_put_u32(nlh, NFTA_OSF_FLAGS, htonl(osf->flags));
 }
 
 static int

@@ -90,13 +90,13 @@ nftnl_expr_synproxy_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
 	struct nftnl_expr_synproxy *synproxy = nftnl_expr_data(e);
 
 	if (e->flags & (1 << NFTNL_EXPR_SYNPROXY_MSS))
-		mnl_attr_put_u16(nlh, NFTNL_EXPR_SYNPROXY_MSS,
+		mnl_attr_put_u16(nlh, NFTA_SYNPROXY_MSS,
 				 htons(synproxy->mss));
 	if (e->flags & (1 << NFTNL_EXPR_SYNPROXY_WSCALE))
-		mnl_attr_put_u8(nlh, NFTNL_EXPR_SYNPROXY_WSCALE,
+		mnl_attr_put_u8(nlh, NFTA_SYNPROXY_WSCALE,
 				synproxy->wscale);
 	if (e->flags & (1 << NFTNL_EXPR_SYNPROXY_FLAGS))
-		mnl_attr_put_u32(nlh, NFTNL_EXPR_SYNPROXY_FLAGS,
+		mnl_attr_put_u32(nlh, NFTA_SYNPROXY_FLAGS,
 				 htonl(synproxy->flags));
 }
 
