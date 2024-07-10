@@ -185,6 +185,9 @@ void nftnl_chain_unset(struct nftnl_chain *c, uint16_t attr)
 			xfree(c->dev_array[i]);
 		xfree(c->dev_array);
 		break;
+	case NFTNL_CHAIN_USERDATA:
+		xfree(c->user.data);
+		break;
 	default:
 		return;
 	}
