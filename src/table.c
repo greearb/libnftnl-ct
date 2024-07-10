@@ -74,6 +74,9 @@ void nftnl_table_unset(struct nftnl_table *t, uint16_t attr)
 	case NFTNL_TABLE_NAME:
 		xfree(t->name);
 		break;
+	case NFTNL_TABLE_USERDATA:
+		xfree(t->user.data);
+		break;
 	case NFTNL_TABLE_FLAGS:
 	case NFTNL_TABLE_HANDLE:
 	case NFTNL_TABLE_FAMILY:
