@@ -118,7 +118,7 @@ static int nftnl_expr_dynset_cb(const struct nlattr *attr, void *data)
 	const struct nlattr **tb = data;
 	int type = mnl_attr_get_type(attr);
 
-	if (mnl_attr_type_valid(attr, NFTA_SET_MAX) < 0)
+	if (mnl_attr_type_valid(attr, NFTA_DYNSET_MAX) < 0)
 		return MNL_CB_OK;
 
 	switch (type) {
@@ -139,6 +139,7 @@ static int nftnl_expr_dynset_cb(const struct nlattr *attr, void *data)
 			abi_breakage();
 		break;
 	case NFTA_DYNSET_EXPR:
+	case NFTA_DYNSET_EXPRESSIONS:
 		if (mnl_attr_validate(attr, MNL_TYPE_NESTED) < 0)
 			abi_breakage();
 		break;
@@ -225,7 +226,7 @@ static int
 nftnl_expr_dynset_parse(struct nftnl_expr *e, struct nlattr *attr)
 {
 	struct nftnl_expr_dynset *dynset = nftnl_expr_data(e);
-	struct nlattr *tb[NFTA_SET_MAX+1] = {};
+	struct nlattr *tb[NFTA_DYNSET_MAX+1] = {};
 	struct nftnl_expr *expr, *next;
 	int ret = 0;
 
