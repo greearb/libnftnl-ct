@@ -327,36 +327,22 @@ int nftnl_table_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_table *t)
 	return 0;
 }
 
-static int nftnl_table_do_parse(struct nftnl_table *t, enum nftnl_parse_type type,
-			      const void *data, struct nftnl_parse_err *err,
-			      enum nftnl_parse_input input)
-{
-	int ret;
-
-	switch (type) {
-	case NFTNL_PARSE_JSON:
-	case NFTNL_PARSE_XML:
-	default:
-		ret = -1;
-		errno = EOPNOTSUPP;
-		break;
-	}
-
-	return ret;
-}
-
 EXPORT_SYMBOL(nftnl_table_parse);
 int nftnl_table_parse(struct nftnl_table *t, enum nftnl_parse_type type,
 		    const char *data, struct nftnl_parse_err *err)
 {
-	return nftnl_table_do_parse(t, type, data, err, NFTNL_PARSE_BUFFER);
+	errno = EOPNOTSUPP;
+
+	return -1;
 }
 
 EXPORT_SYMBOL(nftnl_table_parse_file);
 int nftnl_table_parse_file(struct nftnl_table *t, enum nftnl_parse_type type,
 			 FILE *fp, struct nftnl_parse_err *err)
 {
-	return nftnl_table_do_parse(t, type, fp, err, NFTNL_PARSE_FILE);
+	errno = EOPNOTSUPP;
+
+	return -1;
 }
 
 static int nftnl_table_snprintf_default(char *buf, size_t size,

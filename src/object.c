@@ -386,40 +386,22 @@ int nftnl_obj_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_obj *obj)
 	return 0;
 }
 
-static int nftnl_obj_do_parse(struct nftnl_obj *obj, enum nftnl_parse_type type,
-			      const void *data, struct nftnl_parse_err *err,
-			      enum nftnl_parse_input input)
-{
-	struct nftnl_parse_err perr = {};
-	int ret;
-
-	switch (type) {
-	case NFTNL_PARSE_JSON:
-	case NFTNL_PARSE_XML:
-	default:
-		ret = -1;
-		errno = EOPNOTSUPP;
-		break;
-	}
-
-	if (err != NULL)
-		*err = perr;
-
-	return ret;
-}
-
 EXPORT_SYMBOL(nftnl_obj_parse);
 int nftnl_obj_parse(struct nftnl_obj *obj, enum nftnl_parse_type type,
 		      const char *data, struct nftnl_parse_err *err)
 {
-	return nftnl_obj_do_parse(obj, type, data, err, NFTNL_PARSE_BUFFER);
+	errno = EOPNOTSUPP;
+
+	return -1;
 }
 
 EXPORT_SYMBOL(nftnl_obj_parse_file);
 int nftnl_obj_parse_file(struct nftnl_obj *obj, enum nftnl_parse_type type,
 			   FILE *fp, struct nftnl_parse_err *err)
 {
-	return nftnl_obj_do_parse(obj, type, fp, err, NFTNL_PARSE_FILE);
+	errno = EOPNOTSUPP;
+
+	return -1;
 }
 
 static int nftnl_obj_snprintf_dflt(char *buf, size_t remain,
