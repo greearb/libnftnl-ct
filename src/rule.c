@@ -573,23 +573,21 @@ static int nftnl_rule_snprintf_default(char *buf, size_t remain,
 		sep = " ";
 	}
 
-	ret = snprintf(buf + offset, remain, "\n");
-	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-
 	list_for_each_entry(expr, &r->expr_list, head) {
-		ret = snprintf(buf + offset, remain, "  [ %s ", expr->ops->name);
+		ret = snprintf(buf + offset, remain,
+			       "\n  [ %s ", expr->ops->name);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		ret = nftnl_expr_snprintf(buf + offset, remain, expr,
 					     type, flags);
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
-		ret = snprintf(buf + offset, remain, "]\n");
+		ret = snprintf(buf + offset, remain, "]");
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 	}
 
 	if (r->user.len) {
-		ret = snprintf(buf + offset, remain, "  userdata = { ");
+		ret = snprintf(buf + offset, remain, "\n  userdata = { ");
 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
 
 		for (i = 0; i < r->user.len; i++) {
